@@ -48,4 +48,5 @@ Version History
 ===============
 
 1.0
-    * Initial release, with ``collate``, ``peekable``, and ``chunked``
+    * Initial release, with ``collate``, ``peekable``, and ``chunked``. Could
+      really use better docs.
