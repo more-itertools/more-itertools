@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from nose.tools import eq_
 
-from more_itertools import collate
+from more_itertools import collate, chunked
 
 
 class CollateTests(TestCase):
@@ -37,3 +37,15 @@ class CollateTests(TestCase):
         eq_(sorted(reduce(list.__add__, [list(it) for it in iterables]),
                    reverse=True),
             list(collate(*iterables, reverse=True)))
+
+
+class ChunkedTests(TestCase):
+    """Tests for chunked()"""
+
+    def test_even(self):
+        """Test when ``n`` divides evenly into the length of the iterable."""
+        eq_(list(chunked('ABCDEF', 3)), [('A', 'B', 'C'), ('D', 'E', 'F')])
+
+    def test_odd(self):
+        """Test when ``n`` does not divide evenly into the length of the iterable."""
+        eq_(list(chunked('ABCDE', 3)), [('A', 'B', 'C'), ('D', 'E')])
