@@ -24,5 +24,5 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: Software Development :: Libraries',
         ],
-    keywords=['itertools', 'iterator', 'iteration', 'filter']
+    keywords=['itertools', 'iterator', 'iteration', 'filter', 'peek', 'peekable', 'collate', 'chunk', 'chunked']
 )
