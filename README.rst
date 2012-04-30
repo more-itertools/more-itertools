@@ -51,6 +51,9 @@ This uses nose for tests. To run the tests, do::
 
     nosetests
 
+It should also be possible to say ``python setup.py test``. However, some part
+of the test runner throws an error after the tests pass.
+
 
 Version History
 ===============
