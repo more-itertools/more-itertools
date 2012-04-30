@@ -44,6 +44,14 @@ License
 More Itertools is under the MIT License. See the LICENSE file.
 
 
+Run the tests
+=============
+
+This uses nose for tests. To run the tests, do::
+
+    nosetests
+
+
 Version History
 ===============
 
