@@ -165,8 +165,8 @@ def collate(*iterables, **kwargs):
 
     min_or_max = partial(max if reverse else min, key=lambda (a, b): a)
     peekables = [peekable(it) for it in iterables]
-    peekables = [p for p in peekables if p]  # Kill empties.
+    peekables = filter(None,peekables)  # Kill empties.
     while peekables:
         _, p = min_or_max((key(p.peek()), p) for p in peekables)
         yield p.next()
-        peekables = [p for p in peekables if p]
+        peekables = filter(None,peekables)
