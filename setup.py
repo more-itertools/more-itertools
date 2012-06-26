@@ -10,7 +10,7 @@ if sys.version_info >= (3,):
 
 setup(
     name='more-itertools',
-    version='1.0',
+    version='1.1',
     description='More routines for operating on iterables, beyond itertools',
     long_description=open('README.rst').read(),
     author='Erik Rose',
@@ -29,6 +29,8 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
         'Topic :: Software Development :: Libraries'],
     keywords=['itertools', 'iterator', 'iteration', 'filter', 'peek',
               'peekable', 'collate', 'chunk', 'chunked'],
