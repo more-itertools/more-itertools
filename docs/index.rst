@@ -1,10 +1,24 @@
-========================
-more-itertools functions
-========================
+==============
+More Itertools
+==============
 
-.. automodule:: more_itertools
+I love itertools; it's one of the most beautiful, composable standard libs.
+Whenever I have an iteration problem, there's almost always an itertools
+routine that fits it perfectly. Sometimes, however, neither itertools nor the
+recipes included in its docs do quite what I need.
 
-    .. autofunction:: first(iterable[, default])
-    .. autofunction:: chunked
-    .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
-    .. autoclass:: peekable
+Here I've collected several routines I've reached for but not found. Since
+they are deceptively tricky to get right, I thought I'd wrap them up into a
+library. Enjoy! Any additions are welcome; just file a pull request.
+
+
+Contents
+========
+
+.. toctree::
+    :maxdepth: 2
+
+    api
+    license
+    testing
+    versions
