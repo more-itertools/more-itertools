@@ -77,9 +77,28 @@ class FirstTests(TestCase):
 
 
 class PeekableTests(TestCase):
+    """Tests for ``peekable()`` behavor not incidentally covered by testing
+    ``collate``
+
+    """
     def test_import(self):
         """``peekable`` is incidentally covered by ``CollateTests``, but make
         sure the symbol is imported by ``import *``.
 
         """
         peekable
+
+    def test_peek_default(self):
+        """Make sure passing a default into ``peek()`` works."""
+        p = peekable([])
+        eq_(p.peek(7), 7)
+
+    def test_truthiness(self):
+        """Make sure a ``peekable`` tests true iff there are items remaining in
+        the iterable.
+
+        """
+        p = peekable([])
+        self.failIf(p)
+        p = peekable(xrange(3))
+        self.failUnless(p)

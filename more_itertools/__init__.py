@@ -50,6 +50,10 @@ def first(iterable, default=_marker):
     try:
         return next(iter(iterable))
     except StopIteration:
+        # I'm on the edge about raising ValueError instead of StopIteration. At
+        # the moment, ValueError wins, because the caller could conceivably
+        # want to do something different with flow control when I raise the
+        # exception, and it's weird to explicitly catch StopIteration.
         if default is _marker:
             raise ValueError('first() was called on an empty iterable, and no '
                              'default value was provided.')
@@ -72,7 +76,15 @@ class peekable(object):
         >>> p.next()
         1
 
-    ``peek()`` raises ``StopIteration`` if there are no items left.
+    Pass ``peek()`` a default value, and it will be returned in the case where
+    the iterator is exhausted:
+
+        >>> p = peekable([])
+        >>> p.peek('hi')
+        'hi'
+
+    If no default is provided, ``peek()`` raises ``StopIteration`` when there
+    are no items left.
 
     """
     # Lowercase to blend in with itertools. The fact that it's a class is an
@@ -91,16 +103,22 @@ class peekable(object):
             return False
         return True
 
-    def peek(self):
+    def peek(self, default=_marker):
         """Return the item that will be next returned from ``next()``.
 
-        Raise ``StopIteration`` if there are no items left.
+        Return ``default`` if there are no items left. If ``default`` is not
+        provided, raise ``StopIteration``.
 
         """
         # TODO: Give peek a default arg. Raise StopIteration only when it isn't
         # provided. If it is, return the arg. Just like get('key', object())
         if not hasattr(self, '_peek'):
-            self._peek = self._it.next()
+            try:
+                self._peek = self._it.next()
+            except StopIteration:
+                if default is _marker:
+                    raise
+                return default
         return self._peek
 
     def next(self):
