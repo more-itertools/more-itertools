@@ -8,16 +8,14 @@ more-itertools uses nose for its tests. First, install nose::
 
 Then, run the tests like this::
 
-    nosetests
-
-It should also be possible to say ``python setup.py test``. However, some part
-of the test runner throws an error after the tests pass.
+    nosetests --with-doctest
 
 
 Multiple Python Versions
 ========================
 
-To run the tests on all the versions of Python more-itertools supports, install tox::
+To run the tests on all the versions of Python more-itertools supports, install
+tox::
 
     pip install tox
 
