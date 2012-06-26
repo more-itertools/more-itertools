@@ -3,12 +3,19 @@ from itertools import izip_longest
 
 _marker = object()
 def chunked(iterable, n):
-    """Break an iterable into tuples of a given length.
+    """Break an iterable into tuples of a given length::
 
-    chunked([1, 2, 3, 4, 5, 6, 7], 3) --> [(1, 2, 3), (4, 5, 6), (7,)]
+        >>> list(chunked([1, 2, 3, 4, 5, 6, 7], 3))
+        [(1, 2, 3), (4, 5, 6), (8,)]
 
     If the length of ``iterable`` is not evenly divisible by ``n``, the last
     returned tuple will be shorter.
+
+    This is useful for splitting up a computation on a large number of keys
+    into batches, to be pickled and sent off to worker processes. One example
+    is operations on rows in MySQL, which does not implement server-side
+    cursors properly and would otherwise load the entire dataset into RAM on
+    the client.
 
     """
     # Doesn't seem to run into any number-of-args limits.
@@ -19,12 +26,48 @@ def chunked(iterable, n):
         yield group
 
 
+def first(iterable, default=_marker):
+    """Return the first item of an iterable, ``default`` if there is none.
+
+        >>> first([2, 3, 4])
+        2
+        >>> first([], 'some default')
+        'some default'
+
+    If ``default`` is not provided and there are no items in the iterable,
+    raise ``ValueError``.
+
+    ``first()`` is less verbose than ``next(iter(...))``, especially if you
+    want to provide a fallback value.
+
+    """
+    try:
+        return next(iter(iterable))
+    except StopIteration:
+        if default is _marker:
+            raise ValueError('first() was called on an empty iterable, and no '
+                             'default value was provided.')
+        return default
+
+
 class peekable(object):
     """Wrapper for an iterator to allow 1-item lookahead
-    
-    Just call ``peek()`` on me to get the value that will next pop out of
-    ``next()``.
-    
+
+    Call ``peek()`` on the result to get the value that will next pop out of
+    ``next()``, without advancing the iterator:
+
+        >>> p = peekable(xrange(2))
+        >>> p.peek()
+        0
+        >>> p.next()
+        0
+        >>> p.peek()
+        1
+        >>> p.next()
+        1
+
+    ``peek()`` raises ``StopIteration`` if there are no items left.
+
     """
     # Lowercase to blend in with itertools. The fact that it's a class is an
     # implementation detail.
@@ -61,11 +104,19 @@ class peekable(object):
 
 
 def collate(*iterables, **kwargs):
-    """Return an iterable ordered collation of the already-sorted items
-    from each of ``iterables``, compared by kwarg ``key``.
+    """Return an iterable sorted merge of the already-sorted items from each of
+    ``iterables``.
 
-    If ``reverse=True`` is passed, iterables must return their results in
-    descending order rather than ascending.
+        >>> list(collate('ACDZ', 'AZ', 'JKL'))
+        ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
+
+    :arg key: A function that returns a comparison value for an item. Defaults
+        to the identity function.
+    :arg reverse: If ``reverse=True`` is passed, iterables must return their
+        results in descending order rather than ascending.
+
+    If the elements of the passed-in iterables are out of order, you might get
+    unexpected results.
 
     """
     key = kwargs.pop('key', lambda a: a)

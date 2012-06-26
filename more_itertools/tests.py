@@ -1,12 +1,12 @@
 from unittest import TestCase
 
-from nose.tools import eq_
+from nose.tools import eq_, assert_raises
 
-from more_itertools import collate, chunked
+from more_itertools import collate, chunked, first
 
 
 class CollateTests(TestCase):
-    """Unit tests for collate()"""
+    """Unit tests for ``collate()``"""
     # Also accidentally tests peekable, though that could use its own tests
 
     def test_default(self):
@@ -40,12 +40,37 @@ class CollateTests(TestCase):
 
 
 class ChunkedTests(TestCase):
-    """Tests for chunked()"""
+    """Tests for ``chunked()``"""
 
     def test_even(self):
         """Test when ``n`` divides evenly into the length of the iterable."""
         eq_(list(chunked('ABCDEF', 3)), [('A', 'B', 'C'), ('D', 'E', 'F')])
 
     def test_odd(self):
-        """Test when ``n`` does not divide evenly into the length of the iterable."""
+        """Test when ``n`` does not divide evenly into the length of the
+        iterable.
+
+        """
         eq_(list(chunked('ABCDE', 3)), [('A', 'B', 'C'), ('D', 'E')])
+
+
+class FirstTests(TestCase):
+    """Tests for ``first()``"""
+
+    def test_many(self):
+        """Test that it works on many-item iterables."""
+        # Also try it on a generator expression to make sure it works on
+        # whatever those return, across Python versions.
+        eq_(first(x for x in xrange(4)), 0)
+
+    def test_one(self):
+        """Test that it doesn't raise StopIteration prematurely."""
+        eq_(first([3]), 3)
+
+    def test_empty_stop_iteration(self):
+        """It should raise StopIteration for empty iterables."""
+        assert_raises(ValueError, first, [])
+
+    def test_default(self):
+        """It should return the provided default arg for empty iterables."""
+        eq_(first([], 'boo'), 'boo')
