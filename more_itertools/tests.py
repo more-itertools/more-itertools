@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
 
-from more_itertools import collate, chunked, first
+from more_itertools import *  # Test all the symbols are in __all__.
 
 
 class CollateTests(TestCase):
@@ -74,3 +74,12 @@ class FirstTests(TestCase):
     def test_default(self):
         """It should return the provided default arg for empty iterables."""
         eq_(first([], 'boo'), 'boo')
+
+
+class PeekableTests(TestCase):
+    def test_import(self):
+        """``peekable`` is incidentally covered by ``CollateTests``, but make
+        sure the symbol is imported by ``import *``.
+
+        """
+        peekable

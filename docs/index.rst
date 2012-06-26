@@ -8,15 +8,15 @@ routine that fits it perfectly. Sometimes, however, neither itertools nor the
 recipes included in its docs do quite what I need.
 
 Here I've collected several routines I've reached for but not found. Since
-they are deceptively tricky to get right, I thought I'd wrap them up into a
-library. Enjoy! Any additions are welcome; just file a pull request.
+they are deceptively tricky to get right, I've wrapped them up into a library.
+Enjoy! Any additions are welcome; just file a pull request.
 
 
 Contents
 ========
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     api
     license

@@ -2,7 +2,12 @@ from functools import partial
 from itertools import izip_longest
 
 
+__all__ = ['chunked', 'first', 'peekable', 'collate']
+
+
 _marker = object()
+
+
 def chunked(iterable, n):
     """Break an iterable into tuples of a given length::
 
@@ -111,10 +116,13 @@ def collate(*iterables, **kwargs):
         >>> list(collate('ACDZ', 'AZ', 'JKL'))
         ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
 
+    Works lazily, keeping only the next value from each iterable in memory.
+
     :arg key: A function that returns a comparison value for an item. Defaults
         to the identity function.
-    :arg reverse: If ``reverse=True`` is passed, iterables must return their
-        results in descending order rather than ascending.
+    :arg reverse: If ``reverse=True``, yield results in descending order
+        rather than ascending.  ``iterables`` must also yield their elements in
+        descending order.
 
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
