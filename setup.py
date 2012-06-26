@@ -1,4 +1,11 @@
+import sys
+
 from setuptools import setup, find_packages
+
+
+extra_setup = {}
+if sys.version_info >= (3,):
+    extra_setup['use_2to3'] = True
 
 
 setup(
@@ -22,7 +29,8 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Topic :: Software Development :: Libraries',
-        ],
-    keywords=['itertools', 'iterator', 'iteration', 'filter', 'peek', 'peekable', 'collate', 'chunk', 'chunked']
+        'Topic :: Software Development :: Libraries'],
+    keywords=['itertools', 'iterator', 'iteration', 'filter', 'peek',
+              'peekable', 'collate', 'chunk', 'chunked'],
+    **extra_setup
 )

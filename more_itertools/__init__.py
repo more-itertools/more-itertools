@@ -1,3 +1,4 @@
+from functools import partial
 from itertools import izip_longest
 
 
@@ -122,7 +123,7 @@ def collate(*iterables, **kwargs):
     key = kwargs.pop('key', lambda a: a)
     reverse = kwargs.pop('reverse', False)
 
-    min_or_max = max if reverse else min
+    min_or_max = partial(max if reverse else min, key=lambda (a, b): a)
     peekables = [peekable(it) for it in iterables]
     peekables = [p for p in peekables if p]  # Kill empties.
     while peekables:
