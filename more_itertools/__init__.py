@@ -35,15 +35,17 @@ def chunked(iterable, n):
 def first(iterable, default=_marker):
     """Return the first item of an iterable, ``default`` if there is none.
 
-        >>> first([2, 3, 4])
-        2
-        >>> first([], 'some default')
+        >>> first(xrange(4))
+        0
+        >>> first(xrange(0), 'some default')
         'some default'
 
     If ``default`` is not provided and there are no items in the iterable,
     raise ``ValueError``.
 
-    ``first()`` is less verbose than ``next(iter(...))``, especially if you
+    ``first()`` is useful when you have a generator of expensive-to-retrieve
+    values and want any arbitrary one. It is marginally shorter than
+    ``next(iter(...))`` but saves you an entire ``try``/``except`` when you
     want to provide a fallback value.
 
     """
@@ -89,16 +91,8 @@ class peekable(object):
     To test whether there are more items in the iterator, examine the
     peekable's truth value. If it is truthy, there are more items.
 
-        >>> p = peekable(xrange(1))
-        >>> if p:
-        ...     print 'Has more items.'
-        ...
-        Has more items.
-        >>> p = peekable([])
-        >>> if not p:
-        ...     print 'Is exhausted.'
-        ...
-        Is exhausted.
+        >>> assert peekable(xrange(1))
+        >>> assert not peekable([])
 
     """
     # Lowercase to blend in with itertools. The fact that it's a class is an
