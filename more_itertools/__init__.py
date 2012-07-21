@@ -25,10 +25,11 @@ def chunked(iterable, n):
 
     """
     # Doesn't seem to run into any number-of-args limits.
-    for group in izip_longest(*[iter(iterable)] * n, fillvalue=_marker):
+    for group in (list(g) for g in izip_longest(*[iter(iterable)] * n,
+                                                fillvalue=_marker)):
         if group[-1] is _marker:
             # If this is the last group, shuck off the padding:
-            group = tuple(x for x in group if x is not _marker)
+            del group[group.index(_marker):]
         yield group
 
 

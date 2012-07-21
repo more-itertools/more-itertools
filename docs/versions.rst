@@ -2,6 +2,11 @@
 Version History
 ===============
 
+2.0
+    * ``chunked`` now returns lists rather than tuples. After all, they're
+      homogeneous.
+    * Improved test machinery.
+
 1.1
     * Added ``first`` function.
     * Added Python 3 support.

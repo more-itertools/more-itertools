@@ -44,14 +44,14 @@ class ChunkedTests(TestCase):
 
     def test_even(self):
         """Test when ``n`` divides evenly into the length of the iterable."""
-        eq_(list(chunked('ABCDEF', 3)), [('A', 'B', 'C'), ('D', 'E', 'F')])
+        eq_(list(chunked('ABCDEF', 3)), [['A', 'B', 'C'], ['D', 'E', 'F']])
 
     def test_odd(self):
         """Test when ``n`` does not divide evenly into the length of the
         iterable.
 
         """
-        eq_(list(chunked('ABCDE', 3)), [('A', 'B', 'C'), ('D', 'E')])
+        eq_(list(chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']])
 
 
 class FirstTests(TestCase):
