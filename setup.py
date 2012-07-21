@@ -1,3 +1,10 @@
+# Hack to prevent stupid error on exit of `python setup.py test`. (See
+# http://www.eby-sarna.com/pipermail/peak/2010-May/003357.html.)
+try:
+    import multiprocessing
+except ImportError:
+    pass
+
 import sys
 
 from setuptools import setup, find_packages
