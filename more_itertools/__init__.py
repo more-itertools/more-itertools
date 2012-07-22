@@ -119,8 +119,6 @@ class peekable(object):
         provided, raise ``StopIteration``.
 
         """
-        # TODO: Give peek a default arg. Raise StopIteration only when it isn't
-        # provided. If it is, return the arg. Just like get('key', object())
         if not hasattr(self, '_peek'):
             try:
                 self._peek = self._it.next()
