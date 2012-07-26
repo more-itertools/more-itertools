@@ -5,6 +5,7 @@ Version History
 2.0
     * ``chunked`` now returns lists rather than tuples. After all, they're
       homogeneous.
+    * Added ``@consumer``.
     * Improved test machinery.
 
 1.1

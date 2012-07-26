@@ -1,8 +1,8 @@
-from functools import partial
+from functools import partial, wraps
 from itertools import izip_longest
 
 
-__all__ = ['chunked', 'first', 'peekable', 'collate']
+__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer']
 
 
 _marker = object()
@@ -163,3 +163,33 @@ def collate(*iterables, **kwargs):
         _, p = min_or_max((key(p.peek()), p) for p in peekables)
         yield p.next()
         peekables = [p for p in peekables if p]
+
+
+def consumer(func):
+    """Decorator that automatically advances a PEP-342-style "reverse iterator"
+    to its first yield point so you don't have to call ``next()`` on it
+    manually.
+
+    >>> @consumer
+    ... def tally():
+    ...     i = 0
+    ...     while True:
+    ...         print 'Thing number %s is %s.' % (i, (yield))
+    ...         i += 1
+    ...
+    >>> t = tally()
+    >>> t.send('red')
+    Thing number 0 is red.
+    >>> t.send('fish')
+    Thing number 1 is fish.
+
+    Without the decorator, you would have to call ``t.next()`` before
+    ``t.send()`` could be used.
+
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        gen = func(*args, **kwargs)
+        gen.next()
+        return gen
+    return wrapper

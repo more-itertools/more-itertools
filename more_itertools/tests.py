@@ -105,3 +105,16 @@ class PeekableTests(TestCase):
         eq_(p.next(), 0)
         eq_(p.peek(), 1)
         eq_(p.next(), 1)
+
+
+class ConsumerTests(TestCase):
+    """Tests for ``consumer()``"""
+
+    def test_consumer(self):
+        @consumer
+        def eater():
+            while True:
+                x = yield
+        
+        e = eater()
+        e.send('hi')  # without @consumer, would raise TypeError
