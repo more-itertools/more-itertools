@@ -1,124 +1,13 @@
-from random import seed
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises, ok_
 
-from more_itertools import *  # Test all the symbols are in __all__.
+from more_itertools import *
 
+from random import seed
 
-class CollateTests(TestCase):
-    """Unit tests for ``collate()``"""
-    # Also accidentally tests peekable, though that could use its own tests
-
-    def test_default(self):
-        """Test with the default `key` function."""
-        iterables = [xrange(4), xrange(7), xrange(3, 6)]
-        eq_(sorted(reduce(list.__add__, [list(it) for it in iterables])),
-            list(collate(*iterables)))
-
-    def test_key(self):
-        """Test using a custom `key` function."""
-        iterables = [xrange(5, 0, -1), xrange(4, 0, -1)]
-        eq_(list(sorted(reduce(list.__add__,
-                                        [list(it) for it in iterables]),
-                        reverse=True)),
-            list(collate(*iterables, key=lambda x: -x)))
-
-    def test_empty(self):
-        """Be nice if passed an empty list of iterables."""
-        eq_([], list(collate()))
-
-    def test_one(self):
-        """Work when only 1 iterable is passed."""
-        eq_([0, 1], list(collate(xrange(2))))
-
-    def test_reverse(self):
-        """Test the `reverse` kwarg."""
-        iterables = [xrange(4, 0, -1), xrange(7, 0, -1), xrange(3, 6, -1)]
-        eq_(sorted(reduce(list.__add__, [list(it) for it in iterables]),
-                   reverse=True),
-            list(collate(*iterables, reverse=True)))
-
-
-class ChunkedTests(TestCase):
-    """Tests for ``chunked()``"""
-
-    def test_even(self):
-        """Test when ``n`` divides evenly into the length of the iterable."""
-        eq_(list(chunked('ABCDEF', 3)), [['A', 'B', 'C'], ['D', 'E', 'F']])
-
-    def test_odd(self):
-        """Test when ``n`` does not divide evenly into the length of the
-        iterable.
-
-        """
-        eq_(list(chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']])
-
-
-class FirstTests(TestCase):
-    """Tests for ``first()``"""
-
-    def test_many(self):
-        """Test that it works on many-item iterables."""
-        # Also try it on a generator expression to make sure it works on
-        # whatever those return, across Python versions.
-        eq_(first(x for x in xrange(4)), 0)
-
-    def test_one(self):
-        """Test that it doesn't raise StopIteration prematurely."""
-        eq_(first([3]), 3)
-
-    def test_empty_stop_iteration(self):
-        """It should raise StopIteration for empty iterables."""
-        assert_raises(ValueError, first, [])
-
-    def test_default(self):
-        """It should return the provided default arg for empty iterables."""
-        eq_(first([], 'boo'), 'boo')
-
-
-class PeekableTests(TestCase):
-    """Tests for ``peekable()`` behavor not incidentally covered by testing
-    ``collate()``
-
-    """
-    def test_peek_default(self):
-        """Make sure passing a default into ``peek()`` works."""
-        p = peekable([])
-        eq_(p.peek(7), 7)
-
-    def test_truthiness(self):
-        """Make sure a ``peekable`` tests true iff there are items remaining in
-        the iterable.
-
-        """
-        p = peekable([])
-        self.failIf(p)
-        p = peekable(xrange(3))
-        self.failUnless(p)
-
-    def test_simple_peeking(self):
-        """Make sure ``next`` and ``peek`` advance and don't advance the
-        iterator, respectively.
-
-        """
-        p = peekable(xrange(10))
-        eq_(p.next(), 0)
-        eq_(p.peek(), 1)
-        eq_(p.next(), 1)
-
-
-class ConsumerTests(TestCase):
-    """Tests for ``consumer()``"""
-
-    def test_consumer(self):
-        @consumer
-        def eater():
-            while True:
-                x = yield
-        
-        e = eater()
-        e.send('hi')  # without @consumer, would raise TypeError
+def setup_module():
+    seed(1337)
 
 class TakeTests(TestCase):
     """Tests for ``take()``"""
@@ -140,7 +29,7 @@ class TakeTests(TestCase):
     def test_take_too_much(self):
         """Taking more than an iterator has remaining should return what the
         iterator has remaining.
-        
+
         """
         t = take(10, xrange(5))
         eq_(t, [0, 1, 2, 3, 4])
@@ -315,7 +204,7 @@ class GrouperTests(TestCase):
     """Tests for ``grouper()``"""
 
     def test_even(self):
-        """Test when group size divides evenly into the length of 
+        """Test when group size divides evenly into the length of
         the iterable.
 
         """
@@ -365,7 +254,7 @@ class UniqueEverseenTests(TestCase):
         u = unique_everseen('AAAABBBBCCDAABBB')
         eq_(['A', 'B', 'C', 'D'],
             list(u))
-        
+
     def test_custom_key(self):
         """ensure the custom key comparison works"""
         u = unique_everseen('aAbACCc', key = str.lower)
@@ -374,7 +263,7 @@ class UniqueEverseenTests(TestCase):
 
 class UniqueJustseenTests(TestCase):
     """Tests for ``unique_justseen()``"""
-    
+
     def test_justseen(self):
         """ensure only last item is remembered"""
         u = unique_justseen('AAAABBBCCDABB')
@@ -417,7 +306,7 @@ class IterExceptTests(TestCase):
 
 class RandomProductTests(TestCase):
     """Tests for ``random_product()``
-    
+
     Since random.choice() has different results with the same seed across
     python versions 2.x and 3.x, these tests use highly probably events to
     create predictable outcomes across platforms.
@@ -425,15 +314,14 @@ class RandomProductTests(TestCase):
 
     def test_simple_lists(self):
         """Ensure that one item is chosen from each list in each pair.
-        Also ensure that each item from each list eventually appears in 
+        Also ensure that each item from each list eventually appears in
         the chosen combinations.
-        
+
         Odds are roughly 1 in 7.1 * 10e16 that one item from either list will
         not be chosen after 100 samplings of one item from each list. Just to
         be safe, better use a known random seed, too.
 
-        """ 
-        seed(1337)
+        """
         nums = [1,2,3]
         lets = ['a', 'b', 'c']
         n, m = zip(*[random_product(nums, lets) for _ in range(100)])
@@ -448,7 +336,6 @@ class RandomProductTests(TestCase):
         from one list then the next, in proper order.
 
         """
-        seed(1337)
         nums = [1,2,3]
         lets = ['a', 'b', 'c']
         r = list(random_product(nums, lets, repeat=100))
@@ -462,21 +349,20 @@ class RandomProductTests(TestCase):
 
 class RandomPermutationTests(TestCase):
     """Tests for ``random_permutation()``"""
-    
+
     def test_full_permutation(self):
         """ensure every item from the iterable is returned in a new ordering
-        
+
         15 elements have a 1 in 1.3 * 10e12 of appearing in sorted order, so
         we fix a seed value just to be sure.
 
         """
-        seed(1337)
         i = range(15)
         r = random_permutation(i)
         eq_(set(i), set(r))
         if i == r:
             raise AssertionError("Values were not permuted")
-        
+
     def test_partial_permutation(self):
         """ensure all returned items are from the iterable, that the returned
         permutation is of the desired length, and that all items eventually
@@ -488,7 +374,6 @@ class RandomPermutationTests(TestCase):
         show up in the resulting output. Using a random seed will fix that.
 
         """
-        seed(1337)
         items = range(15)
         item_set = set(items)
         all_items = set()
@@ -497,7 +382,7 @@ class RandomPermutationTests(TestCase):
             eq_(len(permutation), 5)
             permutation_set = set(permutation)
             ok_(permutation_set <= item_set)
-            all_items |= permutation_set 
+            all_items |= permutation_set
         eq_(all_items, item_set)
 
 
@@ -507,17 +392,15 @@ class RandomCombinationTests(TestCase):
     def test_psuedorandomness(self):
         """ensure different subsets of the iterable get returned over many
         samplings of random combinations"""
-        seed(1337)
         items = range(15)
         all_items = set()
         for _ in xrange(50):
             combination = random_combination(items, 5)
-            all_items |= set(combination) 
+            all_items |= set(combination)
         eq_(all_items, set(items))
 
     def test_no_replacement(self):
         """ensure that elements are sampled without replacement"""
-        seed(1337)
         items = range(15)
         for _ in xrange(50):
             combination = random_combination(items, len(items))
@@ -539,10 +422,9 @@ class RandomCombinationWithReplacementTests(TestCase):
     def test_psuedorandomness(self):
         """ensure different subsets of the iterable get returned over many
         samplings of random combinations"""
-        seed(1337)
         items = range(15)
         all_items = set()
         for _ in xrange(50):
             combination = random_combination_with_replacement(items, 5)
-            all_items |= set(combination) 
+            all_items |= set(combination)
         eq_(all_items, set(items))
