@@ -4,6 +4,7 @@ from nose.tools import eq_, assert_raises
 
 from more_itertools import *  # Test all the symbols are in __all__.
 
+
 class CollateTests(TestCase):
     """Unit tests for ``collate()``"""
     # Also accidentally tests peekable, though that could use its own tests
@@ -117,4 +118,3 @@ class ConsumerTests(TestCase):
 
         e = eater()
         e.send('hi')  # without @consumer, would raise TypeError
-

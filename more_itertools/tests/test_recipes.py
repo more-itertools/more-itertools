@@ -6,8 +6,10 @@ from more_itertools import *
 
 from random import seed
 
+
 def setup_module():
     seed(1337)
+
 
 class TakeTests(TestCase):
     """Tests for ``take()``"""
@@ -34,13 +36,14 @@ class TakeTests(TestCase):
         t = take(10, xrange(5))
         eq_(t, [0, 1, 2, 3, 4])
 
+
 class TabulateTests(TestCase):
     """Tests for ``tabulate()``"""
 
     def test_simple_tabulate(self):
         """Test the happy path"""
         t = tabulate(lambda x: x)
-        f = (next(t), next(t), next(t))
+        f = tuple([next(t) for _ in range(3)])
         eq_(f, (0, 1, 2))
 
     def test_count(self):
@@ -48,6 +51,7 @@ class TabulateTests(TestCase):
         t = tabulate(lambda x: 2 * x, -1)
         f = (next(t), next(t), next(t))
         eq_(f, (-2, 0, 2))
+
 
 class ConsumeTests(TestCase):
     """Tests for ``consume()``"""
@@ -106,7 +110,7 @@ class QuantifyTests(TestCase):
     def test_custom_predicate(self):
         """Ensure non-default predicates return as expected"""
         q = range(10)
-        eq_(quantify(q, lambda x: x % 2 == 0), 5) 
+        eq_(quantify(q, lambda x: x % 2 == 0), 5)
 
 
 class PadnoneTests(TestCase):
@@ -127,7 +131,7 @@ class NcyclesTests(TestCase):
         r = ["a", "b", "c"]
         n = ncycles(r, 3)
         eq_(["a", "b", "c", "a", "b", "c", "a", "b", "c"],
-            [x for x in n])
+            list(n))
 
     def test_null_case(self):
         """asking for 0 cycles should return an empty iterator"""
@@ -145,7 +149,7 @@ class DotproductTests(TestCase):
 
     def test_happy_path(self):
         """simple dotproduct example"""
-        eq_(400 , dotproduct([10,10], [20,20]))
+        eq_(400, dotproduct([10, 10], [20, 20]))
 
 
 class FlattenTests(TestCase):
@@ -153,14 +157,13 @@ class FlattenTests(TestCase):
 
     def test_basic_usage(self):
         """ensure list of lists is flattened one level"""
-        f = [[0,1,2], [3,4,5]]
-        eq_(range(6), [x for x in flatten(f)])
+        f = [[0, 1, 2], [3, 4, 5]]
+        eq_(range(6), list(flatten(f)))
 
     def test_single_level(self):
         """ensure list of lists is flattened only one level"""
-        f = [[0, [1,2]], [[3,4], 5]]
-        eq_([0, [1, 2], [3, 4], 5],
-            [x for x in flatten(f)])
+        f = [[0, [1, 2]], [[3, 4], 5]]
+        eq_([0, [1, 2], [3, 4], 5], list(flatten(f)))
 
 
 class RepeatfuncTests(TestCase):
@@ -174,17 +177,18 @@ class RepeatfuncTests(TestCase):
     def test_finite_repeat(self):
         """ensure limited repeat when times is provided"""
         r = repeatfunc(lambda: 5, times=5)
-        eq_([5, 5, 5, 5, 5], [x for x in r])
+        eq_([5, 5, 5, 5, 5], list(r))
 
     def test_added_arguments(self):
         """ensure arguments are applied to the function"""
         r = repeatfunc(lambda x: x, 2, 3)
-        eq_([3, 3], [x for x in r])
+        eq_([3, 3], list(r))
 
     def test_null_times(self):
         """repeat 0 should return an empty iterator"""
         r = repeatfunc(range, 0, 3)
         assert_raises(StopIteration, next, r)
+
 
 class PairwiseTests(TestCase):
     """Tests for ``pairwise()``"""
@@ -192,7 +196,7 @@ class PairwiseTests(TestCase):
     def test_base_case(self):
         """ensure an iterable will return pairwise"""
         p = pairwise([1, 2, 3])
-        eq_([(1, 2), (2, 3)], [x for x in p])
+        eq_([(1, 2), (2, 3)], list(p))
 
     def test_short_case(self):
         """ensure an empty iterator if there's not enough values to pair"""
@@ -227,12 +231,12 @@ class RoundrobinTests(TestCase):
 
     def test_even_groups(self):
         """Ensure ordered output from evenly populated iterables"""
-        eq_(list(roundrobin('ABC', [1,2,3], range(3))),
+        eq_(list(roundrobin('ABC', [1, 2, 3], range(3))),
             ['A', 1, 0, 'B', 2, 1, 'C', 3, 2])
 
     def test_uneven_groups(self):
         """Ensure ordered output from unevenly populated iterables"""
-        eq_(list(roundrobin('ABCD', [1,2], range(0))),
+        eq_(list(roundrobin('ABCD', [1, 2], range(0))),
             ['A', 1, 'B', 2, 'C', 'D'])
 
 
@@ -241,7 +245,7 @@ class PowersetTests(TestCase):
 
     def test_combinatorics(self):
         """Ensure a proper enumeration"""
-        p = powerset([1,2,3])
+        p = powerset([1, 2, 3])
         eq_(list(p),
             [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)])
 
@@ -257,7 +261,7 @@ class UniqueEverseenTests(TestCase):
 
     def test_custom_key(self):
         """ensure the custom key comparison works"""
-        u = unique_everseen('aAbACCc', key = str.lower)
+        u = unique_everseen('aAbACCc', key=str.lower)
         eq_(list('abC'), list(u))
 
 
@@ -288,7 +292,7 @@ class IterExceptTests(TestCase):
         """ensure the generic exception can be caught"""
         l = [1, 2]
         i = iter_except(l.pop, Exception)
-        eq_(list(i), [2,1])
+        eq_(list(i), [2, 1])
 
     def test_uncaught_exception_is_raised(self):
         """ensure a non-specified exception is raised"""
@@ -298,7 +302,7 @@ class IterExceptTests(TestCase):
 
     def test_first(self):
         """ensure first is run before the function"""
-        l = [1,2,3]
+        l = [1, 2, 3]
         f = lambda: 25
         i = iter_except(l.pop, IndexError, f)
         eq_(list(i), [25, 3, 2, 1])
@@ -322,7 +326,7 @@ class RandomProductTests(TestCase):
         be safe, better use a known random seed, too.
 
         """
-        nums = [1,2,3]
+        nums = [1, 2, 3]
         lets = ['a', 'b', 'c']
         n, m = zip(*[random_product(nums, lets) for _ in range(100)])
         n, m = set(n), set(m)
@@ -336,11 +340,11 @@ class RandomProductTests(TestCase):
         from one list then the next, in proper order.
 
         """
-        nums = [1,2,3]
+        nums = [1, 2, 3]
         lets = ['a', 'b', 'c']
         r = list(random_product(nums, lets, repeat=100))
         eq_(2 * 100, len(r))
-        n, m  = set(r[::2]), set(r[1::2])
+        n, m = set(r[::2]), set(r[1::2])
         eq_(n, set(nums))
         eq_(m, set(lets))
         eq_(len(n), len(nums))
