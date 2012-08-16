@@ -17,7 +17,7 @@ if sys.version_info >= (3,):
 
 setup(
     name='more-itertools',
-    version='2.0',
+    version='2.1',
     description='More routines for operating on iterables, beyond itertools',
     long_description=(open('README.rst').read() + '\n\n' +
                       '\n'.join(open('docs/versions.rst').read()
