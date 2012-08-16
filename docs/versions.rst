@@ -2,6 +2,10 @@
 Version History
 ===============
 
+2.1
+    * Added (tested!) implementations of the recipes from the itertools
+      documentation. (Thanks, Chris Lonnen!)
+
 2.0
     * ``chunked`` now returns lists rather than tuples. After all, they're
       homogeneous. This slightly backward-incompatible change is the reason for

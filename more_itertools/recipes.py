@@ -1,16 +1,25 @@
-import operator
+"""Imported from the recipes section of the itertools documentation.
+
+All functions taken from the recipes section of the itertools library docs
+[1]_.
+Some backward-compatible usability improvements have been made.
+
+.. [1] http://docs.python.org/library/itertools.html#recipes
+
+"""
 from collections import deque
-from itertools import chain, count, combinations, cycle, groupby, imap, ifilterfalse, islice, izip, izip_longest, repeat, starmap, tee
+from itertools import chain, count, combinations, cycle, groupby, imap, ifilterfalse, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
+import operator
 from random import randrange, sample, choice
 
-'''
-Imported from the recipes section of the itertools documentation.
 
-All functions taken from the recipes section of the itertools library docs[1].
-Some backwards compatable usability improvements have been made.
+__all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
+           'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
+           'grouper', 'roundrobin', 'powerset', 'unique_everseen',
+           'unique_justseen', 'iter_except', 'random_product',
+           'random_permutation', 'random_combination',
+           'random_combination_with_replacement']
 
-[1] http://docs.python.org/library/itertools.html#recipes
-'''
 
 def take(n, iterable):
     """Return first n items of the iterable as a list
@@ -22,6 +31,7 @@ def take(n, iterable):
 
     Effectively a short replacement for ``next`` based iterator consumption
     when you want more than one item, but less than the whole iterator.
+
     """
     return list(islice(iterable, n))
 

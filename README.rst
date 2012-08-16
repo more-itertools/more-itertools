@@ -9,7 +9,8 @@ recipes included in its docs do quite what I need.
 
 Here I've collected several routines I've reached for but not found. Since
 they are deceptively tricky to get right, I've wrapped them up into a library.
-Enjoy! Any additions are welcome; just file a pull request.
+We've also included implementations of the recipes from the itertools
+documentation. Enjoy! Any additions are welcome; just file a pull request.
 
 
 Full Documentation
