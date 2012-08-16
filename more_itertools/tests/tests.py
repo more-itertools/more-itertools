@@ -115,6 +115,6 @@ class ConsumerTests(TestCase):
         def eater():
             while True:
                 x = yield
-        
+
         e = eater()
         e.send('hi')  # without @consumer, would raise TypeError
