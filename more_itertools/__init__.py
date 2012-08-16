@@ -1,8 +1,13 @@
 from functools import partial, wraps
 from itertools import izip_longest
+from recipes import *
 
-
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer']
+__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'take',
+           'tabulate', 'consume', 'nth', 'quantify', 'padnone', 'ncycles',
+           'dotproduct', 'flatten', 'repeatfunc', 'pairwise', 'grouper',
+           'roundrobin', 'powerset', 'unique_everseen', 'unique_justseen',
+           'iter_except', 'random_product', 'random_permutation',
+           'random_combination', 'random_combination_with_replacement']
 
 
 _marker = object()
