@@ -19,9 +19,9 @@ setup(
     name='more-itertools',
     version='2.1',
     description='More routines for operating on iterables, beyond itertools',
-    long_description=(open('README.rst').read() + '\n\n' +
-                      '\n'.join(open('docs/versions.rst').read()
-                                                         .splitlines()[1:])),
+    long_description=open('README.rst').read() + '\n\n' +
+                     '\n'.join(open('docs/versions.rst').read()
+                                                        .splitlines()[1:]),
     author='Erik Rose',
     author_email='erikrose@grinchcentral.com',
     license='MIT',
