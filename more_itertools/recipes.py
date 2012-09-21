@@ -8,7 +8,7 @@ Some backward-compatible usability improvements have been made.
 
 """
 from collections import deque
-from itertools import chain, count, combinations, cycle, groupby, imap, ifilterfalse, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
+from itertools import chain, combinations, count, cycle, groupby, ifilterfalse, imap, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
 import operator
 from random import randrange, sample, choice
 
