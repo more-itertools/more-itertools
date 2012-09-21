@@ -8,14 +8,14 @@ Some backward-compatible usability improvements have been made.
 
 """
 from collections import deque
-from itertools import chain, combinations, count, cycle, groupby, ifilter, ifilterfalse, imap, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
+from itertools import chain, combinations, count, cycle, groupby, ifilterfalse, imap, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
 import operator
 from random import randrange, sample, choice
 
 
-__all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'filter_len',
-           'padnone', 'ncycles', 'dotproduct', 'flatten', 'repeatfunc',
-           'pairwise', 'grouper', 'roundrobin', 'powerset', 'unique_everseen',
+__all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
+           'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
+           'grouper', 'roundrobin', 'powerset', 'unique_everseen',
            'unique_justseen', 'iter_except', 'random_product',
            'random_permutation', 'random_combination',
            'random_combination_with_replacement']
@@ -110,16 +110,6 @@ def quantify(iterable, pred=bool):
 
     """
     return sum(imap(pred, iterable))
-
-
-def filter_len(func, iterable):
-    """Returns the number of items in `iterable` where `func(item)` is truthy
-
-        >>> filter_len(lambda x: x % 3 == 0, xrange(1000000))
-        333334
-
-    """
-    return sum(1 for _ in ifilter(func, iterable))
 
 
 def padnone(iterable):
