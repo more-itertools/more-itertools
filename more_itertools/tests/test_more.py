@@ -1,4 +1,4 @@
-from itertools import islice
+from itertools import islice, ifilter
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
@@ -121,29 +121,6 @@ class ConsumerTests(TestCase):
         e.send('hi')  # without @consumer, would raise TypeError
 
 
-class FilterLenTests(TestCase):
-    """Tests for ``filter_len()``"""
-
-    def test_generators(self):
-        """Test that generators work properly."""
-        def fib():
-            """The Fibonacci Sequence is within."""
-            a, b = 0, 1
-            yield a
-            yield b
-            while 1:
-                a, b = b, a + b
-                yield b
-
-        long_fib = islice(fib(), 100)
-        eq_(filter_len(lambda x: x % 10 == 5, long_fib), 13)
-
-    def test_sequences(self):
-        """Test that sequences work properly."""
-        eq_(filter_len(lambda x: x % 10 == 0, range(101)), 11)
-
-    def test_no_truthiness(self):
-        """Test that truthy values don't muck with the output."""
-        vals = [1, True, "yes", [1, 2, 3]]
-        eq_(filter_len(lambda x: x, vals), len(vals))
-        eq_(filter_len(lambda x: False, vals), 0)
+def test_ilen():
+    """Sanity-check ``ilen()``."""
+    eq_(ilen(ifilter(lambda x: x % 10 == 0, range(101))), 11)

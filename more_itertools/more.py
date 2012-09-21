@@ -2,7 +2,7 @@ from functools import partial, wraps
 from itertools import izip_longest, ifilter
 from recipes import *
 
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'filter_len']
+__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen']
 
 
 _marker = object()
@@ -197,15 +197,13 @@ def consumer(func):
     return wrapper
 
 
-def filter_len(func, iterable):
-    """Return the number of items in ``iterable`` where ``func(item)`` is
-    truthy.
+def ilen(iterable):
+    """Return the number of items in ``iterable``.
 
-    Pass ``None`` for ``func`` to test the truthiness of the items themselves
-    with high performance.
-
-    >>> filter_len(lambda x: x % 3 == 0, xrange(1000000))
+    >>> ilen(ifilter(lambda x: x % 3 == 0, xrange(1000000)))
     333334
 
+    This does, of course, consume the iterable, so handle it with care.
+
     """
-    return sum(1 for _ in ifilter(func, iterable))
+    return sum(1 for _ in iterable)

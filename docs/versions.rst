@@ -5,7 +5,7 @@ Version History
 2.1
     * Added (tested!) implementations of the recipes from the itertools
       documentation. (Thanks, Chris Lonnen!)
-    * Added ``filter_len``.
+    * Added ``ilen``. (Thanks for the inspiration, Matt Basta!)
 
 2.0
     * ``chunked`` now returns lists rather than tuples. After all, they're

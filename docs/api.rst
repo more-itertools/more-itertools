@@ -14,8 +14,8 @@ New Routines
     .. autofunction:: chunked
     .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
     .. autofunction:: consumer
-    .. autofunction:: filter_len
     .. autofunction:: first(iterable[, default])
+    .. autofunction:: ilen
     .. autoclass:: peekable
 
 
