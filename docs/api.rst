@@ -2,14 +2,11 @@
 API Reference
 =============
 
-Though these routines are listed as living under the ``more`` and ``recipes``
-submodules, you should just import them from ``more_itertools`` directly.
+.. automodule:: more_itertools
 
 
 New Routines
 ============
-
-.. automodule:: more_itertools.more
 
     .. autofunction:: chunked
     .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
@@ -22,5 +19,24 @@ New Routines
 Itertools Recipes
 =================
 
-.. automodule:: more_itertools.recipes
-   :members:
+    .. autofunction:: take
+    .. autofunction:: tabulate
+    .. autofunction:: consume
+    .. autofunction:: nth
+    .. autofunction:: quantify
+    .. autofunction:: padnone
+    .. autofunction:: ncycles
+    .. autofunction:: dotproduct
+    .. autofunction:: flatten
+    .. autofunction:: repeatfunc
+    .. autofunction:: pairwise
+    .. autofunction:: grouper
+    .. autofunction:: roundrobin
+    .. autofunction:: powerset
+    .. autofunction:: unique_everseen
+    .. autofunction:: unique_justseen
+    .. autofunction:: iter_except
+    .. autofunction:: random_product
+    .. autofunction:: random_permutation
+    .. autofunction:: random_combination
+    .. autofunction:: random_combination_with_replacement
