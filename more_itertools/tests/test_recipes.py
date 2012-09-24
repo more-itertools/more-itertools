@@ -1,10 +1,9 @@
+from random import seed
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises, ok_
 
 from more_itertools import *
-
-from random import seed
 
 
 def setup_module():
