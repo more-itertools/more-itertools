@@ -1,3 +1,4 @@
+from itertools import repeat
 from random import seed
 from unittest import TestCase
 
@@ -431,3 +432,23 @@ class RandomCombinationWithReplacementTests(TestCase):
             combination = random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         eq_(all_items, set(items))
+
+
+class igetattrTests(TestCase):
+    """Tests for ``igetattr()``"""
+
+    class DummyObject(object):
+        def __init__(self, value):
+            self.foo = value
+
+    def test_getattr(self):
+        """Show that getattr() is getting applied to each element."""
+        dummies = map(self.DummyObject, range(100))
+        eq_(list(igetattr(dummies, 'foo')), range(100))
+
+    def test_empty(self):
+        """Show that the `default` keyword argument works."""
+        dummies = map(self.DummyObject, range(100))
+        eq_(list(igetattr(dummies, 'does_not_exist', 'defvalue')),
+            list(repeat('defvalue', 100)))
+
