@@ -7,9 +7,9 @@ Some backward-compatible usability improvements have been made.
 .. [1] http://docs.python.org/library/itertools.html#recipes
 
 """
+import operator
 from collections import deque
 from itertools import chain, combinations, count, cycle, groupby, ifilterfalse, imap, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
-import operator
 from random import randrange, sample, choice
 
 
@@ -18,7 +18,7 @@ __all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
            'grouper', 'roundrobin', 'powerset', 'unique_everseen',
            'unique_justseen', 'iter_except', 'random_product',
            'random_permutation', 'random_combination',
-           'random_combination_with_replacement']
+           'random_combination_with_replacement', 'igetattr']
 
 
 def take(n, iterable):
@@ -329,3 +329,17 @@ def random_combination_with_replacement(iterable, r):
     n = len(pool)
     indices = sorted(randrange(n) for i in xrange(r))
     return tuple(pool[i] for i in indices)
+
+
+def igetattr(iterable, name, default=None):
+    """Yields a property (via `getattr()`) from each element of the iterable.
+
+        >>> x = igetattr(iterable, 'foo', 'bar') # # doctest:+SKIP
+
+    is roughly equivalent to
+
+        >>> x = (getattr(x, 'foo', 'bar') for x in iterable) # # doctest:+SKIP
+
+    """
+    return imap(lambda x: getattr(x, name, default), iterable)
+
