@@ -329,3 +329,4 @@ def random_combination_with_replacement(iterable, r):
     n = len(pool)
     indices = sorted(randrange(n) for i in xrange(r))
     return tuple(pool[i] for i in indices)
+
