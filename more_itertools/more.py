@@ -2,7 +2,8 @@ from functools import partial, wraps
 from itertools import izip_longest, ifilter
 from recipes import *
 
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen']
+__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 
+           'with_iter']
 
 
 _marker = object()
@@ -207,3 +208,13 @@ def ilen(iterable):
 
     """
     return sum(1 for _ in iterable)
+
+def with_iter(iterable):
+    """Wrap an iterable in a with statement, so it closes when consumed.
+
+    >>> uplines = (line.upper() for line in with_iter(open("foo")))
+    >>> print('\n'.join(uplines))
+    """
+    with iterable:
+        for item in iterable:
+            yield item
