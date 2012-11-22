@@ -230,31 +230,31 @@ def unique_everseen(iterable, key=None):
         ['A', 'B', 'C', 'D']
 
     """
-    seen = set()
-    seen_add = seen.add
+    seenset = set()
+    seenset_add = seenset.add
+    seenlist = []
+    seenlist_add = seenlist.append
     if key is None:
         for element in iterable:
             try:
-                if element not in seen:
-                    seen_add(element)
+                if element not in seenset:
+                    seenset_add(element)
+                    yield element
             except TypeError as e:
-                seen = list(seen)
-                seen_add = seen.append
-                if element not in seen:
-                    seen_add(element)
-            yield element
+                if element not in seenlist:
+                    seenlist_add(element)
+                    yield element
     else:
         for element in iterable:
             k = key(element)
             try:
-                if k not in seen:
-                    seen_add(k)
+                if k not in seenset:
+                    seenset_add(k)
+                    yield element
             except TypeError as e:
-                seen = list(seen)
-                seen_add = seen.append
-                if k not in seen:
-                    seen_add(k)
-            yield element
+                if k not in seenlist:
+                    seenlist_add(k)
+                    yield element
 
 
 def unique_justseen(iterable, key=None):
