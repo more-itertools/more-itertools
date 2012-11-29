@@ -1,8 +1,9 @@
 from functools import partial, wraps
-from itertools import izip_longest, ifilter
+from itertools import chain, izip, izip_longest, ifilter
 from recipes import *
 
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen']
+__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
+           'append', 'prepend', 'interleave', 'interleave_longest', 'collapse']
 
 
 _marker = object()
@@ -207,3 +208,73 @@ def ilen(iterable):
 
     """
     return sum(1 for _ in iterable)
+
+def append(iterable, value):
+    """Return a new iterable with ``value`` appended to the end.
+
+    >>> list(append(range(5), 5))
+    [0, 1, 2, 3, 4, 5]
+    """
+    # This seems to be the fastest implementation of everything I tried.
+    return chain(iterable, [value])
+
+def prepend(iterable, value):
+    """Return a new iterable with ``value`` prepended to the start.
+
+    >>> list(prepend(range(5), -1))
+    [-1, 0, 1, 2, 3, 4]
+    """
+    return chain([value], iterable)
+
+def interleave(*iterables):
+    """Return a new iterable yielding from each iterable in turn,
+    until the shortest is exhausted. Note that this is the same as
+    chain(*zip(*iterables)).
+
+    >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
+    [1, 4, 6, 2, 5, 7]
+    """
+    return chain.from_iterable(izip(*iterables))
+
+def interleave_longest(*iterables):
+    """Return a new iterable yielding from each iterable in turn,
+    skipping any that are exhausted. Note that this is not the same as
+    chain(*izip_longest(*iterables)).
+
+    >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
+    [1, 4, 6, 2, 5, 7, 3, 8]
+    """
+    dummy = object()
+    i = chain.from_iterable(izip_longest(*iterables, fillvalue=dummy))
+    return ifilter(lambda x: x is not dummy, i)
+
+def collapse(iterable, basetype=None, levels=None):
+    """Flatten an iterable containing some iterables (themselves containing
+    some iterables, etc.) into non-iterable types, strings, elements
+    matching ``isinstance(element, basetype)``, and elements that are
+    ``levels`` levels down.
+
+    >>> list(collapse([[1], 2, [[3], 4], [[[5]]]]))
+    [1, 2, 3, 4, 5]
+    >>> list(collapse([[1], 2, [[3], 4], [[[5]]]], levels=2))
+    [1, 2, 3, 4, [5]]
+    >>> list(collapse((1, [2], (3, [4, (5,)])), list))
+    [1, [2], 3, [4, (5,)]]
+    """
+    def walk(node, level):
+        if (levels is not None and level > levels or
+            isinstance(node, basestring) or 
+            basetype and isinstance(node, basetype)):
+            yield node
+            return
+        try:
+            tree = iter(node)
+        except TypeError:
+            yield node
+            return
+        else:
+            for child in tree:
+                for x in walk(child, level+1):
+                    yield x
+    for x in walk(iterable, 0):
+        yield x
