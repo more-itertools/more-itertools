@@ -13,6 +13,7 @@ New Routines
 .. autofunction:: consumer
 .. autofunction:: first(iterable[, default])
 .. autofunction:: ilen
+.. autofunction:: iterate
 .. autoclass:: peekable
 
 
