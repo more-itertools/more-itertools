@@ -2,6 +2,9 @@
 Version History
 ===============
 
+2.2
+    * Added ``iterate``. (Thanks to abarnert!)
+
 2.1
     * Added (tested!) implementations of the recipes from the itertools
       documentation. (Thanks, Chris Lonnen!)

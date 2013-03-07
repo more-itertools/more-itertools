@@ -1,8 +1,9 @@
 from functools import partial, wraps
-from itertools import izip_longest, ifilter
+from itertools import izip_longest
 from recipes import *
 
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen']
+__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
+           'iterate']
 
 
 _marker = object()
@@ -200,6 +201,7 @@ def consumer(func):
 def ilen(iterable):
     """Return the number of items in ``iterable``.
 
+    >>> from itertools import ifilter
     >>> ilen(ifilter(lambda x: x % 3 == 0, xrange(1000000)))
     333334
 
@@ -207,3 +209,16 @@ def ilen(iterable):
 
     """
     return sum(1 for _ in iterable)
+
+
+def iterate(func, start):
+    """Return ``start``, ``func(start)``, ``func(func(start))``, ...
+
+    >>> from itertools import islice
+    >>> list(islice(iterate(lambda x: 2*x, 1), 10))
+    [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+    """
+    while True:
+        yield start
+        start = func(start)
