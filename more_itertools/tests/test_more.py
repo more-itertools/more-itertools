@@ -1,4 +1,6 @@
+from contextlib import closing
 from itertools import islice, ifilter
+from StringIO import StringIO
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
@@ -124,3 +126,18 @@ class ConsumerTests(TestCase):
 def test_ilen():
     """Sanity-check ``ilen()``."""
     eq_(ilen(ifilter(lambda x: x % 10 == 0, range(101))), 11)
+
+
+def test_with_iter():
+    """Make sure ``with_iter`` iterates over and closes things correctly."""
+    s = StringIO('One fish\nTwo fish')
+    initial_words = [line.split()[0] for line in with_iter(closing(s))]
+    eq_(initial_words, ['One', 'Two'])
+
+    # Make sure closing happened:
+    try:
+        list(s)
+    except ValueError:  # "I/O operation on closed file"
+        pass
+    else:
+        raise AssertionError('StringIO object was not closed.')
