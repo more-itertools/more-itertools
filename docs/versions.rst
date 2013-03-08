@@ -3,7 +3,7 @@ Version History
 ===============
 
 2.2
-    * Added ``iterate``. (Thanks to abarnert!)
+    * Added ``iterate`` and ``with_iter``. (Thanks, abarnert!)
 
 2.1
     * Added (tested!) implementations of the recipes from the itertools
