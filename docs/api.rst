@@ -15,6 +15,7 @@ New Routines
 .. autofunction:: ilen
 .. autofunction:: iterate
 .. autoclass:: peekable
+.. autofunction:: with_iter
 
 
 Itertools Recipes

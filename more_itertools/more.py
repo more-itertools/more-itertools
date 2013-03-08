@@ -3,7 +3,7 @@ from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate']
+           'iterate', 'with_iter']
 
 
 _marker = object()
@@ -222,3 +222,16 @@ def iterate(func, start):
     while True:
         yield start
         start = func(start)
+
+
+def with_iter(context_manager):
+    """Wrap an iterable in a ``with`` statement, so it closes once exhausted.
+
+    Example::
+
+        upper_lines = (line.upper() for line in with_iter(open('foo')))
+
+    """
+    with context_manager as iterable:
+        for item in iterable:
+            yield item
