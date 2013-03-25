@@ -90,11 +90,22 @@ class peekable(object):
     If no default is provided, ``peek()`` raises ``StopIteration`` when there
     are no items left.
 
-    To test whether there are more items in the iterator, examine the
-    peekable's truth value. If it is truthy, there are more items.
+    To test whether there are more items in the iterator, either catch
+    the ``StopIteration`` exception or pass a recognizable default
+    value to ``peek()`` function:
 
-        >>> assert peekable(xrange(1))
-        >>> assert not peekable([])
+        >>> p = peekable([])
+        >>> try:
+        >>>     p.peek()
+        >>>     is_empty = False
+        >>> except StopIteration:
+        >>>     is_empty = True
+
+    or:
+
+        >>> empty_sentinel = object()
+        >>> p = peekable([])
+        >>> is_empty = p.peek(empty_sentinel) == empty_sentinel
 
     """
     # Lowercase to blend in with itertools. The fact that it's a class is an
