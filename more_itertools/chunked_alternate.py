@@ -16,9 +16,11 @@ def chunked_alternate(iterable, size, strict=False):
         prev = chunk
 
     if prev[-1] is fillvalue:
-        while prev[-1] is fillvalue:
-            prev = prev[:-1]
-
+        n = len(prev)-1
+        while prev[n] is fillvalue:
+            n -= 1
+        prev=prev[:n+1]
+        
         if strict:
             raise ValueError("only %d value(s) left in iterator, expected %d" % (len(prev),size))
 
