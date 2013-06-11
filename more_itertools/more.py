@@ -1,9 +1,10 @@
 from functools import partial, wraps
 from itertools import izip_longest
+from collections import deque
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter']
+           'iterate', 'with_iter', 'ipartition']
 
 
 _marker = object()
@@ -235,3 +236,31 @@ def with_iter(context_manager):
     with context_manager as iterable:
         for item in iterable:
             yield item
+
+def ipartition(pred,it):
+    """Partition an iterable based on a predicate.
+
+    Returns two iterables, for those with pred False and those True."""
+    falses, trues=deque(), deque()
+    it=iter(it)
+    def get_false():
+        while True:
+            if falses:
+                yield falses.pop(0)
+            else:
+                while True:
+                    val=next(it)
+                    if pred(val): trues.append(val)
+                    else: break
+                yield val
+    def get_true():
+        while True:
+            if trues:
+                yield trues.pop(0)
+            else:
+                while True:
+                    val=next(it)
+                    if not pred(val): falses.append(val)
+                    else: break
+                yield val
+    return get_false(),get_true()
