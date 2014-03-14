@@ -3,7 +3,7 @@ from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter']
+           'iterate', 'with_iter', 'bisect', 'buckets', 'fetching_queue']
 
 
 _marker = object()
@@ -235,3 +235,120 @@ def with_iter(context_manager):
     with context_manager as iterable:
         for item in iterable:
             yield item
+
+def bisect(seq, func=bool):
+    """
+    Split a sequence into two iterables:  the first is elements that
+    return True for func(element) and the second for those returning False.
+    By default, func is `:func:bool()`, so uses the truth value of the object.
+    """
+    queues = buckets(seq, func)
+    return queues.get_first_n_queues(2)
+
+
+class buckets(object):
+    """
+    Split a sequence or iterable into n iterables where n is determined by the
+    number of distinct values returned by a key function applied to each
+    element.
+
+    >>> truthsplit = buckets(['Test', '', 30, None], bool)
+    >>> truthsplit['x']
+    Traceback (most recent call last):
+    ...
+    KeyError: 'x'
+    >>> true_items = truthsplit[True]
+    >>> false_items = truthsplit[False]
+    >>> tuple(iter(false_items))
+    ('', None)
+    >>> tuple(iter(true_items))
+    ('Test', 30)
+
+    >>> every_third_split = buckets(range(99), lambda n: n%3)
+    >>> zeros = every_third_split[0]
+    >>> ones = every_third_split[1]
+    >>> twos = every_third_split[2]
+    >>> next(zeros)
+    0
+    >>> next(zeros)
+    3
+    >>> next(ones)
+    1
+    >>> next(twos)
+    2
+    >>> next(ones)
+    4
+    """
+    def __init__(self, sequence, func = lambda x: x):
+        self.sequence = iter(sequence)
+        self.func = func
+        self.queues = dict()
+
+    def __getitem__(self, key):
+        try:
+            return self.queues[key]
+        except KeyError:
+            return self.__find_queue__(key)
+
+    def __fetch__(self):
+        "get the next item from the sequence and queue it up"
+        item = next(self.sequence)
+        key = self.func(item)
+        queue = self.queues.setdefault(key, fetching_queue(self.__fetch__))
+        queue.enqueue(item)
+
+    def __find_queue__(self, key):
+        "search for the queue indexed by key"
+        try:
+            while not key in self.queues:
+                self.__fetch__()
+            return self.queues[key]
+        except StopIteration:
+            raise KeyError(key)
+
+    def get_first_n_queues(self, n):
+        """
+        Run through the sequence until n queues are created and return
+        them. If fewer are created, return those plus empty iterables to
+        compensate.
+        """
+        try:
+            while len(self.queues) < n:
+                self.__fetch__()
+        except StopIteration:
+            pass
+        values = list(self.queues.values())
+        missing = n - len(values)
+        values.extend(iter([]) for n in range(missing))
+        return values
+
+
+class fetching_queue(list):
+    """
+    A FIFO Queue that is supplied with a function to inject more into
+    the queue if it is empty.
+
+    >>> values = iter(range(10))
+    >>> get_value = lambda: globals()['q'].enqueue(next(values))
+    >>> q = fetching_queue(get_value)
+    >>> [x for x in q] == list(range(10))
+    True
+
+    Note that tuple(q) or list(q) would not have worked above because
+    tuple(q) just copies the queued elements (of which there are none).
+    """
+    def __init__(self, fetcher):
+        self._fetcher = fetcher
+
+    def __next__(self):
+        while not self:
+            self._fetcher()
+        return self.pop()
+    next = __next__
+
+    def __iter__(self):
+        while True:
+            yield next(self)
+
+    def enqueue(self, item):
+        self.insert(0, item)

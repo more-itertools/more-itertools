@@ -16,6 +16,9 @@ New Routines
 .. autofunction:: iterate
 .. autoclass:: peekable
 .. autofunction:: with_iter
+.. autofunction:: bisect
+.. autoclass:: buckets
+.. autoclass:: fetching_queue
 
 
 Itertools Recipes
