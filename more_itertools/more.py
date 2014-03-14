@@ -3,7 +3,7 @@ from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter']
+           'iterate', 'with_iter', 'one']
 
 
 _marker = object()
@@ -235,3 +235,32 @@ def with_iter(context_manager):
     with context_manager as iterable:
         for item in iterable:
             yield item
+
+def one(item):
+    """
+    Return the first element from the iterable, but raise an exception
+    if elements remain in the iterable after the first.
+
+    >>> one(['val'])
+    'val'
+
+    >>> one(['val', 'other'])
+    Traceback (most recent call last):
+    ...
+    ValueError: too many values to unpack (expected 1)
+
+    >>> one([])
+    Traceback (most recent call last):
+    ...
+    ValueError: need more than 0 values to unpack
+
+    >>> numbers = itertools.count()
+    >>> one(numbers)
+    Traceback (most recent call last):
+    ...
+    ValueError: too many values to unpack (expected 1)
+    >>> next(numbers)
+    2
+    """
+    result, = item
+    return result
