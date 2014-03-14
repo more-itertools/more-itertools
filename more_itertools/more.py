@@ -159,7 +159,7 @@ def collate(*iterables, **kwargs):
     key = kwargs.pop('key', lambda a: a)
     reverse = kwargs.pop('reverse', False)
 
-    min_or_max = partial(max if reverse else min, key=lambda (a, b): a)
+    min_or_max = partial(max if reverse else min, key=lambda a_b: a_b[0])
     peekables = [peekable(it) for it in iterables]
     peekables = [p for p in peekables if p]  # Kill empties.
     while peekables:
