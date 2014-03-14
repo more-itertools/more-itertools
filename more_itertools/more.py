@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from functools import partial, wraps
 from itertools import izip_longest
 from recipes import *
@@ -177,7 +179,7 @@ def consumer(func):
     ... def tally():
     ...     i = 0
     ...     while True:
-    ...         print 'Thing number %s is %s.' % (i, (yield))
+    ...         print('Thing number %s is %s.' % (i, (yield)))
     ...         i += 1
     ...
     >>> t = tally()
