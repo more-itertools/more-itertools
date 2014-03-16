@@ -16,6 +16,7 @@ New Routines
 .. autofunction:: iterate
 .. autoclass:: peekable
 .. autofunction:: with_iter
+.. autofunction:: distinct_permutations
 
 
 Itertools Recipes

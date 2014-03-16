@@ -1,9 +1,10 @@
+from collections import Counter
 from functools import partial, wraps
 from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter']
+           'iterate', 'with_iter', 'distinct_permutations']
 
 
 _marker = object()
@@ -235,3 +236,27 @@ def with_iter(context_manager):
     with context_manager as iterable:
         for item in iterable:
             yield item
+
+
+def distinct_permutations(iterable):
+  """Yield successive distinct permutations of the elements in the iterable.
+  Equivalent to ``(set(permutations(iterable))``, except duplicates are not
+  generated. For large input sequences this is much more efficient.
+  """
+  def perm_unique_helper(item_counts, perm, i):
+      if i < 0:
+          yield tuple(perm)
+      else:
+          for item in item_counts:
+              if item_counts[item] <= 0:
+                  continue
+              perm[i] = item
+              item_counts[item] -= 1
+              for x in perm_unique_helper(item_counts, perm, i - 1):
+                  yield x
+              item_counts[item] += 1
+  
+  item_counts = Counter(iterable)
+  L = len(iterable)
+  
+  return perm_unique_helper(item_counts, [0] * L, L - 1)

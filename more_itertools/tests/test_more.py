@@ -1,5 +1,5 @@
 from contextlib import closing
-from itertools import islice, ifilter
+from itertools import islice, ifilter, permutations
 from StringIO import StringIO
 from unittest import TestCase
 
@@ -121,6 +121,17 @@ class ConsumerTests(TestCase):
 
         e = eater()
         e.send('hi')  # without @consumer, would raise TypeError
+
+
+class DistinctPermutationsTests(TestCase):
+    """Tests for ``distinct_permutations()``"""
+  
+    def test_output(self):
+        """Test that its output is the same as set(permutations(it))"""
+        iterable = ['z', 'a', 'a', 2, 2, 2, 1]
+        test_output = sorted(distinct_permutations(iterable))
+        ref_output = sorted(set(permutations(iterable)))
+        eq_(test_output, ref_output)
 
 
 def test_ilen():
