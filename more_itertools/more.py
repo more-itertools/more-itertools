@@ -3,7 +3,7 @@ from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter']
+           'iterate', 'with_iter', 'one']
 
 
 _marker = object()
@@ -238,3 +238,32 @@ def with_iter(context_manager):
     with context_manager as iterable:
         for item in iterable:
             yield item
+
+def one(iterable):
+    """Return the only element from the iterable.
+
+    Raise ValueError if the iterable is empty or longer than 1 element. For
+    example, assert that a DB query returns a single, unique result.
+
+    >>> one(['val'])
+    'val'
+
+    >>> one(['val', 'other'])  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    ValueError: too many values to unpack (expected 1)
+
+    >>> one([])
+    Traceback (most recent call last):
+    ...
+    ValueError: need more than 0 values to unpack
+
+    ``one()`` attempts to advance the iterable twice in order to ensure there
+    aren't further items. Because this discards any second item, ``one()`` is
+    not suitable in situations where you want to catch its exception and then
+    try an alternative treatment of the iterable. It should be used only when a
+    iterable longer than 1 item is, in fact, an error.
+
+    """
+    result, = iterable
+    return result

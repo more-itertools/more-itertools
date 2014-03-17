@@ -14,6 +14,7 @@ New Routines
 .. autofunction:: first(iterable[, default])
 .. autofunction:: ilen
 .. autofunction:: iterate
+.. autofunction:: one
 .. autoclass:: peekable
 .. autofunction:: with_iter
 
