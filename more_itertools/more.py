@@ -47,8 +47,7 @@ def first(iterable, default=_marker):
 
     ``first()`` is useful when you have a generator of expensive-to-retrieve
     values and want any arbitrary one. It is marginally shorter than
-    ``next(iter(...))`` but saves you an entire ``try``/``except`` when you
-    want to provide a fallback value.
+    ``next(iter(...), default)``.
 
     """
     try:
