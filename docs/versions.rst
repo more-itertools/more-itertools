@@ -2,6 +2,9 @@
 Version History
 ===============
 
+2.3
+    * Added ``one`` from ``jaraco.util.itertools``. (Thanks, jaraco!)
+
 2.2
     * Added ``iterate`` and ``with_iter``. (Thanks, abarnert!)
 

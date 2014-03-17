@@ -236,15 +236,16 @@ def with_iter(context_manager):
         for item in iterable:
             yield item
 
-def one(item):
-    """
-    Return the first element from the iterable, but raise an exception
-    if elements remain in the iterable after the first.
+def one(iterable):
+    """Return the only element from the iterable.
+
+    Raise ValueError if the iterable is empty or longer than 1 element. For
+    example, assert that a DB query returns a single, unique result.
 
     >>> one(['val'])
     'val'
 
-    >>> one(['val', 'other'])
+    >>> one(['val', 'other'])  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     ValueError: too many values to unpack (expected 1)
@@ -254,13 +255,12 @@ def one(item):
     ...
     ValueError: need more than 0 values to unpack
 
-    >>> numbers = itertools.count()
-    >>> one(numbers)
-    Traceback (most recent call last):
-    ...
-    ValueError: too many values to unpack (expected 1)
-    >>> next(numbers)
-    2
+    ``one()`` attempts to advance the iterable twice in order to ensure there
+    aren't further items. Because this discards any second item, ``one()`` is
+    not suitable in situations where you want to catch its exception and then
+    try an alternative treatment of the iterable. It should be used only when a
+    iterable longer than 1 item is, in fact, an error.
+
     """
-    result, = item
+    result, = iterable
     return result

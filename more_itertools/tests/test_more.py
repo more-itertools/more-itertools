@@ -1,5 +1,5 @@
 from contextlib import closing
-from itertools import islice, ifilter
+from itertools import count, islice, ifilter
 from StringIO import StringIO
 from unittest import TestCase
 
@@ -141,3 +141,11 @@ def test_with_iter():
         pass
     else:
         raise AssertionError('StringIO object was not closed.')
+
+
+def test_one():
+    """Test the ``one()`` cases that aren't covered by its doctests."""
+    # Infinite iterables
+    numbers = count()
+    assert_raises(ValueError, one, numbers)  # burn 0 and 1
+    eq_(next(numbers), 2)
