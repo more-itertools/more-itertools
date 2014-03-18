@@ -239,24 +239,32 @@ def with_iter(context_manager):
 
 
 def distinct_permutations(iterable):
-  """Yield successive distinct permutations of the elements in the iterable.
-  Equivalent to ``(set(permutations(iterable))``, except duplicates are not
-  generated. For large input sequences this is much more efficient.
-  """
-  def perm_unique_helper(item_counts, perm, i):
-      if i < 0:
-          yield tuple(perm)
-      else:
-          for item in item_counts:
-              if item_counts[item] <= 0:
-                  continue
-              perm[i] = item
-              item_counts[item] -= 1
-              for x in perm_unique_helper(item_counts, perm, i - 1):
-                  yield x
-              item_counts[item] += 1
-  
-  item_counts = Counter(iterable)
-  L = len(iterable)
-  
-  return perm_unique_helper(item_counts, [0] * L, L - 1)
+    """Yield successive distinct permutations of the elements in the iterable.
+    Equivalent to ``(set(permutations(iterable))``, except duplicates are not
+    generated. For large input sequences this is much more efficient.
+    """
+    def perm_unique_helper(item_counts, perm, i):
+        """Helper function for ``distinct_permutations``.
+        ``item_counts`` is a ``collections.Counter`` type that stores the unique
+        items in ``iterable`` and how many times they are repeated.
+        ``perm`` is the permutation that is being built for output.
+        ``i`` is the index of the permutation being modified.
+        The output permutations are built up recursively; the distinct items are
+        placed until their repetitions are exhausted.
+        """
+        if i < 0:
+            yield tuple(perm)
+        else:
+            for item in item_counts:
+                if item_counts[item] <= 0:
+                    continue
+                perm[i] = item
+                item_counts[item] -= 1
+                for x in perm_unique_helper(item_counts, perm, i - 1):
+                    yield x
+                item_counts[item] += 1
+
+    item_counts = Counter(iterable)
+    L = len(iterable)
+
+    return perm_unique_helper(item_counts, [None] * L, L - 1)
