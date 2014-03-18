@@ -123,9 +123,12 @@ class ConsumerTests(TestCase):
         e.send('hi')  # without @consumer, would raise TypeError
 
 
-def test_output():
-    """Make sure the output for ``distinct_permutations()`` is the same as set(permutations(it))"""
-    iterable = ['z', 'a', 'a', 2, 2, 2, 1]
+def test_distinct_permutations():
+    """Make sure the output for ``distinct_permutations()`` is the same as
+    set(permutations(it)).
+
+    """
+    iterable = ['z', 'a', 'a', 'q', 'q', 'q', 'y']
     test_output = sorted(distinct_permutations(iterable))
     ref_output = sorted(set(permutations(iterable)))
     eq_(test_output, ref_output)
