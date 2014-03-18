@@ -239,17 +239,21 @@ def with_iter(context_manager):
 
 def distinct_permutations(iterable):
     """Yield successive distinct permutations of the elements in the iterable.
-    Equivalent to ``(set(permutations(iterable))``, except duplicates are not
+
+    Equivalent to ``set(permutations(iterable))``, except duplicates are not
     generated. For large input sequences this is much more efficient.
+
     """
     def perm_unique_helper(item_counts, perm, i):
-        """Helper function for ``distinct_permutations``.
+        """Internal helper function
+
         :arg item_counts: Stores the unique items in ``iterable`` and how many
-            times they are repeated.
-        :arg perm: The permutation that is being built for output.
-        :arg i: The index of the permutation being modified.
-        The output permutations are built up recursively; the distinct items are
-            placed until their repetitions are exhausted.
+            times they are repeated
+        :arg perm: The permutation that is being built for output
+        :arg i: The index of the permutation being modified
+
+        The output permutations are built up recursively; the distinct items
+        are placed until their repetitions are exhausted.
         """
         if i < 0:
             yield tuple(perm)
@@ -265,7 +269,7 @@ def distinct_permutations(iterable):
     
     item_counts = {}
     for item in iterable:
-        item_counts[item] = item_counts.setdefault(item, 0) + 1
+        item_counts[item] = item_counts.get(item, 0) + 1
 
     return perm_unique_helper(item_counts, [None] * len(iterable),
                               len(iterable) - 1)
