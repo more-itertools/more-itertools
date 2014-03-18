@@ -245,12 +245,12 @@ def distinct_permutations(iterable):
     """
     def perm_unique_helper(item_counts, perm, i):
         """Helper function for ``distinct_permutations``.
-        ``item_counts`` is a ``collections.Counter`` type that stores the unique
-        items in ``iterable`` and how many times they are repeated.
-        ``perm`` is the permutation that is being built for output.
-        ``i`` is the index of the permutation being modified.
+        :arg item_counts: Stores the unique items in ``iterable`` and how many
+            times they are repeated.
+        :arg perm: The permutation that is being built for output.
+        :arg i: The index of the permutation being modified.
         The output permutations are built up recursively; the distinct items are
-        placed until their repetitions are exhausted.
+            placed until their repetitions are exhausted.
         """
         if i < 0:
             yield tuple(perm)
