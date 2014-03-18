@@ -265,6 +265,6 @@ def distinct_permutations(iterable):
                 item_counts[item] += 1
 
     item_counts = Counter(iterable)
-    L = len(iterable)
 
-    return perm_unique_helper(item_counts, [None] * L, L - 1)
+    return perm_unique_helper(item_counts, [None] * len(iterable),
+                              len(iterable) - 1)
