@@ -2,6 +2,9 @@
 Version History
 ===============
 
+2.3
+    * Added ``distinct_permutations``. (Thanks, Bo Bayles!)
+
 2.2
     * Added ``iterate`` and ``with_iter``. (Thanks, abarnert!)
 

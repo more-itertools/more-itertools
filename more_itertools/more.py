@@ -241,7 +241,7 @@ def distinct_permutations(iterable):
     """Yield successive distinct permutations of the elements in the iterable.
 
     Equivalent to ``set(permutations(iterable))``, except duplicates are not
-    generated. For large input sequences this is much more efficient.
+    generated. For large input sequences, this is much more efficient.
 
     """
     def perm_unique_helper(item_counts, perm, i):
