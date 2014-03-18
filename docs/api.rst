@@ -11,6 +11,7 @@ New Routines
 .. autofunction:: chunked
 .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: consumer
+.. autofunction:: distinct_permutations
 .. autofunction:: first(iterable[, default])
 .. autofunction:: ilen
 .. autofunction:: iterate
