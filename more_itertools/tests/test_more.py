@@ -154,3 +154,9 @@ class TestBuckets(object):
         true, false = bisect(items)
         assert list(true) == [1, 2]
         assert list(false) == [0]
+
+    def test_get_first_n_queues(self):
+        "ensure get_first_n_queues returns n queues"
+        items = [0, 1, 2]
+        for n in range(4):
+            assert len(buckets(items).get_first_n_queues(n)) == n
