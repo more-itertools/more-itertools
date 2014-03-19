@@ -243,7 +243,7 @@ def bisect(seq, func=bool):
     By default, func is `:func:bool()`, so uses the truth value of the object.
     """
     queues = buckets(seq, func)
-    return queues.get_first_n_queues(2)
+    return queues.get(True), queues.get(False)
 
 
 class buckets(object):
