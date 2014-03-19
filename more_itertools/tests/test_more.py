@@ -141,3 +141,16 @@ def test_with_iter():
         pass
     else:
         raise AssertionError('StringIO object was not closed.')
+
+
+class TestBuckets(object):
+    """
+    Tests for buckets and bisect
+    """
+
+    def test_bisect_order(self):
+        "bisect should always return the True bucket first"
+        items = [0, 1, 2]
+        true, false = bisect(items)
+        assert list(true) == [1, 2]
+        assert list(false) == [0]
