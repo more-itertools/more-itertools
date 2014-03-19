@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from functools import partial, wraps
 from itertools import izip_longest
 from recipes import *
@@ -158,7 +160,7 @@ def collate(*iterables, **kwargs):
     key = kwargs.pop('key', lambda a: a)
     reverse = kwargs.pop('reverse', False)
 
-    min_or_max = partial(max if reverse else min, key=lambda (a, b): a)
+    min_or_max = partial(max if reverse else min, key=lambda a_b: a_b[0])
     peekables = [peekable(it) for it in iterables]
     peekables = [p for p in peekables if p]  # Kill empties.
     while peekables:
@@ -176,7 +178,7 @@ def consumer(func):
     ... def tally():
     ...     i = 0
     ...     while True:
-    ...         print 'Thing number %s is %s.' % (i, (yield))
+    ...         print('Thing number %s is %s.' % (i, (yield)))
     ...         i += 1
     ...
     >>> t = tally()
