@@ -278,6 +278,11 @@ class buckets(object):
     2
     >>> next(ones)
     4
+
+    Use the ``get`` method to always get an iterator:
+
+    >>> tuple(every_third_split.get('missing'))
+    ()
     """
     def __init__(self, sequence, func = lambda x: x):
         self.sequence = iter(sequence)
@@ -289,6 +294,16 @@ class buckets(object):
             return self.queues[key]
         except KeyError:
             return self._find_queue(key)
+
+    def get(self, key, default=iter(())):
+        """
+        Get the bucket indicated by key. If no bucket is found, return
+        default. Default should be an iterator.
+        """
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
     def _fetch(self):
         "get the next item from the sequence and queue it up"
