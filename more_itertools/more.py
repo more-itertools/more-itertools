@@ -288,20 +288,20 @@ class buckets(object):
         try:
             return self.queues[key]
         except KeyError:
-            return self.__find_queue__(key)
+            return self._find_queue(key)
 
-    def __fetch__(self):
+    def _fetch(self):
         "get the next item from the sequence and queue it up"
         item = next(self.sequence)
         key = self.func(item)
-        queue = self.queues.setdefault(key, fetching_queue(self.__fetch__))
+        queue = self.queues.setdefault(key, fetching_queue(self._fetch))
         queue.enqueue(item)
 
-    def __find_queue__(self, key):
+    def _find_queue(self, key):
         "search for the queue indexed by key"
         try:
             while not key in self.queues:
-                self.__fetch__()
+                self._fetch()
             return self.queues[key]
         except StopIteration:
             raise KeyError(key)
@@ -314,7 +314,7 @@ class buckets(object):
         """
         try:
             while len(self.queues) < n:
-                self.__fetch__()
+                self._fetch()
         except StopIteration:
             pass
         values = list(self.queues.values())
