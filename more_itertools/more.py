@@ -1,3 +1,4 @@
+import queue
 from functools import partial, wraps
 from itertools import izip_longest
 from recipes import *
@@ -338,7 +339,7 @@ class buckets(object):
         return values
 
 
-class fetching_queue(list):
+class fetching_queue(queue.Queue):
     """
     A FIFO Queue that is supplied with a function to inject more into
     the queue if it is empty.
@@ -353,12 +354,13 @@ class fetching_queue(list):
     tuple(q) just copies the queued elements (of which there are none).
     """
     def __init__(self, fetcher):
+        super(fetching_queue, self).__init__()
         self._fetcher = fetcher
 
     def __next__(self):
-        while not self:
+        while self.empty():
             self._fetcher()
-        return self.pop()
+        return self.get()
     next = __next__
 
     def __iter__(self):
@@ -366,4 +368,4 @@ class fetching_queue(list):
             yield next(self)
 
     def enqueue(self, item):
-        self.insert(0, item)
+        self.put_nowait(item)
