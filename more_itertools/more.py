@@ -342,7 +342,8 @@ class buckets(object):
 class fetching_queue(queue.Queue):
     """
     A FIFO Queue that is supplied with a function to inject more into
-    the queue if it is empty.
+    the queue if it is empty. The function should raise a StopIteration if
+    no items are available.
 
     >>> values = iter(range(10))
     >>> get_value = lambda: globals()['q'].enqueue(next(values))
