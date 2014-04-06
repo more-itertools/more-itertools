@@ -269,6 +269,7 @@ def always_iterable(item):
     """
     if item is None:
         item = ()
-    if isinstance(item, six.string_types) or not hasattr(item, '__iter__'):
+    string_types = unicode, str
+    if isinstance(item, string_types) or not hasattr(item, '__iter__'):
         item = item,
     return item
