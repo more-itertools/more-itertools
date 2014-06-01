@@ -272,7 +272,7 @@ def always_iterable(item):
     """
     if item is None:
         item = ()
-    string_types = unicode, str
+    string_types = unicode, bytes
     if isinstance(item, string_types) or not hasattr(item, '__iter__'):
         item = item,
     return item
