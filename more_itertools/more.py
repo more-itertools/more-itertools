@@ -249,6 +249,9 @@ def always_iterable(item):
     >>> always_iterable('foo')
     ('foo',)
 
+    >>> always_iterable(b'foo') == (b'foo',)
+    True
+
     >>> always_iterable(None)
     ()
 
