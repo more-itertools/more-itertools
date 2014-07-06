@@ -5,7 +5,8 @@ from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter', 'one', 'distinct_permutations']
+           'iterate', 'with_iter', 'one', 'distinct_permutations', 'total_product',
+           'specific_product']
 
 
 _marker = object()
@@ -306,3 +307,46 @@ def distinct_permutations(iterable):
 
     return perm_unique_helper(item_counts, [None] * len(iterable),
                               len(iterable) - 1)
+
+def total_product(*args):
+    """Calculate total permutations of a Cartesian product
+    
+    :args args is the iterables that will eventually be passed to more_itertools.specific_product()
+    
+    Used to get an integer of for iteration over with specific Cartesian product
+    """
+    
+    pools = map(tuple, args)
+    pool_length = 1
+    for pool in pools:
+        pool_length = pool_length * len(pool)
+    pool_length = pool_length - 1
+    return pool_length
+
+def specific_product(sets,n):
+    """Extract single permutation of Cartesian product iteration in an consistent speed regardless of list/set sizes.
+    
+    :arg sets: The same arg used for itertools.product, iterables.
+    :arg n: Integer of the specific permutation of the product you want to extract.
+    
+    This is better then the current intertools generator/yield when dealing with massive amounts of sets/permutations.
+    
+    Allows for a consistent speed of product extraction regardless of sets size.
+    """
+    ln = len(sets)
+    dm = [None] * ln;
+    f = 1
+    
+    for i in xrange(ln):
+        l = len(sets[i])
+        dm[i] = [f,l]
+        f*=l
+    
+    c = [None] * ln;
+    for i in xrange(ln):
+        try:
+            c[i] = sets[i][(n/dm[i][0]<<0)%dm[i][1]]
+        except Exception as e: """ Division of 0, shouldn't happen """
+            raise;
+    
+    return c

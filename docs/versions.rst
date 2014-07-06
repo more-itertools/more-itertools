@@ -2,6 +2,9 @@
 Version History
 ===============
 
+2.4
+    * Added ``total_product`` and ``specific_product``. (Thanks, Andy Hawkins of BombSquad!)
+
 2.3
     * Added ``one`` from ``jaraco.util.itertools``. (Thanks, jaraco!)
     * Added ``distinct_permutations``. (Thanks, Bo Bayles!)
