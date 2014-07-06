@@ -18,6 +18,8 @@ New Routines
 .. autofunction:: one
 .. autoclass:: peekable
 .. autofunction:: with_iter
+.. autofunction:: total_product
+.. autofunction:: specific_product
 
 
 Itertools Recipes
