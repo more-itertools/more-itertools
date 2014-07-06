@@ -330,8 +330,6 @@ def specific_product(sets,n):
     :arg n: Integer of the specific permutation of the product you want to extract.
     
     This is better then the current intertools generator/yield when dealing with massive amounts of sets/permutations.
-    
-    Allows for a consistent speed of product extraction regardless of sets size.
     """
     ln = len(sets)
     dm = [None] * ln;
