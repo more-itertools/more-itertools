@@ -7,7 +7,7 @@ Some backward-compatible usability improvements have been made.
 .. [1] http://docs.python.org/library/itertools.html#recipes
 
 """
-from collections import deque
+from collections import deque, Iterable
 from itertools import chain, combinations, count, cycle, groupby, ifilterfalse, imap, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
 import operator
 from random import randrange, sample, choice
@@ -18,7 +18,8 @@ __all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
            'grouper', 'roundrobin', 'powerset', 'unique_everseen',
            'unique_justseen', 'iter_except', 'random_product',
            'random_permutation', 'random_combination',
-           'random_combination_with_replacement']
+           'random_combination_with_replacement', 'collapse',
+           'flatten_2', 'flatten_3', 'flatten_4']
 
 
 def take(n, iterable):
@@ -152,6 +153,76 @@ def flatten(listOfLists):
 
     """
     return chain.from_iterable(listOfLists)
+
+
+def flatten_2(l):
+    for el in l:
+        if isinstance(el, Iterable) and not isinstance(el, basestring):
+            for sub in flatten_2(el):
+                yield sub
+        else:
+            yield el
+
+
+def flatten_3(l):
+    # if isinstance(l, basestring):
+    #     yield l
+    #     return
+    try:
+        tree = iter(l)
+    except TypeError:
+        yield l
+        return
+    else:
+        for child in tree:
+            for sub in flatten_3(child):
+                yield sub
+
+
+def flatten_4(l):
+    try:
+        tree = iter(l)
+    except TypeError:
+        yield l
+        return
+    else:
+        if isinstance(tree, basestring):
+            yield l
+            return
+        else:
+            for child in tree:
+                for sub in flatten_4(child):
+                    yield sub
+
+def collapse(iterable, basetype=basestring, levels=None):
+    """Flatten an iterable containing some iterables (themselves containing
+    some iterables, etc.) into non-iterable types, strings, elements
+    matching ``isinstance(element, basetype)``, and elements that are
+    ``levels`` levels down.
+
+    >>> list(collapse([[1], 2, [[3], 4], [[[5]]]]))
+    [1, 2, 3, 4, 5]
+    >>> list(collapse([[1], 2, [[3], 4], [[[5]]]], levels=2))
+    [1, 2, 3, 4, [5]]
+    >>> list(collapse((1, [2], (3, [4, (5,)])), list))
+    [1, [2], 3, [4, (5,)]]
+    """
+    def walk(node, level):
+        if (levels is not None and level > levels or basetype and
+           isinstance(node, basetype)):
+            yield node
+            return
+        try:
+            tree = iter(node)
+        except TypeError:
+            yield node
+            return
+        else:
+            for child in tree:
+                for x in walk(child, level + 1):
+                    yield x
+    for x in walk(iterable, 0):
+        yield x
 
 
 def repeatfunc(func, times=None, *args):
