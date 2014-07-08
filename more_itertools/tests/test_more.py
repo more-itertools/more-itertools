@@ -160,3 +160,35 @@ def test_one():
     numbers = count()
     assert_raises(ValueError, one, numbers)  # burn 0 and 1
     eq_(next(numbers), 2)
+
+
+
+class IntersperseTest(TestCase):
+    """ Tests for intersperse() """
+
+    def test_intersperse(self):
+        itp = intersperse('_', 'aeiou')
+        assert next(itp) == 'a'
+        assert next(itp) == '_'
+        assert next(itp) == 'e'
+        assert next(itp) == '_'
+        assert next(itp) == 'i'
+        assert next(itp) == '_'
+        assert next(itp) == 'o'
+        assert next(itp) == '_'
+        assert next(itp) == 'u'
+        assert_raises(StopIteration, next, itp)
+
+    def test_intersperse_empty(self):
+        itp = intersperse(1, '')
+        assert_raises(StopIteration, next, itp)
+
+    def test_intersperse_not_iterable(self):
+        itp = intersperse('x', 1)
+        assert_raises(TypeError, next, itp)
+
+    def test_intersperse_generator(self):
+        itp = intersperse('x', xrange(5))
+        assert next(itp) == 0
+        assert next(itp) == 'x'
+        assert next(itp) == 1

@@ -5,7 +5,8 @@ from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter', 'one', 'distinct_permutations']
+           'iterate', 'with_iter', 'one', 'distinct_permutations',
+           'intersperse']
 
 
 _marker = object()
@@ -306,3 +307,22 @@ def distinct_permutations(iterable):
 
     return perm_unique_helper(item_counts, [None] * len(iterable),
                               len(iterable) - 1)
+
+
+def intersperse(e, iterable):
+    """
+    The intersperse generator takes an element and an iterable and
+    `intersperses' that element between the elements of the iterable.
+
+    intersperse('x', [1,'o',5.6,'k']) -> [1,'x','o','x',5.6,'x','k']
+    intersperse(None, [1,2,3]) -> [1,None,2,None,3]
+    intersperse('x', 1) -> TypeError
+    intersperse('x', []) -> StopIteration
+    """
+    iterable = iter(iterable)
+    if iterable:
+        yield next(iterable)
+        for item in iterable:
+            yield e
+            yield item
+    raise StopIteration
