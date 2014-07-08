@@ -186,7 +186,7 @@ def flatten_4(l):
         yield l
         return
     else:
-        if isinstance(tree, basestring):
+        if isinstance(l, basestring):
             yield l
             return
         else:
@@ -221,7 +221,7 @@ def collapse(iterable, basetype=basestring, levels=None):
             for child in tree:
                 for x in walk(child, level + 1):
                     yield x
-    for x in walk(iterable, 0):
+    for x in walk(iterable, 1):
         yield x
 
 
