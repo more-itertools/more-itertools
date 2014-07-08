@@ -160,3 +160,11 @@ def test_one():
     numbers = count()
     assert_raises(ValueError, one, numbers)  # burn 0 and 1
     eq_(next(numbers), 2)
+
+
+def test_intersperse():
+    itp = intersperse('_', 'aeiou')
+    assert next(itp) == 'a'
+    assert next(itp) == '_'
+    next(itp)
+    assert next(itp) == '_'
