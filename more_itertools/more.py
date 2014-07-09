@@ -319,6 +319,7 @@ def intersperse(e, iterable):
     iterable = iter(iterable)
     if iterable:
         yield next(iterable)
-    for item in iterable:
-        yield e
-        yield item
+        for item in iterable:
+            yield e
+            yield item
+    raise StopIteration
