@@ -174,3 +174,16 @@ def test_intersperse():
     assert next(itp) == '_'
     assert next(itp) == 'u'
     assert_raises(StopIteration, next, itp)
+
+def test_intersperse_empty():
+    itp = intersperse(None, 'aeiou')
+    assert next(itp) == 'a'
+    assert next(itp) is None
+    itp = intersperse(None, '')
+    assert_raises(StopIteration, next, itp)
+
+def test_intersperse_generator():
+    itp = intersperse('x', xrange(5))
+    assert next(itp) == 0
+    assert next(itp) == 'x'
+    assert next(itp) == 1
