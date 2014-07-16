@@ -181,6 +181,8 @@ def test_intersperse_empty():
     assert next(itp) is None
     itp = intersperse(None, '')
     assert_raises(StopIteration, next, itp)
+    itp = intersperse('x', 1)
+    assert_raises(TypeError, next, itp)
 
 def test_intersperse_generator():
     itp = intersperse('x', xrange(5))
