@@ -166,5 +166,11 @@ def test_intersperse():
     itp = intersperse('_', 'aeiou')
     assert next(itp) == 'a'
     assert next(itp) == '_'
-    next(itp)
+    assert next(itp) == 'e'
     assert next(itp) == '_'
+    assert next(itp) == 'i'
+    assert next(itp) == '_'
+    assert next(itp) == 'o'
+    assert next(itp) == '_'
+    assert next(itp) == 'u'
+    assert_raises(StopIteration, next, itp)
