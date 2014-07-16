@@ -175,7 +175,7 @@ def test_intersperse():
     assert next(itp) == 'u'
     assert_raises(StopIteration, next, itp)
 
-def test_intersperse_empty():
+def test_intersperse_error():
     itp = intersperse(None, 'aeiou')
     assert next(itp) == 'a'
     assert next(itp) is None

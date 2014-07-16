@@ -314,7 +314,10 @@ def intersperse(e, iterable):
     The intersperse generator takes an element and an iterable and
     `intersperses' that element between the elements of the iterable.
 
-    intersperse('x', [a, b, c, d]) = [a, x, b, x, c, x, d]
+    intersperse('x', [1,'o',5.6,'k']) -> [1,'x','o','x',5.6,'x','k']
+    intersperse(None, [1,2,3]) -> [1,None,2,None,3]
+    intersperse('x', 1) -> TypeError
+    intersperse('x', []) -> StopIteration
     """
     iterable = iter(iterable)
     if iterable:
