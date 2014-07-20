@@ -162,30 +162,33 @@ def test_one():
     eq_(next(numbers), 2)
 
 
-def test_intersperse():
-    itp = intersperse('_', 'aeiou')
-    assert next(itp) == 'a'
-    assert next(itp) == '_'
-    assert next(itp) == 'e'
-    assert next(itp) == '_'
-    assert next(itp) == 'i'
-    assert next(itp) == '_'
-    assert next(itp) == 'o'
-    assert next(itp) == '_'
-    assert next(itp) == 'u'
-    assert_raises(StopIteration, next, itp)
 
-def test_intersperse_error():
-    itp = intersperse(None, 'aeiou')
-    assert next(itp) == 'a'
-    assert next(itp) is None
-    itp = intersperse(None, '')
-    assert_raises(StopIteration, next, itp)
-    itp = intersperse('x', 1)
-    assert_raises(TypeError, next, itp)
+class IntersperseTest(TestCase):
+    """ Tests for intersperse() """
 
-def test_intersperse_generator():
-    itp = intersperse('x', xrange(5))
-    assert next(itp) == 0
-    assert next(itp) == 'x'
-    assert next(itp) == 1
+    def test_intersperse(self):
+        itp = intersperse('_', 'aeiou')
+        assert next(itp) == 'a'
+        assert next(itp) == '_'
+        assert next(itp) == 'e'
+        assert next(itp) == '_'
+        assert next(itp) == 'i'
+        assert next(itp) == '_'
+        assert next(itp) == 'o'
+        assert next(itp) == '_'
+        assert next(itp) == 'u'
+        assert_raises(StopIteration, next, itp)
+
+    def test_intersperse_empty(self):
+        itp = intersperse(1, '')
+        assert_raises(StopIteration, next, itp)
+
+    def test_intersperse_not_iterable(self):
+        itp = intersperse('x', 1)
+        assert_raises(TypeError, next, itp)
+
+    def test_intersperse_generator(self):
+        itp = intersperse('x', xrange(5))
+        assert next(itp) == 0
+        assert next(itp) == 'x'
+        assert next(itp) == 1
