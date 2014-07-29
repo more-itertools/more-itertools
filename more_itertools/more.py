@@ -36,7 +36,7 @@ def chunked(iterable, n):
         yield group
 
 
-def first(iterable, default=_marker):
+def first(iterable, default=None):
     """Return the first item of an iterable, ``default`` if there is none.
 
         >>> first(xrange(4))
@@ -52,17 +52,18 @@ def first(iterable, default=_marker):
     ``next(iter(...), default)``.
 
     """
-    try:
-        return next(iter(iterable))
-    except StopIteration:
-        # I'm on the edge about raising ValueError instead of StopIteration. At
-        # the moment, ValueError wins, because the caller could conceivably
-        # want to do something different with flow control when I raise the
-        # exception, and it's weird to explicitly catch StopIteration.
-        if default is _marker:
-            raise ValueError('first() was called on an empty iterable, and no '
-                             'default value was provided.')
-        return default
+    # try:
+    #     return next(iter(iterable))
+    # except StopIteration:
+    #     # I'm on the edge about raising ValueError instead of StopIteration. At
+    #     # the moment, ValueError wins, because the caller could conceivably
+    #     # want to do something different with flow control when I raise the
+    #     # exception, and it's weird to explicitly catch StopIteration.
+    #     if default is _marker:
+    #         raise ValueError('first() was called on an empty iterable, and no '
+    #                          'default value was provided.')
+    #     return default
+    return next(iter(iterable), default)
 
 
 class peekable(object):

@@ -70,9 +70,9 @@ class FirstTests(TestCase):
         """Test that it doesn't raise StopIteration prematurely."""
         eq_(first([3]), 3)
 
-    def test_empty_stop_iteration(self):
+    def test_empty(self):
         """It should raise StopIteration for empty iterables."""
-        assert_raises(ValueError, first, [])
+        eq_(first([]), None)
 
     def test_default(self):
         """It should return the provided default arg for empty iterables."""
