@@ -55,6 +55,35 @@ def first(iterable, default=None):
     return next(iter(iterable), default)
 
 
+def old(iterable, default=_marker):
+    """Return the first item of an iterable, ``default`` if there is none.
+
+        >>> first(xrange(4))
+        0
+        >>> first(xrange(0), 'some default')
+        'some default'
+
+    If ``default`` is not provided and there are no items in the iterable,
+    raise ``ValueError``.
+
+    ``first()`` is useful when you have a generator of expensive-to-retrieve
+    values and want any arbitrary one. It is marginally shorter than
+    ``next(iter(...), default)``.
+
+    """
+    try:
+        return next(iter(iterable))
+    except StopIteration:
+        # I'm on the edge about raising ValueError instead of StopIteration. At
+        # the moment, ValueError wins, because the caller could conceivably
+        # want to do something different with flow control when I raise the
+        # exception, and it's weird to explicitly catch StopIteration.
+        if default is _marker:
+            raise ValueError('first() was called on an empty iterable, and no '
+                             'default value was provided.')
+        return default
+
+
 class peekable(object):
     """Wrapper for an iterator to allow 1-item lookahead
 
