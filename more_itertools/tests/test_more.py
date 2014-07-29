@@ -71,7 +71,7 @@ class FirstTests(TestCase):
         eq_(first([3]), 3)
 
     def test_empty(self):
-        """It should raise StopIteration for empty iterables."""
+        """It should return None for empty iterables."""
         eq_(first([]), None)
 
     def test_default(self):
