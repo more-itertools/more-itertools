@@ -314,10 +314,17 @@ def intersperse(e, iterable):
     The intersperse generator takes an element and an iterable and
     `intersperses' that element between the elements of the iterable.
 
-    intersperse('x', [1,'o',5.6,'k']) -> [1,'x','o','x',5.6,'x','k']
-    intersperse(None, [1,2,3]) -> [1,None,2,None,3]
-    intersperse('x', 1) -> TypeError
-    intersperse('x', []) -> StopIteration
+    >>> from more_itertools import intersperse
+    >>> list(intersperse('x', [1, 'o', 5, 'k']))
+    [1, 'x', 'o', 'x', 5, 'x', 'k']
+    >>> list(intersperse(None, [1, 2, 3]))
+    [1, None, 2, None, 3]
+    >>> list(intersperse('x', 1))
+    Traceback (most recent call last):
+    ...
+    TypeError: 'int' object is not iterable
+    >>> list(intersperse('x', []))
+    []
     """
     iterable = iter(iterable)
     if iterable:
