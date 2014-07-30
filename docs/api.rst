@@ -18,6 +18,7 @@ New Routines
 .. autofunction:: one
 .. autoclass:: peekable
 .. autofunction:: with_iter
+.. autofunction:: intersperse
 
 
 Itertools Recipes

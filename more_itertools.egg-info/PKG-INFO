@@ -1,0 +1,74 @@
+Metadata-Version: 1.1
+Name: more-itertools
+Version: 2.2
+Summary: More routines for operating on iterables, beyond itertools
+Home-page: https://github.com/erikrose/more-itertools
+Author: Erik Rose
+Author-email: erikrose@grinchcentral.com
+License: MIT
+Description: ==============
+        More Itertools
+        ==============
+        
+        I love itertools; it's one of the most beautiful, composable standard libs.
+        Whenever I have an iteration problem, there's almost always an itertools
+        routine that fits it perfectly. Sometimes, however, neither itertools nor the
+        recipes included in its docs do quite what I need.
+        
+        Here I've collected several routines I've reached for but not found. Since
+        they are deceptively tricky to get right, I've wrapped them up into a library.
+        We've also included implementations of the recipes from the itertools
+        documentation. Enjoy! Any additions are welcome; just file a pull request.
+        
+        
+        Full Documentation
+        ==================
+        
+        Please see http://packages.python.org/more-itertools/api.html for the list of
+        routines.
+        
+        
+        Version History
+        ===============
+        
+        2.3
+            * Added ``one`` from ``jaraco.util.itertools``. (Thanks, jaraco!)
+            * Added ``distinct_permutations``. (Thanks, Bo Bayles!)
+        
+        2.2
+            * Added ``iterate`` and ``with_iter``. (Thanks, abarnert!)
+        
+        2.1
+            * Added (tested!) implementations of the recipes from the itertools
+              documentation. (Thanks, Chris Lonnen!)
+            * Added ``ilen``. (Thanks for the inspiration, Matt Basta!)
+        
+        2.0
+            * ``chunked`` now returns lists rather than tuples. After all, they're
+              homogeneous. This slightly backward-incompatible change is the reason for
+              the major version bump.
+            * Added ``@consumer``.
+            * Improved test machinery.
+        
+        1.1
+            * Added ``first`` function.
+            * Added Python 3 support.
+            * Added a default arg to ``peekable.peek()``.
+            * Noted how to easily test whether a peekable iterator is exhausted.
+            * Rewrote documentation.
+        
+        1.0
+            * Initial release, with ``collate``, ``peekable``, and ``chunked``. Could
+              really use better docs.
+Keywords: itertools,iterator,iteration,filter,peek,peekable,collate,chunk,chunked
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Topic :: Software Development :: Libraries
