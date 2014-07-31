@@ -18,6 +18,7 @@ New Routines
 .. autofunction:: iterate
 .. autofunction:: one
 .. autoclass:: peekable
+.. autofunction:: unique_from_each
 .. autofunction:: with_iter
 
 

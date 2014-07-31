@@ -1,12 +1,12 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from itertools import izip_longest
+from itertools import chain, izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse']
+           'intersperse', 'unique_from_each']
 
 
 _marker = object()
@@ -333,3 +333,28 @@ def intersperse(e, iterable):
             yield e
             yield item
     raise StopIteration
+
+
+def unique_from_each(*iterables):
+    """
+    Return the elements from each of the input iterables that aren't in the
+    other input iterables.
+    
+    If there are duplicates in one input iterable that aren't in the others
+    they will be duplicated in the output. Input order is preserved.
+    
+    >>> unique_from_each("hello", "world")
+    [['h', 'e'], ['w', 'r', 'd']]
+    >>> unique_from_each("mississippi", "missouri")
+    [['p', 'p'], ['o', 'u', 'r']]
+    """
+    ret = []
+    pool = [tuple(it) for it in iterables]
+    for it in pool:
+        super_list = list(chain(*pool))
+        for element in it:
+            super_list.remove(element)
+        uniques = [element for element in it if element not in super_list]
+        ret.append(uniques)
+    
+    return ret
