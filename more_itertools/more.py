@@ -53,17 +53,17 @@ def first(iterable, default=_marker):
     ``next(iter(...), default)``.
 
     """
-    try:
-        return next(iter(iterable))
-    except StopIteration:
+    value = next(iter(iterable), default)
+
+    if value is _marker:
         # I'm on the edge about raising ValueError instead of StopIteration. At
         # the moment, ValueError wins, because the caller could conceivably
         # want to do something different with flow control when I raise the
         # exception, and it's weird to explicitly catch StopIteration.
-        if default is _marker:
-            raise ValueError('first() was called on an empty iterable, and no '
-                             'default value was provided.')
-        return default
+        raise ValueError('first() was called on an empty iterable, and no '
+                         'default value was provided.')
+
+    return value
 
 
 class peekable(object):
