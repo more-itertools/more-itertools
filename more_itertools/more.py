@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from itertools import chain, izip_longest
+from itertools import izip_longest
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
@@ -358,14 +358,16 @@ def unique_to_each(*iterables):
     
     It is assumed that the elements of each iterable are hashable.
     """
-    ret = []
-    pool = [tuple(it) for it in iterables]
-    for it in pool:
-        super_list = list(chain(*pool))
+    elements_to_indices = {}
+    pool = [list(it) for it in iterables]
+    for i, it in enumerate(pool):
         for element in it:
-            super_list.remove(element)
-        super_set = set(super_list)
-        uniques = [element for element in it if element not in super_set]
-        ret.append(uniques)
+            elements_to_indices.setdefault(element, set()).add(i)
     
-    return ret
+    for element, indices in elements_to_indices.iteritems():
+        if len(indices) != 1:
+            for i in indices:
+                while element in pool[i]:
+                    pool[i].remove(element)
+
+    return pool
