@@ -222,15 +222,7 @@ def collapse2(iterable, basetype=basestring, levels=None):
 
 def _collapse2(iterable, basetype=basestring, levels=None):
     if levels is None or levels >= 0:
-        try:
-            # fast way to confirm if iterable is actually an iterable
-            iter(iterable)
-        except TypeError:
-            #iterable isn't actually an iterable, so yield it and return
-            #this will happen often if levels was not defined
-            yield iterable
-            return
-        if isinstance(iterable, basetype):
+        if not isinstance(iterable, basetype):
             yield iterable
             return
         if levels is not None:
