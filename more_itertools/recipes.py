@@ -221,10 +221,8 @@ def collapse2(iterable, basetype=basestring, levels=None):
 
 
 def _collapse2(iterable, basetype=basestring, levels=None):
-    if levels is None or levels >= 0:
-        if not isinstance(iterable, basetype):
-            yield iterable
-            return
+    if (levels is None or levels >= 0) and \
+            not isinstance(iterable, basetype) and hasattr(iterable, '__iter__'):
         if levels is not None:
             levels -= 1
         for item in iterable:
