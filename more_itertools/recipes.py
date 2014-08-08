@@ -194,6 +194,8 @@ def flatten_4(l):
                 for sub in flatten_4(child):
                     yield sub
 
+
+
 def collapse2(iterable, basetype=basestring, levels=None):
     """Flatten an iterable containing some iterables (themselves containing
     some iterables, etc.) into non-iterable types, strings, elements
@@ -221,12 +223,61 @@ def collapse2(iterable, basetype=basestring, levels=None):
 
 
 def _collapse2(iterable, basetype=basestring, levels=None):
+    if levels is None or levels >= 0:
+        try:
+        # fast way to confirm if iterable is actually an iterable
+            iter(iterable)
+        except TypeError:
+            #iterable isn't actually an iterable, so yield it and return
+            #this will happen often if levels was not defined
+            yield iterable
+            return
+        if isinstance(iterable, basetype):
+            yield iterable
+            return
+        if levels is not None:
+            levels -= 1
+        for item in iterable:
+            for sub_item in _collapse2(item, basetype=basetype, levels=levels):
+                yield sub_item
+    else:
+        #levels is defined but < 0, which means we don't want to flatten any further
+        yield iterable
+        return
+
+
+def collapse3(iterable, basetype=basestring, levels=None):
+    """Flatten an iterable containing some iterables (themselves containing
+    some iterables, etc.) into non-iterable types, strings, elements
+    matching ``isinstance(element, basetype)``, and elements that are
+    ``levels`` levels down.
+
+    >>> list(collapse2([[1], [2], [3, 4], [5]]))
+    [1, 2, 3, 4, 5]
+    >>> list(collapse2([[1], [2], [3, 4], [5]], levels=0))
+    [[1], [2], [3, 4], [5]]
+    >>> list(collapse2([[1], [2], [3, 4], [5]], levels=1))
+    [1, 2, 3, 4, 5]
+    >>> list(collapse2([[1], 2, [[3], 4], [[[5]]]]))
+    [1, 2, 3, 4, 5]
+    >>> list(collapse2([[1], 2, [[3], 4], [[[5]]]], levels=2))
+    [1, 2, 3, 4, [5]]
+    >>> list(collapse2((1, [2], (3, [4, (5,)])), list))
+    [1, [2], 3, [4, (5,)]]
+    """
+    #flatten() is really fast, so use it if possible
+    if levels == 1 and not isinstance(iterable, basetype):
+        return flatten(iterable)
+    return _collapse3(iterable, basetype=basetype, levels=levels)
+
+
+def _collapse3(iterable, basetype=basestring, levels=None):
     if (levels is None or levels >= 0) and \
             not isinstance(iterable, basetype) and hasattr(iterable, '__iter__'):
         if levels is not None:
             levels -= 1
         for item in iterable:
-            for sub_item in _collapse2(item, basetype=basetype, levels=levels):
+            for sub_item in _collapse3(item, basetype=basetype, levels=levels):
                 yield sub_item
     else:
         #levels is defined but < 0, which means we don't want to flatten any further
