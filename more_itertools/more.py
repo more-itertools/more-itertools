@@ -167,7 +167,7 @@ def collate(*iterables, **kwargs):
     while peekables:
         _, p = min_or_max((key(p.peek()), p) for p in peekables)
         yield p.next()
-        peekables = [p for p in peekables if p]
+        peekables = list(p for p in peekables if p)
 
 
 def consumer(func):
