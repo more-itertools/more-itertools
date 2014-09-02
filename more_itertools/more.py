@@ -6,7 +6,7 @@ from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse']
+           'intersperse', 'side_effect']
 
 
 _marker = object()
@@ -241,6 +241,7 @@ def with_iter(context_manager):
         for item in iterable:
             yield item
 
+
 def one(iterable):
     """Return the only element from the iterable.
 
@@ -333,3 +334,39 @@ def intersperse(e, iterable):
             yield e
             yield item
     raise StopIteration
+
+
+def side_effect(fn, iterable):
+    """
+    Passes through the iterable, but invokes a function for each item
+    iterated over.
+
+    Can be useful for lazy counting, logging, collecting data, or updating
+    progress bars, anything un-pure.
+
+    `fn` must be a function that takes a single argument.  Its return value
+    will be discarded.
+
+    Examples:
+
+        >>> from more_itertools import take, consume, side_effect
+        >>> iterable = take(3, range(10))
+        >>> iterable = side_effect(print, iterable)
+        >>> consume(iterable)
+        0
+        1
+        2
+
+    Example for collecting data as it streams through:
+
+        >>> iterable = take(3, range(10))
+        >>> c = set()
+        >>> iterable = side_effect(c.add, iterable)
+        >>> consume(iterable)
+        >>> sorted(c)
+        [0, 1, 2]
+
+    """
+    for item in iterable:
+        fn(item)
+        yield item
