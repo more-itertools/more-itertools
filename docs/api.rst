@@ -18,6 +18,7 @@ New Routines
 .. autofunction:: iterate
 .. autofunction:: one
 .. autoclass:: peekable
+.. autofunction:: side_effect
 .. autofunction:: with_iter
 
 
