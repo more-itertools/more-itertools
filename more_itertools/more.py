@@ -336,7 +336,7 @@ def intersperse(e, iterable):
     raise StopIteration
 
 
-def side_effect(fn, iterable):
+def side_effect(fn, iterable, chunk_size=None):
     """
     Passes through the iterable, but invokes a function for each item
     iterated over.
@@ -366,7 +366,36 @@ def side_effect(fn, iterable):
         >>> c
         [0, 1, 2]
 
+    Collecting items in chunks:
+
+        >>> iterable = range(10)
+        >>> c, d = [], []
+        >>> iterable = side_effect(lambda xs: c.append(sum(xs)), iterable, 2)
+        >>> iterable = side_effect(lambda xs: d.append(sum(xs)), iterable, 3)
+        >>> list(iterable)
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        >>> c
+        [1, 5, 9, 13, 17]
+        >>> d
+        [3, 12, 21, 9]
+
+    Emit progress:
+
+        >>> iterable = range(100)
+        >>> iterable = side_effect(lambda xs: print('Processed ' + str(len(xs)) + ' items'), iterable, 30)
+        >>> consume(iterable)
+        Processed 30 items
+        Processed 30 items
+        Processed 30 items
+        Processed 10 items
+
     """
-    for item in iterable:
-        fn(item)
-        yield item
+    if chunk_size is None:
+        for item in iterable:
+            fn(item)
+            yield item
+    else:
+        for chunk in chunked(iterable, chunk_size):
+            fn(chunk)
+            for item in chunk:
+                yield item
