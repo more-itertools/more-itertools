@@ -360,10 +360,10 @@ def side_effect(fn, iterable):
     Example for collecting data as it streams through:
 
         >>> iterable = take(3, range(10))
-        >>> c = set()
-        >>> iterable = side_effect(c.add, iterable)
+        >>> c = []
+        >>> iterable = side_effect(c.append, iterable)
         >>> consume(iterable)
-        >>> sorted(c)
+        >>> c
         [0, 1, 2]
 
     """
