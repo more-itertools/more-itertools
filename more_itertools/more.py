@@ -350,19 +350,19 @@ def side_effect(fn, iterable):
     Examples:
 
         >>> from more_itertools import take, consume, side_effect
-        >>> iterable = take(3, range(10))
+        >>> iterable = range(10)
         >>> iterable = side_effect(print, iterable)
-        >>> consume(iterable)
+        >>> consume(take(3, iterable))
         0
         1
         2
 
     Example for collecting data as it streams through:
 
-        >>> iterable = take(3, range(10))
+        >>> iterable = range(10)
         >>> c = []
         >>> iterable = side_effect(c.append, iterable)
-        >>> consume(iterable)
+        >>> consume(take(3, iterable))
         >>> c
         [0, 1, 2]
 
