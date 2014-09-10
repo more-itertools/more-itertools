@@ -1,13 +1,25 @@
 from random import seed
 from unittest import TestCase
 
-from nose.tools import eq_, assert_raises, ok_
-
+import pytest
 from more_itertools import *
 
 
 def setup_module():
     seed(1337)
+
+
+def eq_(lhs, rhs):
+    assert lhs == rhs
+
+
+def ok_(expr):
+    assert expr
+
+
+def assert_raises(exc_class, f, *args, **kwargs):
+    with pytest.raises(exc_class):
+        f(*args, **kwargs)
 
 
 class TakeTests(TestCase):
