@@ -340,5 +340,5 @@ def empty_iterator():
     """
     An empty iterator.
     """
-    yield
     return
+    yield
