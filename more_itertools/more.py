@@ -1,12 +1,12 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from itertools import izip_longest
+from itertools import islice, izip_longest, tee
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse']
+           'intersperse', 'windowed']
 
 
 _marker = object()
@@ -333,3 +333,17 @@ def intersperse(e, iterable):
             yield e
             yield item
     raise StopIteration
+
+def windowed(iterable, n=2):
+    """Returns an iterator of overlapping windows, from the original.
+
+    With the default window size of 2, this is equivalent to pairwise.
+
+        >>> take(4, windowed(count(), 3))
+        [(0, 1, 2), (1, 2, 3), (2, 3, 4), (3, 4, 5)]
+        
+    """
+    tees = tee(iterable, n)
+    for i, t in enumerate(tees):
+        next(islice(t, i, i), None)
+    return zip(*tees)
