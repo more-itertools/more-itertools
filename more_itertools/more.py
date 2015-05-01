@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from itertools import islice, izip_longest, tee
+from itertools import islice, izip, izip_longest, tee
 from recipes import *
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
@@ -346,4 +346,4 @@ def windowed(iterable, n=2):
     tees = tee(iterable, n)
     for i, t in enumerate(tees):
         next(islice(t, i, i), None)
-    return zip(*tees)
+    return izip(*tees)
