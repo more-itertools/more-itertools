@@ -57,6 +57,41 @@ class ChunkedTests(TestCase):
         eq_(list(chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']])
 
 
+class IterChunkedTests(TestCase):
+    """Tests for ``iter_chunked()``"""
+
+    def test_even(self):
+        """Test when ``n`` divides evenly into the length of the iterable."""
+        eq_(
+            list(list(chunk) for chunk in iter_chunked('ABCDEF', 3)),
+            [['A', 'B', 'C'], ['D', 'E', 'F']]
+        )
+
+    def test_odd(self):
+        """Test when ``n`` does not divide evenly into the length of the
+        iterable.
+
+        """
+        eq_(
+            list(list(chunk) for chunk in iter_chunked('ABCDE', 3)),
+            [['A', 'B', 'C'], ['D', 'E']]
+        )
+
+    def test_consume_unfetched_items(self):
+        """Test that remaining items of a chunk are correctly consumed
+        when a new chunk is fetched.
+
+        """
+        generator = (i for i in xrange(10))
+
+        chunks = iter_chunked(generator, 3)
+
+        eq_(
+            list(take(2, chunk) for chunk in chunks),
+            [[0, 1], [3, 4], [6, 7], [9]]
+        )
+
+
 class FirstTests(TestCase):
     """Tests for ``first()``"""
 

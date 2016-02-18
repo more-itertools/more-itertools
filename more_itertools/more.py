@@ -1,12 +1,12 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from itertools import izip_longest
+from itertools import izip_longest, islice
 from recipes import *
 
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse']
+__all__ = ['chunked', 'iter_chunked', 'first', 'peekable', 'collate',
+           'consumer', 'ilen', 'iterate', 'with_iter', 'one',
+           'distinct_permutations', 'intersperse']
 
 
 _marker = object()
@@ -35,6 +35,31 @@ def chunked(iterable, n):
             # If this is the last group, shuck off the padding:
             del group[group.index(_marker):]
         yield group
+
+
+def iter_chunked(iterable, n):
+    """Break an iterable into iterable chunks of a given length::
+
+        >>> list(map(list, iter_chunked([1, 2, 3, 4, 5, 6, 7], 3)))
+        [[1, 2, 3], [4, 5, 6], [7]]
+
+        >>> list(next(chunk) for chunk in iter_chunked((xrange(1, 8)), 3))
+        [1, 4, 7]
+
+    If the length of ``iterable`` is not evenly divisible by ``n``, the last
+    returned list will be shorter.
+
+    It is not necessary to retrieve all the items from the chunk. If the chunk
+    is advanced and there are unfetched items in the last chunk, these will be
+    automatically consumed.
+
+    """
+    iterable_peekable = peekable(iterable)
+    while iterable_peekable:
+        chunk = islice(iterable_peekable, n)
+        yield chunk
+
+        consume(chunk)
 
 
 def first(iterable, default=_marker):
