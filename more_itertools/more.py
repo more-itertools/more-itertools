@@ -46,14 +46,21 @@ def iter_chunked(iterable, n):
         >>> list(next(chunk) for chunk in iter_chunked((xrange(1, 8)), 3))
         [1, 4, 7]
 
+        >>> list(iter_chunked([1, 2, 3], 0))
+        []
+
     If the length of ``iterable`` is not evenly divisible by ``n``, the last
     returned list will be shorter.
+    If ``n`` <= 0, no chunk will be generated.
 
     It is not necessary to retrieve all the items from the chunk. If the chunk
     is advanced and there are unfetched items in the last chunk, these will be
     automatically consumed.
 
     """
+    if n <= 0:
+        raise StopIteration
+
     iterable_peekable = peekable(iterable)
     while iterable_peekable:
         chunk = islice(iterable_peekable, n)

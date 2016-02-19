@@ -91,6 +91,12 @@ class IterChunkedTests(TestCase):
             [[0, 1], [3, 4], [6, 7], [9]]
         )
 
+    def test_invalid_n(self):
+        """It shouldn't generate anything for ``n`` <= 0."""
+        eq_(list(iter_chunked([1, 2, 3], 0)), [])
+
+        eq_(list(iter_chunked([1, 2, 3], -1)), [])
+
 
 class FirstTests(TestCase):
     """Tests for ``first()``"""
