@@ -233,15 +233,28 @@ def unique_everseen(iterable, key=None):
     seen = set()
     seen_add = seen.add
     if key is None:
-        for element in ifilterfalse(seen.__contains__, iterable):
-            seen_add(element)
+        for element in iterable:
+            try:
+                if element not in seen:
+                    seen_add(element)
+            except TypeError as e:
+                seen = list(seen)
+                seen_add = seen.append
+                if element not in seen:
+                    seen_add(element)
             yield element
     else:
         for element in iterable:
             k = key(element)
-            if k not in seen:
-                seen_add(k)
-                yield element
+            try:
+                if k not in seen:
+                    seen_add(k)
+            except TypeError as e:
+                seen = list(seen)
+                seen_add = seen.append
+                if k not in seen:
+                    seen_add(k)
+            yield element
 
 
 def unique_justseen(iterable, key=None):
