@@ -1,8 +1,7 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from itertools import izip_longest
-from recipes import *
+from recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
@@ -28,13 +27,12 @@ def chunked(iterable, n):
     the client.
 
     """
-    # Doesn't seem to run into any number-of-args limits.
-    for group in (list(g) for g in izip_longest(*[iter(iterable)] * n,
-                                                fillvalue=_marker)):
-        if group[-1] is _marker:
-            # If this is the last group, shuck off the padding:
-            del group[group.index(_marker):]
-        yield group
+    iterable = iter(iterable)
+    while True:
+        chunk = take(n, iterable)
+        if not chunk:
+            return
+        yield chunk
 
 
 def first(iterable, default=_marker):
