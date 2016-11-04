@@ -1,11 +1,19 @@
 from contextlib import closing
-from itertools import count, islice, ifilter, permutations
+from itertools import count, ifilter, islice, permutations
 from StringIO import StringIO
 from unittest import TestCase
 
-from nose.tools import eq_, assert_raises
-
+import pytest
 from more_itertools import *  # Test all the symbols are in __all__.
+
+
+def eq_(lhs, rhs):
+    assert lhs == rhs
+
+
+def assert_raises(exc_class, f, *args, **kwargs):
+    with pytest.raises(exc_class):
+        f(*args, **kwargs)
 
 
 class CollateTests(TestCase):
