@@ -5,7 +5,7 @@ from recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse']
+           'intersperse', 'empty_iterator']
 
 
 _marker = object()
@@ -331,3 +331,12 @@ def intersperse(e, iterable):
             yield e
             yield item
     raise StopIteration
+
+
+# http://stackoverflow.com/a/13243870/2863746
+def empty_iterator():
+    """
+    An empty iterator.
+    """
+    return
+    yield

@@ -192,3 +192,13 @@ class IntersperseTest(TestCase):
         assert next(itp) == 0
         assert next(itp) == 'x'
         assert next(itp) == 1
+
+
+class EmptyIteratorTests(TestCase):
+    """Tests for ``empty_iterator()``"""
+
+    def test_empty(self):
+        eq_(list(empty_iterator()), [])
+
+    def test_raises_stopiteration(self):
+        assert_raises(StopIteration, next, empty_iterator())
