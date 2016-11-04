@@ -7,7 +7,7 @@ Some backward-compatible usability improvements have been made.
 .. [1] http://docs.python.org/library/itertools.html#recipes
 
 """
-from collections import deque
+from collections import deque, Iterable
 from itertools import chain, combinations, count, cycle, groupby, ifilterfalse, imap, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
 import operator
 from random import randrange, sample, choice
@@ -144,14 +144,19 @@ def dotproduct(vec1, vec2):
     return sum(imap(operator.mul, vec1, vec2))
 
 
-def flatten(listOfLists):
-    """Return an iterator flattening one level of nesting in a list of lists
-
-        >>> list(flatten([[0, 1], [2, 3]]))
-        [0, 1, 2, 3]
+def flatten(l):
+    """
+    flatten an irregular list of lists
+    example: flatten([[[1, 2, 3], [4, 5]], 6]) -> [1, 2, 3, 4, 5, 6]
+    lifted from: http://stackoverflow.com/questions/2158395/
 
     """
-    return chain.from_iterable(listOfLists)
+    for el in l:
+        if isinstance(el, Iterable) and not isinstance(el, basestring):
+            for sub in flatten(el):
+                yield sub
+        else:
+            yield el
 
 
 def repeatfunc(func, times=None, *args):
