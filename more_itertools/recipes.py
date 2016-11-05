@@ -13,7 +13,7 @@ import operator
 from random import randrange, sample, choice
 
 from six import PY2
-from six.moves import filterfalse, map, zip, zip_longest
+from six.moves import filterfalse, map, range, zip, zip_longest
 
 __all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
            'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
@@ -268,7 +268,7 @@ def iter_except(func, exception, first=None):
     Like __builtin__.iter(func, sentinel) but uses an exception instead
     of a sentinel to end the loop.
 
-        >>> l = range(3)
+        >>> l = [0, 1, 2]
         >>> list(iter_except(l.pop, IndexError))
         [2, 1, 0]
 
@@ -319,7 +319,7 @@ def random_combination(iterable, r):
     """
     pool = tuple(iterable)
     n = len(pool)
-    indices = sorted(sample(xrange(n), r))
+    indices = sorted(sample(range(n), r))
     return tuple(pool[i] for i in indices)
 
 
@@ -332,5 +332,5 @@ def random_combination_with_replacement(iterable, r):
     """
     pool = tuple(iterable)
     n = len(pool)
-    indices = sorted(randrange(n) for i in xrange(r))
+    indices = sorted(randrange(n) for i in range(r))
     return tuple(pool[i] for i in indices)

@@ -39,9 +39,9 @@ def chunked(iterable, n):
 def first(iterable, default=_marker):
     """Return the first item of an iterable, ``default`` if there is none.
 
-        >>> first(xrange(4))
+        >>> first([0, 1, 2, 3])
         0
-        >>> first(xrange(0), 'some default')
+        >>> first([], 'some default')
         'some default'
 
     If ``default`` is not provided and there are no items in the iterable,
@@ -71,7 +71,7 @@ class peekable(object):
     Call ``peek()`` on the result to get the value that will next pop out of
     ``next()``, without advancing the iterator:
 
-        >>> p = peekable(xrange(2))
+        >>> p = peekable([0, 1])
         >>> p.peek()
         0
         >>> next(p)
@@ -94,7 +94,7 @@ class peekable(object):
     To test whether there are more items in the iterator, examine the
     peekable's truth value. If it is truthy, there are more items.
 
-        >>> assert peekable(xrange(1))
+        >>> assert peekable([1])
         >>> assert not peekable([])
 
     """
@@ -209,8 +209,7 @@ def consumer(func):
 def ilen(iterable):
     """Return the number of items in ``iterable``.
 
-    >>> from itertools import ifilter
-    >>> ilen(ifilter(lambda x: x % 3 == 0, xrange(1000000)))
+    >>> ilen(x for x in range(1000000) if x % 3 == 0)
     333334
 
     This does, of course, consume the iterable, so handle it with care.
