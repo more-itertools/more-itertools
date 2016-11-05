@@ -2,6 +2,8 @@ from __future__ import print_function
 
 from functools import partial, wraps
 
+from six import iteritems
+
 from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
@@ -368,7 +370,7 @@ def unique_to_each(*iterables):
     they will be duplicated in the output. Input order is preserved:
     >>> unique_to_each("mississippi", "missouri")
     [['p', 'p'], ['o', 'u', 'r']]
-    
+
     It is assumed that the elements of each iterable are hashable.
     """
     elements_to_indices = {}
@@ -376,8 +378,8 @@ def unique_to_each(*iterables):
     for i, it in enumerate(pool):
         for element in it:
             elements_to_indices.setdefault(element, set()).add(i)
-    
-    for element, indices in elements_to_indices.iteritems():
+
+    for element, indices in iteritems(elements_to_indices):
         if len(indices) != 1:
             for i in indices:
                 while element in pool[i]:
