@@ -166,7 +166,6 @@ def test_one():
     eq_(next(numbers), 2)
 
 
-
 class IntersperseTest(TestCase):
     """ Tests for intersperse() """
 
@@ -196,3 +195,25 @@ class IntersperseTest(TestCase):
         assert next(itp) == 0
         assert next(itp) == 'x'
         assert next(itp) == 1
+
+
+class UniqueToEachTests(TestCase):
+    """Tests for ``unique_to_each()``"""
+    
+    def test_all_unique(self):
+        """When all the input iterables are unique the output should match
+        the input."""
+        iterables = [[1, 2], [3, 4, 5], [6, 7, 8]]
+        eq_(unique_to_each(*iterables), iterables)
+    
+    def test_duplicates(self):
+        """When there are duplicates in any of the input iterables that aren't
+        in the rest, those duplicates should be emitted."""
+        iterables = ["mississippi", "missouri"]
+        eq_(unique_to_each(*iterables), [['p', 'p'], ['o', 'u', 'r']])
+    
+    def test_mixed(self):
+        """When the input iterables contain different types the function should
+        still behave properly"""
+        iterables = ['x', (i for i in range(3)), [1, 2, 3], tuple()]
+        eq_(unique_to_each(*iterables), [['x'], [0], [3], []])

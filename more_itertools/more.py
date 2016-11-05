@@ -6,7 +6,7 @@ from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse']
+           'intersperse', 'unique_to_each']
 
 
 _marker = object()
@@ -346,3 +346,41 @@ def intersperse(e, iterable):
             yield e
             yield item
     raise StopIteration
+
+
+def unique_to_each(*iterables):
+    """
+    Return the elements from each of the input iterables that aren't in the
+    other input iterables.
+
+    For example, suppose packages 1, 2, and 3 have these dependencies:
+    pkg_1: (A, B), pkg_2: (B, C), pkg_3: (B, D)
+
+    If you remove one package, which dependencies can also be removed?
+
+    If pkg_1 is removed, then A is no longer necessary - it is not associated
+    with pkg_2 or pkg_3. Similarly, C is only needed for pkg_2, and D is
+    only needed for pkg_3:
+    >>> unique_to_each("AB", "BC", "BD")
+    [['A'], ['C'], ['D']]
+
+    If there are duplicates in one input iterable that aren't in the others
+    they will be duplicated in the output. Input order is preserved:
+    >>> unique_to_each("mississippi", "missouri")
+    [['p', 'p'], ['o', 'u', 'r']]
+    
+    It is assumed that the elements of each iterable are hashable.
+    """
+    elements_to_indices = {}
+    pool = [list(it) for it in iterables]
+    for i, it in enumerate(pool):
+        for element in it:
+            elements_to_indices.setdefault(element, set()).add(i)
+    
+    for element, indices in elements_to_indices.iteritems():
+        if len(indices) != 1:
+            for i in indices:
+                while element in pool[i]:
+                    pool[i].remove(element)
+
+    return pool
