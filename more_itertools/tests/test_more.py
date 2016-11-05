@@ -95,9 +95,9 @@ class PeekableTests(TestCase):
 
         """
         p = peekable([])
-        self.failIf(p)
+        self.assertFalse(p)
         p = peekable(xrange(3))
-        self.failUnless(p)
+        self.assertTrue(p)
 
     def test_simple_peeking(self):
         """Make sure ``next`` and ``peek`` advance and don't advance the
