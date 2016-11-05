@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from contextlib import closing
 from functools import reduce
 from io import StringIO
-from itertools import count, islice, permutations
+from itertools import count, permutations
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
@@ -199,19 +199,19 @@ class IntersperseTest(TestCase):
 
 class UniqueToEachTests(TestCase):
     """Tests for ``unique_to_each()``"""
-    
+
     def test_all_unique(self):
         """When all the input iterables are unique the output should match
         the input."""
         iterables = [[1, 2], [3, 4, 5], [6, 7, 8]]
         eq_(unique_to_each(*iterables), iterables)
-    
+
     def test_duplicates(self):
         """When there are duplicates in any of the input iterables that aren't
         in the rest, those duplicates should be emitted."""
         iterables = ["mississippi", "missouri"]
         eq_(unique_to_each(*iterables), [['p', 'p'], ['o', 'u', 'r']])
-    
+
     def test_mixed(self):
         """When the input iterables contain different types the function should
         still behave properly"""

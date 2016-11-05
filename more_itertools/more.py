@@ -248,6 +248,7 @@ def with_iter(context_manager):
         for item in iterable:
             yield item
 
+
 def one(iterable):
     """Return the only element from the iterable.
 
