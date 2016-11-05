@@ -8,11 +8,12 @@ Some backward-compatible usability improvements have been made.
 
 """
 from collections import deque
-from itertools import chain, combinations, count, cycle, groupby, ifilterfalse, imap, islice, izip, izip_longest, repeat, starmap, tee  # Wrapping breaks 2to3.
+from itertools import chain, combinations, count, cycle, groupby, islice, repeat, starmap, tee  # Wrapping breaks 2to3.
 import operator
 from random import randrange, sample, choice
 
 from six import PY2
+from six.moves import filterfalse, map, zip, zip_longest
 
 __all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
            'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
@@ -48,7 +49,7 @@ def tabulate(function, start=0):
         [9, 4, 1]
 
     """
-    return imap(function, count(start))
+    return map(function, count(start))
 
 
 def consume(iterator, n=None):
@@ -110,7 +111,7 @@ def quantify(iterable, pred=bool):
         2
 
     """
-    return sum(imap(pred, iterable))
+    return sum(map(pred, iterable))
 
 
 def padnone(iterable):
@@ -142,7 +143,7 @@ def dotproduct(vec1, vec2):
         400
 
     """
-    return sum(imap(operator.mul, vec1, vec2))
+    return sum(map(operator.mul, vec1, vec2))
 
 
 def flatten(listOfLists):
@@ -178,7 +179,7 @@ def pairwise(iterable):
     """
     a, b = tee(iterable)
     next(b, None)
-    return izip(a, b)
+    return zip(a, b)
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -189,7 +190,7 @@ def grouper(n, iterable, fillvalue=None):
 
     """
     args = [iter(iterable)] * n
-    return izip_longest(fillvalue=fillvalue, *args)
+    return zip_longest(fillvalue=fillvalue, *args)
 
 
 def roundrobin(*iterables):
@@ -237,7 +238,7 @@ def unique_everseen(iterable, key=None):
     seen = set()
     seen_add = seen.add
     if key is None:
-        for element in ifilterfalse(seen.__contains__, iterable):
+        for element in filterfalse(seen.__contains__, iterable):
             seen_add(element)
             yield element
     else:
@@ -257,7 +258,7 @@ def unique_justseen(iterable, key=None):
         ['A', 'B', 'C', 'A', 'D']
 
     """
-    return imap(next, imap(operator.itemgetter(1), groupby(iterable, key)))
+    return map(next, map(operator.itemgetter(1), groupby(iterable, key)))
 
 
 def iter_except(func, exception, first=None):
@@ -291,7 +292,7 @@ def random_product(*args, **kwds):
         ('b', '2', 'c', '2')
 
     """
-    pools = map(tuple, args) * kwds.get('repeat', 1)
+    pools = [tuple(pool) for pool in args] * kwds.get('repeat', 1)
     return tuple(choice(pool) for pool in pools)
 
 

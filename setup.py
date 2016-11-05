@@ -15,7 +15,9 @@ if sys.version_info >= (3,):
     extra_setup['use_2to3'] = True
     extra_setup['use_2to3_exclude_fixers'] = [
         'lib2to3.fixes.fix_nonzero',
+        'lib2to3.fixes.fix_map',
         'lib2to3.fixes.fix_next',
+        'lib2to3.fixes.fix_zip',
     ]
 
 
