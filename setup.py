@@ -13,6 +13,10 @@ from setuptools import setup, find_packages
 extra_setup = {}
 if sys.version_info >= (3,):
     extra_setup['use_2to3'] = True
+    extra_setup['use_2to3_exclude_fixers'] = [
+        'lib2to3.fixes.fix_nonzero',
+        'lib2to3.fixes.fix_next',
+    ]
 
 
 setup(
@@ -26,6 +30,7 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
+    install_requires=['six>=1.10.0'],
     tests_require=['nose'],
     test_suite='nose.collector',
     url='https://github.com/erikrose/more-itertools',

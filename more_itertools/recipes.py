@@ -12,6 +12,7 @@ from itertools import chain, combinations, count, cycle, groupby, ifilterfalse, 
 import operator
 from random import randrange, sample, choice
 
+from six import PY2
 
 __all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
            'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
@@ -200,7 +201,10 @@ def roundrobin(*iterables):
     """
     # Recipe credited to George Sakkis
     pending = len(iterables)
-    nexts = cycle(iter(it).next for it in iterables)
+    if PY2:
+        nexts = cycle(iter(it).next for it in iterables)
+    else:
+        nexts = cycle(iter(it).__next__ for it in iterables)
     while pending:
         try:
             for next in nexts:

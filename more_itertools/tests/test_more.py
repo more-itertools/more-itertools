@@ -1,9 +1,13 @@
+from __future__ import unicode_literals
+
 from contextlib import closing
-from itertools import count, islice, ifilter, permutations
-from StringIO import StringIO
+from functools import reduce
+from io import StringIO
+from itertools import count, islice, permutations
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
+from six.moves import filter, range
 
 from more_itertools import *  # Test all the symbols are in __all__.
 
@@ -14,13 +18,13 @@ class CollateTests(TestCase):
 
     def test_default(self):
         """Test with the default `key` function."""
-        iterables = [xrange(4), xrange(7), xrange(3, 6)]
+        iterables = [range(4), range(7), range(3, 6)]
         eq_(sorted(reduce(list.__add__, [list(it) for it in iterables])),
             list(collate(*iterables)))
 
     def test_key(self):
         """Test using a custom `key` function."""
-        iterables = [xrange(5, 0, -1), xrange(4, 0, -1)]
+        iterables = [range(5, 0, -1), range(4, 0, -1)]
         eq_(list(sorted(reduce(list.__add__,
                                         [list(it) for it in iterables]),
                         reverse=True)),
@@ -32,11 +36,11 @@ class CollateTests(TestCase):
 
     def test_one(self):
         """Work when only 1 iterable is passed."""
-        eq_([0, 1], list(collate(xrange(2))))
+        eq_([0, 1], list(collate(range(2))))
 
     def test_reverse(self):
         """Test the `reverse` kwarg."""
-        iterables = [xrange(4, 0, -1), xrange(7, 0, -1), xrange(3, 6, -1)]
+        iterables = [range(4, 0, -1), range(7, 0, -1), range(3, 6, -1)]
         eq_(sorted(reduce(list.__add__, [list(it) for it in iterables]),
                    reverse=True),
             list(collate(*iterables, reverse=True)))
@@ -64,7 +68,7 @@ class FirstTests(TestCase):
         """Test that it works on many-item iterables."""
         # Also try it on a generator expression to make sure it works on
         # whatever those return, across Python versions.
-        eq_(first(x for x in xrange(4)), 0)
+        eq_(first(x for x in range(4)), 0)
 
     def test_one(self):
         """Test that it doesn't raise StopIteration prematurely."""
@@ -96,7 +100,7 @@ class PeekableTests(TestCase):
         """
         p = peekable([])
         self.assertFalse(p)
-        p = peekable(xrange(3))
+        p = peekable(range(3))
         self.assertTrue(p)
 
     def test_simple_peeking(self):
@@ -104,7 +108,7 @@ class PeekableTests(TestCase):
         iterator, respectively.
 
         """
-        p = peekable(xrange(10))
+        p = peekable(range(10))
         eq_(next(p), 0)
         eq_(p.peek(), 1)
         eq_(next(p), 1)
@@ -136,7 +140,7 @@ def test_distinct_permutations():
 
 def test_ilen():
     """Sanity-check ``ilen()``."""
-    eq_(ilen(ifilter(lambda x: x % 10 == 0, range(101))), 11)
+    eq_(ilen(filter(lambda x: x % 10 == 0, range(101))), 11)
 
 
 def test_with_iter():
@@ -188,7 +192,7 @@ class IntersperseTest(TestCase):
         assert_raises(TypeError, next, itp)
 
     def test_intersperse_generator(self):
-        itp = intersperse('x', xrange(5))
+        itp = intersperse('x', range(5))
         assert next(itp) == 0
         assert next(itp) == 'x'
         assert next(itp) == 1
