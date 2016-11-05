@@ -1,7 +1,8 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from recipes import take
+
+from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
