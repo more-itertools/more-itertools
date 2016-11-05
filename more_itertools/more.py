@@ -107,12 +107,15 @@ class peekable(object):
     def __iter__(self):
         return self
 
-    def __nonzero__(self):
+    def __bool__(self):
         try:
             self.peek()
         except StopIteration:
             return False
         return True
+
+    def __nonzero__(self):
+        return self.__bool__()
 
     def peek(self, default=_marker):
         """Return the item that will be next returned from ``next()``.
