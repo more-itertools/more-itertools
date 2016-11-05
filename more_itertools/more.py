@@ -1,8 +1,8 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from itertools import izip_longest
-from recipes import *
+
+from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
@@ -28,13 +28,12 @@ def chunked(iterable, n):
     the client.
 
     """
-    # Doesn't seem to run into any number-of-args limits.
-    for group in (list(g) for g in izip_longest(*[iter(iterable)] * n,
-                                                fillvalue=_marker)):
-        if group[-1] is _marker:
-            # If this is the last group, shuck off the padding:
-            del group[group.index(_marker):]
-        yield group
+    iterable = iter(iterable)
+    while True:
+        chunk = take(n, iterable)
+        if not chunk:
+            return
+        yield chunk
 
 
 def first(iterable, default=_marker):
@@ -167,7 +166,7 @@ def collate(*iterables, **kwargs):
     while peekables:
         _, p = min_or_max((key(p.peek()), p) for p in peekables)
         yield p.next()
-        peekables = [p for p in peekables if p]
+        peekables = [x for x in peekables if x]
 
 
 def consumer(func):
@@ -267,8 +266,16 @@ def one(iterable):
     iterable longer than 1 item is, in fact, an error.
 
     """
-    result, = iterable
-    return result
+    it = iter(iterable)
+    first = next(it, _marker)
+    if first is _marker:
+        raise ValueError('need more than 0 values to unpack')
+
+    second = next(it, _marker)
+    if second is not _marker:
+        raise ValueError('too many values to unpack (expected 1)')
+
+    return first
 
 
 def distinct_permutations(iterable):
