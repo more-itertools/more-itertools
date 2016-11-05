@@ -6,7 +6,7 @@ from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse']
+           'intersperse', 'side_effect']
 
 
 _marker = object()
@@ -240,6 +240,7 @@ def with_iter(context_manager):
         for item in iterable:
             yield item
 
+
 def one(iterable):
     """Return the only element from the iterable.
 
@@ -340,3 +341,68 @@ def intersperse(e, iterable):
             yield e
             yield item
     raise StopIteration
+
+
+def side_effect(fn, iterable, chunk_size=None):
+    """
+    Passes through the iterable, but invokes a function for each item
+    iterated over.
+
+    Can be useful for lazy counting, logging, collecting data, or updating
+    progress bars, anything un-pure.
+
+    `fn` must be a function that takes a single argument.  Its return value
+    will be discarded.
+
+    Examples:
+
+        >>> from more_itertools import take, consume, side_effect
+        >>> iterable = range(10)
+        >>> iterable = side_effect(print, iterable)
+        >>> consume(take(3, iterable))
+        0
+        1
+        2
+
+    Example for collecting data as it streams through:
+
+        >>> iterable = range(10)
+        >>> c = []
+        >>> iterable = side_effect(c.append, iterable)
+        >>> consume(take(3, iterable))
+        >>> c
+        [0, 1, 2]
+
+    Collecting items in chunks:
+
+        >>> iterable = range(10)
+        >>> c, d = [], []
+        >>> iterable = side_effect(lambda xs: c.append(sum(xs)), iterable, 2)
+        >>> iterable = side_effect(lambda xs: d.append(sum(xs)), iterable, 3)
+        >>> list(iterable)
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        >>> c
+        [1, 5, 9, 13, 17]
+        >>> d
+        [3, 12, 21, 9]
+
+    Emit progress:
+
+        >>> iterable = range(100)
+        >>> iterable = side_effect(lambda xs: print('Processed ' + str(len(xs)) + ' items'), iterable, 30)
+        >>> consume(iterable)
+        Processed 30 items
+        Processed 30 items
+        Processed 30 items
+        Processed 10 items
+
+    """
+    if chunk_size is None:
+        for item in iterable:
+            fn(item)
+            yield item
+    else:
+        for chunk in chunked(iterable, chunk_size):
+            fn(chunk)
+            for item in chunk:
+                yield item
