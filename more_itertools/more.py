@@ -1,7 +1,8 @@
 from __future__ import print_function
 
 from functools import partial, wraps
-from recipes import take
+
+from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
@@ -265,8 +266,16 @@ def one(iterable):
     iterable longer than 1 item is, in fact, an error.
 
     """
-    result, = iterable
-    return result
+    it = iter(iterable)
+    first = next(it, _marker)
+    if first is _marker:
+        raise ValueError('need more than 0 values to unpack')
+
+    second = next(it, _marker)
+    if second is not _marker:
+        raise ValueError('too many values to unpack (expected 1)')
+
+    return first
 
 
 def distinct_permutations(iterable):
