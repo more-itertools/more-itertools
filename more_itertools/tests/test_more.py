@@ -105,9 +105,9 @@ class PeekableTests(TestCase):
 
         """
         p = peekable(xrange(10))
-        eq_(p.next(), 0)
+        eq_(next(p), 0)
         eq_(p.peek(), 1)
-        eq_(p.next(), 1)
+        eq_(next(p), 1)
 
 
 class ConsumerTests(TestCase):

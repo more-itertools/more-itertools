@@ -74,11 +74,11 @@ class peekable(object):
         >>> p = peekable(xrange(2))
         >>> p.peek()
         0
-        >>> p.next()
+        >>> next(p)
         0
         >>> p.peek()
         1
-        >>> p.next()
+        >>> next(p)
         1
 
     Pass ``peek()`` a default value, and it will be returned in the case where
@@ -123,17 +123,21 @@ class peekable(object):
         """
         if not hasattr(self, '_peek'):
             try:
-                self._peek = self._it.next()
+                self._peek = next(self._it)
             except StopIteration:
                 if default is _marker:
                     raise
                 return default
         return self._peek
 
-    def next(self):
+    def __next__(self):
         ret = self.peek()
         del self._peek
         return ret
+
+    def next(self):
+        # For Python 2 compatibility
+        return self.__next__()
 
 
 def collate(*iterables, **kwargs):
@@ -165,7 +169,7 @@ def collate(*iterables, **kwargs):
     peekables = [p for p in peekables if p]  # Kill empties.
     while peekables:
         _, p = min_or_max((key(p.peek()), p) for p in peekables)
-        yield p.next()
+        yield next(p)
         peekables = [x for x in peekables if x]
 
 
@@ -187,14 +191,14 @@ def consumer(func):
     >>> t.send('fish')
     Thing number 1 is fish.
 
-    Without the decorator, you would have to call ``t.next()`` before
+    Without the decorator, you would have to call ``next(t)`` before
     ``t.send()`` could be used.
 
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
         gen = func(*args, **kwargs)
-        gen.next()
+        next(gen)
         return gen
     return wrapper
 
