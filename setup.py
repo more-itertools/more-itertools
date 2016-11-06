@@ -5,14 +5,7 @@ try:
 except ImportError:
     pass
 
-import sys
-
 from setuptools import setup, find_packages
-
-
-extra_setup = {}
-if sys.version_info >= (3,):
-    extra_setup['use_2to3'] = True
 
 
 setup(
@@ -26,6 +19,7 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
+    install_requires=['six>=1.0.0,<2.0.0'],
     tests_require=['nose'],
     test_suite='nose.collector',
     url='https://github.com/erikrose/more-itertools',
@@ -36,12 +30,10 @@ setup(
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
         'Topic :: Software Development :: Libraries'],
     keywords=['itertools', 'iterator', 'iteration', 'filter', 'peek',
               'peekable', 'collate', 'chunk', 'chunked'],
-    **extra_setup
 )

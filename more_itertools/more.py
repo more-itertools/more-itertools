@@ -2,6 +2,8 @@ from __future__ import print_function
 
 from functools import partial, wraps
 
+from six import iteritems
+
 from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
@@ -39,9 +41,9 @@ def chunked(iterable, n):
 def first(iterable, default=_marker):
     """Return the first item of an iterable, ``default`` if there is none.
 
-        >>> first(xrange(4))
+        >>> first([0, 1, 2, 3])
         0
-        >>> first(xrange(0), 'some default')
+        >>> first([], 'some default')
         'some default'
 
     If ``default`` is not provided and there are no items in the iterable,
@@ -71,14 +73,14 @@ class peekable(object):
     Call ``peek()`` on the result to get the value that will next pop out of
     ``next()``, without advancing the iterator:
 
-        >>> p = peekable(xrange(2))
+        >>> p = peekable([0, 1])
         >>> p.peek()
         0
-        >>> p.next()
+        >>> next(p)
         0
         >>> p.peek()
         1
-        >>> p.next()
+        >>> next(p)
         1
 
     Pass ``peek()`` a default value, and it will be returned in the case where
@@ -94,7 +96,7 @@ class peekable(object):
     To test whether there are more items in the iterator, examine the
     peekable's truth value. If it is truthy, there are more items.
 
-        >>> assert peekable(xrange(1))
+        >>> assert peekable([1])
         >>> assert not peekable([])
 
     """
@@ -107,12 +109,15 @@ class peekable(object):
     def __iter__(self):
         return self
 
-    def __nonzero__(self):
+    def __bool__(self):
         try:
             self.peek()
         except StopIteration:
             return False
         return True
+
+    def __nonzero__(self):
+        return self.__bool__()
 
     def peek(self, default=_marker):
         """Return the item that will be next returned from ``next()``.
@@ -123,17 +128,21 @@ class peekable(object):
         """
         if not hasattr(self, '_peek'):
             try:
-                self._peek = self._it.next()
+                self._peek = next(self._it)
             except StopIteration:
                 if default is _marker:
                     raise
                 return default
         return self._peek
 
-    def next(self):
+    def __next__(self):
         ret = self.peek()
         del self._peek
         return ret
+
+    def next(self):
+        # For Python 2 compatibility
+        return self.__next__()
 
 
 def collate(*iterables, **kwargs):
@@ -165,7 +174,7 @@ def collate(*iterables, **kwargs):
     peekables = [p for p in peekables if p]  # Kill empties.
     while peekables:
         _, p = min_or_max((key(p.peek()), p) for p in peekables)
-        yield p.next()
+        yield next(p)
         peekables = [x for x in peekables if x]
 
 
@@ -187,14 +196,14 @@ def consumer(func):
     >>> t.send('fish')
     Thing number 1 is fish.
 
-    Without the decorator, you would have to call ``t.next()`` before
+    Without the decorator, you would have to call ``next(t)`` before
     ``t.send()`` could be used.
 
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
         gen = func(*args, **kwargs)
-        gen.next()
+        next(gen)
         return gen
     return wrapper
 
@@ -202,8 +211,7 @@ def consumer(func):
 def ilen(iterable):
     """Return the number of items in ``iterable``.
 
-    >>> from itertools import ifilter
-    >>> ilen(ifilter(lambda x: x % 3 == 0, xrange(1000000)))
+    >>> ilen(x for x in range(1000000) if x % 3 == 0)
     333334
 
     This does, of course, consume the iterable, so handle it with care.
@@ -239,6 +247,7 @@ def with_iter(context_manager):
     with context_manager as iterable:
         for item in iterable:
             yield item
+
 
 def one(iterable):
     """Return the only element from the iterable.
@@ -362,7 +371,7 @@ def unique_to_each(*iterables):
     they will be duplicated in the output. Input order is preserved:
     >>> unique_to_each("mississippi", "missouri")
     [['p', 'p'], ['o', 'u', 'r']]
-    
+
     It is assumed that the elements of each iterable are hashable.
     """
     elements_to_indices = {}
@@ -370,8 +379,8 @@ def unique_to_each(*iterables):
     for i, it in enumerate(pool):
         for element in it:
             elements_to_indices.setdefault(element, set()).add(i)
-    
-    for element, indices in elements_to_indices.iteritems():
+
+    for element, indices in iteritems(elements_to_indices):
         if len(indices) != 1:
             for i in indices:
                 while element in pool[i]:

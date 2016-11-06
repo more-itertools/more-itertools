@@ -2,6 +2,7 @@ from random import seed
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises, ok_
+from six.moves import range
 
 from more_itertools import *
 
@@ -15,24 +16,24 @@ class TakeTests(TestCase):
 
     def test_simple_take(self):
         """Test basic usage"""
-        t = take(5, xrange(10))
+        t = take(5, range(10))
         eq_(t, [0, 1, 2, 3, 4])
 
     def test_null_take(self):
         """Check the null case"""
-        t = take(0, xrange(10))
+        t = take(0, range(10))
         eq_(t, [])
 
     def test_negative_take(self):
         """Make sure taking negative items results in a ValueError"""
-        assert_raises(ValueError, take, -3, xrange(10))
+        assert_raises(ValueError, take, -3, range(10))
 
     def test_take_too_much(self):
         """Taking more than an iterator has remaining should return what the
         iterator has remaining.
 
         """
-        t = take(10, xrange(5))
+        t = take(10, range(5))
         eq_(t, [0, 1, 2, 3, 4])
 
 
@@ -157,7 +158,7 @@ class FlattenTests(TestCase):
     def test_basic_usage(self):
         """ensure list of lists is flattened one level"""
         f = [[0, 1, 2], [3, 4, 5]]
-        eq_(range(6), list(flatten(f)))
+        eq_(list(range(6)), list(flatten(f)))
 
     def test_single_level(self):
         """ensure list of lists is flattened only one level"""
@@ -380,7 +381,7 @@ class RandomPermutationTests(TestCase):
         items = range(15)
         item_set = set(items)
         all_items = set()
-        for _ in xrange(100):
+        for _ in range(100):
             permutation = random_permutation(items, 5)
             eq_(len(permutation), 5)
             permutation_set = set(permutation)
@@ -397,7 +398,7 @@ class RandomCombinationTests(TestCase):
         samplings of random combinations"""
         items = range(15)
         all_items = set()
-        for _ in xrange(50):
+        for _ in range(50):
             combination = random_combination(items, 5)
             all_items |= set(combination)
         eq_(all_items, set(items))
@@ -405,7 +406,7 @@ class RandomCombinationTests(TestCase):
     def test_no_replacement(self):
         """ensure that elements are sampled without replacement"""
         items = range(15)
-        for _ in xrange(50):
+        for _ in range(50):
             combination = random_combination(items, len(items))
             eq_(len(combination), len(set(combination)))
         assert_raises(ValueError, random_combination, items, len(items) + 1)
@@ -427,7 +428,7 @@ class RandomCombinationWithReplacementTests(TestCase):
         samplings of random combinations"""
         items = range(15)
         all_items = set()
-        for _ in xrange(50):
+        for _ in range(50):
             combination = random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         eq_(all_items, set(items))
