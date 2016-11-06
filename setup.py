@@ -19,7 +19,7 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
-    install_requires=['six>=1.10.0'],
+    install_requires=['six>=1.0.0,<2.0.0'],
     tests_require=['nose'],
     test_suite='nose.collector',
     url='https://github.com/erikrose/more-itertools',
