@@ -416,7 +416,7 @@ def windowed(seq, n, fillvalue=None):
     append = window.append
 
     # Initial deque fill
-    for __ in range(n):
+    for _ in range(n):
         append(next(it, fillvalue))
     yield tuple(window)
 
