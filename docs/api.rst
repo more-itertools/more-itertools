@@ -19,6 +19,7 @@ New Routines
 .. autofunction:: one
 .. autoclass:: peekable
 .. autofunction:: unique_to_each
+.. autofunction:: windowed
 .. autofunction:: with_iter
 
 

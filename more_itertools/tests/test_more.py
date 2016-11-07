@@ -217,3 +217,41 @@ class UniqueToEachTests(TestCase):
         still behave properly"""
         iterables = ['x', (i for i in range(3)), [1, 2, 3], tuple()]
         eq_(unique_to_each(*iterables), [['x'], [0], [3], []])
+
+
+class WindowedTests(TestCase):
+    """Tests for ``windowed()``"""
+
+    def test_basic(self):
+        actual = list(windowed([1, 2, 3, 4, 5], 3))
+        expected = [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
+        eq_(actual, expected)
+
+    def test_large_size(self):
+        """
+        When the window size is larger than the iterable, and no fill value is
+        given,``None`` should be filled in.
+        """
+        actual = list(windowed([1, 2, 3, 4, 5], 6))
+        expected = [(1, 2, 3, 4, 5, None)]
+        eq_(actual, expected)
+
+    def test_fillvalue(self):
+        """
+        When the window size is larger than the iterable, the given fill value
+        should be used.
+        """
+        actual = list(windowed([1, 2, 3, 4, 5], 6, '!'))
+        expected = [(1, 2, 3, 4, 5, '!')]
+        eq_(actual, expected)
+
+    def test_zero(self):
+        """When the window size is zero, an empty tuple should be emitted."""
+        actual = list(windowed([1, 2, 3, 4, 5], 0))
+        expected = [tuple()]
+        eq_(actual, expected)
+
+    def test_negative(self):
+        """When the window size is negative, ValueError should be raised."""
+        with self.assertRaises(ValueError):
+            list(windowed([1, 2, 3, 4, 5], -1))

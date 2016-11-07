@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from collections import deque
 from functools import partial, wraps
 
 from six import iteritems
@@ -8,7 +9,7 @@ from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse', 'unique_to_each']
+           'intersperse', 'unique_to_each', 'windowed']
 
 
 _marker = object()
@@ -387,3 +388,39 @@ def unique_to_each(*iterables):
                     pool[i].remove(element)
 
     return pool
+
+
+def windowed(seq, n, fillvalue=None):
+    """
+    Returns a sliding window (of width n) over data from the iterable.
+    When n=2 this is equivalent to ``pairwise(iterable)``.
+    When n is larger than the iterable, ``fillvalue`` is used in place of
+    missing values.
+
+    >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
+    >>> next(all_windows)
+    (1, 2, 3)
+    >>> next(all_windows)
+    (2, 3, 4)
+    >>> next(all_windows)
+    (3, 4, 5)
+     """
+    if n < 0:
+        raise ValueError('n must be >= 0')
+    if n == 0:
+        yield tuple()
+        return
+
+    it = iter(seq)
+    window = deque([], n)
+    append = window.append
+
+    # Initial deque fill
+    for _ in range(n):
+        append(next(it, fillvalue))
+    yield tuple(window)
+
+    # Appending new items to the right causes old items to fall off the left
+    for item in it:
+        append(item)
+        yield tuple(window)
