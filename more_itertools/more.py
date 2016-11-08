@@ -68,31 +68,44 @@ def first(iterable, default=_marker):
         return default
 
 
+
+
 class peekable(object):
-    """Wrapper for an iterator to allow 1-item lookahead
+    """
+    Wrapper for an iterator to allow lookahead.
 
     Call ``peek()`` on the result to get the value that will next pop out of
     ``next()``, without advancing the iterator:
 
-        >>> p = peekable([0, 1])
-        >>> p.peek()
-        0
-        >>> next(p)
-        0
-        >>> p.peek()
-        1
-        >>> next(p)
-        1
+    >>> p = peekable(['a', 'b'])
+    >>> p.peek()
+    'a'
+    >>> next(p)
+    'a'
 
-    Pass ``peek()`` a default value, and it will be returned in the case where
-    the iterator is exhausted:
+    Pass ``peek()`` a default value to return that instead of raising
+    ``StopIteration`` when the iterator is exhausted.
 
-        >>> p = peekable([])
-        >>> p.peek('hi')
-        'hi'
+    >>> p = peekable([])
+    >>> p.peek('hi')
+    'hi'
 
-    If no default is provided, ``peek()`` raises ``StopIteration`` when there
-    are no items left.
+    You may index the peekable to look ahead by more than one item.
+    The values up to the index you specified will be cached.
+    Index 0 is the item that will be returned by ``next()``, index 1 is the
+    item after that, and so on:
+
+    >>> p = peekable(['a', 'b', 'c', 'd'])
+    >>> p[0]
+    'a'
+    >>> p[1]
+    'b'
+    >>> next(p)
+    'a'
+    >>> p[1]
+    'c'
+    >>> next(p)
+    'b'
 
     To test whether there are more items in the iterator, examine the
     peekable's truth value. If it is truthy, there are more items.
@@ -106,6 +119,7 @@ class peekable(object):
 
     def __init__(self, iterable):
         self._it = iter(iterable)
+        self._cache = deque()
 
     def __iter__(self):
         return self
@@ -118,6 +132,7 @@ class peekable(object):
         return True
 
     def __nonzero__(self):
+        # For Python 2 compatibility
         return self.__bool__()
 
     def peek(self, default=_marker):
@@ -127,23 +142,46 @@ class peekable(object):
         provided, raise ``StopIteration``.
 
         """
-        if not hasattr(self, '_peek'):
+        if not self._cache:
             try:
-                self._peek = next(self._it)
+                self._cache.append(next(self._it))
             except StopIteration:
                 if default is _marker:
                     raise
                 return default
-        return self._peek
+        return self._cache[0]
 
     def __next__(self):
         ret = self.peek()
-        del self._peek
+        self._cache.popleft()
         return ret
 
     def next(self):
         # For Python 2 compatibility
         return self.__next__()
+
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            raise NotImplementedError('Slicing not supported')
+
+        if index < 0:
+            raise NotImplementedError('Negative indexing not supported')
+
+        if index == 0:
+            return self.peek()
+
+        cache_len = len(self._cache)
+        if index < cache_len:
+            return self._cache[index]
+
+        for i in range(index - cache_len + 1):
+            try:
+                self._cache.append(next(self._it))
+            except StopIteration:
+                break
+
+        return self._cache[index]
+
 
 
 def collate(*iterables, **kwargs):
