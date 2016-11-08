@@ -4,7 +4,13 @@ Version History
 
 2.3
     * Added ``one`` from ``jaraco.util.itertools``. (Thanks, jaraco!)
-    * Added ``distinct_permutations``. (Thanks, Bo Bayles!)
+    * Added ``distinct_permutations`` and ``unique_to_each``. (contributed by
+      bbayles)
+    * Added ``windowed``. (Contributed by bbayles, with thanks to buchanae,
+      jaraco, and abarnert)
+    * Simplified the implementation of ``chunked``. (Thanks, nvie!)
+    * Python 3.5 is now supported. Python 2.6 is no longer supported.
+    * Python 3 is now supported directly; there is no 2to3 step.
 
 2.2
     * Added ``iterate`` and ``with_iter``. (Thanks, abarnert!)

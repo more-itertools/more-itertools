@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='more-itertools',
-    version='2.2',
+    version='2.3',
     description='More routines for operating on iterables, beyond itertools',
     long_description=open('README.rst').read() + '\n\n' +
                      '\n'.join(open('docs/versions.rst').read()
