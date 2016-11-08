@@ -2,6 +2,8 @@ from __future__ import print_function
 
 from collections import deque
 from functools import partial, wraps
+from heapq import merge
+from sys import version_info
 
 from six import iteritems
 
@@ -146,6 +148,23 @@ class peekable(object):
         return self.__next__()
 
 
+def _collate(*iterables, **kwargs):
+    """
+    Helper for ``collate()`` - called when the user is using the ``reverse`` or
+    ``key`` keyword arguments on Python versions below 3.5 .
+    """
+    key = kwargs.pop('key', lambda a: a)
+    reverse = kwargs.pop('reverse', False)
+
+    min_or_max = partial(max if reverse else min, key=lambda a_b: a_b[0])
+    peekables = [peekable(it) for it in iterables]
+    peekables = [p for p in peekables if p]  # Kill empties.
+    while peekables:
+        _, p = min_or_max((key(p.peek()), p) for p in peekables)
+        yield next(p)
+        peekables = [x for x in peekables if x]
+
+
 def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
     ``iterables``.
@@ -166,17 +185,17 @@ def collate(*iterables, **kwargs):
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
-    """
-    key = kwargs.pop('key', lambda a: a)
-    reverse = kwargs.pop('reverse', False)
+    If neither of the keyword arguments are specified, or if the Python version
+    is 3.5 or greater, this function delegates to ``heapq.merge()``.
 
-    min_or_max = partial(max if reverse else min, key=lambda a_b: a_b[0])
-    peekables = [peekable(it) for it in iterables]
-    peekables = [p for p in peekables if p]  # Kill empties.
-    while peekables:
-        _, p = min_or_max((key(p.peek()), p) for p in peekables)
-        yield next(p)
-        peekables = [x for x in peekables if x]
+    """
+    if not kwargs:
+        return merge(*iterables)
+
+    if (version_info[0] >= 3) and (version_info[1] >= 5):
+        return merge(*iterables, **kwargs)
+
+    return _collate(*iterables, **kwargs)
 
 
 def consumer(func):
