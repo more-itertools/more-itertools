@@ -426,9 +426,9 @@ def windowed(seq, n, fillvalue=None):
         yield tuple(window)
 
 
-def partition(iterable, *keys, **kwargs):
+def partition(iterable, keys=None, fn=None):
     """
-    By defeault, returns a dictionary whose keys are ``True`` and ``False``,
+    By default, returns a dictionary whose keys are ``True`` and ``False``,
     and whose values are iterables.
     The items in the ``True`` iterable have ``bool(item) == True``,
     and the items in the ``False`` iterable have ``bool(item) == False``.
@@ -446,7 +446,7 @@ def partition(iterable, *keys, **kwargs):
     the ``keys`` arguments:
 
     >>> iterable = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    >>> D = partition(iterable, 0, 1, 2, fn=lambda x: x % 3)
+    >>> D = partition(iterable, keys=(0, 1, 2), fn=lambda x: x % 3)
     >>> list(D[0])
     [0, 3, 6]
     >>> list(D[1])
@@ -458,7 +458,8 @@ def partition(iterable, *keys, **kwargs):
     it will not be represented in the output dictionary.
 
     """
-    fn = kwargs.get('fn', bool)
+    keys = (False, True) if keys is None else keys
+    fn = bool if fn is None else fn
 
     if not keys:
         keys = [True, False]
