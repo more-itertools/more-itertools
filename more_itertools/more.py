@@ -9,7 +9,7 @@ from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse', 'unique_to_each', 'windowed']
+           'intersperse', 'unique_to_each', 'windowed', 'partition']
 
 
 _marker = object()
@@ -424,3 +424,60 @@ def windowed(seq, n, fillvalue=None):
     for item in it:
         append(item)
         yield tuple(window)
+
+
+def partition(iterable, *keys, **kwargs):
+    """
+    By defeault, returns a dictionary whose keys are ``True`` and ``False``,
+    and whose values are iterables.
+    The items in the ``True`` iterable have ``bool(item) == True``,
+    and the items in the ``False`` iterable have ``bool(item) == False``.
+
+    >>> iterable = [0, '', 1, 'x', None, [1]]
+    >>> D = partition(iterable)
+    >>> list(D[False])
+    [0, '', None]
+    >>> list(D[True])
+    [1, 'x', [1]]
+
+    If callable function ``fn`` is specified as a keyword argument, then it
+    will be applied to the items in ``iterable`` instead of ``bool``.
+    The possible values that ``fn`` can take on should then be specified with
+    the ``keys`` arguments:
+
+    >>> iterable = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    >>> D = partition(iterable, 0, 1, 2, fn=lambda x: x % 3)
+    >>> list(D[0])
+    [0, 3, 6]
+    >>> list(D[1])
+    [1, 4, 7]
+    >>> list(D[2])
+    [2, 5, 8]
+
+    If one of the possible values of ``fn`` is not specified in ``keys``, then
+    it will not be represented in the output dictionary.
+
+    """
+    fn = kwargs.get('fn', bool)
+
+    if not keys:
+        keys = [True, False]
+
+    it = iter(iterable)
+    ret = {k: deque() for k in keys}
+
+    def _get_items(result):
+        while True:
+            if ret[result]:
+                yield ret[result].popleft()
+            else:
+                while True:
+                    item = next(it)
+                    fn_item = fn(item)
+                    if fn_item == result:
+                        break
+                    elif fn_item in ret:
+                        ret[fn_item].append(item)
+                yield item
+
+    return {k: _get_items(k) for k in keys}
