@@ -114,8 +114,6 @@ class peekable(object):
         >>> assert not peekable([])
 
     """
-    # Lowercase to blend in with itertools. The fact that it's a class is an
-    # implementation detail.
 
     def __init__(self, iterable):
         self._it = iter(iterable)
@@ -160,28 +158,39 @@ class peekable(object):
         # For Python 2 compatibility
         return self.__next__()
 
-    def __getitem__(self, index):
-        if isinstance(index, slice):
-            raise NotImplementedError('Slicing not supported')
+    def _get_slice(self, index):
+        start = 0 if index.start is None else index.start
+        stop = index.stop
+        step = index.step
 
-        if index < 0:
-            raise NotImplementedError('Negative indexing not supported')
+        if (start < 0) or ((stop is not None) and (stop < 0)):
+            raise ValueError('Negative indexing not supported')
 
-        if index == 0:
-            return self.peek()
+        if start == stop:
+            return []
 
         cache_len = len(self._cache)
-        if index < cache_len:
-            return self._cache[index]
 
-        for i in range(index - cache_len + 1):
-            try:
-                self._cache.append(next(self._it))
-            except StopIteration:
-                break
+        if stop is None:
+            while True:
+                try:
+                    self._cache.append(next(self._it))
+                except StopIteration:
+                    break
+        elif stop >= cache_len:
+            for i in range(stop - cache_len):
+                try:
+                    self._cache.append(next(self._it))
+                except StopIteration:
+                    break
 
-        return self._cache[index]
+        return list(self._cache)[start:stop:step]
 
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            return self._get_slice(index)
+
+        return self._get_slice(slice(index, index + 1, None))[0]
 
 
 def collate(*iterables, **kwargs):
