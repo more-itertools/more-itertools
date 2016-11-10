@@ -257,20 +257,20 @@ class WindowedTests(TestCase):
             list(windowed([1, 2, 3, 4, 5], -1))
 
 
-class PartitionTests(TestCase):
-    """Tests for ``partition()``"""
+class SeparateTests(TestCase):
+    """Tests for ``separate()``"""
 
     def test_default(self):
         """By default the function is ``bool``"""
         iterable = [0, 1, False, True, '', 'a', None]
-        D = partition(iterable)
+        D = separate(iterable)
         eq_(list(D[False]), [0, False, '', None])
         eq_(list(D[True]), [1, True, 'a'])
 
     def test_function(self):
         """Custom function and keys: round down to nearest 10"""
         iterable = [10, 20, 30, 11, 21, 31, 41, 12, 22, 23, 33, 43]
-        D = partition(iterable, keys=(10, 20, 30), fn=lambda x: 10 * (x // 10))
+        D = separate(iterable, keys=(10, 20, 30), fn=lambda x: 10 * (x // 10))
         eq_(sorted(D), [10, 20, 30])  # No 40; it wasn't in keys
         eq_(list(D[10]), [10, 11, 12])
         eq_(list(D[20]), [20, 21, 22, 23])
@@ -279,14 +279,14 @@ class PartitionTests(TestCase):
     def test_no_keys(self):
         """Custom function but default keys: filter True and False"""
         iterable = [0, 1, 2, 0, 1, 2]
-        D = partition(iterable, fn=lambda x: x)
+        D = separate(iterable, fn=lambda x: x)
         eq_(list(D[False]), [0, 0])
         eq_(list(D[True]), [1, 1])  # 1 == True
 
     def test_no_function(self):
         """Custom function but default keys: filter True and False"""
         iterable = [0, 1, 2, 0, 1, 2]
-        D = partition(iterable, keys=(False, True, None))
+        D = separate(iterable, keys=(False, True, None))
         eq_(list(D[False]), [0, 0])
         eq_(list(D[True]), [1, 2, 1, 2])
         eq_(list(D[None]), [])

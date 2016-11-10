@@ -17,8 +17,8 @@ New Routines
 .. autofunction:: intersperse
 .. autofunction:: iterate
 .. autofunction:: one
-.. autofunction:: partition
 .. autoclass:: peekable
+.. autofunction:: separate
 .. autofunction:: unique_to_each
 .. autofunction:: windowed
 .. autofunction:: with_iter
