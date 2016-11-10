@@ -17,12 +17,14 @@ from random import randrange, sample, choice
 from six import PY2
 from six.moves import filterfalse, map, range, zip, zip_longest
 
-__all__ = ['take', 'tabulate', 'consume', 'nth', 'quantify', 'padnone',
-           'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
-           'grouper', 'roundrobin', 'powerset', 'unique_everseen',
-           'unique_justseen', 'iter_except', 'random_product',
-           'random_permutation', 'random_combination',
-           'random_combination_with_replacement']
+__all__ = [
+    'take', 'tabulate', 'tail', 'consume', 'nth', 'all_equal', 'quantify',
+    'padnone', 'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
+    'grouper', 'roundrobin', 'partition', 'powerset', 'unique_everseen',
+    'unique_justseen', 'iter_except', 'first_true', 'random_product',
+    'random_permutation', 'random_combination',
+    'random_combination_with_replacement',
+]
 
 
 def take(n, iterable):
@@ -52,6 +54,18 @@ def tabulate(function, start=0):
 
     """
     return map(function, count(start))
+
+
+def tail(n, iterable):
+    """
+    Return an iterator over the last n items"
+
+        >>> t = tail(3, 'ABCDEFG')
+        >>> list(t)
+        ['E', 'F', 'G']
+
+    """
+    return iter(deque(iterable, maxlen=n))
 
 
 def consume(iterator, n=None):
@@ -104,6 +118,19 @@ def nth(iterable, n, default=None):
 
     """
     return next(islice(iterable, n, None), default)
+
+
+def all_equal(iterable):
+    """
+    Returns True if all the elements are equal to each other.
+        >>> all_equal('aaaa')
+        True
+        >>> all_equal('aaab')
+        False
+
+    """
+    g = groupby(iterable)
+    return next(g, True) and not next(g, False)
 
 
 def quantify(iterable, pred=bool):
@@ -217,6 +244,24 @@ def roundrobin(*iterables):
             nexts = cycle(islice(nexts, pending))
 
 
+def partition(pred, iterable):
+    """
+    Returns a 2-tuple of iterables derived from the input iterable.
+    The first yields the items that have ``pred(item) == False``.
+    The first yields the items that have ``pred(item) == False``.
+
+        >>> is_odd = lambda x: x % 2 != 0
+        >>> iterable = range(10)
+        >>> even_items, odd_items = partition(is_odd, iterable)
+        >>> list(even_items), list(odd_items)
+        ([0, 2, 4, 6, 8], [1, 3, 5, 7, 9])
+
+    """
+    # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
+    t1, t2 = tee(iterable)
+    return filterfalse(pred, t1), filter(pred, t2)
+
+
 def powerset(iterable):
     """Yields all possible subsets of the iterable
 
@@ -282,6 +327,26 @@ def iter_except(func, exception, first=None):
             yield func()
     except exception:
         pass
+
+
+def first_true(iterable, default=False, pred=None):
+    """
+    Returns the first true value in the iterable.
+
+    If no true value is found, returns *default*
+
+    If *pred* is not None, returns the first item for which
+    ``pred(item) == True`` .
+
+    >>> first_true(range(10))
+    1
+    >>> first_true(range(10), pred=lambda x: x > 5)
+    6
+    >>> first_true(range(10), default='missing', pred=lambda x: x > 9)
+    'missing'
+
+    """
+    return next(filter(pred, iterable), default)
 
 
 def random_product(*args, **kwds):
