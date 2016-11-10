@@ -15,7 +15,7 @@ import operator
 from random import randrange, sample, choice
 
 from six import PY2
-from six.moves import filterfalse, map, range, zip, zip_longest
+from six.moves import filter, filterfalse, map, range, zip, zip_longest
 
 __all__ = [
     'accumulate', 'take', 'tabulate', 'tail', 'consume', 'nth', 'all_equal',
