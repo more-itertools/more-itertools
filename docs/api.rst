@@ -26,6 +26,7 @@ New Routines
 Itertools Recipes
 =================
 
+.. autofunction:: accumulate
 .. autofunction:: take
 .. autofunction:: tabulate
 .. autofunction:: tail

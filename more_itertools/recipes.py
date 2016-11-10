@@ -18,13 +18,43 @@ from six import PY2
 from six.moves import filterfalse, map, range, zip, zip_longest
 
 __all__ = [
-    'take', 'tabulate', 'tail', 'consume', 'nth', 'all_equal', 'quantify',
-    'padnone', 'ncycles', 'dotproduct', 'flatten', 'repeatfunc', 'pairwise',
-    'grouper', 'roundrobin', 'partition', 'powerset', 'unique_everseen',
-    'unique_justseen', 'iter_except', 'first_true', 'random_product',
-    'random_permutation', 'random_combination',
+    'accumulate', 'take', 'tabulate', 'tail', 'consume', 'nth', 'all_equal',
+    'quantify', 'padnone', 'ncycles', 'dotproduct', 'flatten', 'repeatfunc',
+    'pairwise', 'grouper', 'roundrobin', 'partition', 'powerset',
+    'unique_everseen', 'unique_justseen', 'iter_except', 'first_true',
+    'random_product', 'random_permutation', 'random_combination',
     'random_combination_with_replacement',
 ]
+
+
+def accumulate(iterable, func=operator.add):
+    """
+    Return an iterator whose items are the accumulated results of a function
+    (specified by the optional *func* argument) that takes two arguments.
+    By default, returns accumulated sums with ``operator.add()``.
+
+    >>> list(accumulate([1, 2, 3, 4, 5]))  # Running sum
+    [1, 3, 6, 10, 15]
+    >>> list(accumulate([1, 2, 3, 4, 5], func=operator.mul))  # Running product
+    [1, 2, 6, 24, 120]
+    >>> list(accumulate([0, 1, -1, 2, 3, 2], func=max))  # Running maximum
+    [0, 1, 1, 2, 3, 3]
+
+    This function is available in the ``itertools`` module for Python 3.2 and
+    greater.
+
+    """
+    it = iter(iterable)
+    try:
+        total = next(it)
+    except StopIteration:
+        return
+    else:
+        yield total
+
+    for element in it:
+        total = func(total, element)
+        yield total
 
 
 def take(n, iterable):
