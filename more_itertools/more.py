@@ -70,8 +70,6 @@ def first(iterable, default=_marker):
         return default
 
 
-
-
 class peekable(object):
     """
     Wrapper for an iterator to allow lookahead.
@@ -161,15 +159,14 @@ class peekable(object):
         return self.__next__()
 
     def _get_slice(self, index):
-        start = 0 if index.start is None else index.start
+        start = index.start
         stop = index.stop
-        step = index.step
 
-        if (start < 0) or ((stop is not None) and (stop < 0)):
+        if (
+            ((start is not None) and (start < 0)) or
+            ((stop is not None) and (stop < 0))
+        ):
             raise ValueError('Negative indexing not supported')
-
-        if start == stop:
-            return []
 
         cache_len = len(self._cache)
 
@@ -186,7 +183,7 @@ class peekable(object):
                 except StopIteration:
                     break
 
-        return list(self._cache)[start:stop:step]
+        return list(self._cache)[index]
 
     def __getitem__(self, index):
         if isinstance(index, slice):

@@ -113,6 +113,63 @@ class PeekableTests(TestCase):
         eq_(p.peek(), 1)
         eq_(next(p), 1)
 
+    def test_indexing(self):
+        """
+        Indexing into the peekable shouldn't advance the iterator.
+        """
+        p = peekable('abcdefghijkl')
+
+        # The 0th index is what ``next()`` will return
+        eq_(p[0], 'a')
+        eq_(next(p), 'a')
+
+        # Indexing further into the peekable shouldn't advance the itertor
+        eq_(p[2], 'd')
+        eq_(next(p), 'b')
+
+        # The 0th index moves up with the iterator; the last index follows
+        eq_(p[0], 'c')
+        eq_(p[9], 'l')
+
+        eq_(next(p), 'c')
+        eq_(p[8], 'l')
+
+        # Negative indexing should fail
+        with self.assertRaises(ValueError):
+            p[-2]
+
+    def test_slicing(self):
+        """
+        Slicing the peekable shouldn't advance the iterator.
+        """
+        seq = list('abcdefghijkl')
+        p = peekable(seq)
+
+        # Slicing the peekable should just be like slicing a re-iterable
+        eq_(p[1:4], seq[1:4])
+
+        # Advancing the iterator moves the slices up also
+        eq_(next(p), 'a')
+        eq_(p[1:4], seq[1:][1:4])
+
+        # Implicit starts and stop should work
+        eq_(p[:5], seq[1:][:5])
+        eq_(p[:], seq[1:][:])
+
+        # Indexing past the end should work
+        eq_(p[:100], seq[1:][:100])
+
+        # Steps should work, including negative
+        eq_(p[::2], seq[1:][::2])
+        eq_(p[::-1], seq[1:][::-1])
+
+        # Negative indexing should fail
+        with self.assertRaises(ValueError):
+            p[-1:]
+
+        with self.assertRaises(ValueError):
+            p[:-1]
+
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""
