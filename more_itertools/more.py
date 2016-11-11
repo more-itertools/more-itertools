@@ -196,10 +196,8 @@ def collate(*iterables, **kwargs):
 
 # If using Python version 3.5 or greater, heapq.merge() will be faster than
 # collate - use that instead.
-if (version_info[0] >= 3) and (version_info[1] >= 5):
+if version_info >= (3, 5, 0):
     collate = merge
-else:
-    collate = collate
 
 
 def consumer(func):
