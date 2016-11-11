@@ -2,6 +2,8 @@ from __future__ import print_function
 
 from collections import deque
 from functools import partial, wraps
+from heapq import merge
+from sys import version_info
 
 from six import iteritems
 
@@ -193,6 +195,23 @@ class peekable(object):
         return self._get_slice(slice(index, index + 1, None))[0]
 
 
+def _collate(*iterables, **kwargs):
+    """
+    Helper for ``collate()`` - called when the user is using the ``reverse`` or
+    ``key`` keyword arguments on Python versions below 3.5 .
+    """
+    key = kwargs.pop('key', lambda a: a)
+    reverse = kwargs.pop('reverse', False)
+
+    min_or_max = partial(max if reverse else min, key=lambda a_b: a_b[0])
+    peekables = [peekable(it) for it in iterables]
+    peekables = [p for p in peekables if p]  # Kill empties.
+    while peekables:
+        _, p = min_or_max((key(p.peek()), p) for p in peekables)
+        yield next(p)
+        peekables = [x for x in peekables if x]
+
+
 def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
     ``iterables``.
@@ -213,17 +232,19 @@ def collate(*iterables, **kwargs):
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
+    If neither of the keyword arguments are specified, this function delegates
+    to ``heapq.merge()``.
     """
-    key = kwargs.pop('key', lambda a: a)
-    reverse = kwargs.pop('reverse', False)
+    if not kwargs:
+        return merge(*iterables)
 
-    min_or_max = partial(max if reverse else min, key=lambda a_b: a_b[0])
-    peekables = [peekable(it) for it in iterables]
-    peekables = [p for p in peekables if p]  # Kill empties.
-    while peekables:
-        _, p = min_or_max((key(p.peek()), p) for p in peekables)
-        yield next(p)
-        peekables = [x for x in peekables if x]
+    return _collate(*iterables, **kwargs)
+
+
+# If using Python version 3.5 or greater, heapq.merge() will be faster than
+# collate - use that instead.
+if version_info >= (3, 5, 0):
+    collate = merge
 
 
 def consumer(func):

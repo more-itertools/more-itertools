@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='more-itertools',
-    version='2.2',
+    version='2.3',
     description='More routines for operating on iterables, beyond itertools',
     long_description=open('README.rst').read() + '\n\n' +
                      '\n'.join(open('docs/versions.rst').read()
@@ -33,6 +33,9 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries'],
     keywords=['itertools', 'iterator', 'iteration', 'filter', 'peek',
               'peekable', 'collate', 'chunk', 'chunked'],

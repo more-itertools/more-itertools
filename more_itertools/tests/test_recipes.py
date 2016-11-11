@@ -11,6 +11,27 @@ def setup_module():
     seed(1337)
 
 
+class AccumulateTests(TestCase):
+    """Tests for ``accumulate()``"""
+
+    def test_empty(self):
+        """Test that an empty input returns an empty output"""
+        eq_(list(accumulate([])), [])
+
+    def test_default(self):
+        """Test accumulate with the default function (addition)"""
+        eq_(list(accumulate([1, 2, 3])), [1, 3, 6])
+
+    def test_bogus_function(self):
+        """Test accumulate with an invalid function"""
+        with self.assertRaises(TypeError):
+            list(accumulate([1, 2, 3], func=lambda x: x))
+
+    def test_custom_function(self):
+        """Test accumulate with a custom function"""
+        eq_(list(accumulate((1, 2, 3, 2, 1), func=max)), [1, 2, 3, 3, 3])
+
+
 class TakeTests(TestCase):
     """Tests for ``take()``"""
 
@@ -51,6 +72,22 @@ class TabulateTests(TestCase):
         t = tabulate(lambda x: 2 * x, -1)
         f = (next(t), next(t), next(t))
         eq_(f, (-2, 0, 2))
+
+
+class TailTests(TestCase):
+    """Tests for ``tail()``"""
+
+    def test_greater(self):
+        """Length of iterable is greather than requested tail"""
+        eq_(list(tail(3, 'ABCDEFG')), ['E', 'F', 'G'])
+
+    def test_equal(self):
+        """Length of iterable is equal to the requested tail"""
+        eq_(list(tail(7, 'ABCDEFG')), ['A', 'B', 'C', 'D', 'E', 'F', 'G'])
+
+    def test_less(self):
+        """Length of iterable is less than requested tail"""
+        eq_(list(tail(8, 'ABCDEFG')), ['A', 'B', 'C', 'D', 'E', 'F', 'G'])
 
 
 class ConsumeTests(TestCase):
@@ -97,6 +134,23 @@ class NthTests(TestCase):
     def test_negative_item_raises(self):
         """Ensure asking for a negative item raises an exception"""
         assert_raises(ValueError, nth, range(10), -3)
+
+
+class AllEqualTests(TestCase):
+    """Tests for ``all_equal()``"""
+
+    def test_true(self):
+        """Everything is equal"""
+        self.assertTrue(all_equal('aaaaaa'))
+
+    def test_false(self):
+        """Not everything is equal"""
+        self.assertFalse(all_equal('aaaaab'))
+
+    def test_tricky(self):
+        """Not everything is identical, but everything is equal"""
+        items = [1, complex(1, 0), 1.0]
+        self.assertTrue(all_equal(items))
 
 
 class QuantifyTests(TestCase):
@@ -240,6 +294,22 @@ class RoundrobinTests(TestCase):
             ['A', 1, 'B', 2, 'C', 'D'])
 
 
+class PartitionTests(TestCase):
+    """Tests for ``partition()``"""
+
+    def test_bool(self):
+        """Test when pred() returns a boolean"""
+        lesser, greater = partition(lambda x: x > 5, range(10))
+        eq_(list(lesser), [0, 1, 2, 3, 4, 5])
+        eq_(list(greater), [6, 7, 8, 9])
+
+    def test_arbitrary(self):
+        """Test when pred() returns an integer"""
+        divisibles, remainders = partition(lambda x: x % 3, range(10))
+        eq_(list(divisibles), [0, 3, 6, 9])
+        eq_(list(remainders), [1, 2, 4, 5, 7, 8])
+
+
 class PowersetTests(TestCase):
     """Tests for ``powerset()``"""
 
@@ -306,6 +376,26 @@ class IterExceptTests(TestCase):
         f = lambda: 25
         i = iter_except(l.pop, IndexError, f)
         eq_(list(i), [25, 3, 2, 1])
+
+
+class FirstTrueTests(TestCase):
+    """Tests for ``first_true()``"""
+
+    def test_something_true(self):
+        """Test with no keywords"""
+        eq_(first_true(range(10)), 1)
+
+    def test_nothing_true(self):
+        """Test default return value."""
+        eq_(first_true([0, 0, 0]), False)
+
+    def test_default(self):
+        """Test with a default keyword"""
+        eq_(first_true([0, 0, 0], default='!'), '!')
+
+    def test_pred(self):
+        """Test with a custom predicate"""
+        eq_(first_true([2, 4, 6], pred=lambda x: x % 3 == 0), 6)
 
 
 class RandomProductTests(TestCase):
