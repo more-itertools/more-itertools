@@ -185,17 +185,21 @@ def collate(*iterables, **kwargs):
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
-    If neither of the keyword arguments are specified, or if the Python version
-    is 3.5 or greater, this function delegates to ``heapq.merge()``.
-
+    If neither of the keyword arguments are specified, this function delegates
+    to ``heapq.merge()``.
     """
     if not kwargs:
         return merge(*iterables)
 
-    if (version_info[0] >= 3) and (version_info[1] >= 5):
-        return merge(*iterables, **kwargs)
-
     return _collate(*iterables, **kwargs)
+
+
+# If using Python version 3.5 or greater, heapq.merge() will be faster than
+# collate - use that instead.
+if (version_info[0] >= 3) and (version_info[1] >= 5):
+    collate = merge
+else:
+    collate = collate
 
 
 def consumer(func):
