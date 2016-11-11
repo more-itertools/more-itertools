@@ -171,7 +171,7 @@ class peekable(object):
         cache_len = len(self._cache)
 
         if stop is None:
-            self._cache.extend(islice(self._it, None))
+            self._cache.extend(self._it)
         elif stop >= cache_len:
             self._cache.extend(islice(self._it, stop - cache_len))
 
