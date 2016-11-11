@@ -7,7 +7,7 @@ from sys import version_info
 
 from six import iteritems
 
-from .recipes import take
+from .recipes import islice, take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
@@ -171,17 +171,9 @@ class peekable(object):
         cache_len = len(self._cache)
 
         if stop is None:
-            while True:
-                try:
-                    self._cache.append(next(self._it))
-                except StopIteration:
-                    break
+            self._cache.extend(islice(self._it, None))
         elif stop >= cache_len:
-            for i in range(stop - cache_len):
-                try:
-                    self._cache.append(next(self._it))
-                except StopIteration:
-                    break
+            self._cache.extend(islice(self._it, stop - cache_len))
 
         return list(self._cache)[index]
 
