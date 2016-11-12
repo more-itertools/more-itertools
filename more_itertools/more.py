@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from collections import deque
+from collections import defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
 from sys import version_info
@@ -447,59 +447,51 @@ def windowed(seq, n, fillvalue=None):
         yield tuple(window)
 
 
-def separate(iterable, keys=None, fn=None):
+class separate(object):
     """
-    By default, returns a dictionary whose keys are ``True`` and ``False``,
-    and whose values are iterables.
-    The items in the ``True`` iterable have ``bool(item) == True``,
-    and the items in the ``False`` iterable have ``bool(item) == False``.
+    Wraps an iterable and returns an object that separates the iterable
+    into child iterables based on the *key* function.
 
-    >>> iterable = [0, '', 1, 'x', None, [1]]
-    >>> D = separate(iterable)
-    >>> list(D[False])
-    [0, '', None]
-    >>> list(D[True])
-    [1, 'x', [1]]
+    >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
+    >>> s = separate(iterable, key=lambda s: s[0])  # Select by first character
+    >>> a_iterable = s['a']
+    >>> next(a_iterable)
+    'a1'
+    >>> next(a_iterable)
+    'a2'
+    >>> list(s['b'])
+    ['b1', 'b2', 'b3']
 
-    If callable function ``fn`` is specified as a keyword argument, then it
-    will be applied to the items in ``iterable`` instead of ``bool``.
-    The possible values that ``fn`` can take on should then be specified with
-    the ``keys`` arguments:
-
-    >>> iterable = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    >>> D = separate(iterable, keys=(0, 1, 2), fn=lambda x: x % 3)
-    >>> list(D[0])
-    [0, 3, 6]
-    >>> list(D[1])
-    [1, 4, 7]
-    >>> list(D[2])
-    [2, 5, 8]
-
-    If one of the possible values of ``fn`` is not specified in ``keys``, then
-    it will not be represented in the output dictionary.
+    The original iterable will be advanced and its items will be cached until
+    they are retrieved.
+    Attempting to select a value that does not match any items in the iterable
+    will exhaust the iterable, caching all the values.
 
     """
-    keys = (False, True) if keys is None else keys
-    fn = bool if fn is None else fn
 
-    if not keys:
-        keys = [True, False]
+    def __init__(self, iterable, key):
+        self._it = iter(iterable)
+        self._key = key
+        self._cache = defaultdict(deque)
 
-    it = iter(iterable)
-    ret = {k: deque() for k in keys}
-
-    def _get_items(result):
+    def _get_values(self, value):
         while True:
-            if ret[result]:
-                yield ret[result].popleft()
+            if self._cache[value]:
+                yield self._cache[value].popleft()
             else:
                 while True:
-                    item = next(it)
-                    fn_item = fn(item)
-                    if fn_item == result:
+                    item = next(self._it)
+                    item_value = self._key(item)
+                    if item_value == value:
                         break
-                    elif fn_item in ret:
-                        ret[fn_item].append(item)
-                yield item
+                    self._cache[item_value].append(item)
 
-    return {k: _get_items(k) for k in keys}
+    def __getitem__(self, value):
+        return self._get_values(value)
+
+    def __next__(self):
+        return next(self._it)
+
+    def next(self):
+        # For Python 2 compatibility
+        return self.__next__()
