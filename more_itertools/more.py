@@ -499,10 +499,3 @@ class separate(object):
 
     def __getitem__(self, value):
         return self._get_values(value)
-
-    def __next__(self):
-        return next(self._it)
-
-    def next(self):
-        # For Python 2 compatibility
-        return self.__next__()
