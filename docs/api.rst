@@ -8,6 +8,7 @@ API Reference
 New Routines
 ============
 
+.. autofunction:: bucket
 .. autofunction:: chunked
 .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: consumer
@@ -18,7 +19,6 @@ New Routines
 .. autofunction:: iterate
 .. autofunction:: one
 .. autoclass:: peekable
-.. autofunction:: separate
 .. autofunction:: unique_to_each
 .. autofunction:: windowed
 .. autofunction:: with_iter

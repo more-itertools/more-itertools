@@ -11,7 +11,7 @@ from .recipes import take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse', 'unique_to_each', 'windowed', 'separate']
+           'intersperse', 'unique_to_each', 'windowed', 'bucket']
 
 
 _marker = object()
@@ -447,13 +447,13 @@ def windowed(seq, n, fillvalue=None):
         yield tuple(window)
 
 
-class separate(object):
+class bucket(object):
     """
-    Wraps an iterable and returns an object that separates the iterable
+    Wraps an iterable and returns an object that buckets the iterable
     into child iterables based on the *key* function.
 
     >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
-    >>> s = separate(iterable, key=lambda s: s[0])  # Select by first character
+    >>> s = bucket(iterable, key=lambda s: s[0])  # Select by first character
     >>> a_iterable = s['a']
     >>> next(a_iterable)
     'a1'
@@ -473,7 +473,7 @@ class separate(object):
     >>> iterable = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     >>> mod_3 = lambda x: x % 3  # Remainder when divided by 3
     >>> values = {0, 1}  # Only keep items that equal 0 or 1 (mod 3)
-    >>> s = separate(iterable, key=mod_3, values=values)
+    >>> s = bucket(iterable, key=mod_3, values=values)
     >>> list(s[0])
     [0, 3, 6]
     >>> list(s[1])

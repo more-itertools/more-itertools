@@ -257,12 +257,12 @@ class WindowedTests(TestCase):
             list(windowed([1, 2, 3, 4, 5], -1))
 
 
-class SeparateTests(TestCase):
-    """Tests for ``separate()``"""
+class BucketTests(TestCase):
+    """Tests for ``bucket()``"""
 
     def test_basic(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
-        D = separate(iterable, key=lambda x: 10 * (x // 10))
+        D = bucket(iterable, key=lambda x: 10 * (x // 10))
 
         # In-order access
         eq_(list(D[10]), [10, 11, 12])
@@ -275,7 +275,7 @@ class SeparateTests(TestCase):
 
     def test_known_values(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
-        D = separate(iterable, key=lambda x: 10 * (x // 10), values=(10, 20))
+        D = bucket(iterable, key=lambda x: 10 * (x // 10), values=(10, 20))
 
         self.assertIn(10, D)
         eq_(list(D[10]), [10, 11, 12])
@@ -289,7 +289,7 @@ class SeparateTests(TestCase):
 
     def test_in(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
-        D = separate(iterable, key=lambda x: 10 * (x // 10))
+        D = bucket(iterable, key=lambda x: 10 * (x // 10))
 
         self.assertTrue(10 in D)
         self.assertFalse(40 in D)
