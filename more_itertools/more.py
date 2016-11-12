@@ -483,6 +483,7 @@ class separate(object):
                     item = next(self._it)
                     item_value = self._key(item)
                     if item_value == value:
+                        yield item
                         break
                     self._cache[item_value].append(item)
 
