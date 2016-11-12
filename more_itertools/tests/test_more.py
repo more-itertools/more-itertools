@@ -273,20 +273,6 @@ class BucketTests(TestCase):
 
         eq_(list(D[40]), [])  # Nothing in here!
 
-    def test_known_values(self):
-        iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
-        D = bucket(iterable, key=lambda x: 10 * (x // 10), values=(10, 20))
-
-        self.assertIn(10, D)
-        eq_(list(D[10]), [10, 11, 12])
-
-        self.assertNotIn(30, D)
-        with self.assertRaises(KeyError):
-            next(D[30])
-
-        eq_(list(D[20]), [20, 21, 22, 23])
-
-
     def test_in(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
         D = bucket(iterable, key=lambda x: 10 * (x // 10))

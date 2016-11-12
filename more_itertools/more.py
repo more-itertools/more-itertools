@@ -464,37 +464,17 @@ class bucket(object):
 
     The original iterable will be advanced and its items will be cached until
     they are used by the child iterables. This may require significant storage.
-
-    By default, attempting to select a value that does not match any items in
-    the iterable will exhaust the iterable, caching all the values.
-    If a set of *values* is provided, items that don't match any will not be
-    cached, and attempting to select them will generate a KeyError.
-
-    >>> iterable = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    >>> mod_3 = lambda x: x % 3  # Remainder when divided by 3
-    >>> values = {0, 1}  # Only keep items that equal 0 or 1 (mod 3)
-    >>> s = bucket(iterable, key=mod_3, values=values)
-    >>> list(s[0])
-    [0, 3, 6]
-    >>> list(s[1])
-    [1, 4, 7]
-    >>> list(s[2])
-    Traceback (most recent call last):
-    ...
-    KeyError: 2
+    Be aware that attempting to select a bucket that no items correspond to
+    will exhaust the iterable and cache all values.
 
     """
 
-    def __init__(self, iterable, key, values=()):
+    def __init__(self, iterable, key):
         self._it = iter(iterable)
         self._key = key
         self._cache = defaultdict(deque)
-        self._values = set(values)
 
     def __contains__(self, value):
-        if self._values and (value not in self._values):
-            return False
-
         try:
             item = next(self[value])
         except StopIteration:
@@ -524,12 +504,8 @@ class bucket(object):
                     if item_value == value:
                         yield item
                         break
-                    elif self._values and (item_value not in self._values):
-                        continue
                     else:
                         self._cache[item_value].append(item)
 
     def __getitem__(self, value):
-        if self._values and (value not in self._values):
-            raise KeyError(value)
         return self._get_values(value)
