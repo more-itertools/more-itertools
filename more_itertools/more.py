@@ -515,9 +515,10 @@ class bucket(object):
                     if item_value == value:
                         yield item
                         break
-                    if self._values and (item_value not in self._values):
+                    elif self._values and (item_value not in self._values):
                         continue
-                    self._cache[item_value].append(item)
+                    else:
+                        self._cache[item_value].append(item)
 
     def __getitem__(self, value):
         if self._values and (value not in self._values):
