@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from collections import deque
+from collections import defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
 from sys import version_info
@@ -11,7 +11,7 @@ from .recipes import islice, take
 
 __all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse', 'unique_to_each', 'windowed']
+           'intersperse', 'unique_to_each', 'windowed', 'bucket']
 
 
 _marker = object()
@@ -481,3 +481,67 @@ def windowed(seq, n, fillvalue=None):
     for item in it:
         append(item)
         yield tuple(window)
+
+
+class bucket(object):
+    """
+    Wraps an iterable and returns an object that buckets the iterable
+    into child iterables based on the *key* function.
+
+    >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
+    >>> s = bucket(iterable, key=lambda s: s[0])  # Select by first character
+    >>> a_iterable = s['a']
+    >>> next(a_iterable)
+    'a1'
+    >>> next(a_iterable)
+    'a2'
+    >>> list(s['b'])
+    ['b1', 'b2', 'b3']
+
+    The original iterable will be advanced and its items will be cached until
+    they are used by the child iterables. This may require significant storage.
+    Be aware that attempting to select a bucket that no items correspond to
+    will exhaust the iterable and cache all values.
+
+    """
+
+    def __init__(self, iterable, key):
+        self._it = iter(iterable)
+        self._key = key
+        self._cache = defaultdict(deque)
+
+    def __contains__(self, value):
+        try:
+            item = next(self[value])
+        except StopIteration:
+            return False
+        else:
+            self._cache[value].appendleft(item)
+
+        return True
+
+    def _get_values(self, value):
+        """
+        Helper to yield items from the parent iterator that match *value*.
+        Items that don't match are stored in the local cache as they
+        are encountered.
+        """
+        while True:
+            # If we've cached some items that match the target value, emit
+            # the first one and evit it from the cache.
+            if self._cache[value]:
+                yield self._cache[value].popleft()
+            # Otherwise we need to advance the parent iterator to search for
+            # a matching item, caching the rest.
+            else:
+                while True:
+                    item = next(self._it)
+                    item_value = self._key(item)
+                    if item_value == value:
+                        yield item
+                        break
+                    else:
+                        self._cache[item_value].append(item)
+
+    def __getitem__(self, value):
+        return self._get_values(value)
