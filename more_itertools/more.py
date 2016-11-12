@@ -9,7 +9,7 @@ from six import iteritems
 
 from .recipes import islice, take
 
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
+__all__ = ['chunked', 'ichunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
            'iterate', 'with_iter', 'one', 'distinct_permutations',
            'intersperse', 'unique_to_each', 'windowed']
 
@@ -40,6 +40,31 @@ def chunked(iterable, n):
             return
         yield chunk
 
+def ichunked(iterable, n):
+    """
+    Break an iterable into chunks of length n.
+
+        >>> list(map(list, ichunked([1, 2, 3, 4, 5, 6, 7], 3)))
+        [[1, 2, 3], [4, 5, 6], [7]]
+
+        >>> list(map(list, ichunked(xrange(1, 7), 3)))
+        [[1, 2, 3], [4, 5, 6], []]
+
+    Each time returns iterable object which points to begin of corresponding chunk inside of iterable.
+    It is important to get all items from iterable object on each step before ask for new one.
+    """
+    stop = []
+    it = iter(iterable)
+    def _next_chunk():
+        try:
+            for _ in xrange(n):
+                yield next(it)
+        except StopIteration:
+            stop.append(True)
+            return
+
+    while not stop:
+        yield _next_chunk()
 
 def first(iterable, default=_marker):
     """Return the first item of an iterable, ``default`` if there is none.

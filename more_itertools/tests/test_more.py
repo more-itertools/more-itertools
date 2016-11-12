@@ -61,6 +61,20 @@ class ChunkedTests(TestCase):
         eq_(list(chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']])
 
 
+class IChunkedTests(TestCase):
+    """Tests for ``ichunked()``"""
+
+    def test_even(self):
+        """Test when ``n`` divides evenly into the length of the iterable."""
+        eq_(list(map(list, ichunked('ABCDEF', 3))), [['A', 'B', 'C'], ['D', 'E', 'F'], []])
+
+    def test_odd(self):
+        """Test when ``n`` does not divide evenly into the length of the
+        iterable.
+
+        """
+        eq_(list(map(list, ichunked('ABCDE', 3))), [['A', 'B', 'C'], ['D', 'E']])
+
 class FirstTests(TestCase):
     """Tests for ``first()``"""
 
