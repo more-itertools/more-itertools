@@ -492,6 +492,9 @@ class separate(object):
         self._values = set(values)
 
     def __contains__(self, value):
+        if self._values and (value not in self._values):
+            return False
+
         try:
             item = next(self[value])
         except StopIteration:
