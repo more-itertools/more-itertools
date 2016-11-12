@@ -485,7 +485,7 @@ class bucket(object):
 
     """
 
-    def __init__(self, iterable, key, values=tuple()):
+    def __init__(self, iterable, key, values=()):
         self._it = iter(iterable)
         self._key = key
         self._cache = defaultdict(deque)
