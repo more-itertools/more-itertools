@@ -474,6 +474,16 @@ class separate(object):
         self._key = key
         self._cache = defaultdict(deque)
 
+    def __contains__(self, value):
+        try:
+            item = next(self[value])
+        except StopIteration:
+            return False
+        else:
+            self._cache[value].appendleft(item)
+
+        return True
+
     def _get_values(self, value):
         while True:
             if self._cache[value]:

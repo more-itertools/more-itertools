@@ -272,3 +272,15 @@ class SeparateTests(TestCase):
         eq_(list(D[20]), [20, 21, 22, 23])
 
         eq_(list(D[40]), [])  # Nothing in here!
+
+    def test_in(self):
+        iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
+        D = separate(iterable, key=lambda x: 10 * (x // 10))
+
+        self.assertTrue(10 in D)
+        self.assertFalse(40 in D)
+        self.assertTrue(20 in D)
+        self.assertFalse(21 in D)
+
+        # Checking in-ness shouldn't advance the iterator
+        eq_(next(D[10]), 10)
