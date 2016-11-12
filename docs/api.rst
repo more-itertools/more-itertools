@@ -27,10 +27,13 @@ New Routines
 Itertools Recipes
 =================
 
+.. autofunction:: accumulate
 .. autofunction:: take
 .. autofunction:: tabulate
+.. autofunction:: tail
 .. autofunction:: consume
 .. autofunction:: nth
+.. autofunction:: all_equal
 .. autofunction:: quantify
 .. autofunction:: padnone
 .. autofunction:: ncycles
@@ -40,10 +43,12 @@ Itertools Recipes
 .. autofunction:: pairwise
 .. autofunction:: grouper
 .. autofunction:: roundrobin
+.. autofunction:: partition
 .. autofunction:: powerset
 .. autofunction:: unique_everseen
 .. autofunction:: unique_justseen
 .. autofunction:: iter_except
+.. autofunction:: first_true
 .. autofunction:: random_product
 .. autofunction:: random_permutation
 .. autofunction:: random_combination
