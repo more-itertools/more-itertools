@@ -209,22 +209,6 @@ def ilen(iterable):
     """
     return sum(1 for _ in iterable)
 
-def append(iterable, value):
-    """Return a new iterable with ``value`` appended to the end.
-
-    >>> list(append(range(5), 5))
-    [0, 1, 2, 3, 4, 5]
-    """
-    # This seems to be the fastest implementation of everything I tried.
-    return chain(iterable, [value])
-
-def prepend(iterable, value):
-    """Return a new iterable with ``value`` prepended to the start.
-
-    >>> list(prepend(range(5), -1))
-    [-1, 0, 1, 2, 3, 4]
-    """
-    return chain([value], iterable)
 
 def interleave(*iterables):
     """Return a new iterable yielding from each iterable in turn,
@@ -235,6 +219,7 @@ def interleave(*iterables):
     [1, 4, 6, 2, 5, 7]
     """
     return chain.from_iterable(izip(*iterables))
+
 
 def interleave_longest(*iterables):
     """Return a new iterable yielding from each iterable in turn,
@@ -247,6 +232,7 @@ def interleave_longest(*iterables):
     dummy = object()
     i = chain.from_iterable(izip_longest(*iterables, fillvalue=dummy))
     return ifilter(lambda x: x is not dummy, i)
+
 
 def collapse(iterable, basetype=None, levels=None):
     """Flatten an iterable containing some iterables (themselves containing
@@ -263,7 +249,7 @@ def collapse(iterable, basetype=None, levels=None):
     """
     def walk(node, level):
         if (levels is not None and level > levels or
-            isinstance(node, basestring) or 
+            isinstance(node, basestring) or
             basetype and isinstance(node, basetype)):
             yield node
             return
