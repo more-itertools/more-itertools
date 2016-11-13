@@ -581,8 +581,8 @@ def collapse(iterable, basetype=None, levels=None):
     matching ``isinstance(element, basetype)``, and elements that are
     ``levels`` levels down.
 
-    >>> list(collapse([[1], 2, [[3], 4], [[[5]]]]))
-    [1, 2, 3, 4, 5]
+    >>> list(collapse([[1], 2, [[3], 4], [[[5]]], 'abc']))
+    [1, 2, 3, 4, 5, 'abc']
     >>> list(collapse([[1], 2, [[3], 4], [[[5]]]], levels=2))
     [1, 2, 3, 4, [5]]
     >>> list(collapse((1, [2], (3, [4, (5,)])), list))
