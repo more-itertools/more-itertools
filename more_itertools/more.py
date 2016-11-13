@@ -571,9 +571,8 @@ def interleave_longest(*iterables):
     >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
     [1, 4, 6, 2, 5, 7, 3, 8]
     """
-    dummy = object()
-    i = chain.from_iterable(zip_longest(*iterables, fillvalue=dummy))
-    return filter(lambda x: x is not dummy, i)
+    i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
+    return filter(lambda x: x is not _marker, i)
 
 
 def collapse(iterable, basetype=None, levels=None):
@@ -595,6 +594,7 @@ def collapse(iterable, basetype=None, levels=None):
             basetype and isinstance(node, basetype)):
             yield node
             return
+
         try:
             tree = iter(node)
         except TypeError:
@@ -602,7 +602,8 @@ def collapse(iterable, basetype=None, levels=None):
             return
         else:
             for child in tree:
-                for x in walk(child, level+1):
+                for x in walk(child, level + 1):
                     yield x
+
     for x in walk(iterable, 0):
         yield x
