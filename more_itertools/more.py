@@ -589,9 +589,11 @@ def collapse(iterable, basetype=None, levels=None):
     [1, [2], 3, [4, (5,)]]
     """
     def walk(node, level):
-        if (levels is not None and level > levels or
+        if (
+            ((levels is not None) and (level > levels)) or
             isinstance(node, string_types) or
-            basetype and isinstance(node, basetype)):
+            ((basetype is not None) and isinstance(node, basetype))
+        ):
             yield node
             return
 

@@ -385,5 +385,7 @@ class TestCollapse(TestCase):
             list(collapse(l, levels=2)))
 
     def test_collapse_to_list(self):
-        l = (1, [2], (3, [4, (5,)]))
-        eq_(list(collapse(l, basetype=list)), [1, [2], 3, [4, (5,)]])
+        l = (1, [2], (3, [4, (5,)], 'ab'))
+        actual = list(collapse(l, basetype=list))
+        expected = [1, [2], 3, [4, (5,)], 'ab']
+        eq_(actual, expected)
