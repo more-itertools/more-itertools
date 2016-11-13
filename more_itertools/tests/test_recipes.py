@@ -334,6 +334,18 @@ class UniqueEverseenTests(TestCase):
         u = unique_everseen('aAbACCc', key=str.lower)
         eq_(list('abC'), list(u))
 
+    def test_unhashable(self):
+        """ensure things work for unhashable items"""
+        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
+        u = unique_everseen(iterable)
+        eq_(list(u), ['a', [1, 2, 3]])
+
+    def test_unhashable_key(self):
+        """ensure things work for unhashable items with a custom key"""
+        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
+        u = unique_everseen(iterable, key=lambda x: x)
+        eq_(list(u), ['a', [1, 2, 3]])
+
 
 class UniqueJustseenTests(TestCase):
     """Tests for ``unique_justseen()``"""

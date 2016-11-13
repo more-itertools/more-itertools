@@ -304,11 +304,16 @@ def powerset(iterable):
 
 
 def unique_everseen(iterable, key=None):
-    """Yield unique elements, preserving order.
+    """
+    Yield unique elements, preserving order.
         >>> list(unique_everseen('AAAABBBCCDAABBB'))
         ['A', 'B', 'C', 'D']
         >>> list(unique_everseen('ABBCcAD', str.lower))
         ['A', 'B', 'C', 'D']
+
+    Sequences with a mix of hashable and unhashable items can be used.
+    The function will be slower (i.e., O(N^2)) for unhashable items.
+
     """
     seenset = set()
     seenset_add = seenset.add
