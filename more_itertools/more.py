@@ -3,15 +3,18 @@ from __future__ import print_function
 from collections import defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
+from itertools import chain
 from sys import version_info
 
 from six import iteritems
 
 from .recipes import islice, take
 
-__all__ = ['chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen',
-           'iterate', 'with_iter', 'one', 'distinct_permutations',
-           'intersperse', 'unique_to_each', 'windowed', 'bucket']
+__all__ = [
+    'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
+    'with_iter', 'one', 'distinct_permutations', 'intersperse',
+    'unique_to_each', 'windowed', 'bucket', 'look_ahead'
+]
 
 
 _marker = object()
@@ -545,3 +548,47 @@ class bucket(object):
 
     def __getitem__(self, value):
         return self._get_values(value)
+
+
+def look_ahead(iterable, n=1):
+    """
+    Returns a 2-tuple with a list containing the first *n* elements of
+    *iterable*, and an iterator with the same items as *iterable*.
+    This allows you to "look ahead" at the items in the iterable without
+    advancing it.
+
+    There is one item in the list by default:
+
+        >>> iterable = 'abcdefg'
+        >>> head, iterable = look_ahead(iterable)
+        >>> head
+        ['a']
+        >>> list(iterable)
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+
+    You may use unpacking to retrieve items instead of lists:
+
+        >>> (head,), iterable = look_ahead('abcdefg')
+        >>> head
+        'a'
+        >>> (first, second), iterable = look_ahead('abcdefg', 2)
+        >>> first
+        'a'
+        >>> second
+        'b'
+
+    The number of items requested can be larger than the number of items in
+    the iterable:
+
+        >>> iterable = [1, 2, 3, 4, 5]
+        >>> head, iterable = look_ahead(iterable, 10)
+        >>> head
+        [1, 2, 3, 4, 5]
+        >>> list(iterable)
+        [1, 2, 3, 4, 5]
+
+    """
+    it = iter(iterable)
+    head = take(n, it)
+
+    return head, chain(head, it)
