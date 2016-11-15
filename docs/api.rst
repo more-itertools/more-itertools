@@ -10,11 +10,14 @@ New Routines
 
 .. autofunction:: bucket
 .. autofunction:: chunked
+.. autofunction:: collapse
 .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: consumer
 .. autofunction:: distinct_permutations
 .. autofunction:: first(iterable[, default])
 .. autofunction:: ilen
+.. autofunction:: interleave
+.. autofunction:: interleave_longest
 .. autofunction:: intersperse
 .. autofunction:: iterate
 .. autofunction:: one
