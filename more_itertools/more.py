@@ -150,9 +150,10 @@ class peekable(object):
         return self._cache[0]
 
     def __next__(self):
-        ret = self.peek()
-        self._cache.popleft()
-        return ret
+        if self._cache:
+            return self._cache.popleft()
+
+        return next(self._it)
 
     def next(self):
         # For Python 2 compatibility
