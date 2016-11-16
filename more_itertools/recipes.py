@@ -304,26 +304,42 @@ def powerset(iterable):
 
 
 def unique_everseen(iterable, key=None):
-    """Yield unique elements, preserving order.
-
+    """
+    Yield unique elements, preserving order.
         >>> list(unique_everseen('AAAABBBCCDAABBB'))
         ['A', 'B', 'C', 'D']
         >>> list(unique_everseen('ABBCcAD', str.lower))
         ['A', 'B', 'C', 'D']
 
+    Sequences with a mix of hashable and unhashable items can be used.
+    The function will be slower (i.e., O(N^2)) for unhashable items.
+
     """
-    seen = set()
-    seen_add = seen.add
+    seenset = set()
+    seenset_add = seenset.add
+    seenlist = []
+    seenlist_add = seenlist.append
     if key is None:
-        for element in filterfalse(seen.__contains__, iterable):
-            seen_add(element)
-            yield element
+        for element in iterable:
+            try:
+                if element not in seenset:
+                    seenset_add(element)
+                    yield element
+            except TypeError as e:
+                if element not in seenlist:
+                    seenlist_add(element)
+                    yield element
     else:
         for element in iterable:
             k = key(element)
-            if k not in seen:
-                seen_add(k)
-                yield element
+            try:
+                if k not in seenset:
+                    seenset_add(k)
+                    yield element
+            except TypeError as e:
+                if k not in seenlist:
+                    seenlist_add(k)
+                    yield element
 
 
 def unique_justseen(iterable, key=None):
