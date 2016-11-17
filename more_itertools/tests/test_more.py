@@ -371,3 +371,51 @@ class SpyTests(TestCase):
         head, new_iterable = spy(original_iterable, 0)
         eq_(head, [])
         eq_(list(new_iterable), ['a', 'b', 'c'])
+
+
+class TestInterleave(TestCase):
+    """Tests for ``interleave()`` and ``interleave_longest()``"""
+
+    def test_interleave(self):
+        l = [[1, 2, 3], [4, 5], [6, 7, 8]]
+        eq_(list(interleave(*l)), [1, 4, 6, 2, 5, 7])
+        l = [[1, 2], [3, 4, 5], [6, 7, 8]]
+        eq_(list(interleave(*l)), [1, 3, 6, 2, 4, 7])
+        l = [[1, 2, 3], [4, 5, 6], [7, 8]]
+        eq_(list(interleave(*l)), [1, 4, 7, 2, 5, 8])
+
+    def test_interleave_longest(self):
+        l = [[1, 2, 3], [4, 5], [6, 7, 8]]
+        eq_(list(interleave_longest(*l)), [1, 4, 6, 2, 5, 7, 3, 8])
+        l = [[1, 2], [3, 4, 5], [6, 7, 8]]
+        eq_(list(interleave_longest(*l)), [1, 3, 6, 2, 4, 7, 5, 8])
+        l = [[1, 2, 3], [4, 5, 6], [7, 8]]
+        eq_(list(interleave_longest(*l)), [1, 4, 7, 2, 5, 8, 3, 6])
+
+
+class TestCollapse(TestCase):
+    """Tests for ``collapse()``"""
+
+    def test_collapse(self):
+        l = [[1], 2, [[3], 4], [[[5]]]]
+        eq_(list(collapse(l)), [1, 2, 3, 4, 5])
+
+    def test_collapse_to_string(self):
+        l = [["s1"], "s2", [["s3"], "s4"], [[["s5"]]]]
+        eq_(list(collapse(l)), ["s1", "s2", "s3", "s4", "s5"])
+
+    def test_collapse_flatten(self):
+        l = [[1], [2], [[3], 4], [[[5]]]]
+        eq_(list(collapse(l, levels=1)), list(flatten(l)))
+
+    def test_collapse_to_level(self):
+        l = [[1], 2, [[3], 4], [[[5]]]]
+        eq_(list(collapse(l, levels=2)), [1, 2, 3, 4, [5]])
+        eq_(list(collapse(collapse(l, levels=1), levels=1)),
+            list(collapse(l, levels=2)))
+
+    def test_collapse_to_list(self):
+        l = (1, [2], (3, [4, (5,)], 'ab'))
+        actual = list(collapse(l, base_type=list))
+        expected = [1, [2], 3, [4, (5,)], 'ab']
+        eq_(actual, expected)

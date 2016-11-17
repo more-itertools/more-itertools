@@ -3,17 +3,19 @@ from __future__ import print_function
 from collections import defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain
+from itertools import chain, islice
 from sys import version_info
 
-from six import iteritems
+from six import iteritems, string_types
+from six.moves import filter, zip, zip_longest
 
-from .recipes import islice, take
+from .recipes import take
 
 __all__ = [
     'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
     'with_iter', 'one', 'distinct_permutations', 'intersperse',
-    'unique_to_each', 'windowed', 'bucket', 'spy'
+    'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
+    'interleave_longest', 'collapse'
 ]
 
 
@@ -451,7 +453,7 @@ def unique_to_each(*iterables):
 
 def windowed(seq, n, fillvalue=None):
     """Return a sliding window (of width n) over data from the iterable.
-    
+
     When n=2 this is equivalent to ``pairwise(iterable)``.
     When n is larger than the iterable, ``fillvalue`` is used in place of
     missing values.
@@ -589,3 +591,62 @@ def spy(iterable, n=1):
     head = take(n, it)
 
     return head, chain(head, it)
+
+
+def interleave(*iterables):
+    """Return a new iterable yielding from each iterable in turn,
+    until the shortest is exhausted. Note that this is the same as
+    chain(*zip(*iterables)).
+
+    >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
+    [1, 4, 6, 2, 5, 7]
+    """
+    return chain.from_iterable(zip(*iterables))
+
+
+def interleave_longest(*iterables):
+    """Return a new iterable yielding from each iterable in turn,
+    skipping any that are exhausted. Note that this is not the same as
+    chain(*zip_longest(*iterables)).
+
+    >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
+    [1, 4, 6, 2, 5, 7, 3, 8]
+    """
+    i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
+    return filter(lambda x: x is not _marker, i)
+
+
+def collapse(iterable, base_type=None, levels=None):
+    """Flatten an iterable containing some iterables (themselves containing
+    some iterables, etc.) into non-iterable types, strings, elements
+    matching ``isinstance(element, base_type)``, and elements that are
+    ``levels`` levels down.
+
+    >>> list(collapse([[1], 2, [[3], 4], [[[5]]], 'abc']))
+    [1, 2, 3, 4, 5, 'abc']
+    >>> list(collapse([[1], 2, [[3], 4], [[[5]]]], levels=2))
+    [1, 2, 3, 4, [5]]
+    >>> list(collapse((1, [2], (3, [4, (5,)])), list))
+    [1, [2], 3, [4, (5,)]]
+    """
+    def walk(node, level):
+        if (
+            ((levels is not None) and (level > levels)) or
+            isinstance(node, string_types) or
+            ((base_type is not None) and isinstance(node, base_type))
+        ):
+            yield node
+            return
+
+        try:
+            tree = iter(node)
+        except TypeError:
+            yield node
+            return
+        else:
+            for child in tree:
+                for x in walk(child, level + 1):
+                    yield x
+
+    for x in walk(iterable, 0):
+        yield x
