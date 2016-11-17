@@ -71,8 +71,7 @@ def first(iterable, default=_marker):
 
 
 class peekable(object):
-    """
-    Wrapper for an iterator to allow lookahead.
+    """Wrap an iterator to allow lookahead.
 
     Call ``peek()`` on the result to get the value that will next pop out of
     ``next()``, without advancing the iterator:
@@ -114,7 +113,6 @@ class peekable(object):
         >>> assert not peekable([])
 
     """
-
     def __init__(self, iterable):
         self._it = iter(iterable)
         self._cache = deque()
@@ -186,9 +184,9 @@ class peekable(object):
 
 
 def _collate(*iterables, **kwargs):
-    """
-    Helper for ``collate()`` - called when the user is using the ``reverse`` or
-    ``key`` keyword arguments on Python versions below 3.5 .
+    """Helper for ``collate()``, called when the user is using the ``reverse``
+    or ``key`` keyword arguments on Python versions below 3.5.
+
     """
     key = kwargs.pop('key', lambda a: a)
     reverse = kwargs.pop('reverse', False)
@@ -224,6 +222,7 @@ def collate(*iterables, **kwargs):
 
     If neither of the keyword arguments are specified, this function delegates
     to ``heapq.merge()``.
+
     """
     if not kwargs:
         return merge(*iterables)
@@ -385,9 +384,7 @@ def distinct_permutations(iterable):
 
 
 def intersperse(e, iterable):
-    """
-    The intersperse generator takes an element and an iterable and
-    `intersperses' that element between the elements of the iterable.
+    """Intersperse element ``e`` between the elements of an iterable.
 
     >>> from more_itertools import intersperse
     >>> list(intersperse('x', [1, 'o', 5, 'k']))
@@ -400,6 +397,7 @@ def intersperse(e, iterable):
     TypeError: 'int' object is not iterable
     >>> list(intersperse('x', []))
     []
+
     """
     iterable = iter(iterable)
     if iterable:
@@ -411,8 +409,7 @@ def intersperse(e, iterable):
 
 
 def unique_to_each(*iterables):
-    """
-    Return the elements from each of the input iterables that aren't in the
+    """Return the elements from each of the input iterables that aren't in the
     other input iterables.
 
     For example, suppose packages 1, 2, and 3 have these dependencies:
@@ -432,6 +429,7 @@ def unique_to_each(*iterables):
     [['p', 'p'], ['o', 'u', 'r']]
 
     It is assumed that the elements of each iterable are hashable.
+
     """
     elements_to_indices = {}
     pool = [list(it) for it in iterables]
@@ -449,8 +447,8 @@ def unique_to_each(*iterables):
 
 
 def windowed(seq, n, fillvalue=None):
-    """
-    Returns a sliding window (of width n) over data from the iterable.
+    """Return a sliding window (of width n) over data from the iterable.
+    
     When n=2 this is equivalent to ``pairwise(iterable)``.
     When n is larger than the iterable, ``fillvalue`` is used in place of
     missing values.
@@ -462,7 +460,8 @@ def windowed(seq, n, fillvalue=None):
     (2, 3, 4)
     >>> next(all_windows)
     (3, 4, 5)
-     """
+
+    """
     if n < 0:
         raise ValueError('n must be >= 0')
     if n == 0:
@@ -485,9 +484,8 @@ def windowed(seq, n, fillvalue=None):
 
 
 class bucket(object):
-    """
-    Wraps an iterable and returns an object that buckets the iterable
-    into child iterables based on the *key* function.
+    """Wrap an iterable and return an object that buckets the iterable into
+    child iterables based on a ``key`` function.
 
     >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
     >>> s = bucket(iterable, key=lambda s: s[0])  # Select by first character
@@ -505,7 +503,6 @@ class bucket(object):
     will exhaust the iterable and cache all values.
 
     """
-
     def __init__(self, iterable, key):
         self._it = iter(iterable)
         self._key = key
