@@ -662,12 +662,13 @@ def side_effect(func, iterable, chunk_size=None):
     `side_effect` can be used for logging, updating progress bars, or anything
     that is not functionally "pure."
 
-    Printing items from an iterable:
+    Emitting a status message:
 
         >>> from more_itertools import consume
-        >>> consume(side_effect(print, range(2)))
-        0
-        1
+        >>> func = lambda item: print('Received {}'.format(item))
+        >>> consume(side_effect(func, range(2)))
+        Received 0
+        Received 1
 
     Operating on chunks of items:
 
