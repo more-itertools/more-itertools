@@ -14,8 +14,8 @@ from .recipes import take
 __all__ = [
     'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
     'with_iter', 'one', 'distinct_permutations', 'intersperse',
-    'unique_to_each', 'windowed', 'bucket', 'interleave', 'interleave_longest',
-    'collapse'
+    'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
+    'interleave_longest', 'collapse'
 ]
 
 
@@ -76,8 +76,7 @@ def first(iterable, default=_marker):
 
 
 class peekable(object):
-    """
-    Wrapper for an iterator to allow lookahead.
+    """Wrap an iterator to allow lookahead.
 
     Call ``peek()`` on the result to get the value that will next pop out of
     ``next()``, without advancing the iterator:
@@ -119,7 +118,6 @@ class peekable(object):
         >>> assert not peekable([])
 
     """
-
     def __init__(self, iterable):
         self._it = iter(iterable)
         self._cache = deque()
@@ -155,9 +153,10 @@ class peekable(object):
         return self._cache[0]
 
     def __next__(self):
-        ret = self.peek()
-        self._cache.popleft()
-        return ret
+        if self._cache:
+            return self._cache.popleft()
+
+        return next(self._it)
 
     def next(self):
         # For Python 2 compatibility
@@ -190,9 +189,9 @@ class peekable(object):
 
 
 def _collate(*iterables, **kwargs):
-    """
-    Helper for ``collate()`` - called when the user is using the ``reverse`` or
-    ``key`` keyword arguments on Python versions below 3.5 .
+    """Helper for ``collate()``, called when the user is using the ``reverse``
+    or ``key`` keyword arguments on Python versions below 3.5.
+
     """
     key = kwargs.pop('key', lambda a: a)
     reverse = kwargs.pop('reverse', False)
@@ -228,6 +227,7 @@ def collate(*iterables, **kwargs):
 
     If neither of the keyword arguments are specified, this function delegates
     to ``heapq.merge()``.
+
     """
     if not kwargs:
         return merge(*iterables)
@@ -389,9 +389,7 @@ def distinct_permutations(iterable):
 
 
 def intersperse(e, iterable):
-    """
-    The intersperse generator takes an element and an iterable and
-    `intersperses' that element between the elements of the iterable.
+    """Intersperse element ``e`` between the elements of an iterable.
 
     >>> from more_itertools import intersperse
     >>> list(intersperse('x', [1, 'o', 5, 'k']))
@@ -404,6 +402,7 @@ def intersperse(e, iterable):
     TypeError: 'int' object is not iterable
     >>> list(intersperse('x', []))
     []
+
     """
     iterable = iter(iterable)
     if iterable:
@@ -415,8 +414,7 @@ def intersperse(e, iterable):
 
 
 def unique_to_each(*iterables):
-    """
-    Return the elements from each of the input iterables that aren't in the
+    """Return the elements from each of the input iterables that aren't in the
     other input iterables.
 
     For example, suppose packages 1, 2, and 3 have these dependencies:
@@ -436,6 +434,7 @@ def unique_to_each(*iterables):
     [['p', 'p'], ['o', 'u', 'r']]
 
     It is assumed that the elements of each iterable are hashable.
+
     """
     elements_to_indices = {}
     pool = [list(it) for it in iterables]
@@ -453,8 +452,8 @@ def unique_to_each(*iterables):
 
 
 def windowed(seq, n, fillvalue=None):
-    """
-    Returns a sliding window (of width n) over data from the iterable.
+    """Return a sliding window (of width n) over data from the iterable.
+
     When n=2 this is equivalent to ``pairwise(iterable)``.
     When n is larger than the iterable, ``fillvalue`` is used in place of
     missing values.
@@ -466,7 +465,8 @@ def windowed(seq, n, fillvalue=None):
     (2, 3, 4)
     >>> next(all_windows)
     (3, 4, 5)
-     """
+
+    """
     if n < 0:
         raise ValueError('n must be >= 0')
     if n == 0:
@@ -489,9 +489,8 @@ def windowed(seq, n, fillvalue=None):
 
 
 class bucket(object):
-    """
-    Wraps an iterable and returns an object that buckets the iterable
-    into child iterables based on the *key* function.
+    """Wrap an iterable and return an object that buckets the iterable into
+    child iterables based on a ``key`` function.
 
     >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
     >>> s = bucket(iterable, key=lambda s: s[0])  # Select by first character
@@ -509,7 +508,6 @@ class bucket(object):
     will exhaust the iterable and cache all values.
 
     """
-
     def __init__(self, iterable, key):
         self._it = iter(iterable)
         self._key = key
@@ -533,7 +531,7 @@ class bucket(object):
         """
         while True:
             # If we've cached some items that match the target value, emit
-            # the first one and evit it from the cache.
+            # the first one and evict it from the cache.
             if self._cache[value]:
                 yield self._cache[value].popleft()
             # Otherwise we need to advance the parent iterator to search for
@@ -550,6 +548,49 @@ class bucket(object):
 
     def __getitem__(self, value):
         return self._get_values(value)
+
+
+def spy(iterable, n=1):
+    """Return a 2-tuple with a list containing the first *n* elements of
+    *iterable*, and an iterator with the same items as *iterable*.
+    This allows you to "look ahead" at the items in the iterable without
+    advancing it.
+
+    There is one item in the list by default:
+
+        >>> iterable = 'abcdefg'
+        >>> head, iterable = spy(iterable)
+        >>> head
+        ['a']
+        >>> list(iterable)
+        ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+
+    You may use unpacking to retrieve items instead of lists:
+
+        >>> (head,), iterable = spy('abcdefg')
+        >>> head
+        'a'
+        >>> (first, second), iterable = spy('abcdefg', 2)
+        >>> first
+        'a'
+        >>> second
+        'b'
+
+    The number of items requested can be larger than the number of items in
+    the iterable:
+
+        >>> iterable = [1, 2, 3, 4, 5]
+        >>> head, iterable = spy(iterable, 10)
+        >>> head
+        [1, 2, 3, 4, 5]
+        >>> list(iterable)
+        [1, 2, 3, 4, 5]
+
+    """
+    it = iter(iterable)
+    head = take(n, it)
+
+    return head, chain(head, it)
 
 
 def interleave(*iterables):

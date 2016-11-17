@@ -343,6 +343,36 @@ class BucketTests(TestCase):
         eq_(next(D[10]), 10)
 
 
+class SpyTests(TestCase):
+    """Tests for ``spy()``"""
+
+    def test_basic(self):
+        original_iterable = iter('abcdefg')
+        head, new_iterable = spy(original_iterable)
+        eq_(head, ['a'])
+        eq_(list(new_iterable), ['a', 'b', 'c', 'd', 'e', 'f', 'g'])
+
+    def test_unpacking(self):
+        original_iterable = iter('abcdefg')
+        (first, second, third), new_iterable = spy(original_iterable, 3)
+        eq_(first, 'a')
+        eq_(second, 'b')
+        eq_(third, 'c')
+        eq_(list(new_iterable), ['a', 'b', 'c', 'd', 'e', 'f', 'g'])
+
+    def test_too_many(self):
+        original_iterable = iter('abc')
+        head, new_iterable = spy(original_iterable, 4)
+        eq_(head, ['a', 'b', 'c'])
+        eq_(list(new_iterable), ['a', 'b', 'c'])
+
+    def test_zero(self):
+        original_iterable = iter('abc')
+        head, new_iterable = spy(original_iterable, 0)
+        eq_(head, [])
+        eq_(list(new_iterable), ['a', 'b', 'c'])
+
+
 class TestInterleave(TestCase):
     """Tests for ``interleave()`` and ``interleave_longest()``"""
 
