@@ -419,3 +419,41 @@ class TestCollapse(TestCase):
         actual = list(collapse(l, base_type=list))
         expected = [1, [2], 3, [4, (5,)], 'ab']
         eq_(actual, expected)
+
+
+class SplitBeforeTest(TestCase):
+    """Tests for ``split_before()``"""
+
+    def test_starts_with_sep(self):
+        actual = list(split_before('xooxoo', lambda c: c == 'x'))
+        expected = [['x', 'o', 'o'], ['x', 'o', 'o']]
+        eq_(actual, expected)
+
+    def test_ends_with_sep(self):
+        actual = list(split_before('ooxoox', lambda c: c == 'x'))
+        expected = [['o', 'o'], ['x', 'o', 'o'], ['x']]
+        eq_(actual, expected)
+
+    def test_no_sep(self):
+        actual = list(split_before('ooo', lambda c: c == 'x'))
+        expected = [['o', 'o', 'o']]
+        eq_(actual, expected)
+
+
+class SplitAfterTest(TestCase):
+    """Tests for ``split_after()``"""
+
+    def test_starts_with_sep(self):
+        actual = list(split_after('xooxoo', lambda c: c == 'x'))
+        expected = [['x'], ['o', 'o', 'x'], ['o', 'o']]
+        eq_(actual, expected)
+
+    def test_ends_with_sep(self):
+        actual = list(split_after('ooxoox', lambda c: c == 'x'))
+        expected = [['o', 'o', 'x'], ['o', 'o', 'x']]
+        eq_(actual, expected)
+
+    def test_no_sep(self):
+        actual = list(split_after('ooo', lambda c: c == 'x'))
+        expected = [['o', 'o', 'o']]
+        eq_(actual, expected)
