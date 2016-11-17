@@ -19,6 +19,7 @@ New Routines
 .. autofunction:: iterate
 .. autofunction:: one
 .. autoclass:: peekable
+.. autofunction:: spy
 .. autofunction:: unique_to_each
 .. autofunction:: windowed
 .. autofunction:: with_iter
