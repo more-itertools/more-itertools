@@ -652,66 +652,39 @@ def collapse(iterable, base_type=None, levels=None):
         yield x
 
 
-def side_effect(fn, iterable, chunk_size=None):
-    """
-    Passes through the iterable, but invokes a function for each item
-    iterated over.
+def side_effect(func, iterable, chunk_size=None):
+    """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
+    of items) before yielding the item.
 
-    Can be useful for lazy counting, logging, collecting data, or updating
-    progress bars, anything un-pure.
-
-    `fn` must be a function that takes a single argument.  Its return value
+    `func` must be a function that takes a single argument.  Its return value
     will be discarded.
 
-    Examples:
+    `side_effect` can be used for logging, updating progress bars, or anything
+    that is not functionally "pure."
 
-        >>> from more_itertools import take, consume, side_effect
-        >>> iterable = range(10)
-        >>> iterable = side_effect(print, iterable)
-        >>> consume(take(3, iterable))
+    Printing items from an iterable:
+
+        >>> from more_itertools import consume
+        >>> consume(side_effect(print, range(2)))
         0
         1
-        2
 
-    Example for collecting data as it streams through:
+    Operating on chunks of items:
 
-        >>> iterable = range(10)
-        >>> c = []
-        >>> iterable = side_effect(c.append, iterable)
-        >>> consume(take(3, iterable))
-        >>> c
-        [0, 1, 2]
-
-    Collecting items in chunks:
-
-        >>> iterable = range(10)
-        >>> c, d = [], []
-        >>> iterable = side_effect(lambda xs: c.append(sum(xs)), iterable, 2)
-        >>> iterable = side_effect(lambda xs: d.append(sum(xs)), iterable, 3)
-        >>> list(iterable)
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        >>> c
-        [1, 5, 9, 13, 17]
-        >>> d
-        [3, 12, 21, 9]
-
-    Emit progress:
-
-        >>> iterable = range(100)
-        >>> iterable = side_effect(lambda xs: print('Processed ' + str(len(xs)) + ' items'), iterable, 30)
-        >>> consume(iterable)
-        Processed 30 items
-        Processed 30 items
-        Processed 30 items
-        Processed 10 items
+        >>> pair_sums = []
+        >>> func = lambda chunk: pair_sums.append(sum(chunk))
+        >>> list(side_effect(func, [0, 1, 2, 3, 4, 5], 2))
+        [0, 1, 2, 3, 4, 5]
+        >>> list(pair_sums)
+        [1, 5, 9]
 
     """
     if chunk_size is None:
         for item in iterable:
-            fn(item)
+            func(item)
             yield item
     else:
         for chunk in chunked(iterable, chunk_size):
-            fn(chunk)
+            func(chunk)
             for item in chunk:
                 yield item
