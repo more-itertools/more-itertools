@@ -676,7 +676,7 @@ def split_after(iterable, pred):
     """Yield lists of items from *iterable*, where each list ends with an
     item where callable *pred* returns ``True``:
 
-        >>> list(split_after('one1two2', lambda s: s.isnumeric()))
+        >>> list(split_after('one1two2', lambda s: s.isdigit()))
         [['o', 'n', 'e', '1'], ['t', 'w', 'o', '2']]
 
         >>> list(split_after(range(10), lambda n: n % 3 == 0))
