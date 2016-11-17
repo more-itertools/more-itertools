@@ -17,9 +17,9 @@ New Routines
 .. autofunction:: ilen
 .. autofunction:: intersperse
 .. autofunction:: iterate
-.. autofunction:: look_ahead
 .. autofunction:: one
 .. autoclass:: peekable
+.. autofunction:: spy
 .. autofunction:: unique_to_each
 .. autofunction:: windowed
 .. autofunction:: with_iter
