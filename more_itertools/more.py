@@ -616,10 +616,10 @@ def interleave_longest(*iterables):
     return filter(lambda x: x is not _marker, i)
 
 
-def collapse(iterable, basetype=None, levels=None):
+def collapse(iterable, base_type=None, levels=None):
     """Flatten an iterable containing some iterables (themselves containing
     some iterables, etc.) into non-iterable types, strings, elements
-    matching ``isinstance(element, basetype)``, and elements that are
+    matching ``isinstance(element, base_type)``, and elements that are
     ``levels`` levels down.
 
     >>> list(collapse([[1], 2, [[3], 4], [[[5]]], 'abc']))
@@ -633,7 +633,7 @@ def collapse(iterable, basetype=None, levels=None):
         if (
             ((levels is not None) and (level > levels)) or
             isinstance(node, string_types) or
-            ((basetype is not None) and isinstance(node, basetype))
+            ((base_type is not None) and isinstance(node, base_type))
         ):
             yield node
             return
