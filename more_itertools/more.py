@@ -39,11 +39,18 @@ def chunked(iterable, n):
 
     """
     iterable = iter(iterable)
+
+    # To avoid leaving a reference to to the chunk in this generator function,
+    # we put the chunk in a list and then pop it off the list when we yield.
+    chunk_holder = []
+    append = chunk_holder.append
+    pop = chunk_holder.pop
+
     while True:
-        chunk = take(n, iterable)
-        if not chunk:
+        append(list(islice(iterable, n)))
+        if not chunk_holder[0]:
             return
-        yield chunk
+        yield pop()
 
 
 def first(iterable, default=_marker):
