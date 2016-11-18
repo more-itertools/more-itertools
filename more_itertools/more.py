@@ -15,7 +15,7 @@ __all__ = [
     'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
     'with_iter', 'one', 'distinct_permutations', 'intersperse',
     'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
-    'interleave_longest', 'collapse'
+    'interleave_longest', 'collapse', 'sliced'
 ]
 
 
@@ -650,3 +650,34 @@ def collapse(iterable, base_type=None, levels=None):
 
     for x in walk(iterable, 0):
         yield x
+
+
+def sliced(seq, n):
+    """Yield slices of length *n* from the sequence *seq*.
+
+        >>> list(sliced((1, 2, 3, 4, 5, 6), 3))
+        [(1, 2, 3), (4, 5, 6)]
+
+    If the length of the sequence is not divisible by the requested slice
+    length, the last slice will be shorter.
+
+        >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
+        [(1, 2, 3), (4, 5, 6), (7, 8)]
+
+    This function will only work for sliceable objects. For non-sliceable
+    iterable, see ``chunked()``.
+
+    """
+    # To avoid leaving a reference to the slice in this generator function,
+    # we put the slice in a list and then pop it off the list when we yield.
+    slice_holder = []
+    append = slice_holder.append
+    pop = slice_holder.pop
+
+    i = 0
+    while True:
+        append(seq[i:i + n])
+        if not slice_holder[0]:
+            return
+        yield pop()
+        i += n

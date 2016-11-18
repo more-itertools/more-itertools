@@ -22,6 +22,7 @@ New Routines
 .. autofunction:: iterate
 .. autofunction:: one
 .. autoclass:: peekable
+.. autofunction:: sliced
 .. autofunction:: spy
 .. autofunction:: unique_to_each
 .. autofunction:: windowed

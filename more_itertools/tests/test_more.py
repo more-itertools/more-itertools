@@ -419,3 +419,23 @@ class TestCollapse(TestCase):
         actual = list(collapse(l, base_type=list))
         expected = [1, [2], 3, [4, (5,)], 'ab']
         eq_(actual, expected)
+
+
+class SlicedTests(TestCase):
+    """Tests for ``sliced()``"""
+
+    def test_even(self):
+        """Test when the length of the sequence is divisible by *n*"""
+        seq = 'ABCDEFGHI'
+        eq_(list(sliced(seq, 3)), ['ABC', 'DEF', 'GHI'])
+
+    def test_odd(self):
+        """Test when the length of the sequence is not divisible by *n*"""
+        seq = 'ABCDEFGHI'
+        eq_(list(sliced(seq, 4)), ['ABCD', 'EFGH', 'I'])
+
+    def test_not_sliceable(self):
+        seq = (x for x in 'ABCDEFGHI')
+
+        with self.assertRaises(TypeError):
+            list(sliced(seq, 3))
