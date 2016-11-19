@@ -321,10 +321,10 @@ def one(iterable):
     ...
     ValueError: too many values to unpack (expected 1)
 
-    >>> one([])
+    >>> one([])  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    ValueError: need more than 0 values to unpack
+    ValueError: not enough values to unpack (expected 1, got 0)
 
     ``one()`` attempts to advance the iterable twice in order to ensure there
     aren't further items. Because this discards any second item, ``one()`` is
@@ -333,16 +333,8 @@ def one(iterable):
     iterable longer than 1 item is, in fact, an error.
 
     """
-    it = iter(iterable)
-    first = next(it, _marker)
-    if first is _marker:
-        raise ValueError('need more than 0 values to unpack')
-
-    second = next(it, _marker)
-    if second is not _marker:
-        raise ValueError('too many values to unpack (expected 1)')
-
-    return first
+    element, = iterable
+    return element
 
 
 def distinct_permutations(iterable):
