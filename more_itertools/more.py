@@ -38,12 +38,7 @@ def chunked(iterable, n):
     the client.
 
     """
-    iterable = iter(iterable)
-    while True:
-        chunk = take(n, iterable)
-        if not chunk:
-            return
-        yield chunk
+    return iter(partial(take, n, iter(iterable)), [])
 
 
 def first(iterable, default=_marker):
