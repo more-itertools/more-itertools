@@ -413,20 +413,20 @@ def unique_to_each(*iterables):
     other input iterables.
 
     For example, suppose packages 1, 2, and 3 have these dependencies:
-    pkg_1: (A, B), pkg_2: (B, C), pkg_3: (B, D)
+        ``pkg_1: (A, B), pkg_2: (B, C), pkg_3: (B, D)``
 
     If you remove one package, which dependencies can also be removed?
 
     If pkg_1 is removed, then A is no longer necessary - it is not associated
     with pkg_2 or pkg_3. Similarly, C is only needed for pkg_2, and D is
     only needed for pkg_3:
-    >>> unique_to_each("AB", "BC", "BD")
-    [['A'], ['C'], ['D']]
+        >>> unique_to_each("AB", "BC", "BD")
+        [['A'], ['C'], ['D']]
 
     If there are duplicates in one input iterable that aren't in the others
     they will be duplicated in the output. Input order is preserved:
-    >>> unique_to_each("mississippi", "missouri")
-    [['p', 'p'], ['o', 'u', 'r']]
+        >>> unique_to_each("mississippi", "missouri")
+        [['p', 'p'], ['o', 'u', 'r']]
 
     It is assumed that the elements of each iterable are hashable.
 
