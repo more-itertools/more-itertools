@@ -22,6 +22,7 @@ New Routines
 .. autofunction:: iterate
 .. autofunction:: one
 .. autoclass:: peekable
+.. autofunction:: side_effect
 .. autofunction:: split_after
 .. autofunction:: split_before
 .. autofunction:: spy
