@@ -15,7 +15,7 @@ __all__ = [
     'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
     'with_iter', 'one', 'distinct_permutations', 'intersperse',
     'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
-    'interleave_longest', 'collapse'
+    'interleave_longest', 'collapse', 'side_effect',
 ]
 
 
@@ -637,3 +637,42 @@ def collapse(iterable, base_type=None, levels=None):
 
     for x in walk(iterable, 0):
         yield x
+
+
+def side_effect(func, iterable, chunk_size=None):
+    """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
+    of items) before yielding the item.
+
+    `func` must be a function that takes a single argument.  Its return value
+    will be discarded.
+
+    `side_effect` can be used for logging, updating progress bars, or anything
+    that is not functionally "pure."
+
+    Emitting a status message:
+
+        >>> from more_itertools import consume
+        >>> func = lambda item: print('Received {}'.format(item))
+        >>> consume(side_effect(func, range(2)))
+        Received 0
+        Received 1
+
+    Operating on chunks of items:
+
+        >>> pair_sums = []
+        >>> func = lambda chunk: pair_sums.append(sum(chunk))
+        >>> list(side_effect(func, [0, 1, 2, 3, 4, 5], 2))
+        [0, 1, 2, 3, 4, 5]
+        >>> list(pair_sums)
+        [1, 5, 9]
+
+    """
+    if chunk_size is None:
+        for item in iterable:
+            func(item)
+            yield item
+    else:
+        for chunk in chunked(iterable, chunk_size):
+            func(chunk)
+            for item in chunk:
+                yield item
