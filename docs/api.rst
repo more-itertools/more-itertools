@@ -23,6 +23,7 @@ New Routines
 .. autofunction:: one
 .. autoclass:: peekable
 .. autofunction:: side_effect
+.. autofunction:: sliced
 .. autofunction:: spy
 .. autofunction:: unique_to_each
 .. autofunction:: windowed

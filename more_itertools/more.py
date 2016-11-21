@@ -3,7 +3,7 @@ from __future__ import print_function
 from collections import defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, islice
+from itertools import chain, count, islice, takewhile
 from sys import version_info
 
 from six import iteritems, string_types
@@ -15,7 +15,7 @@ __all__ = [
     'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
     'with_iter', 'one', 'distinct_permutations', 'intersperse',
     'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
-    'interleave_longest', 'collapse', 'side_effect',
+    'interleave_longest', 'collapse', 'side_effect', 'sliced'
 ]
 
 
@@ -676,3 +676,22 @@ def side_effect(func, iterable, chunk_size=None):
             func(chunk)
             for item in chunk:
                 yield item
+
+
+def sliced(seq, n):
+    """Yield slices of length *n* from the sequence *seq*.
+
+        >>> list(sliced((1, 2, 3, 4, 5, 6), 3))
+        [(1, 2, 3), (4, 5, 6)]
+
+    If the length of the sequence is not divisible by the requested slice
+    length, the last slice will be shorter.
+
+        >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
+        [(1, 2, 3), (4, 5, 6), (7, 8)]
+
+    This function will only work for sliceable objects. For non-sliceable
+    iterable, see ``chunked()``.
+
+    """
+    return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
