@@ -421,6 +421,32 @@ class TestCollapse(TestCase):
         eq_(actual, expected)
 
 
+class SideEffectTests(TestCase):
+    """Tests for ``side_effect()``"""
+
+    def test_individual(self):
+        # The function increments the counter for each call
+        counter = [0]
+
+        def func(arg):
+            counter[0] += 1
+
+        result = list(side_effect(func, range(10)))
+        eq_(result, list(range(10)))
+        eq_(counter[0], 10)
+
+    def test_chunked(self):
+        # The function increments the counter for each call
+        counter = [0]
+
+        def func(arg):
+            counter[0] += 1
+
+        result = list(side_effect(func, range(10), 2))
+        eq_(result, list(range(10)))
+        eq_(counter[0], 5)
+
+
 class SlicedTests(TestCase):
     """Tests for ``sliced()``"""
 

@@ -22,7 +22,11 @@ New Routines
 .. autofunction:: iterate
 .. autofunction:: one
 .. autoclass:: peekable
+<<<<<<< HEAD
 .. autofunction:: sliced
+=======
+.. autofunction:: side_effect
+>>>>>>> origin/master
 .. autofunction:: spy
 .. autofunction:: unique_to_each
 .. autofunction:: windowed

@@ -15,7 +15,7 @@ __all__ = [
     'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
     'with_iter', 'one', 'distinct_permutations', 'intersperse',
     'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
-    'interleave_longest', 'collapse', 'sliced'
+    'interleave_longest', 'collapse', 'side_effect', 'sliced'
 ]
 
 
@@ -38,12 +38,7 @@ def chunked(iterable, n):
     the client.
 
     """
-    iterable = iter(iterable)
-    while True:
-        chunk = take(n, iterable)
-        if not chunk:
-            return
-        yield chunk
+    return iter(partial(take, n, iter(iterable)), [])
 
 
 def first(iterable, default=_marker):
@@ -326,10 +321,10 @@ def one(iterable):
     ...
     ValueError: too many values to unpack (expected 1)
 
-    >>> one([])
+    >>> one([])  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    ValueError: need more than 0 values to unpack
+    ValueError: not enough values to unpack (expected 1, got 0)
 
     ``one()`` attempts to advance the iterable twice in order to ensure there
     aren't further items. Because this discards any second item, ``one()`` is
@@ -338,16 +333,8 @@ def one(iterable):
     iterable longer than 1 item is, in fact, an error.
 
     """
-    it = iter(iterable)
-    first = next(it, _marker)
-    if first is _marker:
-        raise ValueError('need more than 0 values to unpack')
-
-    second = next(it, _marker)
-    if second is not _marker:
-        raise ValueError('too many values to unpack (expected 1)')
-
-    return first
+    element, = iterable
+    return element
 
 
 def distinct_permutations(iterable):
@@ -418,20 +405,20 @@ def unique_to_each(*iterables):
     other input iterables.
 
     For example, suppose packages 1, 2, and 3 have these dependencies:
-    pkg_1: (A, B), pkg_2: (B, C), pkg_3: (B, D)
+        ``pkg_1: (A, B), pkg_2: (B, C), pkg_3: (B, D)``
 
     If you remove one package, which dependencies can also be removed?
 
     If pkg_1 is removed, then A is no longer necessary - it is not associated
     with pkg_2 or pkg_3. Similarly, C is only needed for pkg_2, and D is
     only needed for pkg_3:
-    >>> unique_to_each("AB", "BC", "BD")
-    [['A'], ['C'], ['D']]
+        >>> unique_to_each("AB", "BC", "BD")
+        [['A'], ['C'], ['D']]
 
     If there are duplicates in one input iterable that aren't in the others
     they will be duplicated in the output. Input order is preserved:
-    >>> unique_to_each("mississippi", "missouri")
-    [['p', 'p'], ['o', 'u', 'r']]
+        >>> unique_to_each("mississippi", "missouri")
+        [['p', 'p'], ['o', 'u', 'r']]
 
     It is assumed that the elements of each iterable are hashable.
 
@@ -650,6 +637,45 @@ def collapse(iterable, base_type=None, levels=None):
 
     for x in walk(iterable, 0):
         yield x
+
+
+def side_effect(func, iterable, chunk_size=None):
+    """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
+    of items) before yielding the item.
+
+    `func` must be a function that takes a single argument.  Its return value
+    will be discarded.
+
+    `side_effect` can be used for logging, updating progress bars, or anything
+    that is not functionally "pure."
+
+    Emitting a status message:
+
+        >>> from more_itertools import consume
+        >>> func = lambda item: print('Received {}'.format(item))
+        >>> consume(side_effect(func, range(2)))
+        Received 0
+        Received 1
+
+    Operating on chunks of items:
+
+        >>> pair_sums = []
+        >>> func = lambda chunk: pair_sums.append(sum(chunk))
+        >>> list(side_effect(func, [0, 1, 2, 3, 4, 5], 2))
+        [0, 1, 2, 3, 4, 5]
+        >>> list(pair_sums)
+        [1, 5, 9]
+
+    """
+    if chunk_size is None:
+        for item in iterable:
+            func(item)
+            yield item
+    else:
+        for chunk in chunked(iterable, chunk_size):
+            func(chunk)
+            for item in chunk:
+                yield item
 
 
 def sliced(seq, n):
