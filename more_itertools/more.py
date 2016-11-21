@@ -3,7 +3,7 @@ from __future__ import print_function
 from collections import defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, islice
+from itertools import chain, count, islice, takewhile
 from sys import version_info
 
 from six import iteritems, string_types
@@ -668,16 +668,4 @@ def sliced(seq, n):
     iterable, see ``chunked()``.
 
     """
-    # To avoid leaving a reference to the slice in this generator function,
-    # we put the slice in a list and then pop it off the list when we yield.
-    slice_holder = []
-    append = slice_holder.append
-    pop = slice_holder.pop
-
-    i = 0
-    while True:
-        append(seq[i:i + n])
-        if not slice_holder[0]:
-            return
-        yield pop()
-        i += n
+    return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
