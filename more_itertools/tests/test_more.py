@@ -447,6 +447,26 @@ class SideEffectTests(TestCase):
         eq_(counter[0], 5)
 
 
+class SlicedTests(TestCase):
+    """Tests for ``sliced()``"""
+
+    def test_even(self):
+        """Test when the length of the sequence is divisible by *n*"""
+        seq = 'ABCDEFGHI'
+        eq_(list(sliced(seq, 3)), ['ABC', 'DEF', 'GHI'])
+
+    def test_odd(self):
+        """Test when the length of the sequence is not divisible by *n*"""
+        seq = 'ABCDEFGHI'
+        eq_(list(sliced(seq, 4)), ['ABCD', 'EFGH', 'I'])
+
+    def test_not_sliceable(self):
+        seq = (x for x in 'ABCDEFGHI')
+
+        with self.assertRaises(TypeError):
+            list(sliced(seq, 3))
+
+
 class SplitBeforeTest(TestCase):
     """Tests for ``split_before()``"""
 
