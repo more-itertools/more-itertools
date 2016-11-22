@@ -24,6 +24,8 @@ New Routines
 .. autoclass:: peekable
 .. autofunction:: side_effect
 .. autofunction:: sliced
+.. autofunction:: split_after
+.. autofunction:: split_before
 .. autofunction:: spy
 .. autofunction:: unique_to_each
 .. autofunction:: windowed

@@ -15,7 +15,8 @@ __all__ = [
     'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
     'with_iter', 'one', 'distinct_permutations', 'intersperse',
     'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
-    'interleave_longest', 'collapse', 'side_effect', 'sliced'
+    'interleave_longest', 'collapse', 'side_effect', 'sliced', 'split_before',
+    'split_after'
 ]
 
 
@@ -686,3 +687,44 @@ def sliced(seq, n):
 
     """
     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
+
+
+def split_before(iterable, pred):
+    """Yield lists of items from *iterable*, where each list starts with an
+    item where callable *pred* returns ``True``:
+
+        >>> list(split_before('OneTwo', lambda s: s.isupper()))
+        [['O', 'n', 'e'], ['T', 'w', 'o']]
+
+        >>> list(split_before(range(10), lambda n: n % 3 == 0))
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
+
+    """
+    buf = []
+    for item in iter(iterable):
+        if pred(item) and buf:
+            yield buf
+            buf = []
+        buf.append(item)
+    yield buf
+
+
+def split_after(iterable, pred):
+    """Yield lists of items from *iterable*, where each list ends with an
+    item where callable *pred* returns ``True``:
+
+        >>> list(split_after('one1two2', lambda s: s.isdigit()))
+        [['o', 'n', 'e', '1'], ['t', 'w', 'o', '2']]
+
+        >>> list(split_after(range(10), lambda n: n % 3 == 0))
+        [[0], [1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+    """
+    buf = []
+    for item in iter(iterable):
+        buf.append(item)
+        if pred(item) and buf:
+            yield buf
+            buf = []
+    if buf:
+        yield buf
