@@ -21,6 +21,7 @@ Version History
         * ``peekable``-wrapped iterables are now indexable and sliceable.
           Iterating through ``peekable``-wrapped iterables is also faster.
         * ``one`` and ``unique_to_each`` have been simplified.
+          (Thanks to coady)
 
 
 2.3
