@@ -1,13 +1,13 @@
 from __future__ import print_function
 
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
 from itertools import chain, count, islice, takewhile
 from sys import version_info
 
 from six import iteritems, string_types
-from six.moves import filter, zip, zip_longest
+from six.moves import filter, map, zip, zip_longest
 
 from .recipes import take
 
@@ -423,19 +423,10 @@ def unique_to_each(*iterables):
     It is assumed that the elements of each iterable are hashable.
 
     """
-    elements_to_indices = {}
     pool = [list(it) for it in iterables]
-    for i, it in enumerate(pool):
-        for element in it:
-            elements_to_indices.setdefault(element, set()).add(i)
-
-    for element, indices in iteritems(elements_to_indices):
-        if len(indices) != 1:
-            for i in indices:
-                while element in pool[i]:
-                    pool[i].remove(element)
-
-    return pool
+    counts = Counter(chain.from_iterable(map(set, pool)))
+    uniques = {element for element in counts if counts[element] == 1}
+    return [list(filter(uniques.__contains__, it)) for it in pool]
 
 
 def windowed(seq, n, fillvalue=None):
