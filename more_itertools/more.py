@@ -340,8 +340,18 @@ def one(iterable):
 def distinct_permutations(iterable):
     """Yield successive distinct permutations of the elements in the iterable.
 
+        >>> sorted(distinct_permutations([1, 0, 1]))
+        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+
     Equivalent to ``set(permutations(iterable))``, except duplicates are not
-    generated. For large input sequences, this is much more efficient.
+    generated and thrown away. For larger input sequences this is much more
+    efficient.
+
+    Duplicate permutations arise when there are duplicated elements in the
+    input iterable. The number of items returned is
+    ``n! / (x_1! * x_2! * ... * x_n!)``, where ``n`` is the total number of
+    items input, and each ``x_i`` is the count of a distinct item in the input
+    sequence.
 
     """
     def perm_unique_helper(item_counts, perm, i):
