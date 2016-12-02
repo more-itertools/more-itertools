@@ -16,5 +16,5 @@ documentation. Enjoy! Any additions are welcome; just file a pull request.
 Full Documentation
 ==================
 
-Please see http://packages.python.org/more-itertools/api.html for the list of
-routines.
+Please see https://more-itertools.readthedocs.io/en/latest/api.html for the
+list of routines.
