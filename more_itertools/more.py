@@ -12,11 +12,11 @@ from six.moves import filter, map, zip, zip_longest
 from .recipes import take
 
 __all__ = [
-    'chunked', 'first', 'peekable', 'collate', 'consumer', 'ilen', 'iterate',
-    'with_iter', 'one', 'distinct_permutations', 'intersperse',
-    'unique_to_each', 'windowed', 'bucket', 'spy', 'interleave',
-    'interleave_longest', 'collapse', 'side_effect', 'sliced', 'split_before',
-    'split_after'
+    'bucket', 'chunked', 'collapse', 'collate', 'consumer',
+    'distinct_permutations', 'first', 'ilen', 'interleave_longest',
+    'interleave', 'intersperse', 'iterate', 'one', 'peekable', 'side_effect',
+    'sliced', 'split_after', 'split_before', 'spy', 'unique_to_each',
+    'windowed', 'with_iter'
 ]
 
 

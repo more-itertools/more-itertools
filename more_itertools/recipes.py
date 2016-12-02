@@ -18,12 +18,12 @@ from six import PY2
 from six.moves import filter, filterfalse, map, range, zip, zip_longest
 
 __all__ = [
-    'accumulate', 'take', 'tabulate', 'tail', 'consume', 'nth', 'all_equal',
-    'quantify', 'padnone', 'ncycles', 'dotproduct', 'flatten', 'repeatfunc',
-    'pairwise', 'grouper', 'roundrobin', 'partition', 'powerset',
-    'unique_everseen', 'unique_justseen', 'iter_except', 'first_true',
-    'random_product', 'random_permutation', 'random_combination',
-    'random_combination_with_replacement',
+    'accumulate', 'all_equal', 'consume', 'dotproduct', 'first_true',
+    'flatten', 'grouper', 'iter_except', 'ncycles', 'nth', 'padnone',
+    'pairwise', 'partition', 'powerset', 'quantify',
+    'random_combination_with_replacement', 'random_combination',
+    'random_permutation', 'random_product', 'repeatfunc', 'roundrobin',
+    'tabulate', 'tail', 'take', 'unique_everseen', 'unique_justseen'
 ]
 
 
