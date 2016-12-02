@@ -402,10 +402,10 @@ def intersperse(e, iterable):
         []
 
     """
-    iterable = iter(iterable)
-    if iterable:
-        yield next(iterable)
-        for item in iterable:
+    it = iter(iterable)
+    if it:
+        yield next(it)
+        for item in it:
             yield e
             yield item
     raise StopIteration
