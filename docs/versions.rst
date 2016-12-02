@@ -2,6 +2,9 @@
 Version History
 ===============
 
+2.4.1
+    * Move docs 100% to readthedocs.io.
+
 2.4
     * New itertools:
         * ``accumulate``, ``all_equal``, ``first_true``, ``partition``, and
