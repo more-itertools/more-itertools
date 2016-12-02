@@ -587,7 +587,7 @@ def spy(iterable, n=1):
 def interleave(*iterables):
     """Return a new iterable yielding from each iterable in turn,
     until the shortest is exhausted. Note that this is the same as
-    chain(*zip(*iterables)).
+    ``chain(*zip(*iterables))``.
 
         >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
         [1, 4, 6, 2, 5, 7]
@@ -599,7 +599,7 @@ def interleave(*iterables):
 def interleave_longest(*iterables):
     """Return a new iterable yielding from each iterable in turn,
     skipping any that are exhausted. Note that this is not the same as
-    chain(*zip_longest(*iterables)).
+    ``chain(*zip_longest(*iterables))``.
 
         >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
         [1, 4, 6, 2, 5, 7, 3, 8]
