@@ -2,9 +2,31 @@
 Version History
 ===============
 
+2.4
+    * New itertools:
+        * ``accumulate``, ``all_equal``, ``first_true``, ``partition``, and
+          ``tail`` from the itertools documentation.
+        * ``bucket`` (Thanks to Rosuav and cvrebert)
+        * ``collapse`` (Thanks to abarnet)
+        * ``interleave`` and ``interleave_longest`` (Thanks to abarnet)
+        * ``side_effect`` (Thanks to nvie)
+        * ``sliced`` (Thanks to j4mie and coady)
+        * ``split_before`` and ``split_after`` (Thanks to astronouth7303)
+        * ``spy`` (Thanks to themiurgo and mathieulongtin)
+    * Improvements to existing itertools:
+        * ``chunked`` is now simpler and more friendly to garbage collection.
+          (Contributed by coady, with thanks to piskvorky)
+        * ``collate`` now delegates to ``heapq.merge`` when possible.
+          (Thanks to kmike and julianpistorius)
+        * ``peekable``-wrapped iterables are now indexable and sliceable.
+          Iterating through ``peekable``-wrapped iterables is also faster.
+        * ``one`` and ``unique_to_each`` have been simplified.
+          (Thanks to coady)
+
+
 2.3
     * Added ``one`` from ``jaraco.util.itertools``. (Thanks, jaraco!)
-    * Added ``distinct_permutations`` and ``unique_to_each``. (contributed by
+    * Added ``distinct_permutations`` and ``unique_to_each``. (Contributed by
       bbayles)
     * Added ``windowed``. (Contributed by bbayles, with thanks to buchanae,
       jaraco, and abarnert)

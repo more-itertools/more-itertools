@@ -33,12 +33,12 @@ def accumulate(iterable, func=operator.add):
     (specified by the optional *func* argument) that takes two arguments.
     By default, returns accumulated sums with ``operator.add()``.
 
-    >>> list(accumulate([1, 2, 3, 4, 5]))  # Running sum
-    [1, 3, 6, 10, 15]
-    >>> list(accumulate([1, 2, 3, 4, 5], func=operator.mul))  # Running product
-    [1, 2, 6, 24, 120]
-    >>> list(accumulate([0, 1, -1, 2, 3, 2], func=max))  # Running maximum
-    [0, 1, 1, 2, 3, 3]
+        >>> list(accumulate([1, 2, 3, 4, 5]))  # Running sum
+        [1, 3, 6, 10, 15]
+        >>> list(accumulate([1, 2, 3], func=operator.mul))  # Running product
+        [1, 2, 6]
+        >>> list(accumulate([0, 1, -1, 2, 3, 2], func=max))  # Running maximum
+        [0, 1, 1, 2, 3, 3]
 
     This function is available in the ``itertools`` module for Python 3.2 and
     greater.
@@ -153,6 +153,7 @@ def nth(iterable, n, default=None):
 def all_equal(iterable):
     """
     Returns True if all the elements are equal to each other.
+
         >>> all_equal('aaaa')
         True
         >>> all_equal('aaab')
@@ -384,12 +385,12 @@ def first_true(iterable, default=False, pred=None):
     If *pred* is not None, returns the first item for which
     ``pred(item) == True`` .
 
-    >>> first_true(range(10))
-    1
-    >>> first_true(range(10), pred=lambda x: x > 5)
-    6
-    >>> first_true(range(10), default='missing', pred=lambda x: x > 9)
-    'missing'
+        >>> first_true(range(10))
+        1
+        >>> first_true(range(10), pred=lambda x: x > 5)
+        6
+        >>> first_true(range(10), default='missing', pred=lambda x: x > 9)
+        'missing'
 
     """
     return next(filter(pred, iterable), default)

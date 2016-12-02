@@ -77,35 +77,35 @@ class peekable(object):
     Call ``peek()`` on the result to get the value that will next pop out of
     ``next()``, without advancing the iterator:
 
-    >>> p = peekable(['a', 'b'])
-    >>> p.peek()
-    'a'
-    >>> next(p)
-    'a'
+        >>> p = peekable(['a', 'b'])
+        >>> p.peek()
+        'a'
+        >>> next(p)
+        'a'
 
     Pass ``peek()`` a default value to return that instead of raising
     ``StopIteration`` when the iterator is exhausted.
 
-    >>> p = peekable([])
-    >>> p.peek('hi')
-    'hi'
+        >>> p = peekable([])
+        >>> p.peek('hi')
+        'hi'
 
     You may index the peekable to look ahead by more than one item.
     The values up to the index you specified will be cached.
     Index 0 is the item that will be returned by ``next()``, index 1 is the
     item after that, and so on:
 
-    >>> p = peekable(['a', 'b', 'c', 'd'])
-    >>> p[0]
-    'a'
-    >>> p[1]
-    'b'
-    >>> next(p)
-    'a'
-    >>> p[1]
-    'c'
-    >>> next(p)
-    'b'
+        >>> p = peekable(['a', 'b', 'c', 'd'])
+        >>> p[0]
+        'a'
+        >>> p[1]
+        'b'
+        >>> next(p)
+        'a'
+        >>> p[1]
+        'c'
+        >>> next(p)
+        'b'
 
     To test whether there are more items in the iterator, examine the
     peekable's truth value. If it is truthy, there are more items.
@@ -242,18 +242,18 @@ def consumer(func):
     to its first yield point so you don't have to call ``next()`` on it
     manually.
 
-    >>> @consumer
-    ... def tally():
-    ...     i = 0
-    ...     while True:
-    ...         print('Thing number %s is %s.' % (i, (yield)))
-    ...         i += 1
-    ...
-    >>> t = tally()
-    >>> t.send('red')
-    Thing number 0 is red.
-    >>> t.send('fish')
-    Thing number 1 is fish.
+        >>> @consumer
+        ... def tally():
+        ...     i = 0
+        ...     while True:
+        ...         print('Thing number %s is %s.' % (i, (yield)))
+        ...         i += 1
+        ...
+        >>> t = tally()
+        >>> t.send('red')
+        Thing number 0 is red.
+        >>> t.send('fish')
+        Thing number 1 is fish.
 
     Without the decorator, you would have to call ``next(t)`` before
     ``t.send()`` could be used.
@@ -270,8 +270,8 @@ def consumer(func):
 def ilen(iterable):
     """Return the number of items in ``iterable``.
 
-    >>> ilen(x for x in range(1000000) if x % 3 == 0)
-    333334
+        >>> ilen(x for x in range(1000000) if x % 3 == 0)
+        333334
 
     This does, of course, consume the iterable, so handle it with care.
 
@@ -282,9 +282,9 @@ def ilen(iterable):
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
 
-    >>> from itertools import islice
-    >>> list(islice(iterate(lambda x: 2*x, 1), 10))
-    [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+        >>> from itertools import islice
+        >>> list(islice(iterate(lambda x: 2*x, 1), 10))
+        [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
     """
     while True:
@@ -314,18 +314,18 @@ def one(iterable):
     Raise ValueError if the iterable is empty or longer than 1 element. For
     example, assert that a DB query returns a single, unique result.
 
-    >>> one(['val'])
-    'val'
+        >>> one(['val'])
+        'val'
 
-    >>> one(['val', 'other'])  # doctest: +IGNORE_EXCEPTION_DETAIL
-    Traceback (most recent call last):
-    ...
-    ValueError: too many values to unpack (expected 1)
+        >>> one(['val', 'other'])  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: too many values to unpack (expected 1)
 
-    >>> one([])  # doctest: +IGNORE_EXCEPTION_DETAIL
-    Traceback (most recent call last):
-    ...
-    ValueError: not enough values to unpack (expected 1, got 0)
+        >>> one([])  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: not enough values to unpack (expected 1, got 0)
 
     ``one()`` attempts to advance the iterable twice in order to ensure there
     aren't further items. Because this discards any second item, ``one()`` is
@@ -341,8 +341,18 @@ def one(iterable):
 def distinct_permutations(iterable):
     """Yield successive distinct permutations of the elements in the iterable.
 
+        >>> sorted(distinct_permutations([1, 0, 1]))
+        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+
     Equivalent to ``set(permutations(iterable))``, except duplicates are not
-    generated. For large input sequences, this is much more efficient.
+    generated and thrown away. For larger input sequences this is much more
+    efficient.
+
+    Duplicate permutations arise when there are duplicated elements in the
+    input iterable. The number of items returned is
+    ``n! / (x_1! * x_2! * ... * x_n!)``, where ``n`` is the total number of
+    items input, and each ``x_i`` is the count of a distinct item in the input
+    sequence.
 
     """
     def perm_unique_helper(item_counts, perm, i):
@@ -379,17 +389,17 @@ def distinct_permutations(iterable):
 def intersperse(e, iterable):
     """Intersperse element ``e`` between the elements of an iterable.
 
-    >>> from more_itertools import intersperse
-    >>> list(intersperse('x', [1, 'o', 5, 'k']))
-    [1, 'x', 'o', 'x', 5, 'x', 'k']
-    >>> list(intersperse(None, [1, 2, 3]))
-    [1, None, 2, None, 3]
-    >>> list(intersperse('x', 1))
-    Traceback (most recent call last):
-    ...
-    TypeError: 'int' object is not iterable
-    >>> list(intersperse('x', []))
-    []
+        >>> from more_itertools import intersperse
+        >>> list(intersperse('x', [1, 'o', 5, 'k']))
+        [1, 'x', 'o', 'x', 5, 'x', 'k']
+        >>> list(intersperse(None, [1, 2, 3]))
+        [1, None, 2, None, 3]
+        >>> list(intersperse('x', 1))
+        Traceback (most recent call last):
+        ...
+        TypeError: 'int' object is not iterable
+        >>> list(intersperse('x', []))
+        []
 
     """
     iterable = iter(iterable)
@@ -413,11 +423,13 @@ def unique_to_each(*iterables):
     If pkg_1 is removed, then A is no longer necessary - it is not associated
     with pkg_2 or pkg_3. Similarly, C is only needed for pkg_2, and D is
     only needed for pkg_3:
+
         >>> unique_to_each("AB", "BC", "BD")
         [['A'], ['C'], ['D']]
 
     If there are duplicates in one input iterable that aren't in the others
     they will be duplicated in the output. Input order is preserved:
+
         >>> unique_to_each("mississippi", "missouri")
         [['p', 'p'], ['o', 'u', 'r']]
 
@@ -437,13 +449,13 @@ def windowed(seq, n, fillvalue=None):
     When n is larger than the iterable, ``fillvalue`` is used in place of
     missing values.
 
-    >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
-    >>> next(all_windows)
-    (1, 2, 3)
-    >>> next(all_windows)
-    (2, 3, 4)
-    >>> next(all_windows)
-    (3, 4, 5)
+        >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
+        >>> next(all_windows)
+        (1, 2, 3)
+        >>> next(all_windows)
+        (2, 3, 4)
+        >>> next(all_windows)
+        (3, 4, 5)
 
     """
     if n < 0:
@@ -471,15 +483,15 @@ class bucket(object):
     """Wrap an iterable and return an object that buckets the iterable into
     child iterables based on a ``key`` function.
 
-    >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
-    >>> s = bucket(iterable, key=lambda s: s[0])  # Select by first character
-    >>> a_iterable = s['a']
-    >>> next(a_iterable)
-    'a1'
-    >>> next(a_iterable)
-    'a2'
-    >>> list(s['b'])
-    ['b1', 'b2', 'b3']
+        >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
+        >>> s = bucket(iterable, key=lambda s: s[0])
+        >>> a_iterable = s['a']
+        >>> next(a_iterable)
+        'a1'
+        >>> next(a_iterable)
+        'a2'
+        >>> list(s['b'])
+        ['b1', 'b2', 'b3']
 
     The original iterable will be advanced and its items will be cached until
     they are used by the child iterables. This may require significant storage.
@@ -577,8 +589,9 @@ def interleave(*iterables):
     until the shortest is exhausted. Note that this is the same as
     chain(*zip(*iterables)).
 
-    >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
-    [1, 4, 6, 2, 5, 7]
+        >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
+        [1, 4, 6, 2, 5, 7]
+
     """
     return chain.from_iterable(zip(*iterables))
 
@@ -588,8 +601,9 @@ def interleave_longest(*iterables):
     skipping any that are exhausted. Note that this is not the same as
     chain(*zip_longest(*iterables)).
 
-    >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
-    [1, 4, 6, 2, 5, 7, 3, 8]
+        >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
+        [1, 4, 6, 2, 5, 7, 3, 8]
+
     """
     i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
     return filter(lambda x: x is not _marker, i)
@@ -601,12 +615,13 @@ def collapse(iterable, base_type=None, levels=None):
     matching ``isinstance(element, base_type)``, and elements that are
     ``levels`` levels down.
 
-    >>> list(collapse([[1], 2, [[3], 4], [[[5]]], 'abc']))
-    [1, 2, 3, 4, 5, 'abc']
-    >>> list(collapse([[1], 2, [[3], 4], [[[5]]]], levels=2))
-    [1, 2, 3, 4, [5]]
-    >>> list(collapse((1, [2], (3, [4, (5,)])), list))
-    [1, [2], 3, [4, (5,)]]
+        >>> list(collapse([[1], 2, [[3], 4], [[[5]]], 'abc']))
+        [1, 2, 3, 4, 5, 'abc']
+        >>> list(collapse([[1], 2, [[3], 4], [[[5]]]], levels=2))
+        [1, 2, 3, 4, [5]]
+        >>> list(collapse((1, [2], (3, [4, (5,)])), list))
+        [1, [2], 3, [4, (5,)]]
+
     """
     def walk(node, level):
         if (
