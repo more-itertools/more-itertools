@@ -416,6 +416,7 @@ def unique_to_each(*iterables):
     other input iterables.
 
     For example, suppose packages 1, 2, and 3 have these dependencies:
+
         ``pkg_1: (A, B), pkg_2: (B, C), pkg_3: (B, D)``
 
     If you remove one package, which dependencies can also be removed?
