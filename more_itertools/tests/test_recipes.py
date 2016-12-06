@@ -142,15 +142,27 @@ class AllEqualTests(TestCase):
     def test_true(self):
         """Everything is equal"""
         self.assertTrue(all_equal('aaaaaa'))
+        self.assertTrue(all_equal([0, 0, 0, 0]))
 
     def test_false(self):
         """Not everything is equal"""
         self.assertFalse(all_equal('aaaaab'))
+        self.assertFalse(all_equal([0, 0, 0, 1]))
 
     def test_tricky(self):
         """Not everything is identical, but everything is equal"""
         items = [1, complex(1, 0), 1.0]
         self.assertTrue(all_equal(items))
+
+    def test_empty(self):
+        """Return True if the iterable is empty"""
+        self.assertTrue(all_equal(''))
+        self.assertTrue(all_equal([]))
+
+    def test_one(self):
+        """Return True if the iterable is singular"""
+        self.assertTrue(all_equal('0'))
+        self.assertTrue(all_equal([0]))
 
 
 class QuantifyTests(TestCase):
