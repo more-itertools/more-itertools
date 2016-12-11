@@ -468,6 +468,8 @@ def windowed(seq, n, fillvalue=None, step=1):
     if n == 0:
         yield tuple()
         return
+    if step < 1:
+        raise ValueError('step must be >= 1')
 
     it = iter(seq)
     window = deque([], n)

@@ -330,6 +330,10 @@ class WindowedTests(TestCase):
             actual = list(windowed(iterable, n, step=step))
             eq_(actual, expected)
 
+        # Step must be greater than or equal to 1
+        with self.assertRaises(ValueError):
+            list(windowed(iterable, 3, step=0))
+
 
 class BucketTests(TestCase):
     """Tests for ``bucket()``"""
