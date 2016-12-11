@@ -323,8 +323,10 @@ class WindowedTests(TestCase):
         for n, step, expected in [
             (3, 2, [(1, 2, 3), (3, 4, 5), (5, 6, 7)]),  # n > step
             (3, 3, [(1, 2, 3), (4, 5, 6), (7, None, None)]),  # n == step
-            (2, 3, [(1, 2), (4, 5), (7, None)]),  # n < step
-            (3, 7, [(1, 2, 3), (None, None, None)]),  # step == len(iterable)
+            (3, 4, [(1, 2, 3), (5, 6, 7)]),  # line up nicely
+            (3, 5, [(1, 2, 3), (6, 7, None)]),  # off by one
+            (3, 6, [(1, 2, 3), (7, None, None)]),  # off by two
+            (3, 7, [(1, 2, 3)]),  # step past the end
             (7, 8, [(1, 2, 3, 4, 5, 6, 7)]),  # step > len(iterable)
         ]:
             actual = list(windowed(iterable, n, step=step))

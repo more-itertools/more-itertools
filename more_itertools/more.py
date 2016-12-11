@@ -488,9 +488,10 @@ def windowed(seq, n, fillvalue=None, step=1):
         if i % step == 0:
             yield tuple(window)
 
-    # If there are items left, fill with the given value
-    if i % step:
-        for _ in range(i, step):
+    # If there are items from the iterable in the window, pad with the given
+    # value and emit them.
+    if (i % step) and (step - i < n):
+        for _ in range(step - i):
             append(fillvalue)
         yield tuple(window)
 
