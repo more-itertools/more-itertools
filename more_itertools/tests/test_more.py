@@ -503,3 +503,66 @@ class SplitAfterTest(TestCase):
         actual = list(split_after('ooo', lambda c: c == 'x'))
         expected = [['o', 'o', 'o']]
         eq_(actual, expected)
+
+
+class PaddedTest(TestCase):
+    """Tests for ``padded()``"""
+
+    def test_no_n(self):
+        seq = [1, 2, 3]
+
+        # No fillvalue
+        self.assertEqual(take(5, padded(seq)), [1, 2, 3, None, None])
+
+        # With fillvalue
+        self.assertEqual(take(5, padded(seq, fillvalue='')), [1, 2, 3, '', ''])
+
+    def test_invalid_n(self):
+        self.assertRaises(ValueError, lambda: list(padded([1, 2, 3], n=-1)))
+        self.assertRaises(ValueError, lambda: list(padded([1, 2, 3], n=0)))
+
+    def test_valid_n(self):
+        seq = [1, 2, 3, 4, 5]
+
+        # No need for padding: len(seq) <= n
+        self.assertEqual(list(padded(seq, n=4)), [1, 2, 3, 4, 5])
+        self.assertEqual(list(padded(seq, n=5)), [1, 2, 3, 4, 5])
+
+        # No fillvalue
+        self.assertEqual(list(padded(seq, n=7)), [1, 2, 3, 4, 5, None, None])
+
+        # With fillvalue
+        self.assertEqual(
+            list(padded(seq, fillvalue='', n=7)), [1, 2, 3, 4, 5, '', '']
+        )
+
+    def test_multiple(self):
+        seq = [1, 2, 3, 4, 5, 6]
+
+        # No need for padding: len(seq) % n == 0
+        self.assertEqual(
+            list(padded(seq, n=3, multiple=True)), [1, 2, 3, 4, 5, 6]
+        )
+
+        # Padding needed: len(seq) < n
+        self.assertEqual(
+            list(padded(seq, n=8, multiple=True)),
+            [1, 2, 3, 4, 5, 6, None, None]
+        )
+
+        # No padding needed: len(seq) == n
+        self.assertEqual(
+            list(padded(seq, n=6, multiple=True)), [1, 2, 3, 4, 5, 6]
+        )
+
+        # Padding needed: len(seq) > n
+        self.assertEqual(
+            list(padded(seq, n=4, multiple=True)),
+            [1, 2, 3, 4, 5, 6, None, None]
+        )
+
+        # With fillvalue
+        self.assertEqual(
+            list(padded(seq, fillvalue='', n=4, multiple=True)),
+            [1, 2, 3, 4, 5, 6, '', '']
+        )

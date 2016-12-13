@@ -14,9 +14,9 @@ from .recipes import take
 __all__ = [
     'bucket', 'chunked', 'collapse', 'collate', 'consumer',
     'distinct_permutations', 'first', 'ilen', 'interleave_longest',
-    'interleave', 'intersperse', 'iterate', 'one', 'peekable', 'side_effect',
-    'sliced', 'split_after', 'split_before', 'spy', 'unique_to_each',
-    'windowed', 'with_iter'
+    'interleave', 'intersperse', 'iterate', 'one', 'padded', 'peekable',
+    'side_effect', 'sliced', 'split_after', 'split_before', 'spy',
+    'unique_to_each', 'windowed', 'with_iter'
 ]
 
 
@@ -775,6 +775,6 @@ def padded(iterable, fillvalue=None, n=None, multiple=False):
             yield item
             item_count += 1
 
-        remaining = (n - (item_count % n)) % n if multiple else n - item_count
+        remaining = (n - item_count) % n if multiple else n - item_count
         for _ in range(remaining):
             yield fillvalue
