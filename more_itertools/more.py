@@ -3,7 +3,7 @@ from __future__ import print_function
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, count, islice, takewhile
+from itertools import chain, count, islice, takewhile, tee
 from sys import version_info
 
 from six import iteritems, string_types
@@ -13,10 +13,10 @@ from .recipes import take
 
 __all__ = [
     'bucket', 'chunked', 'collapse', 'collate', 'consumer',
-    'distinct_permutations', 'first', 'ilen', 'interleave_longest',
-    'interleave', 'intersperse', 'iterate', 'one', 'peekable', 'side_effect',
-    'sliced', 'split_after', 'split_before', 'spy', 'unique_to_each',
-    'windowed', 'with_iter'
+    'distinct_permutations', 'distribute', 'first', 'ilen',
+    'interleave_longest', 'interleave', 'intersperse', 'iterate', 'one',
+    'peekable', 'side_effect', 'sliced', 'split_after', 'split_before', 'spy',
+    'unique_to_each', 'windowed', 'with_iter'
 ]
 
 
@@ -745,3 +745,37 @@ def split_after(iterable, pred):
             buf = []
     if buf:
         yield buf
+
+
+def distribute(n, iterable):
+    """Distribute the items from *iterable* among *n* smaller iterables.
+
+        >>> group_1, group_2 = distribute(2, [1, 2, 3, 4, 5, 6])
+        >>> list(group_1)
+        [1, 3, 5]
+        >>> list(group_2)
+        [2, 4, 6]
+
+    If the length of the iterable is not evenly divisible by n, then the
+    length of the smaller iterables will not be identical::
+
+        >>> children = distribute(3, [1, 2, 3, 4, 5, 6, 7])
+        >>> [list(c) for c in children]
+        [[1, 4, 7], [2, 5], [3, 6]]
+
+    This function uses ``itertools.tee``, and may require significant storage.
+
+    """
+    if n < 1:
+        raise ValueError('n must be at least 1')
+
+    children = tee(iter(iterable), n)
+
+    def _iterator(index):
+        i = 0
+        for item in children[index]:
+            if i == index:
+                yield item
+            i = (i + 1) % n
+
+    return [_iterator(index) for index in range(n)]
