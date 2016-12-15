@@ -763,6 +763,13 @@ def distribute(n, iterable):
         >>> [list(c) for c in children]
         [[1, 4, 7], [2, 5], [3, 6]]
 
+    If the length of the iterable is smaller than n, then the last returned
+    iterables will be empty:
+
+        >>> children = distribute(5, [1, 2, 3])
+        >>> [list(c) for c in children]
+        [[1], [2], [3], [], []]
+
     This function uses ``itertools.tee``, and may require significant storage.
 
     """
