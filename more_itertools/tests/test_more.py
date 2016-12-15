@@ -536,33 +536,33 @@ class PaddedTest(TestCase):
             list(padded(seq, fillvalue='', n=7)), [1, 2, 3, 4, 5, '', '']
         )
 
-    def test_multiple(self):
+    def test_next_multiple(self):
         seq = [1, 2, 3, 4, 5, 6]
 
         # No need for padding: len(seq) % n == 0
         self.assertEqual(
-            list(padded(seq, n=3, multiple=True)), [1, 2, 3, 4, 5, 6]
+            list(padded(seq, n=3, next_multiple=True)), [1, 2, 3, 4, 5, 6]
         )
 
         # Padding needed: len(seq) < n
         self.assertEqual(
-            list(padded(seq, n=8, multiple=True)),
+            list(padded(seq, n=8, next_multiple=True)),
             [1, 2, 3, 4, 5, 6, None, None]
         )
 
         # No padding needed: len(seq) == n
         self.assertEqual(
-            list(padded(seq, n=6, multiple=True)), [1, 2, 3, 4, 5, 6]
+            list(padded(seq, n=6, next_multiple=True)), [1, 2, 3, 4, 5, 6]
         )
 
         # Padding needed: len(seq) > n
         self.assertEqual(
-            list(padded(seq, n=4, multiple=True)),
+            list(padded(seq, n=4, next_multiple=True)),
             [1, 2, 3, 4, 5, 6, None, None]
         )
 
         # With fillvalue
         self.assertEqual(
-            list(padded(seq, fillvalue='', n=4, multiple=True)),
+            list(padded(seq, fillvalue='', n=4, next_multiple=True)),
             [1, 2, 3, 4, 5, 6, '', '']
         )

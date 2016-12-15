@@ -747,17 +747,17 @@ def split_after(iterable, pred):
         yield buf
 
 
-def padded(iterable, fillvalue=None, n=None, multiple=False):
+def padded(iterable, fillvalue=None, n=None, next_multiple=False):
     """Yield the elements from *iterable*, followed by *fillvalue*, such that
     at least *n* items are emitted.
 
         >>> list(padded([1, 2, 3], '?', 5))
         [1, 2, 3, '?', '?']
 
-    If *multiple* is ``True``, *fillvalue* will be emitted until the number of
-    items emitted is a multiple of *n*::
+    If *next_multiple* is ``True``, *fillvalue* will be emitted until the
+    number of items emitted is a multiple of *n*::
 
-        >>> list(padded([1, 2, 3, 4], n=3, multiple=True))
+        >>> list(padded([1, 2, 3, 4], n=3, next_multiple=True))
         [1, 2, 3, 4, None, None]
 
     If *n* is ``None``, *fillvalue* will be emitted indefinitely.
@@ -775,6 +775,6 @@ def padded(iterable, fillvalue=None, n=None, multiple=False):
             yield item
             item_count += 1
 
-        remaining = (n - item_count) % n if multiple else n - item_count
+        remaining = (n - item_count) % n if next_multiple else n - item_count
         for _ in range(remaining):
             yield fillvalue
