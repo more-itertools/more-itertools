@@ -3,7 +3,7 @@ from __future__ import print_function
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, count, islice, takewhile
+from itertools import chain, count, islice, repeat, takewhile
 from sys import version_info
 
 from six import iteritems, string_types
@@ -14,9 +14,9 @@ from .recipes import take
 __all__ = [
     'bucket', 'chunked', 'collapse', 'collate', 'consumer',
     'distinct_permutations', 'first', 'ilen', 'interleave_longest',
-    'interleave', 'intersperse', 'iterate', 'one', 'peekable', 'side_effect',
-    'sliced', 'split_after', 'split_before', 'spy', 'unique_to_each',
-    'windowed', 'with_iter'
+    'interleave', 'intersperse', 'iterate', 'one', 'padded', 'peekable',
+    'side_effect', 'sliced', 'split_after', 'split_before', 'spy',
+    'unique_to_each', 'windowed', 'with_iter'
 ]
 
 
@@ -745,3 +745,36 @@ def split_after(iterable, pred):
             buf = []
     if buf:
         yield buf
+
+
+def padded(iterable, fillvalue=None, n=None, next_multiple=False):
+    """Yield the elements from *iterable*, followed by *fillvalue*, such that
+    at least *n* items are emitted.
+
+        >>> list(padded([1, 2, 3], '?', 5))
+        [1, 2, 3, '?', '?']
+
+    If *next_multiple* is ``True``, *fillvalue* will be emitted until the
+    number of items emitted is a multiple of *n*::
+
+        >>> list(padded([1, 2, 3, 4], n=3, next_multiple=True))
+        [1, 2, 3, 4, None, None]
+
+    If *n* is ``None``, *fillvalue* will be emitted indefinitely.
+
+    """
+    it = iter(iterable)
+    if n is None:
+        for item in chain(it, repeat(fillvalue)):
+            yield item
+    elif n < 1:
+        raise ValueError('n must be at least 1')
+    else:
+        item_count = 0
+        for item in it:
+            yield item
+            item_count += 1
+
+        remaining = (n - item_count) % n if next_multiple else n - item_count
+        for _ in range(remaining):
+            yield fillvalue
