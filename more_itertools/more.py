@@ -107,6 +107,10 @@ class peekable(object):
         >>> next(p)
         'b'
 
+    Negative indexes are supported, but be aware that they will cache the
+    remaining items in the source iterator, which may require significant
+    storage.
+
     To test whether there are more items in the iterator, examine the
     peekable's truth value. If it is truthy, there are more items.
 
@@ -168,9 +172,7 @@ class peekable(object):
         ):
             stop = None
         elif (
-            (start is not None) and
-            (stop is not None) and
-            (start > stop)
+            (start is not None) and (stop is not None) and (start > stop)
         ):
             stop = start + 1
 
