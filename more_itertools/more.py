@@ -166,10 +166,9 @@ class peekable(object):
             ((start is not None) and (start < 0)) or
             ((stop is not None) and (stop < 0))
         ):
-            raise ValueError('Negative indexing not supported')
+            stop = None
 
         cache_len = len(self._cache)
-
         if stop is None:
             self._cache.extend(self._it)
         elif stop >= cache_len:
@@ -182,9 +181,8 @@ class peekable(object):
             return self._get_slice(index)
 
         cache_len = len(self._cache)
-
         if index < 0:
-            raise ValueError('Negative indexing not supported')
+            self._cache.extend(self._it)
         elif index + 1 >= cache_len:
             self._cache.extend(islice(self._it, index + 1 - cache_len))
 

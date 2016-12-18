@@ -134,9 +134,10 @@ class PeekableTests(TestCase):
         eq_(next(p), 'c')
         eq_(p[8], 'l')
 
-        # Negative indexing should fail
-        with self.assertRaises(ValueError):
-            p[-2]
+        # Negative indexing should work too
+        eq_(p[-2], 'k')
+        eq_(p[-9], 'd')
+        self.assertRaises(IndexError, lambda: p[-10])
 
     def test_slicing(self):
         """
@@ -163,12 +164,12 @@ class PeekableTests(TestCase):
         eq_(p[::2], seq[1:][::2])
         eq_(p[::-1], seq[1:][::-1])
 
-        # Negative indexing should fail
-        with self.assertRaises(ValueError):
-            p[-1:]
-
-        with self.assertRaises(ValueError):
-            p[:-1]
+        # Negative indexing should work too
+        eq_(p[-1:], seq[1:][-1:])
+        eq_(p[:-1], seq[1:][:-1])
+        eq_(p[2:-2], seq[1:][2:-2])
+        eq_(p[-9:4], seq[1:][-9:4])
+        eq_(p[6:1:-2], seq[1:][6:1:-2])
 
 
 class ConsumerTests(TestCase):
