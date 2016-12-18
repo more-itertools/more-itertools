@@ -181,7 +181,14 @@ class peekable(object):
         if isinstance(index, slice):
             return self._get_slice(index)
 
-        return self._get_slice(slice(index, index + 1, None))[0]
+        cache_len = len(self._cache)
+
+        if index < 0:
+            raise ValueError('Negative indexing not supported')
+        elif index + 1 >= cache_len:
+            self._cache.extend(islice(self._it, index + 1 - cache_len))
+
+        return self._cache[index]
 
 
 def _collate(*iterables, **kwargs):
