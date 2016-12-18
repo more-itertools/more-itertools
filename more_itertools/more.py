@@ -167,6 +167,12 @@ class peekable(object):
             ((stop is not None) and (stop < 0))
         ):
             stop = None
+        elif (
+            (start is not None) and
+            (stop is not None) and
+            (start > stop)
+        ):
+            stop = start + 1
 
         cache_len = len(self._cache)
         if stop is None:

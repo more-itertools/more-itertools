@@ -140,9 +140,7 @@ class PeekableTests(TestCase):
         self.assertRaises(IndexError, lambda: p[-10])
 
     def test_slicing(self):
-        """
-        Slicing the peekable shouldn't advance the iterator.
-        """
+        """Slicing the peekable shouldn't advance the iterator."""
         seq = list('abcdefghijkl')
         p = peekable(seq)
 
@@ -164,12 +162,20 @@ class PeekableTests(TestCase):
         eq_(p[::2], seq[1:][::2])
         eq_(p[::-1], seq[1:][::-1])
 
-        # Negative indexing should work too
-        eq_(p[-1:], seq[1:][-1:])
-        eq_(p[:-1], seq[1:][:-1])
-        eq_(p[2:-2], seq[1:][2:-2])
-        eq_(p[-9:4], seq[1:][-9:4])
-        eq_(p[6:1:-2], seq[1:][6:1:-2])
+    def test_slicing_reset(self):
+        """Test slicing on a fresh iterable each time"""
+        seq = list(range(11))
+        for index in [
+            slice(None, None, None),
+            slice(1, None, None),
+            slice(None, 1, None),
+            slice(1, 8, 3),
+            slice(8, 1, -3),
+            slice(8, -9, -3),
+        ]:
+            p = peekable(seq)
+            next(p)
+            eq_(p[index], seq[1:][index])
 
 
 class ConsumerTests(TestCase):
