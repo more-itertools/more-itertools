@@ -189,7 +189,7 @@ class peekable(object):
         cache_len = len(self._cache)
         if index < 0:
             self._cache.extend(self._it)
-        elif index + 1 >= cache_len:
+        elif index >= cache_len:
             self._cache.extend(islice(self._it, index + 1 - cache_len))
 
         return self._cache[index]
