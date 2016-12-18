@@ -295,12 +295,16 @@ class WindowedTests(TestCase):
 
     def test_fillvalue(self):
         """
-        When the window size is larger than the iterable, the given fill value
-        should be used.
+        When sizes don't match evenly, the given fill value should be used.
         """
-        actual = list(windowed([1, 2, 3, 4, 5], 6, '!'))
-        expected = [(1, 2, 3, 4, 5, '!')]
-        eq_(actual, expected)
+        iterable = [1, 2, 3, 4, 5]
+
+        for n, kwargs, expected in [
+            (6, {}, [(1, 2, 3, 4, 5, '!')]),  # n > len(iterable)
+            (3, {'step': 3}, [(1, 2, 3), (4, 5, '!')]),  # using ``step``
+        ]:
+            actual = list(windowed(iterable, n, fillvalue='!', **kwargs))
+            eq_(actual, expected)
 
     def test_zero(self):
         """When the window size is zero, an empty tuple should be emitted."""
@@ -312,6 +316,25 @@ class WindowedTests(TestCase):
         """When the window size is negative, ValueError should be raised."""
         with self.assertRaises(ValueError):
             list(windowed([1, 2, 3, 4, 5], -1))
+
+    def test_step(self):
+        """The window should advance by the number of steps provided"""
+        iterable = [1, 2, 3, 4, 5, 6, 7]
+        for n, step, expected in [
+            (3, 2, [(1, 2, 3), (3, 4, 5), (5, 6, 7)]),  # n > step
+            (3, 3, [(1, 2, 3), (4, 5, 6), (7, None, None)]),  # n == step
+            (3, 4, [(1, 2, 3), (5, 6, 7)]),  # line up nicely
+            (3, 5, [(1, 2, 3), (6, 7, None)]),  # off by one
+            (3, 6, [(1, 2, 3), (7, None, None)]),  # off by two
+            (3, 7, [(1, 2, 3)]),  # step past the end
+            (7, 8, [(1, 2, 3, 4, 5, 6, 7)]),  # step > len(iterable)
+        ]:
+            actual = list(windowed(iterable, n, step=step))
+            eq_(actual, expected)
+
+        # Step must be greater than or equal to 1
+        with self.assertRaises(ValueError):
+            list(windowed(iterable, 3, step=0))
 
 
 class BucketTests(TestCase):

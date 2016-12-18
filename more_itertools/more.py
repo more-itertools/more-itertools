@@ -6,7 +6,7 @@ from heapq import merge
 from itertools import chain, count, islice, repeat, takewhile
 from sys import version_info
 
-from six import iteritems, string_types
+from six import string_types
 from six.moves import filter, map, zip, zip_longest
 
 from .recipes import take
@@ -444,20 +444,23 @@ def unique_to_each(*iterables):
     return [list(filter(uniques.__contains__, it)) for it in pool]
 
 
-def windowed(seq, n, fillvalue=None):
-    """Return a sliding window (of width n) over data from the iterable.
-
-    When n=2 this is equivalent to ``pairwise(iterable)``.
-    When n is larger than the iterable, ``fillvalue`` is used in place of
-    missing values.
+def windowed(seq, n, fillvalue=None, step=1):
+    """Return a sliding window of width *n* over the given iterable.
 
         >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
-        >>> next(all_windows)
-        (1, 2, 3)
-        >>> next(all_windows)
-        (2, 3, 4)
-        >>> next(all_windows)
-        (3, 4, 5)
+        >>> list(all_windows)
+        [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
+
+    When the window is larger than the iterable, ``fillvalue`` is used in place
+    of missing values::
+
+        >>> list(windowed([1, 2, 3], 4))
+        [(1, 2, 3, None)]
+
+    Each window will advance in increments of *step*::
+
+        >>> list(windowed([1, 2, 3, 4, 5, 6], 3, fillvalue='!', step=2))
+        [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
 
     """
     if n < 0:
@@ -465,6 +468,8 @@ def windowed(seq, n, fillvalue=None):
     if n == 0:
         yield tuple()
         return
+    if step < 1:
+        raise ValueError('step must be >= 1')
 
     it = iter(seq)
     window = deque([], n)
@@ -476,8 +481,18 @@ def windowed(seq, n, fillvalue=None):
     yield tuple(window)
 
     # Appending new items to the right causes old items to fall off the left
+    i = 0
     for item in it:
         append(item)
+        i = (i + 1) % step
+        if i % step == 0:
+            yield tuple(window)
+
+    # If there are items from the iterable in the window, pad with the given
+    # value and emit them.
+    if (i % step) and (step - i < n):
+        for _ in range(step - i):
+            append(fillvalue)
         yield tuple(window)
 
 
