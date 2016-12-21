@@ -795,21 +795,28 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
             yield fillvalue
 
 
-def something(iterable, offsets=(-1, 0, 1), fillvalue=None):
+def offsetter(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     """Yield tuples whose elements from are offset from *iterable*.
     The amount by which the ith item in each tuple offset is given by the
     ith item in *offsets*.
 
-        >>> list(something([1, 2, 3]))
-        [(None, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
-        >>> list(something([1, 2, 3, 4], offsets=(0, 2)))
-        [(1, 3), (2, 4), (3, None), (4, None)]
+        >>> list(offsetter([0, 1, 2, 3]))
+        [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
+        >>> list(offsetter(range(8), offsets=(0, 2, 4)))
+        [(0, 2, 4), (1, 3, 5), (2, 4, 6), (3, 5, 7)]
 
-    If an offset extends past the boundaries of the iterable, *fillvalue*
-    will be used.
+    By default, the sequence will end when the final element of a tuple is the
+    last item in the iterable. To continue until the first element of a tuple
+    is the last item in the iterable, set *longest* to ``True``::
 
-        >>> list(something([1, 2, 3], offsets=(-1, 1), fillvalue='?'))
-        [('?', 2), (1, 3), (2, '?'), (3, '?')]
+        >>> list(offsetter([0, 1, 2, 3], longest=True))
+        [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
+
+    By default, ``None`` will be used to replace offsets beyond the end of the
+    sequence. Specify *fillvalue* to use some other value::
+
+        >>> list(offsetter([0, 1, 2, 3], fillvalue='?'))
+        [('?', 0, 1), (0, 1, 2), (1, 2, 3)]
 
     """
     children = tee(iterable, len(offsets))
@@ -823,4 +830,7 @@ def something(iterable, offsets=(-1, 0, 1), fillvalue=None):
         else:
             iterables.append(child)
 
-    return zip_longest(*iterables, fillvalue=fillvalue)
+    if longest:
+        return zip_longest(*iterables, fillvalue=fillvalue)
+
+    return zip(*iterables)
