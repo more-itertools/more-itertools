@@ -3,7 +3,7 @@ from __future__ import print_function
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, count, islice, repeat, takewhile
+from itertools import chain, count, islice, repeat, takewhile, tee
 from sys import version_info
 
 from six import string_types
@@ -793,3 +793,34 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
         remaining = (n - item_count) % n if next_multiple else n - item_count
         for _ in range(remaining):
             yield fillvalue
+
+
+def something(iterable, offsets=(-1, 0, 1), fillvalue=None):
+    """Yield tuples whose elements from are offset from *iterable*.
+    The amount by which the ith item in each tuple offset is given by the
+    ith item in *offsets*.
+
+        >>> list(something([1, 2, 3]))
+        [(None, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
+        >>> list(something([1, 2, 3, 4], offsets=(0, 2)))
+        [(1, 3), (2, 4), (3, None), (4, None)]
+
+    If an offset extends past the boundaries of the iterable, *fillvalue*
+    will be used.
+
+        >>> list(something([1, 2, 3], offsets=(-1, 1), fillvalue='?'))
+        [('?', 2), (1, 3), (2, '?'), (3, '?')]
+
+    """
+    children = tee(iterable, len(offsets))
+
+    iterables = []
+    for child, n in zip(children, offsets):
+        if n < 0:
+            iterables.append(chain(repeat(fillvalue, -n), child))
+        elif n > 0:
+            iterables.append(islice(child, n, None))
+        else:
+            iterables.append(child)
+
+    return zip_longest(*iterables, fillvalue=fillvalue)
