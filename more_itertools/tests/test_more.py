@@ -589,3 +589,29 @@ class PaddedTest(TestCase):
             list(padded(seq, fillvalue='', n=4, next_multiple=True)),
             [1, 2, 3, 4, 5, 6, '', '']
         )
+
+
+class DistributeTest(TestCase):
+    """Tests for distribute()"""
+
+    def test_invalid_n(self):
+        self.assertRaises(ValueError, lambda: distribute(-1, [1, 2, 3]))
+        self.assertRaises(ValueError, lambda: distribute(0, [1, 2, 3]))
+
+    def test_basic(self):
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        for n, expected in [
+            (1, [iterable]),
+            (2, [[1, 3, 5, 7, 9], [2, 4, 6, 8, 10]]),
+            (3, [[1, 4, 7, 10], [2, 5, 8], [3, 6, 9]]),
+            (10, [[n] for n in range(1, 10 + 1)]),
+        ]:
+            eq_([list(x) for x in distribute(n, iterable)], expected)
+
+    def test_large_n(self):
+        iterable = [1, 2, 3, 4]
+        eq_(
+            [list(x) for x in distribute(6, iterable)],
+            [[1], [2], [3], [4], [], []]
+        )
