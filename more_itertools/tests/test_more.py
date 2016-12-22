@@ -615,3 +615,38 @@ class DistributeTest(TestCase):
             [list(x) for x in distribute(6, iterable)],
             [[1], [2], [3], [4], [], []]
         )
+
+
+class OffsetGroupsTestCase(TestCase):
+    """Tests for ``offset_groups()``"""
+
+    def test_default(self):
+        iterable = [0, 1, 2, 3]
+        actual = list(offset_groups(iterable))
+        expected = [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
+        eq_(actual, expected)
+
+    def test_offsets(self):
+        iterable = [0, 1, 2, 3]
+        for offsets, expected in [
+            ((-2, 0, 2), [('', 0, 2), ('', 1, 3)]),
+            ((-2, -1), [('', ''), ('', 0), (0, 1), (1, 2), (2, 3)]),
+            ((1, 2), [(1, 2), (2, 3)]),
+        ]:
+            all_groups = offset_groups(iterable, offsets=offsets, fillvalue='')
+            eq_(list(all_groups), expected)
+
+    def test_longest(self):
+        iterable = [0, 1, 2, 3]
+        for offsets, expected in [
+            (
+                (-1, 0, 1),
+                [('', 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, ''), (3, '', '')]
+            ),
+            ((-2, -1), [('', ''), ('', 0), (0, 1), (1, 2), (2, 3), (3, '')]),
+            ((1, 2), [(1, 2), (2, 3), (3, '')]),
+        ]:
+            all_groups = offset_groups(
+                iterable, offsets=offsets, fillvalue='', longest=True
+            )
+            eq_(list(all_groups), expected)
