@@ -9,7 +9,7 @@ from sys import version_info
 from six import string_types
 from six.moves import filter, map, zip, zip_longest
 
-from .recipes import take
+from .recipes import flatten, take
 
 __all__ = [
     'bucket', 'chunked', 'collapse', 'collate', 'consumer',
@@ -387,28 +387,17 @@ def distinct_permutations(iterable):
 
 
 def intersperse(e, iterable):
-    """Intersperse element ``e`` between the elements of an iterable.
+    """Intersperse element ``e`` between the elements of *iterable*.
 
-        >>> from more_itertools import intersperse
-        >>> list(intersperse('x', [1, 'o', 5, 'k']))
-        [1, 'x', 'o', 'x', 5, 'x', 'k']
+        >>> list(intersperse('x', 'ABCD'))
+        ['A', 'x', 'B', 'x', 'C', 'x', 'D']
         >>> list(intersperse(None, [1, 2, 3]))
         [1, None, 2, None, 3]
-        >>> list(intersperse('x', 1))
-        Traceback (most recent call last):
-        ...
-        TypeError: 'int' object is not iterable
-        >>> list(intersperse('x', []))
-        []
 
     """
     it = iter(iterable)
-    if it:
-        yield next(it)
-        for item in it:
-            yield e
-            yield item
-    raise StopIteration
+    filler = repeat(e)
+    return islice(flatten(zip(filler, it)), 1, None)
 
 
 def unique_to_each(*iterables):
