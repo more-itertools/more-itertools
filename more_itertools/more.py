@@ -397,7 +397,9 @@ def intersperse(e, iterable):
     """
     it = iter(iterable)
     filler = repeat(e)
-    return islice(flatten(zip(filler, it)), 1, None)
+    zipped = flatten(zip(filler, it))
+    next(zipped)
+    return zipped
 
 
 def unique_to_each(*iterables):
