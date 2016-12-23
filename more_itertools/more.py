@@ -37,6 +37,7 @@ __all__ = [
     'unique_to_each',
     'windowed',
     'with_iter',
+    'zip_offset',
 ]
 
 
@@ -873,25 +874,49 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
         >>> list(stagger([0, 1, 2, 3], longest=True))
         [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
 
-    By default, ``None`` will be used to replace offsets beyond the end of the
-    sequence. Specify *fillvalue* to use some other value::
-
-        >>> list(stagger([0, 1, 2, 3], fillvalue='?'))
-        [('?', 0, 1), (0, 1, 2), (1, 2, 3)]
-
     """
     children = tee(iterable, len(offsets))
 
-    iterables = []
-    for child, n in zip(children, offsets):
+    return zip_offset(
+        *children, offsets=offsets, longest=longest, fillvalue=fillvalue
+    )
+
+
+def zip_offset(*iterables, **kwargs):
+    """``zip`` the input *iterables* together, but offset the ``i``th iterable
+    by the ``i``th item in *offsets*.
+
+        >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1)))
+        [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e')]
+
+    By default, the sequence will end when the shortest iterable is exhausted.
+    To continue until the longest iterable is exhausted, set *longest* to
+    ``True``.
+
+        >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1), longest=True))
+        [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e'), (None, 'f')]
+
+    By default, ``None`` will be used to replace offsets beyond the end of the
+    sequence. Specify *fillvalue* to use some other value.
+
+    """
+    offsets = kwargs['offsets']
+    longest = kwargs.get('longest', False)
+    fillvalue = kwargs.get('fillvalue', None)
+
+    if len(iterables) != len(offsets):
+        raise ValueError("Number of iterables and offsets didn't match")
+
+    staggered = []
+    for it, n in zip(iterables, offsets):
         if n < 0:
-            iterables.append(chain(repeat(fillvalue, -n), child))
+            staggered.append(chain(repeat(fillvalue, -n), it))
         elif n > 0:
-            iterables.append(islice(child, n, None))
+            staggered.append(islice(it, n, None))
         else:
-            iterables.append(child)
+            staggered.append(it)
 
     if longest:
-        return zip_longest(*iterables, fillvalue=fillvalue)
+        return zip_longest(*staggered, fillvalue=fillvalue)
 
-    return zip(*iterables)
+    return zip(*staggered)

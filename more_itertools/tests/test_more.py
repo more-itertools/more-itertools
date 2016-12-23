@@ -650,3 +650,35 @@ class StaggerTest(TestCase):
                 iterable, offsets=offsets, fillvalue='', longest=True
             )
             eq_(list(all_groups), expected)
+
+
+class ZipOffsetTest(TestCase):
+    """Tests for ``zip_offset()``"""
+
+    def test_shortest(self):
+        seq_1 = [0, 1, 2, 3]
+        seq_2 = [0, 1, 2, 3, 4, 5]
+        seq_3 = [0, 1, 2, 3, 4, 5, 6, 7]
+        actual = list(
+            zip_offset(seq_1, seq_2, seq_3, offsets=(-1, 0, 1), fillvalue='')
+        )
+        expected = [('', 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, 4), (3, 4, 5)]
+        eq_(actual, expected)
+
+    def test_longest(self):
+        seq_1 = [0, 1, 2, 3]
+        seq_2 = [0, 1, 2, 3, 4, 5]
+        seq_3 = [0, 1, 2, 3, 4, 5, 6, 7]
+        actual = list(
+            zip_offset(seq_1, seq_2, seq_3, offsets=(-1, 0, 1), longest=True)
+        )
+        expected = [
+            (None, 0, 1),
+            (0, 1, 2),
+            (1, 2, 3),
+            (2, 3, 4),
+            (3, 4, 5),
+            (None, 5, 6),
+            (None, None, 7),
+        ]
+        eq_(actual, expected)
