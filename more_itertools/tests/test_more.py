@@ -617,12 +617,12 @@ class DistributeTest(TestCase):
         )
 
 
-class OffsetGroupsTestCase(TestCase):
-    """Tests for ``offset_groups()``"""
+class StaggerTest(TestCase):
+    """Tests for ``stagger()``"""
 
     def test_default(self):
         iterable = [0, 1, 2, 3]
-        actual = list(offset_groups(iterable))
+        actual = list(stagger(iterable))
         expected = [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
         eq_(actual, expected)
 
@@ -633,7 +633,7 @@ class OffsetGroupsTestCase(TestCase):
             ((-2, -1), [('', ''), ('', 0), (0, 1), (1, 2), (2, 3)]),
             ((1, 2), [(1, 2), (2, 3)]),
         ]:
-            all_groups = offset_groups(iterable, offsets=offsets, fillvalue='')
+            all_groups = stagger(iterable, offsets=offsets, fillvalue='')
             eq_(list(all_groups), expected)
 
     def test_longest(self):
@@ -646,7 +646,7 @@ class OffsetGroupsTestCase(TestCase):
             ((-2, -1), [('', ''), ('', 0), (0, 1), (1, 2), (2, 3), (3, '')]),
             ((1, 2), [(1, 2), (2, 3), (3, '')]),
         ]:
-            all_groups = offset_groups(
+            all_groups = stagger(
                 iterable, offsets=offsets, fillvalue='', longest=True
             )
             eq_(list(all_groups), expected)

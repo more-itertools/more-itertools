@@ -12,11 +12,30 @@ from six.moves import filter, map, zip, zip_longest
 from .recipes import take
 
 __all__ = [
-    'bucket', 'chunked', 'collapse', 'collate', 'consumer',
-    'distinct_permutations', 'distribute', 'first', 'ilen',
-    'interleave_longest', 'interleave', 'intersperse', 'iterate',
-    'offset_groups', 'one', 'padded', 'peekable', 'side_effect', 'sliced',
-    'split_after', 'split_before', 'spy', 'unique_to_each', 'windowed',
+    'bucket',
+    'chunked',
+    'collapse',
+    'collate',
+    'consumer',
+    'distinct_permutations',
+    'distribute',
+    'first',
+    'ilen',
+    'interleave_longest',
+    'interleave',
+    'intersperse',
+    'iterate',
+    'one',
+    'padded',
+    'peekable',
+    'side_effect',
+    'sliced',
+    'split_after',
+    'split_before',
+    'spy',
+    'stagger',
+    'unique_to_each',
+    'windowed',
     'with_iter',
 ]
 
@@ -837,27 +856,27 @@ def distribute(n, iterable):
     return [_iterator(index) for index in range(n)]
 
 
-def offset_groups(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
+def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     """Yield tuples whose elements from are offset from *iterable*.
-    The amount by which the ith item in each tuple offset is given by the
-    ith item in *offsets*.
+    The amount by which the ``i``th item in each tuple is offset is given by
+    the ``i``th item in *offsets*.
 
-        >>> list(offset_groups([0, 1, 2, 3]))
+        >>> list(stagger([0, 1, 2, 3]))
         [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
-        >>> list(offset_groups(range(8), offsets=(0, 2, 4)))
+        >>> list(stagger(range(8), offsets=(0, 2, 4)))
         [(0, 2, 4), (1, 3, 5), (2, 4, 6), (3, 5, 7)]
 
     By default, the sequence will end when the final element of a tuple is the
     last item in the iterable. To continue until the first element of a tuple
     is the last item in the iterable, set *longest* to ``True``::
 
-        >>> list(offset_groups([0, 1, 2, 3], longest=True))
+        >>> list(stagger([0, 1, 2, 3], longest=True))
         [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
 
     By default, ``None`` will be used to replace offsets beyond the end of the
     sequence. Specify *fillvalue* to use some other value::
 
-        >>> list(offset_groups([0, 1, 2, 3], fillvalue='?'))
+        >>> list(stagger([0, 1, 2, 3], fillvalue='?'))
         [('?', 0, 1), (0, 1, 2), (1, 2, 3)]
 
     """
