@@ -682,3 +682,10 @@ class ZipOffsetTest(TestCase):
             (None, None, 7),
         ]
         eq_(actual, expected)
+
+    def test_mismatch(self):
+        iterables = [0, 1, 2], [2, 3, 4]
+        offsets = (-1, 0, 1)
+        self.assertRaises(
+            ValueError, lambda: list(zip_offset(*iterables, offsets=offsets))
+        )
