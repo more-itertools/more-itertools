@@ -107,6 +107,10 @@ class peekable(object):
         >>> next(p)
         'b'
 
+    Negative indexes are supported, but be aware that they will cache the
+    remaining items in the source iterator, which may require significant
+    storage.
+
     To test whether there are more items in the iterator, examine the
     peekable's truth value. If it is truthy, there are more items.
 
@@ -166,10 +170,13 @@ class peekable(object):
             ((start is not None) and (start < 0)) or
             ((stop is not None) and (stop < 0))
         ):
-            raise ValueError('Negative indexing not supported')
+            stop = None
+        elif (
+            (start is not None) and (stop is not None) and (start > stop)
+        ):
+            stop = start + 1
 
         cache_len = len(self._cache)
-
         if stop is None:
             self._cache.extend(self._it)
         elif stop >= cache_len:
@@ -181,7 +188,13 @@ class peekable(object):
         if isinstance(index, slice):
             return self._get_slice(index)
 
-        return self._get_slice(slice(index, index + 1, None))[0]
+        cache_len = len(self._cache)
+        if index < 0:
+            self._cache.extend(self._it)
+        elif index >= cache_len:
+            self._cache.extend(islice(self._it, index + 1 - cache_len))
+
+        return self._cache[index]
 
 
 def _collate(*iterables, **kwargs):
