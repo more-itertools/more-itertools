@@ -858,7 +858,7 @@ def distribute(n, iterable):
 
 
 def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
-    """Yield tuples whose elements from are offset from *iterable*.
+    """Yield tuples whose elements are offset from *iterable*.
     The amount by which the ``i``-th item in each tuple is offset is given by
     the ``i``-th item in *offsets*.
 
