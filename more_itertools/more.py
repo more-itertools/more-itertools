@@ -4,6 +4,7 @@ from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
 from itertools import chain, count, islice, repeat, takewhile, tee
+from operator import itemgetter
 from sys import version_info
 
 from six import string_types
@@ -15,8 +16,9 @@ __all__ = [
     'bucket', 'chunked', 'collapse', 'collate', 'consumer',
     'distinct_permutations', 'distribute', 'first', 'ilen',
     'interleave_longest', 'interleave', 'intersperse', 'iterate', 'one',
-    'padded', 'peekable', 'side_effect', 'sliced', 'split_after',
-    'split_before', 'spy', 'unique_to_each', 'windowed', 'with_iter',
+    'padded', 'peekable', 'side_effect', 'sliced', 'sort_together',
+    'split_after', 'split_before', 'spy', 'unique_to_each', 'windowed',
+    'with_iter',
 ]
 
 
@@ -838,3 +840,40 @@ def distribute(n, iterable):
             i = (i + 1) % n
 
     return [_iterator(index) for index in range(n)]
+
+
+def sort_together(iterables, key_list=(0,), reverse=False):
+    """Returns sorted iterables using the indexes in key_list as the priority
+    for sorting. Default sort is ascending. All iterables are trimmed to the
+    shortest iterable length before sorting.
+
+        >>> data = [['GA', 'GA', 'GA', 'CT', 'CT', 'CT'],
+                    ['May', 'Aug.', 'May', 'June', 'July', 'July'],
+                    [97, 20, 100, 70, 100, 20]]
+        >>> sort_together(data, key_list=(0,))
+        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+         ('July', 'June', 'July', 'May', 'Aug.', 'May'),
+         (70, 100, 20, 97, 20, 100)]
+        >>> sort_together(data, key_list=(0, 1, 2))
+        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+         ('July', 'July', 'June', 'Aug.', 'May', 'May'),
+         (20, 70, 100, 20, 97, 100)]
+
+    With `reverse=True` the sort order is descending:
+
+        >>> sort_together(data, key_list=(0, 1, 2), reverse=True)
+        [('GA', 'GA', 'GA', 'CT', 'CT', 'CT'),
+         ('May', 'May', 'Aug.', 'June', 'July', 'July'),
+         (100, 97, 20, 100, 70, 20)]
+
+    Default behavior of `key_list` sorts all iterables to the ascending sort
+    order of the first iterable only.
+
+        >>> sort_together(data)
+        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+         ('July', 'June', 'July', 'May', 'Aug.', 'May'),
+         (70, 100, 20, 97, 20, 100)]
+    """
+    return list(zip(*sorted(zip(*iterables),
+                            key=itemgetter(*key_list),
+                            reverse=reverse)))
