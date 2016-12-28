@@ -874,6 +874,9 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
         >>> list(stagger([0, 1, 2, 3], longest=True))
         [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
 
+    By default, ``None`` will be used to replace offsets beyond the end of the
+    sequence. Specify *fillvalue* to use some other value.
+
     """
     children = tee(iterable, len(offsets))
 
@@ -888,6 +891,9 @@ def zip_offset(*iterables, **kwargs):
 
         >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1)))
         [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e')]
+
+    This can be used as a lightweight alternative to SciPy or pandas to analyze
+    data sets in which somes series have a lead or lag relationship.
 
     By default, the sequence will end when the shortest iterable is exhausted.
     To continue until the longest iterable is exhausted, set *longest* to
