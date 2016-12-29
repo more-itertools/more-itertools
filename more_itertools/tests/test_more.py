@@ -134,14 +134,13 @@ class PeekableTests(TestCase):
         eq_(next(p), 'c')
         eq_(p[8], 'l')
 
-        # Negative indexing should fail
-        with self.assertRaises(ValueError):
-            p[-2]
+        # Negative indexing should work too
+        eq_(p[-2], 'k')
+        eq_(p[-9], 'd')
+        self.assertRaises(IndexError, lambda: p[-10])
 
     def test_slicing(self):
-        """
-        Slicing the peekable shouldn't advance the iterator.
-        """
+        """Slicing the peekable shouldn't advance the iterator."""
         seq = list('abcdefghijkl')
         p = peekable(seq)
 
@@ -163,12 +162,20 @@ class PeekableTests(TestCase):
         eq_(p[::2], seq[1:][::2])
         eq_(p[::-1], seq[1:][::-1])
 
-        # Negative indexing should fail
-        with self.assertRaises(ValueError):
-            p[-1:]
-
-        with self.assertRaises(ValueError):
-            p[:-1]
+    def test_slicing_reset(self):
+        """Test slicing on a fresh iterable each time"""
+        seq = list(range(11))
+        for index in [
+            slice(None, None, None),
+            slice(1, None, None),
+            slice(None, 1, None),
+            slice(1, 8, 3),
+            slice(8, 1, -3),
+            slice(8, -9, -3),
+        ]:
+            p = peekable(seq)
+            next(p)
+            eq_(p[index], seq[1:][index])
 
 
 class ConsumerTests(TestCase):
@@ -226,32 +233,18 @@ def test_one():
 class IntersperseTest(TestCase):
     """ Tests for intersperse() """
 
-    def test_intersperse(self):
-        itp = intersperse('_', 'aeiou')
-        assert next(itp) == 'a'
-        assert next(itp) == '_'
-        assert next(itp) == 'e'
-        assert next(itp) == '_'
-        assert next(itp) == 'i'
-        assert next(itp) == '_'
-        assert next(itp) == 'o'
-        assert next(itp) == '_'
-        assert next(itp) == 'u'
-        assert_raises(StopIteration, next, itp)
+    def test_even(self):
+        eq_(list(intersperse(None, '01')), ['0', None, '1'])
 
-    def test_intersperse_empty(self):
-        itp = intersperse(1, '')
-        assert_raises(StopIteration, next, itp)
+    def test_odd(self):
+        eq_(list(intersperse(None, '012')), ['0', None, '1', None, '2'])
+
+    def test_generator(self):
+        iterable = (x for x in '012')
+        eq_(list(intersperse(None, iterable)), ['0', None, '1', None, '2'])
 
     def test_intersperse_not_iterable(self):
-        itp = intersperse('x', 1)
-        assert_raises(TypeError, next, itp)
-
-    def test_intersperse_generator(self):
-        itp = intersperse('x', range(5))
-        assert next(itp) == 0
-        assert next(itp) == 'x'
-        assert next(itp) == 1
+        assert_raises(TypeError, lambda: intersperse('x', 1))
 
 
 class UniqueToEachTests(TestCase):
