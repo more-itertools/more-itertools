@@ -12,11 +12,32 @@ from six.moves import filter, map, zip, zip_longest
 from .recipes import flatten, take
 
 __all__ = [
-    'bucket', 'chunked', 'collapse', 'collate', 'consumer',
-    'distinct_permutations', 'distribute', 'first', 'ilen',
-    'interleave_longest', 'interleave', 'intersperse', 'iterate', 'one',
-    'padded', 'peekable', 'side_effect', 'sliced', 'split_after',
-    'split_before', 'spy', 'unique_to_each', 'windowed', 'with_iter',
+    'bucket',
+    'chunked',
+    'collapse',
+    'collate',
+    'consumer',
+    'distinct_permutations',
+    'distribute',
+    'first',
+    'ilen',
+    'interleave_longest',
+    'interleave',
+    'intersperse',
+    'iterate',
+    'one',
+    'padded',
+    'peekable',
+    'side_effect',
+    'sliced',
+    'split_after',
+    'split_before',
+    'spy',
+    'stagger',
+    'unique_to_each',
+    'windowed',
+    'with_iter',
+    'zip_offset',
 ]
 
 
@@ -827,5 +848,77 @@ def distribute(n, iterable):
     """
     if n < 1:
         raise ValueError('n must be at least 1')
+
     children = tee(iterable, n)
     return [islice(it, index, None, n) for index, it in enumerate(children)]
+
+
+def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
+    """Yield tuples whose elements are offset from *iterable*.
+    The amount by which the ``i``-th item in each tuple is offset is given by
+    the ``i``-th item in *offsets*.
+
+        >>> list(stagger([0, 1, 2, 3]))
+        [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
+        >>> list(stagger(range(8), offsets=(0, 2, 4)))
+        [(0, 2, 4), (1, 3, 5), (2, 4, 6), (3, 5, 7)]
+
+    By default, the sequence will end when the final element of a tuple is the
+    last item in the iterable. To continue until the first element of a tuple
+    is the last item in the iterable, set *longest* to ``True``::
+
+        >>> list(stagger([0, 1, 2, 3], longest=True))
+        [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
+
+    By default, ``None`` will be used to replace offsets beyond the end of the
+    sequence. Specify *fillvalue* to use some other value.
+
+    """
+    children = tee(iterable, len(offsets))
+
+    return zip_offset(
+        *children, offsets=offsets, longest=longest, fillvalue=fillvalue
+    )
+
+
+def zip_offset(*iterables, **kwargs):
+    """``zip`` the input *iterables* together, but offset the ``i``-th iterable
+    by the ``i``-th item in *offsets*.
+
+        >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1)))
+        [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e')]
+
+    This can be used as a lightweight alternative to SciPy or pandas to analyze
+    data sets in which somes series have a lead or lag relationship.
+
+    By default, the sequence will end when the shortest iterable is exhausted.
+    To continue until the longest iterable is exhausted, set *longest* to
+    ``True``.
+
+        >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1), longest=True))
+        [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e'), (None, 'f')]
+
+    By default, ``None`` will be used to replace offsets beyond the end of the
+    sequence. Specify *fillvalue* to use some other value.
+
+    """
+    offsets = kwargs['offsets']
+    longest = kwargs.get('longest', False)
+    fillvalue = kwargs.get('fillvalue', None)
+
+    if len(iterables) != len(offsets):
+        raise ValueError("Number of iterables and offsets didn't match")
+
+    staggered = []
+    for it, n in zip(iterables, offsets):
+        if n < 0:
+            staggered.append(chain(repeat(fillvalue, -n), it))
+        elif n > 0:
+            staggered.append(islice(it, n, None))
+        else:
+            staggered.append(it)
+
+    if longest:
+        return zip_longest(*staggered, fillvalue=fillvalue)
+
+    return zip(*staggered)

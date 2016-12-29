@@ -14,6 +14,7 @@ New Routines
 .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: consumer
 .. autofunction:: distinct_permutations
+.. autofunction:: distribute
 .. autofunction:: first(iterable[, default])
 .. autofunction:: ilen
 .. autofunction:: interleave
@@ -21,15 +22,18 @@ New Routines
 .. autofunction:: intersperse
 .. autofunction:: iterate
 .. autofunction:: one
+.. autofunction:: padded
 .. autoclass:: peekable
 .. autofunction:: side_effect
 .. autofunction:: sliced
 .. autofunction:: split_after
 .. autofunction:: split_before
 .. autofunction:: spy
+.. autofunction:: stagger
 .. autofunction:: unique_to_each
 .. autofunction:: windowed
 .. autofunction:: with_iter
+.. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
 
 
 Itertools Recipes
