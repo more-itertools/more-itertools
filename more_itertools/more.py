@@ -827,14 +827,5 @@ def distribute(n, iterable):
     """
     if n < 1:
         raise ValueError('n must be at least 1')
-
-    children = tee(iter(iterable), n)
-
-    def _iterator(index):
-        i = 0
-        for item in children[index]:
-            if i == index:
-                yield item
-            i = (i + 1) % n
-
-    return [_iterator(index) for index in range(n)]
+    children = tee(iterable, n)
+    return [islice(it, index, None, n) for index, it in enumerate(children)]
