@@ -610,6 +610,80 @@ class DistributeTest(TestCase):
         )
 
 
+class StaggerTest(TestCase):
+    """Tests for ``stagger()``"""
+
+    def test_default(self):
+        iterable = [0, 1, 2, 3]
+        actual = list(stagger(iterable))
+        expected = [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
+        eq_(actual, expected)
+
+    def test_offsets(self):
+        iterable = [0, 1, 2, 3]
+        for offsets, expected in [
+            ((-2, 0, 2), [('', 0, 2), ('', 1, 3)]),
+            ((-2, -1), [('', ''), ('', 0), (0, 1), (1, 2), (2, 3)]),
+            ((1, 2), [(1, 2), (2, 3)]),
+        ]:
+            all_groups = stagger(iterable, offsets=offsets, fillvalue='')
+            eq_(list(all_groups), expected)
+
+    def test_longest(self):
+        iterable = [0, 1, 2, 3]
+        for offsets, expected in [
+            (
+                (-1, 0, 1),
+                [('', 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, ''), (3, '', '')]
+            ),
+            ((-2, -1), [('', ''), ('', 0), (0, 1), (1, 2), (2, 3), (3, '')]),
+            ((1, 2), [(1, 2), (2, 3), (3, '')]),
+        ]:
+            all_groups = stagger(
+                iterable, offsets=offsets, fillvalue='', longest=True
+            )
+            eq_(list(all_groups), expected)
+
+
+class ZipOffsetTest(TestCase):
+    """Tests for ``zip_offset()``"""
+
+    def test_shortest(self):
+        seq_1 = [0, 1, 2, 3]
+        seq_2 = [0, 1, 2, 3, 4, 5]
+        seq_3 = [0, 1, 2, 3, 4, 5, 6, 7]
+        actual = list(
+            zip_offset(seq_1, seq_2, seq_3, offsets=(-1, 0, 1), fillvalue='')
+        )
+        expected = [('', 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, 4), (3, 4, 5)]
+        eq_(actual, expected)
+
+    def test_longest(self):
+        seq_1 = [0, 1, 2, 3]
+        seq_2 = [0, 1, 2, 3, 4, 5]
+        seq_3 = [0, 1, 2, 3, 4, 5, 6, 7]
+        actual = list(
+            zip_offset(seq_1, seq_2, seq_3, offsets=(-1, 0, 1), longest=True)
+        )
+        expected = [
+            (None, 0, 1),
+            (0, 1, 2),
+            (1, 2, 3),
+            (2, 3, 4),
+            (3, 4, 5),
+            (None, 5, 6),
+            (None, None, 7),
+        ]
+        eq_(actual, expected)
+
+    def test_mismatch(self):
+        iterables = [0, 1, 2], [2, 3, 4]
+        offsets = (-1, 0, 1)
+        self.assertRaises(
+            ValueError, lambda: list(zip_offset(*iterables, offsets=offsets))
+        )
+
+
 class SortTogetherTest(TestCase):
     """Tests for sort_together()"""
 
