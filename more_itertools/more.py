@@ -934,29 +934,29 @@ def sort_together(iterables, key_list=(0,), reverse=False):
         >>> iterables = [['GA', 'GA', 'GA', 'CT', 'CT', 'CT'],
         ...              ['May', 'Aug.', 'May', 'June', 'July', 'July'],
         ...              [97, 20, 100, 70, 100, 20]]
-        >>> sort_together(iterables, key_list=(0,))
-        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'), \
-('June', 'July', 'July', 'May', 'Aug.', 'May'), \
-(70, 100, 20, 97, 20, 100)]
-        >>> sort_together(iterables, key_list=(0, 1, 2))
-        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'), \
-('July', 'July', 'June', 'Aug.', 'May', 'May'), \
-(20, 100, 70, 20, 97, 100)]
+        >>> sort_together(iterables, key_list=(0,))  # doctest: +NORMALIZE_WHITESPACE
+        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+         ('June', 'July', 'July', 'May', 'Aug.', 'May'),
+         (70, 100, 20, 97, 20, 100)]
+        >>> sort_together(iterables, key_list=(0, 1, 2))  # doctest: +NORMALIZE_WHITESPACE
+        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+         ('July', 'July', 'June', 'Aug.', 'May', 'May'),
+         (20, 100, 70, 20, 97, 100)]
 
     With `reverse=True` the sort order is descending:
 
-        >>> sort_together(iterables, key_list=(0, 1, 2), reverse=True)
-        [('GA', 'GA', 'GA', 'CT', 'CT', 'CT'), \
-('May', 'May', 'Aug.', 'June', 'July', 'July'), \
-(100, 97, 20, 70, 100, 20)]
+        >>> sort_together(iterables, key_list=(0, 1, 2), reverse=True)  # doctest: +NORMALIZE_WHITESPACE
+        [('GA', 'GA', 'GA', 'CT', 'CT', 'CT'),
+         ('May', 'May', 'Aug.', 'June', 'July', 'July'),
+         (100, 97, 20, 70, 100, 20)]
 
     Default behavior of `key_list` sorts all iterables to the ascending sort
     order of the first iterable only:
 
-        >>> sort_together(iterables)
-        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'), \
-('June', 'July', 'July', 'May', 'Aug.', 'May'), \
-(70, 100, 20, 97, 20, 100)]
+        >>> sort_together(iterables)  # doctest: +NORMALIZE_WHITESPACE
+        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+         ('June', 'July', 'July', 'May', 'Aug.', 'May'),
+         (70, 100, 20, 97, 20, 100)]
     """
     return list(zip(*sorted(zip(*iterables),
                             key=itemgetter(*key_list),
