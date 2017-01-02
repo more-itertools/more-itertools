@@ -927,36 +927,33 @@ def zip_offset(*iterables, **kwargs):
 
 
 def sort_together(iterables, key_list=(0,), reverse=False):
-    """Returns sorted iterables using the indexes in key_list as the priority
-    for sorting. Default sort is ascending. All iterables are trimmed to the
-    shortest iterable length before sorting.
+    """Return the input iterables sorted together, with *key_list* as the
+    priority for sorting. All iterables are trimmed to the length of the
+    shortest one.
 
-        >>> iterables = [['GA', 'GA', 'GA', 'CT', 'CT', 'CT'],
-        ...              ['May', 'Aug.', 'May', 'June', 'July', 'July'],
-        ...              [97, 20, 100, 70, 100, 20]]
-        >>> sort_together(iterables, key_list=(0,))  # doctest: +NORMALIZE_WHITESPACE
-        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
-         ('June', 'July', 'July', 'May', 'Aug.', 'May'),
-         (70, 100, 20, 97, 20, 100)]
-        >>> sort_together(iterables, key_list=(0, 1, 2))  # doctest: +NORMALIZE_WHITESPACE
-        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
-         ('July', 'July', 'June', 'Aug.', 'May', 'May'),
-         (20, 100, 70, 20, 97, 100)]
+    This can be used like the sorting function in a spreadsheet. If each
+    iterable represents a column of data, the key list determines which
+    columns are used for sorting.
 
-    With `reverse=True` the sort order is descending:
+    By default, all iterables are sorted using the ``0``-th iterable::
 
-        >>> sort_together(iterables, key_list=(0, 1, 2), reverse=True)  # doctest: +NORMALIZE_WHITESPACE
-        [('GA', 'GA', 'GA', 'CT', 'CT', 'CT'),
-         ('May', 'May', 'Aug.', 'June', 'July', 'July'),
-         (100, 97, 20, 70, 100, 20)]
+        >>> iterables = [(4, 3, 2, 1), ('a', 'b', 'c', 'd')]
+        >>> sort_together(iterables)
+        [(1, 2, 3, 4), ('d', 'c', 'b', 'a')]
 
-    Default behavior of `key_list` sorts all iterables to the ascending sort
-    order of the first iterable only:
+    Set a different key list to sort according to another iterable.
+    Specifying mutliple keys dictates how ties are broken::
 
-        >>> sort_together(iterables)  # doctest: +NORMALIZE_WHITESPACE
-        [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
-         ('June', 'July', 'July', 'May', 'Aug.', 'May'),
-         (70, 100, 20, 97, 20, 100)]
+        >>> iterables = [(3, 1, 2), (0, 1, 0), ('c', 'b', 'a')]
+        >>> sort_together(iterables, key_list=(1, 2))
+        [(2, 3, 1), (0, 0, 1), ('a', 'c', 'b')]
+
+
+    With *reverse* to ``True`` to sort descending:
+
+        >>> sort_together([(1, 2, 3), ('a', 'b', 'c')], reverse=True)
+        [(3, 2, 1), ('c', 'b', 'a')]
+
     """
     return list(zip(*sorted(zip(*iterables),
                             key=itemgetter(*key_list),
