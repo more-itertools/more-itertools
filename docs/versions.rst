@@ -2,6 +2,20 @@
 Version History
 ===============
 
+2.5.0
+    * New itertools:
+        * ``distribute`` (Thanks to mozbhearsum and coady)
+        * ``sort_together`` (Thanks to clintval)
+        * ``stagger`` and ``zip_offset`` (Thanks to joshbode)
+        * ``padded``
+    * Improvements to existing itertools:
+        * ``peekable`` now handles negative indexes and slices with negative
+          components properly.
+        * ``intersperse`` is now slightly faster. (Thanks to pylang)
+        * ``windowed`` now accepts a ``step`` keyword argument.
+          (Thanks to pylang)
+    * Python 3.6 is now supported.
+
 2.4.1
     * Move docs 100% to readthedocs.io.
 
