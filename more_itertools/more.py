@@ -4,6 +4,7 @@ from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
 from itertools import chain, count, islice, repeat, takewhile, tee
+from operator import itemgetter
 from sys import version_info
 
 from six import string_types
@@ -30,6 +31,7 @@ __all__ = [
     'peekable',
     'side_effect',
     'sliced',
+    'sort_together',
     'split_after',
     'split_before',
     'spy',
@@ -922,3 +924,36 @@ def zip_offset(*iterables, **kwargs):
         return zip_longest(*staggered, fillvalue=fillvalue)
 
     return zip(*staggered)
+
+
+def sort_together(iterables, key_list=(0,), reverse=False):
+    """Return the input iterables sorted together, with *key_list* as the
+    priority for sorting. All iterables are trimmed to the length of the
+    shortest one.
+
+    This can be used like the sorting function in a spreadsheet. If each
+    iterable represents a column of data, the key list determines which
+    columns are used for sorting.
+
+    By default, all iterables are sorted using the ``0``-th iterable::
+
+        >>> iterables = [(4, 3, 2, 1), ('a', 'b', 'c', 'd')]
+        >>> sort_together(iterables)
+        [(1, 2, 3, 4), ('d', 'c', 'b', 'a')]
+
+    Set a different key list to sort according to another iterable.
+    Specifying mutliple keys dictates how ties are broken::
+
+        >>> iterables = [(3, 1, 2), (0, 1, 0), ('c', 'b', 'a')]
+        >>> sort_together(iterables, key_list=(1, 2))
+        [(2, 3, 1), (0, 0, 1), ('a', 'c', 'b')]
+
+    Set *reverse* to ``True`` to sort in descending order.
+
+        >>> sort_together([(1, 2, 3), ('c', 'b', 'a')], reverse=True)
+        [(3, 2, 1), ('a', 'b', 'c')]
+
+    """
+    return list(zip(*sorted(zip(*iterables),
+                            key=itemgetter(*key_list),
+                            reverse=reverse)))

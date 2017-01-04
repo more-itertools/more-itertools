@@ -682,3 +682,64 @@ class ZipOffsetTest(TestCase):
         self.assertRaises(
             ValueError, lambda: list(zip_offset(*iterables, offsets=offsets))
         )
+
+
+class SortTogetherTest(TestCase):
+    """Tests for sort_together()"""
+
+    def test_key_list(self):
+        """tests `key_list` including default, iterables include duplicates"""
+        iterables = [['GA', 'GA', 'GA', 'CT', 'CT', 'CT'],
+                     ['May', 'Aug.', 'May', 'June', 'July', 'July'],
+                     [97, 20, 100, 70, 100, 20]]
+
+        eq_(sort_together(iterables),
+            [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+             ('June', 'July', 'July', 'May', 'Aug.', 'May'),
+             (70, 100, 20, 97, 20, 100)])
+
+        eq_(sort_together(iterables, key_list=(0, 1)),
+            [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+             ('July', 'July', 'June', 'Aug.', 'May', 'May'),
+             (100, 20, 70, 20, 97, 100)])
+
+        eq_(sort_together(iterables, key_list=(0, 1, 2)),
+            [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+             ('July', 'July', 'June', 'Aug.', 'May', 'May'),
+             (20, 100, 70, 20, 97, 100)])
+
+        eq_(sort_together(iterables, key_list=(2,)),
+            [('GA', 'CT', 'CT', 'GA', 'GA', 'CT'),
+             ('Aug.', 'July', 'June', 'May', 'May', 'July'),
+             (20, 20, 70, 97, 100, 100)])
+
+    def test_invalid_key_list(self):
+        """tests `key_list` for indexes not available in `iterables`"""
+        iterables = [['GA', 'GA', 'GA', 'CT', 'CT', 'CT'],
+                     ['May', 'Aug.', 'May', 'June', 'July', 'July'],
+                     [97, 20, 100, 70, 100, 20]]
+
+        self.assertRaises(IndexError,
+                          lambda: sort_together(iterables, key_list=(5,)))
+
+    def test_reverse(self):
+        """tests `reverse` to ensure a reverse sort for `key_list` iterables"""
+        iterables = [['GA', 'GA', 'GA', 'CT', 'CT', 'CT'],
+                     ['May', 'Aug.', 'May', 'June', 'July', 'July'],
+                     [97, 20, 100, 70, 100, 20]]
+
+        eq_(sort_together(iterables, key_list=(0, 1, 2), reverse=True),
+            [('GA', 'GA', 'GA', 'CT', 'CT', 'CT'),
+             ('May', 'May', 'Aug.', 'June', 'July', 'July'),
+             (100, 97, 20, 70, 100, 20)])
+
+    def test_uneven_iterables(self):
+        """tests trimming of iterables to the shortest length before sorting"""
+        iterables = [['GA', 'GA', 'GA', 'CT', 'CT', 'CT', 'MA'],
+                     ['May', 'Aug.', 'May', 'June', 'July', 'July'],
+                     [97, 20, 100, 70, 100, 20, 0]]
+
+        eq_(sort_together(iterables),
+            [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+             ('June', 'July', 'July', 'May', 'Aug.', 'May'),
+             (70, 100, 20, 97, 20, 100)])
