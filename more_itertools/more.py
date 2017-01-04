@@ -950,8 +950,8 @@ def sort_together(iterables, key_list=(0,), reverse=False):
 
     Set *reverse* to ``True`` to sort in descending order.
 
-        >>> sort_together([(1, 2, 3), ('a', 'b', 'c')], reverse=True)
-        [(3, 2, 1), ('c', 'b', 'a')]
+        >>> sort_together([(1, 2, 3), ('c', 'b', 'a')], reverse=True)
+        [(3, 2, 1), ('a', 'b', 'c')]
 
     """
     return list(zip(*sorted(zip(*iterables),
