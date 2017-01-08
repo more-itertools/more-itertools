@@ -15,6 +15,7 @@ New Routines
 .. autofunction:: consumer
 .. autofunction:: distinct_permutations
 .. autofunction:: distribute
+.. autofunction:: divide
 .. autofunction:: first(iterable[, default])
 .. autofunction:: ilen
 .. autofunction:: interleave
