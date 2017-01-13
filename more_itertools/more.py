@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+from __future__ import print_function
 
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
@@ -846,7 +846,7 @@ def distribute(n, iterable):
         >>> [list(c) for c in children]
         [[1], [2], [3], [], []]
 
-    This function uses ``itertools.tee``, and may require significant storage.
+    This function uses ``itertools.tee`` and may require significant storage.
     If you need the order items in the smaller iterables to match the original
     iterable, see ``divide()``.
 
@@ -986,7 +986,7 @@ def divide(n, iterable):
         >>> [list(c) for c in children]
         [[1], [2], [3], [], []]
 
-    This function will exhaust the iterable before returning, and may require
+    This function will exhaust the iterable before returning and may require
     significant storage.
     If order is not important, see ``distribute()``, which does not first pull
     the iterable into memory.
