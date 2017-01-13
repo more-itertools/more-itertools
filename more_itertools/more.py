@@ -761,7 +761,7 @@ def split_before(iterable, pred):
 
     """
     buf = []
-    for item in iter(iterable):
+    for item in iterable:
         if pred(item) and buf:
             yield buf
             buf = []
@@ -781,7 +781,7 @@ def split_after(iterable, pred):
 
     """
     buf = []
-    for item in iter(iterable):
+    for item in iterable:
         buf.append(item)
         if pred(item) and buf:
             yield buf
