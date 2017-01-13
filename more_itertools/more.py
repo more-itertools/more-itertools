@@ -987,9 +987,8 @@ def divide(n, iterable):
         [[1], [2], [3], [], []]
 
     This function will exhaust the iterable before returning and may require
-    significant storage.
-    If order is not important, see ``distribute()``, which does not first pull
-    the iterable into memory.
+    significant storage. If order is not important, see ``distribute()``,
+    which does not first pull the iterable into memory.
 
     """
     if n < 1:
