@@ -743,3 +743,29 @@ class SortTogetherTest(TestCase):
             [('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
              ('June', 'July', 'July', 'May', 'Aug.', 'May'),
              (70, 100, 20, 97, 20, 100)])
+
+
+class DivideTest(TestCase):
+    """Tests for divide()"""
+
+    def test_invalid_n(self):
+        self.assertRaises(ValueError, lambda: divide(-1, [1, 2, 3]))
+        self.assertRaises(ValueError, lambda: divide(0, [1, 2, 3]))
+
+    def test_basic(self):
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        for n, expected in [
+            (1, [iterable]),
+            (2, [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]),
+            (3, [[1, 2, 3, 4], [5, 6, 7], [8, 9, 10]]),
+            (10, [[n] for n in range(1, 10 + 1)]),
+        ]:
+            eq_([list(x) for x in divide(n, iterable)], expected)
+
+    def test_large_n(self):
+        iterable = [1, 2, 3, 4]
+        eq_(
+            [list(x) for x in divide(6, iterable)],
+            [[1], [2], [3], [4], [], []]
+        )
