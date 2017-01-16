@@ -3,7 +3,7 @@ from __future__ import division, unicode_literals
 from contextlib import closing
 from functools import reduce
 from io import StringIO
-from itertools import count, permutations
+from itertools import chain, count, permutations
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
@@ -177,69 +177,97 @@ class PeekableTests(TestCase):
             next(p)
             eq_(p[index], seq[1:][index])
 
-    # pushback behavior tests
-
     def test_passthrough(self):
-        """Tests passing through an iterable without pushing anything"""
+        """Iterating a peekable without using ``peek()`` or ``prepend()``
+        should just give the underlying iterable's elements (a trivial test but
+        useful to set a baseline in case something goes wrong)"""
         expected = [1, 2, 3, 4, 5]
         actual = list(peekable(expected))
         eq_(actual, expected)
 
-    def test_first_push(self):
-        """Tests pushing before consuming anything"""
+    # prepend() behavior tests
+
+    def test_prepend(self):
+        """Test calling ``prepend()`` at various points interspersed with calls
+        to ``next()``"""
         it = peekable(range(5))
         it.prepend(10)
-        actual = list(it)
-        expected = [10, 0, 1, 2, 3, 4]
-
-    def test_second_push(self):
-        """Tests pushing after consuming only one element"""
-        it = peekable(range(5))
-        actual = [next(it)]
-        it.prepend(10)
-        actual += list(it)
-        expected = [0, 10, 1, 2, 3, 4]
-        eq_(actual, expected)
-
-    def test_last_push(self):
-        """Tests pushing after consuming the entire underlying iterable"""
-        it = peekable(range(5))
-        actual = [next(it), next(it), next(it), next(it), next(it)]
-        it.prepend(10)
-        actual += [next(it)]
-        expected = [0, 1, 2, 3, 4, 10]
-        eq_(actual, expected)
-
-    def test_multi_push(self):
-        """Tests pushing multiple elements and getting them in reverse order"""
-        it = peekable(range(5))
         actual = [next(it), next(it)]
-        it.prepend(10, 11, 12)
-        actual += list(it)
-        expected = [0, 1, 12, 11, 10, 2, 3, 4]
-        eq_(actual, expected)
-
-    def test_interleaved_push(self):
-        """Tests pushes interleaved with consuming from the underlying iterable"""
-        it = peekable(range(5))
-        actual = [next(it)]
-        it.prepend(10)
-        actual += [next(it), next(it)]
         it.prepend(11)
         actual += [next(it), next(it)]
         it.prepend(12)
         actual += [next(it), next(it)]
         it.prepend(13)
         actual += [next(it), next(it)]
-        expected = [0, 10, 1, 11, 2, 12, 3, 13, 4]
+        it.prepend(14)
+        actual += [next(it), next(it)]
+        it.prepend(15)
+        actual += [next(it)]
+        expected = [10, 0, 11, 1, 12, 2, 13, 3, 14, 4, 15]
+        eq_(actual, expected)
+
+    def test_multi_prepend(self):
+        """Tests prepending multiple elements and getting them in reverse order"""
+        it = peekable(range(5))
+        actual = [next(it), next(it)]
+        it.prepend(10, 11, 12)
+        it.prepend(13, 14)
+        actual += list(it)
+        expected = [0, 1, 14, 13, 12, 11, 10, 2, 3, 4]
         eq_(actual, expected)
 
     def test_empty(self):
-        """Tests pushing in front of an empty iterable"""
+        """Tests prepending in front of an empty iterable"""
         it = peekable([])
         it.prepend(10)
         actual = list(it)
         expected = [10]
+        eq_(actual, expected)
+
+    def test_prepend_bool(self):
+        """Tests that ``__bool__()`` or ``__nonzero__()`` works properly
+        with ``prepend()``"""
+        it = peekable(range(5))
+        self.assertTrue(it)
+        actual = list(it)
+        self.assertFalse(it)
+        it.prepend(10)
+        self.assertTrue(it)
+        actual += [next(it)]
+        self.assertFalse(it)
+        expected = [0, 1, 2, 3, 4, 10]
+        eq_(actual, expected)
+
+    def test_multi_prepend_peek(self):
+        """Tests prepending multiple elements and getting them in reverse order
+        while peeking"""
+        it = peekable(range(5))
+        actual = [next(it), next(it)]
+        eq_(it.peek(), 2)
+        it.prepend(10, 11, 12)
+        eq_(it.peek(), 12)
+        it.prepend(13, 14)
+        eq_(it.peek(), 14)
+        actual += list(it)
+        self.assertFalse(it)
+        expected = [0, 1, 14, 13, 12, 11, 10, 2, 3, 4]
+        eq_(actual, expected)
+
+    def test_prepend_iterable(self):
+        """Tests prepending from an iterable (because if this doesn't work, the
+        output from ``test_prepend_many()`` is going to be messy)"""
+        it = peekable(range(5))
+        it.prepend(*range(5))
+        actual = list(it)
+        expected = list(chain(reversed(range(5)), range(5)))
+        eq_(actual, expected)
+
+    def test_prepend_many(self):
+        """Tests that prepending a huge number of elements works"""
+        it = peekable(range(5))
+        it.prepend(*range(20000))
+        actual = list(it)
+        expected = list(chain(reversed(range(20000)), range(5)))
         eq_(actual, expected)
 
 
