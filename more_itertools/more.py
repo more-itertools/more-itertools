@@ -113,6 +113,21 @@ class peekable(object):
         >>> p.peek('hi')
         'hi'
 
+    peekables also offer a ``prepend()`` method which will insert items before
+    the remaining part of the underlying source iterator.
+
+        >>> p = peekable([1, 2, 3])
+        >>> p.prepend(10, 11, 12)
+        >>> next(p)
+        12
+        >>> p.peek()
+        11
+        >>> list(p)
+        [11, 10, 1, 2, 3]
+
+    Prepended items are treated by other peekable methods exactly as if they had
+    come from the source iterator.
+
     You may index the peekable to look ahead by more than one item.
     The values up to the index you specified will be cached.
     Index 0 is the item that will be returned by ``next()``, index 1 is the
@@ -125,8 +140,11 @@ class peekable(object):
         'b'
         >>> next(p)
         'a'
+        >>> p.prepend('x')
         >>> p[1]
-        'c'
+        'b'
+        >>> next(p)
+        'x'
         >>> next(p)
         'b'
 
@@ -135,7 +153,8 @@ class peekable(object):
     storage.
 
     To test whether there are more items in the iterator, examine the
-    peekable's truth value. If it is truthy, there are more items.
+    peekable's truth value. If it is truthy, there are more items (which may
+    have been prepended or obtained from the source iterator).
 
         >>> assert peekable([1])
         >>> assert not peekable([])
@@ -176,8 +195,29 @@ class peekable(object):
         return self._cache[0]
 
     def prepend(self, *items):
-        """Schedule items to be the next ones returned from ``next()`` or
-        ``self.peek()``."""
+        """Stack up items to be the next ones returned from ``next()`` or
+        ``self.peek()``. The items will be returned in last-in first-out order:
+
+            >>> p = peekable([1, 2, 3])
+            >>> p.prepend(10, 11, 12)
+            >>> next(p)
+            12
+            >>> list(p)
+            [11, 10, 1, 2, 3]
+
+        It is possible, by prepending items, to "resurrect" a peekable that
+        previously raised StopIteration.
+
+            >>> p = peekable([])
+            >>> next(p)
+            StopIteration:
+            >>> p.prepend(1)
+            >>> next(p)
+            1
+            >>> next(p)
+            StopIteration:
+
+        """
         self._cache.extendleft(items)
 
     def __next__(self):
