@@ -224,7 +224,7 @@ class PeekableTests(TestCase):
         expected = [10]
         eq_(actual, expected)
 
-    def test_prepend_bool(self):
+    def test_prepend_truthiness(self):
         """Tests that ``__bool__()`` or ``__nonzero__()`` works properly
         with ``prepend()``"""
         it = peekable(range(5))
@@ -252,6 +252,54 @@ class PeekableTests(TestCase):
         self.assertFalse(it)
         expected = [0, 1, 14, 13, 12, 11, 10, 2, 3, 4]
         eq_(actual, expected)
+
+    def test_prepend_after_stop(self):
+        """Tests that prepending after StopIteration makes the iterator valid again"""
+        it = peekable(range(3))
+        eq_(list(it), [0, 1, 2])
+        self.assertRaises(StopIteration, lambda: next(it))
+        it.prepend(10)
+        eq_(next(it), 10)
+        self.assertRaises(StopIteration, lambda: next(it))
+
+    def test_prepend_slicing(self):
+        """Tests interaction between prepending and slicing"""
+        seq = list(range(20))
+        p = peekable(seq)
+
+        p.prepend(50, 40, 30)
+        pseq = [30, 40, 50] + seq # pseq for prepended_seq
+
+        # adapt the specific tests from test_slicing
+        eq_(p[0], 30)
+        eq_(p[1:8], pseq[1:8])
+        eq_(p[1:], pseq[1:])
+        eq_(p[:5], pseq[:5])
+        eq_(p[:], pseq[:])
+        eq_(p[:100], pseq[:100])
+        eq_(p[::2], pseq[::2])
+        eq_(p[::-1], pseq[::-1])
+
+    def test_prepend_indexing(self):
+        """Tests interaction between prepending and indexing"""
+        seq = list(range(20))
+        p = peekable(seq)
+
+        p.prepend(50, 40, 30)
+        pseq = [30, 40, 50] + seq # pseq for prepended_seq
+
+        # adapt the specific tests from test_indexing
+        eq_(p[0], 30)
+        eq_(next(p), 30)
+        eq_(p[2], 0)
+        eq_(next(p), 40)
+        eq_(p[0], 50)
+        eq_(p[9], 8)
+        eq_(next(p), 50)
+        eq_(p[8], 8)
+        eq_(p[-2], 18)
+        eq_(p[-9], 11)
+        self.assertRaises(IndexError, lambda: p[-21])
 
     def test_prepend_iterable(self):
         """Tests prepending from an iterable (because if this doesn't work, the
