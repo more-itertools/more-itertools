@@ -177,6 +177,71 @@ class PeekableTests(TestCase):
             next(p)
             eq_(p[index], seq[1:][index])
 
+    # pushback behavior tests
+
+    def test_passthrough(self):
+        """Tests passing through an iterable without pushing anything"""
+        expected = [1, 2, 3, 4, 5]
+        actual = list(peekable(expected))
+        eq_(actual, expected)
+
+    def test_first_push(self):
+        """Tests pushing before consuming anything"""
+        it = peekable(range(5))
+        it.prepend(10)
+        actual = list(it)
+        expected = [10, 0, 1, 2, 3, 4]
+
+    def test_second_push(self):
+        """Tests pushing after consuming only one element"""
+        it = peekable(range(5))
+        actual = [next(it)]
+        it.prepend(10)
+        actual += list(it)
+        expected = [0, 10, 1, 2, 3, 4]
+        eq_(actual, expected)
+
+    def test_last_push(self):
+        """Tests pushing after consuming the entire underlying iterable"""
+        it = peekable(range(5))
+        actual = [next(it), next(it), next(it), next(it), next(it)]
+        it.prepend(10)
+        actual += [next(it)]
+        expected = [0, 1, 2, 3, 4, 10]
+        eq_(actual, expected)
+
+    def test_multi_push(self):
+        """Tests pushing multiple elements and getting them in reverse order"""
+        it = peekable(range(5))
+        actual = [next(it), next(it)]
+        it.prepend(10, 11, 12)
+        actual += list(it)
+        expected = [0, 1, 12, 11, 10, 2, 3, 4]
+        eq_(actual, expected)
+
+    def test_interleaved_push(self):
+        """Tests pushes interleaved with consuming from the underlying iterable"""
+        it = peekable(range(5))
+        actual = [next(it)]
+        it.prepend(10)
+        actual += [next(it), next(it)]
+        it.prepend(11)
+        actual += [next(it), next(it)]
+        it.prepend(12)
+        actual += [next(it), next(it)]
+        it.prepend(13)
+        actual += [next(it), next(it)]
+        expected = [0, 10, 1, 11, 2, 12, 3, 13, 4]
+        eq_(actual, expected)
+
+    def test_empty(self):
+        """Tests pushing in front of an empty iterable"""
+        it = peekable([])
+        it.prepend(10)
+        actual = list(it)
+        expected = [10]
+        eq_(actual, expected)
+
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""

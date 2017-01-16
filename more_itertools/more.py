@@ -175,6 +175,11 @@ class peekable(object):
                 return default
         return self._cache[0]
 
+    def prepend(self, *items):
+        """Schedule items to be the next ones returned from ``next()`` or
+        ``self.peek()``."""
+        self._cache.extendleft(items)
+
     def __next__(self):
         if self._cache:
             return self._cache.popleft()
