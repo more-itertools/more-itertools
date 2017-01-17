@@ -210,12 +210,16 @@ class peekable(object):
 
             >>> p = peekable([])
             >>> next(p)
-            StopIteration:
+            Traceback (most recent call last):
+              ...
+            StopIteration
             >>> p.prepend(1)
             >>> next(p)
             1
             >>> next(p)
-            StopIteration:
+            Traceback (most recent call last):
+              ...
+            StopIteration
 
         """
         self._cache.extendleft(items)
