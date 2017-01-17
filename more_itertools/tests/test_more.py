@@ -207,13 +207,13 @@ class PeekableTests(TestCase):
         eq_(actual, expected)
 
     def test_multi_prepend(self):
-        """Tests prepending multiple elements and getting them in reverse order"""
+        """Tests prepending multiple elements and getting them in proper order"""
         it = peekable(range(5))
         actual = [next(it), next(it)]
         it.prepend(10, 11, 12)
-        it.prepend(13, 14)
+        it.prepend(20, 21)
         actual += list(it)
-        expected = [0, 1, 14, 13, 12, 11, 10, 2, 3, 4]
+        expected = [0, 1, 20, 21, 10, 11, 12, 2, 3, 4]
         eq_(actual, expected)
 
     def test_empty(self):
@@ -245,12 +245,12 @@ class PeekableTests(TestCase):
         actual = [next(it), next(it)]
         eq_(it.peek(), 2)
         it.prepend(10, 11, 12)
-        eq_(it.peek(), 12)
-        it.prepend(13, 14)
-        eq_(it.peek(), 14)
+        eq_(it.peek(), 10)
+        it.prepend(20, 21)
+        eq_(it.peek(), 20)
         actual += list(it)
         self.assertFalse(it)
-        expected = [0, 1, 14, 13, 12, 11, 10, 2, 3, 4]
+        expected = [0, 1, 20, 21, 10, 11, 12, 2, 3, 4]
         eq_(actual, expected)
 
     def test_prepend_after_stop(self):
@@ -267,7 +267,7 @@ class PeekableTests(TestCase):
         seq = list(range(20))
         p = peekable(seq)
 
-        p.prepend(50, 40, 30)
+        p.prepend(30, 40, 50)
         pseq = [30, 40, 50] + seq # pseq for prepended_seq
 
         # adapt the specific tests from test_slicing
@@ -285,7 +285,7 @@ class PeekableTests(TestCase):
         seq = list(range(20))
         p = peekable(seq)
 
-        p.prepend(50, 40, 30)
+        p.prepend(30, 40, 50)
         pseq = [30, 40, 50] + seq # pseq for prepended_seq
 
         # adapt the specific tests from test_indexing
@@ -307,7 +307,7 @@ class PeekableTests(TestCase):
         it = peekable(range(5))
         it.prepend(*range(5))
         actual = list(it)
-        expected = list(chain(reversed(range(5)), range(5)))
+        expected = list(chain(range(5), range(5)))
         eq_(actual, expected)
 
     def test_prepend_many(self):
@@ -315,7 +315,7 @@ class PeekableTests(TestCase):
         it = peekable(range(5))
         it.prepend(*range(20000))
         actual = list(it)
-        expected = list(chain(reversed(range(20000)), range(5)))
+        expected = list(chain(range(20000), range(5)))
         eq_(actual, expected)
 
 

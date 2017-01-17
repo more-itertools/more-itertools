@@ -95,7 +95,7 @@ def first(iterable, default=_marker):
 
 
 class peekable(object):
-    """Wrap an iterator to allow lookahead.
+    """Wrap an iterator to allow lookahead and prepending elements.
 
     Call ``peek()`` on the result to get the value that will next pop out of
     ``next()``, without advancing the iterator:
@@ -119,11 +119,11 @@ class peekable(object):
         >>> p = peekable([1, 2, 3])
         >>> p.prepend(10, 11, 12)
         >>> next(p)
-        12
+        10
         >>> p.peek()
         11
         >>> list(p)
-        [11, 10, 1, 2, 3]
+        [11, 12, 1, 2, 3]
 
     Prepended items are treated by other peekable methods exactly as if they had
     come from the source iterator.
@@ -157,7 +157,10 @@ class peekable(object):
     have been prepended or obtained from the source iterator).
 
         >>> assert peekable([1])
-        >>> assert not peekable([])
+        >>> p = peekable([])
+        >>> assert not p
+        >>> p.prepend(1)
+        >>> assert p
 
     """
     def __init__(self, iterable):
@@ -196,17 +199,36 @@ class peekable(object):
 
     def prepend(self, *items):
         """Stack up items to be the next ones returned from ``next()`` or
-        ``self.peek()``. The items will be returned in last-in first-out order:
+        ``self.peek()``. The items will be returned in first-in first-out order:
 
             >>> p = peekable([1, 2, 3])
             >>> p.prepend(10, 11, 12)
             >>> next(p)
-            12
+            10
             >>> list(p)
-            [11, 10, 1, 2, 3]
+            [11, 12, 1, 2, 3]
+
+        If you want to prepend elements such that the last one in the argument
+        list is the first to be returned, use ``reversed()``,
+
+            >>> p = peekable([1, 2, 3])
+            >>> p.prepend(*reversed((10, 11, 12)))
+            >>> list(p)
+            [12, 11, 10, 1, 2, 3]
+
+        or use separate calls to ``prepend()`` with one element each:
+
+            >>> p = peekable([1, 2, 3])
+            >>> p.prepend(10)
+            >>> p.prepend(11)
+            >>> p.prepend(12)
+            >>> list(p)
+            [12, 11, 10, 1, 2, 3]
+
+        This last example could also be wrapped up with a `for` loop.
 
         It is possible, by prepending items, to "resurrect" a peekable that
-        previously raised StopIteration.
+        previously raised ``StopIteration``.
 
             >>> p = peekable([])
             >>> next(p)
@@ -222,7 +244,7 @@ class peekable(object):
             StopIteration
 
         """
-        self._cache.extendleft(items)
+        self._cache.extendleft(reversed(items))
 
     def __next__(self):
         if self._cache:
