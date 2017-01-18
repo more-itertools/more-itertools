@@ -9,7 +9,7 @@ Conditions for Contributors
 
 By contributing to this software project, you are agreeing to the following
 terms and conditions for your contributions: First, you agree your
-contributions are submitted under the BSD license. Second, you represent you
+contributions are submitted under the MIT license. Second, you represent you
 are authorized to make the contributions and grant the license. If your
 employer has rights to intellectual property that includes your contributions,
 you represent that you have received permission to make contributions and grant
