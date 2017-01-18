@@ -208,25 +208,6 @@ class peekable(object):
             >>> list(p)
             [11, 12, 1, 2, 3]
 
-        If you want to prepend elements such that the last one in the argument
-        list is the first to be returned, use ``reversed()``,
-
-            >>> p = peekable([1, 2, 3])
-            >>> p.prepend(*reversed((10, 11, 12)))
-            >>> list(p)
-            [12, 11, 10, 1, 2, 3]
-
-        or use separate calls to ``prepend()`` with one element each:
-
-            >>> p = peekable([1, 2, 3])
-            >>> p.prepend(10)
-            >>> p.prepend(11)
-            >>> p.prepend(12)
-            >>> list(p)
-            [12, 11, 10, 1, 2, 3]
-
-        This last example could also be wrapped up with a `for` loop.
-
         It is possible, by prepending items, to "resurrect" a peekable that
         previously raised ``StopIteration``.
 

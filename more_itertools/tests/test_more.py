@@ -189,21 +189,25 @@ class PeekableTests(TestCase):
 
     def test_prepend(self):
         """Test calling ``prepend()`` at various points interspersed with calls
-        to ``next()``"""
-        it = peekable(range(5))
+        to ``next()``. This covers ``prepend()`` before the first call to ``next()``,
+        ``prepend()`` after the last call to ``next()`` that touches the source
+        iterable, and ``prepend()`` in the middle."""
+        it = peekable(range(2))
+        actual = []
+
+        # Test prepend() before next()
         it.prepend(10)
-        actual = [next(it), next(it)]
+        actual += [next(it), next(it)]
+
+        # Test prepend() between next()s
         it.prepend(11)
         actual += [next(it), next(it)]
+
+        # Test prepend() after source iterable is consumed
         it.prepend(12)
-        actual += [next(it), next(it)]
-        it.prepend(13)
-        actual += [next(it), next(it)]
-        it.prepend(14)
-        actual += [next(it), next(it)]
-        it.prepend(15)
         actual += [next(it)]
-        expected = [10, 0, 11, 1, 12, 2, 13, 3, 14, 4, 15]
+
+        expected = [10, 0, 11, 1, 12]
         eq_(actual, expected)
 
     def test_multi_prepend(self):
@@ -305,7 +309,8 @@ class PeekableTests(TestCase):
         """Tests prepending from an iterable (because if this doesn't work, the
         output from ``test_prepend_many()`` is going to be messy)"""
         it = peekable(range(5))
-        it.prepend(*range(5))
+        # Don't directly use the range() object to avoid any range-specific optimizations
+        it.prepend(*(x for x in range(5)))
         actual = list(it)
         expected = list(chain(range(5), range(5)))
         eq_(actual, expected)
@@ -313,11 +318,19 @@ class PeekableTests(TestCase):
     def test_prepend_many(self):
         """Tests that prepending a huge number of elements works"""
         it = peekable(range(5))
-        it.prepend(*range(20000))
+        # Don't directly use the range() object to avoid any range-specific optimizations
+        it.prepend(*(x for x in range(20000)))
         actual = list(it)
         expected = list(chain(range(20000), range(5)))
         eq_(actual, expected)
 
+    def test_prepend_reversed(self):
+        """Tests prepending from a reversed iterable"""
+        it = peekable(range(3))
+        it.prepend(*reversed((10, 11, 12)))
+        actual = list(it)
+        expected = [12, 11, 10, 0, 1, 2]
+        eq_(actual, expected)
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""
