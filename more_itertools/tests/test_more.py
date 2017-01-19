@@ -7,6 +7,7 @@ from itertools import count, permutations
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
+import six
 from six.moves import filter, range
 
 from more_itertools import *  # Test all the symbols are in __all__.
@@ -769,3 +770,31 @@ class DivideTest(TestCase):
             [list(x) for x in divide(6, iterable)],
             [[1], [2], [3], [4], [], []]
         )
+
+
+class TestAlwaysIterable(TestCase):
+    """Tests for always_iterable()"""
+    def test_single(self):
+        self.assertEqual(always_iterable(1), (1,))
+        self.assertEqual(list(always_iterable(1)), [1])
+
+    def test_strings(self):
+        self.assertEqual(always_iterable('foo'), ('foo',))
+        self.assertEqual(always_iterable(six.b('bar')), (six.b('bar'),))
+        self.assertEqual(always_iterable(six.u('baz')), (six.u('baz'),))
+
+    def test_iterables(self):
+        self.assertEqual(always_iterable([0, 1]), [0, 1])
+        self.assertEqual(list(iter('foo')), ['f', 'o', 'o'])
+        self.assertEqual(list([]), [])
+
+    def test_none(self):
+        self.assertEqual(always_iterable(None), ())
+        self.assertEqual(list(always_iterable(None)), [])
+
+    def test_generator(self):
+        def _gen():
+            yield 0
+            yield 1
+
+        self.assertEqual(list(always_iterable(_gen())), [0, 1])

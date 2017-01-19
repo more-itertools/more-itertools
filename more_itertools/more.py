@@ -1006,39 +1006,51 @@ def divide(n, iterable):
     return ret
 
 
-def always_iterable(item):
+def always_iterable(obj):
     """
-    Given an object, always return an iterable. If the item is not
-    already iterable, return a tuple containing only the item. If item is
-    None, an empty iterable is returned. Strings are not considered iterable.
+    Given an object, always return an iterable.
 
-    >>> always_iterable([1,2,3])
-    [1, 2, 3]
+    If the object is not already iterable, return a tuple containing containing
+    the object::
 
-    >>> always_iterable('foo')
-    ('foo',)
+        >>> always_iterable(1)
+        (1,)
 
-    >>> always_iterable(b'foo') == (b'foo',)
-    True
+    If the object is ``None``, return an empty iterable::
 
-    >>> always_iterable(None)
-    ()
+        >>> always_iterable(None)
+        ()
 
-    >>> def _test_func(): yield "I'm iterable"
-    >>> print(next(always_iterable(_test_func())))
-    I'm iterable
+    Otherwise, return the object itself::
 
-    This function is particularly useful in simplifying the case where a
-    parameter could be iterable but may be None or a single value:
+        >>> always_iterable([1, 2, 3])
+        [1, 2, 3]
 
-        def process_codes(code):
-            "code may be None, str, or list of strings"
-            for item in always_iterable(code):
-                process(item)
+    Strings (binary or unicode) are not considered to be iterable::
+
+        >>> always_iterable('foo')
+        ('foo',)
+
+    This function is useful in applications where a passed parameter may be
+    either a single item or a collection of items::
+
+        >>> def item_sum(param):
+        ...     total = 0
+        ...     for item in always_iterable(param):
+        ...         total += item
+        ...
+        ...     return total
+        >>> item_sum(10)
+        10
+        >>> item_sum([10, 20])
+        30
+
     """
-    if item is None:
-        item = ()
+    if obj is None:
+        return ()
+
     string_like_types = (text_type, binary_type)
-    if isinstance(item, string_like_types) or not hasattr(item, '__iter__'):
-        item = item,
-    return item
+    if isinstance(obj, string_like_types) or not hasattr(obj, '__iter__'):
+        return obj,
+
+    return obj
