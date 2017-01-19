@@ -3,7 +3,7 @@ from __future__ import division, unicode_literals
 from contextlib import closing
 from functools import reduce
 from io import StringIO
-from itertools import count, permutations
+from itertools import chain, count, permutations
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
@@ -177,6 +177,160 @@ class PeekableTests(TestCase):
             next(p)
             eq_(p[index], seq[1:][index])
 
+    def test_passthrough(self):
+        """Iterating a peekable without using ``peek()`` or ``prepend()``
+        should just give the underlying iterable's elements (a trivial test but
+        useful to set a baseline in case something goes wrong)"""
+        expected = [1, 2, 3, 4, 5]
+        actual = list(peekable(expected))
+        eq_(actual, expected)
+
+    # prepend() behavior tests
+
+    def test_prepend(self):
+        """Test calling ``prepend()`` at various points interspersed with calls
+        to ``next()``. This covers ``prepend()`` before the first call to ``next()``,
+        ``prepend()`` after the last call to ``next()`` that touches the source
+        iterable, and ``prepend()`` in the middle."""
+        it = peekable(range(2))
+        actual = []
+
+        # Test prepend() before next()
+        it.prepend(10)
+        actual += [next(it), next(it)]
+
+        # Test prepend() between next()s
+        it.prepend(11)
+        actual += [next(it), next(it)]
+
+        # Test prepend() after source iterable is consumed
+        it.prepend(12)
+        actual += [next(it)]
+
+        expected = [10, 0, 11, 1, 12]
+        eq_(actual, expected)
+
+    def test_multi_prepend(self):
+        """Tests prepending multiple elements and getting them in proper order"""
+        it = peekable(range(5))
+        actual = [next(it), next(it)]
+        it.prepend(10, 11, 12)
+        it.prepend(20, 21)
+        actual += list(it)
+        expected = [0, 1, 20, 21, 10, 11, 12, 2, 3, 4]
+        eq_(actual, expected)
+
+    def test_empty(self):
+        """Tests prepending in front of an empty iterable"""
+        it = peekable([])
+        it.prepend(10)
+        actual = list(it)
+        expected = [10]
+        eq_(actual, expected)
+
+    def test_prepend_truthiness(self):
+        """Tests that ``__bool__()`` or ``__nonzero__()`` works properly
+        with ``prepend()``"""
+        it = peekable(range(5))
+        self.assertTrue(it)
+        actual = list(it)
+        self.assertFalse(it)
+        it.prepend(10)
+        self.assertTrue(it)
+        actual += [next(it)]
+        self.assertFalse(it)
+        expected = [0, 1, 2, 3, 4, 10]
+        eq_(actual, expected)
+
+    def test_multi_prepend_peek(self):
+        """Tests prepending multiple elements and getting them in reverse order
+        while peeking"""
+        it = peekable(range(5))
+        actual = [next(it), next(it)]
+        eq_(it.peek(), 2)
+        it.prepend(10, 11, 12)
+        eq_(it.peek(), 10)
+        it.prepend(20, 21)
+        eq_(it.peek(), 20)
+        actual += list(it)
+        self.assertFalse(it)
+        expected = [0, 1, 20, 21, 10, 11, 12, 2, 3, 4]
+        eq_(actual, expected)
+
+    def test_prepend_after_stop(self):
+        """Tests that prepending after StopIteration makes the iterator valid again"""
+        it = peekable(range(3))
+        eq_(list(it), [0, 1, 2])
+        self.assertRaises(StopIteration, lambda: next(it))
+        it.prepend(10)
+        eq_(next(it), 10)
+        self.assertRaises(StopIteration, lambda: next(it))
+
+    def test_prepend_slicing(self):
+        """Tests interaction between prepending and slicing"""
+        seq = list(range(20))
+        p = peekable(seq)
+
+        p.prepend(30, 40, 50)
+        pseq = [30, 40, 50] + seq # pseq for prepended_seq
+
+        # adapt the specific tests from test_slicing
+        eq_(p[0], 30)
+        eq_(p[1:8], pseq[1:8])
+        eq_(p[1:], pseq[1:])
+        eq_(p[:5], pseq[:5])
+        eq_(p[:], pseq[:])
+        eq_(p[:100], pseq[:100])
+        eq_(p[::2], pseq[::2])
+        eq_(p[::-1], pseq[::-1])
+
+    def test_prepend_indexing(self):
+        """Tests interaction between prepending and indexing"""
+        seq = list(range(20))
+        p = peekable(seq)
+
+        p.prepend(30, 40, 50)
+        pseq = [30, 40, 50] + seq # pseq for prepended_seq
+
+        # adapt the specific tests from test_indexing
+        eq_(p[0], 30)
+        eq_(next(p), 30)
+        eq_(p[2], 0)
+        eq_(next(p), 40)
+        eq_(p[0], 50)
+        eq_(p[9], 8)
+        eq_(next(p), 50)
+        eq_(p[8], 8)
+        eq_(p[-2], 18)
+        eq_(p[-9], 11)
+        self.assertRaises(IndexError, lambda: p[-21])
+
+    def test_prepend_iterable(self):
+        """Tests prepending from an iterable (because if this doesn't work, the
+        output from ``test_prepend_many()`` is going to be messy)"""
+        it = peekable(range(5))
+        # Don't directly use the range() object to avoid any range-specific optimizations
+        it.prepend(*(x for x in range(5)))
+        actual = list(it)
+        expected = list(chain(range(5), range(5)))
+        eq_(actual, expected)
+
+    def test_prepend_many(self):
+        """Tests that prepending a huge number of elements works"""
+        it = peekable(range(5))
+        # Don't directly use the range() object to avoid any range-specific optimizations
+        it.prepend(*(x for x in range(20000)))
+        actual = list(it)
+        expected = list(chain(range(20000), range(5)))
+        eq_(actual, expected)
+
+    def test_prepend_reversed(self):
+        """Tests prepending from a reversed iterable"""
+        it = peekable(range(3))
+        it.prepend(*reversed((10, 11, 12)))
+        actual = list(it)
+        expected = [12, 11, 10, 0, 1, 2]
+        eq_(actual, expected)
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""
