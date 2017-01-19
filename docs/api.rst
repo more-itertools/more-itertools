@@ -8,7 +8,6 @@ API Reference
 New Routines
 ============
 
-<<<<<<< HEAD
 .. autofunction:: always_iterable
 .. autofunction:: bucket
 .. autofunction:: chunked

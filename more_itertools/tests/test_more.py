@@ -781,7 +781,7 @@ class TestAlwaysIterable(TestCase):
     def test_strings(self):
         self.assertEqual(always_iterable('foo'), ('foo',))
         self.assertEqual(always_iterable(six.b('bar')), (six.b('bar'),))
-        self.assertEqual(always_iterable(six.u('baz')), (six.u('baz'),))
+        self.assertEqual(always_iterable(six.u(b'baz')), (six.u(b'baz'),))
 
     def test_iterables(self):
         self.assertEqual(always_iterable([0, 1]), [0, 1])
