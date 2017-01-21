@@ -7,12 +7,13 @@ from itertools import chain, count, islice, repeat, takewhile, tee
 from operator import itemgetter
 from sys import version_info
 
-from six import string_types
+from six import binary_type, string_types, text_type
 from six.moves import filter, map, zip, zip_longest
 
 from .recipes import flatten, take
 
 __all__ = [
+    'always_iterable',
     'bucket',
     'chunked',
     'collapse',
@@ -42,7 +43,6 @@ __all__ = [
     'with_iter',
     'zip_offset',
 ]
-
 
 _marker = object()
 
@@ -1056,3 +1056,53 @@ def divide(n, iterable):
         ret.append(iter(seq[start:stop]))
 
     return ret
+
+
+def always_iterable(obj):
+    """
+    Given an object, always return an iterable.
+
+    If the object is not already iterable, return a tuple containing containing
+    the object::
+
+        >>> always_iterable(1)
+        (1,)
+
+    If the object is ``None``, return an empty iterable::
+
+        >>> always_iterable(None)
+        ()
+
+    Otherwise, return the object itself::
+
+        >>> always_iterable([1, 2, 3])
+        [1, 2, 3]
+
+    Strings (binary or unicode) are not considered to be iterable::
+
+        >>> always_iterable('foo')
+        ('foo',)
+
+    This function is useful in applications where a passed parameter may be
+    either a single item or a collection of items::
+
+        >>> def item_sum(param):
+        ...     total = 0
+        ...     for item in always_iterable(param):
+        ...         total += item
+        ...
+        ...     return total
+        >>> item_sum(10)
+        10
+        >>> item_sum([10, 20])
+        30
+
+    """
+    if obj is None:
+        return ()
+
+    string_like_types = (text_type, binary_type)
+    if isinstance(obj, string_like_types) or not hasattr(obj, '__iter__'):
+        return obj,
+
+    return obj
