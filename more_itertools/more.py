@@ -1180,8 +1180,9 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     """
     if valuefunc is None:
         if keyfunc is None:
-            keyfunc = lambda t: t[0]
-            valuefunc = lambda t: t[1]
+            # itemgetter is about 2.2x as fast as lambda functions in some tests
+            keyfunc = itemgetter(0)
+            valuefunc = itemgetter(1)
         else:
             return groupby(iterable, keyfunc)
     for key, group in groupby(iterable, keyfunc):
