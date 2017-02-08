@@ -3,7 +3,7 @@ from __future__ import division, unicode_literals
 from contextlib import closing
 from functools import reduce
 from io import StringIO
-from itertools import chain, count, permutations
+from itertools import chain, count, groupby, permutations, repeat
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
@@ -952,3 +952,117 @@ class TestAlwaysIterable(TestCase):
             yield 1
 
         self.assertEqual(list(always_iterable(_gen())), [0, 1])
+
+class AdjacentTests(TestCase):
+    def test_typical(self):
+        actual = list(adjacent(lambda x: x % 5 == 0, range(10)))
+        expected = [(True, 0), (True, 1), (False, 2), (False, 3), (True, 4),
+                    (True, 5), (True, 6), (False, 7), (False, 8), (False, 9)]
+        self.assertEqual(actual, expected)
+
+    def test_empty_iterable(self):
+        actual = list(adjacent(lambda x: x % 5 == 0, []))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_length_one(self):
+        actual = list(adjacent(lambda x: x % 5 == 0, [0]))
+        expected = [(True, 0)]
+        self.assertEqual(actual, expected)
+
+        actual = list(adjacent(lambda x: x % 5 == 0, [1]))
+        expected = [(False, 1)]
+        self.assertEqual(actual, expected)
+
+    def test_consecutive_true(self):
+        """Test that when the predicate matches multiple consecutive elements
+        it doesn't repeat elements in the output"""
+        actual = list(adjacent(lambda x: x % 5 < 2, range(10)))
+        expected = [(True, 0), (True, 1), (True, 2), (False, 3), (True, 4),
+                    (True, 5), (True, 6), (True, 7), (False, 8), (False, 9)]
+        self.assertEqual(actual, expected)
+
+    def test_distance(self):
+        actual = list(adjacent(lambda x: x % 5 == 0, range(10), distance=2))
+        expected = [(True, 0), (True, 1), (True, 2), (True, 3), (True, 4),
+                    (True, 5), (True, 6), (True, 7), (False, 8), (False, 9)]
+        self.assertEqual(actual, expected)
+
+        actual = list(adjacent(lambda x: x % 5 == 0, range(10), distance=3))
+        expected = [(True, 0), (True, 1), (True, 2), (True, 3), (True, 4),
+                    (True, 5), (True, 6), (True, 7), (True, 8), (False, 9)]
+        self.assertEqual(actual, expected)
+
+    def test_large_distance(self):
+        """Test distance larger than the length of the iterable"""
+        iterable = range(10)
+        actual = list(adjacent(lambda x: x % 5 == 4, iterable, distance=20))
+        expected = list(zip(repeat(True), iterable))
+        self.assertEqual(actual, expected)
+
+        actual = list(adjacent(lambda x: False, iterable, distance=20))
+        expected = list(zip(repeat(False), iterable))
+        self.assertEqual(actual, expected)
+
+    def test_grouping(self):
+        """Test interaction of adjacent() with groupby_transform()"""
+        grouper = groupby_transform(adjacent(lambda x: x % 5 == 0, range(10)))
+        actual = [(k, list(g)) for k, g in grouper]
+        expected = [(True, [0, 1]), (False, [2, 3]), (True, [4, 5, 6]), (False, [7, 8, 9])]
+        self.assertEqual(actual, expected)
+
+    def test_call_once(self):
+        """Test that the predicate is only called once per item in the iterable."""
+        already_seen = set()
+        iterable = range(10)
+        def predicate(item):
+            self.assertNotIn(item, already_seen)
+            already_seen.add(item)
+            return True
+        actual = list(adjacent(predicate, iterable))
+        expected = [(True, x) for x in iterable]
+        self.assertEqual(actual, expected)
+
+class GroupByTransformTests(TestCase):
+    def assertAllEqual(self, iterable1, iterable2, msg=None):
+        """Compare two iterables element-by-element for equality"""
+        for a, b in zip(iterable1, iterable2):
+            self.assertEqual(a, b, msg)
+
+    def test_default_funcs(self):
+        iterable = [(int(x / 5), x) for x in range(10)]
+        actual = [(k, list(g)) for k, g in groupby_transform(iterable)]
+        expected = [(0, [0, 1, 2, 3, 4]), (1, [5, 6, 7 ,8, 9])]
+        self.assertEqual(actual, expected)
+
+    def test_valuefunc(self):
+        iterable = [(int(x / 5), int(x / 3), x) for x in range(10)]
+        grouper = groupby_transform(iterable, keyfunc=lambda t: t[0], valuefunc=lambda t: t[-1])
+        actual = [(k, list(g)) for k, g in grouper]
+        expected = [(0, [0, 1, 2, 3, 4]), (1, [5, 6, 7, 8, 9])]
+        self.assertEqual(actual, expected)
+
+        grouper = groupby_transform(iterable, keyfunc=lambda t: t[1], valuefunc=lambda t: t[-1])
+        actual = [(k, list(g)) for k, g in grouper]
+        expected = [(0, [0, 1, 2]), (1, [3, 4, 5]), (2, [6, 7, 8]), (3, [9])]
+        self.assertEqual(actual, expected)
+
+        # and now for something a little different
+        d = dict(zip(range(10), 'abcdefghij'))
+        grouper = groupby_transform(range(10), keyfunc=lambda x: int(x / 5), valuefunc=d.get)
+        actual = [(k, ''.join(g)) for k, g in grouper]
+        expected = [(0, 'abcde'), (1, 'fghij')]
+        self.assertEqual(actual, expected)
+
+    def test_no_valuefunc(self):
+        iterable = range(1000)
+        def key(x):
+            return int(x / 5)
+
+        actual = groupby_transform(iterable, key, valuefunc=None)
+        expected = groupby(iterable, key)
+        self.assertAllEqual(actual, expected)
+
+        actual = groupby_transform(iterable, key) # default valuefunc
+        expected = groupby(iterable, key)
+        self.assertAllEqual(actual, expected)

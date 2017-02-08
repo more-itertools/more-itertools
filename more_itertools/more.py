@@ -3,7 +3,7 @@ from __future__ import print_function
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, count, islice, repeat, takewhile, tee
+from itertools import chain, count, groupby, islice, repeat, takewhile, tee
 from operator import itemgetter
 from sys import version_info
 
@@ -13,6 +13,7 @@ from six.moves import filter, map, zip, zip_longest
 from .recipes import flatten, take
 
 __all__ = [
+    'adjacent',
     'always_iterable',
     'bucket',
     'chunked',
@@ -23,6 +24,7 @@ __all__ = [
     'distribute',
     'divide',
     'first',
+    'groupby_transform',
     'ilen',
     'interleave_longest',
     'interleave',
@@ -1106,3 +1108,81 @@ def always_iterable(obj):
         return obj,
 
     return obj
+
+def adjacent(predicate, iterable, distance=1):
+    """
+    Returns an iterable over ``(bool, item)`` tuples where the ``item`` is drawn
+    from the underlying *iterable* and the ``bool`` indicates whether that item
+    satisfies the *predicate* or is adjacent to one that does. For example:
+
+        >>> list(adjacent(lambda x: x % 4 == 2, range(6)))
+        [(False, 0), (True, 1), (True, 2), (True, 3), (False, 4), (False, 5)]
+
+    The *distance* used to determine what counts as adjacent can be configured:
+
+        >>> list(adjacent(lambda x: x % 4 == 2, range(6), 2))
+        [(True, 0), (True, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
+
+    In this case any elements within 2 positions of the one that satisfies the
+    predicate are paired with ``True``. *distance* can be any nonnegative
+    integer. If *distance* is zero, this reduces to ``map()`` and ``zip()``:
+
+        >>> predicate = lambda x: x % 4 == 2
+        >>> iterable = range(1000)
+        >>> with_adjacent    = adjacent(predicate, iterable, 0)
+        >>> without_adjacent = zip(map(predicate, iterable), iterable)
+        >>> all(a == b for a, b in zip(without_adjacent, with_adjacent))
+        True
+
+    This tool could be used to render contextual diffs, for example.
+
+    ``adjacent()`` is designed to avoid calling *predicate* more than once per
+    item in the *iterable*, and thus is suitable for computationally expensive
+    *predicate*s.
+
+    To group consecutive elements which are associated with the same boolean
+    value, see ``groupby_transform()``.
+    """
+    # Allow distance=0 mainly for testing that it reproduces results with map()
+    if distance < 0:
+        raise ValueError('distance must be at least 0')
+
+    i1, i2 = tee(iterable)
+    padding = [False] * distance
+    selected = chain(padding, map(predicate, i1), padding)
+    adjacent = map(any, windowed(selected, 2 * distance + 1))
+    return zip(adjacent, i2)
+
+def groupby_transform(iterable, keyfunc=None, valuefunc=None):
+    """
+    A wrapper for ``itertools.groupby()`` which computes the values in the group
+    by applying *valuefunc* to the items in the iterable.
+
+        >>> grouper = groupby_transform(range(10),
+        ...                             lambda x: int(x / 5), lambda x: x + 2)
+        >>> [(k, list(g)) for k, g in grouper]
+        [(0, [2, 3, 4, 5, 6]), (1, [7, 8, 9, 10, 11])]
+
+    This is particularly useful when grouping elements of an iterable using
+    a separate, parallel iterable as the grouping key: ``zip()`` the iterables
+    and pass a *keyfunc* which extracts the first element and a *valuefunc*
+    which extracts the second element. Since this is likely to be such
+    a common use case, ``groupby_transform()`` defaults to this behavior if
+    neither *keyfunc* nor *valuefunc* are specified.
+
+        >>> keys = [0, 0, 1, 1, 1, 2, 2, 2, 3]
+        >>> values = 'abcdefghi'
+        >>> [(k, ''.join(g)) for k, g in groupby_transform(zip(keys, values))]
+        [(0, 'ab'), (1, 'cde'), (2, 'fgh'), (3, 'i')]
+
+    If ``None`` or an identity function is passed for *valuefunc*, the behavior
+    is identical to ``itertools.groupby()``.
+    """
+    if valuefunc is None:
+        if keyfunc is None:
+            keyfunc = lambda t: t[0]
+            valuefunc = lambda t: t[1]
+        else:
+            return groupby(iterable, keyfunc)
+    for key, group in groupby(iterable, keyfunc):
+        yield key, map(valuefunc, group)
