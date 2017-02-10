@@ -1178,12 +1178,13 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     If ``None`` or an identity function is passed for *valuefunc*, the behavior
     is identical to ``itertools.groupby()``.
     """
-    if valuefunc is None:
-        if keyfunc is None:
+    if valuefunc is None and keyfunc is not None:
+        for key, group in groupby(iterable, keyfunc):
+            yield key, group
+    else:
+        if valuefunc is None and keyfunc is None:
             # itemgetter is about 2.2x as fast as lambda functions in some tests
             keyfunc = itemgetter(0)
             valuefunc = itemgetter(1)
-        else:
-            return groupby(iterable, keyfunc)
-    for key, group in groupby(iterable, keyfunc):
-        yield key, map(valuefunc, group)
+        for key, group in groupby(iterable, keyfunc):
+            yield key, map(valuefunc, group)
