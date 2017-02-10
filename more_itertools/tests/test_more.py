@@ -8,7 +8,7 @@ from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
 import six
-from six.moves import filter, range
+from six.moves import filter, range, zip
 
 from more_itertools import *  # Test all the symbols are in __all__.
 
@@ -1024,10 +1024,15 @@ class AdjacentTests(TestCase):
         self.assertEqual(actual, expected)
 
 class GroupByTransformTests(TestCase):
-    def assertAllEqual(self, iterable1, iterable2, msg=None):
-        """Compare two iterables element-by-element for equality"""
-        for a, b in zip(iterable1, iterable2):
-            self.assertEqual(a, b, msg)
+    def assertAllGroupsEqual(self, groupby1, groupby2):
+        """Compare two groupby objects for equality, both keys and groups."""
+        for a, b in zip(groupby1, groupby2):
+            key1, group1 = a
+            key2, group2 = b
+            self.assertEqual(key1, key2)
+            self.assertListEqual(list(group1), list(group2))
+        self.assertRaises(StopIteration, lambda: next(groupby1))
+        self.assertRaises(StopIteration, lambda: next(groupby2))
 
     def test_default_funcs(self):
         iterable = [(int(x / 5), x) for x in range(10)]
@@ -1061,8 +1066,8 @@ class GroupByTransformTests(TestCase):
 
         actual = groupby_transform(iterable, key, valuefunc=None)
         expected = groupby(iterable, key)
-        self.assertAllEqual(actual, expected)
+        self.assertAllGroupsEqual(actual, expected)
 
         actual = groupby_transform(iterable, key) # default valuefunc
         expected = groupby(iterable, key)
-        self.assertAllEqual(actual, expected)
+        self.assertAllGroupsEqual(actual, expected)
