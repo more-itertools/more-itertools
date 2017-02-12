@@ -387,10 +387,10 @@ def with_file(file_handle):
 
     For example, this will close the file when the iterator is consumed::
 
-        >>> from more_itertools import consume
-        >>> consume(print(line, file=outfile)
-                    for outfile in with_file(open("temp.tmp", "w"))
-                    for line in range(3))
+        from more_itertools import consume
+        consume(print(line, file=outfile)
+                for outfile in with_file(open("temp.tmp", "w"))
+                for line in range(3))
 
 
     """
