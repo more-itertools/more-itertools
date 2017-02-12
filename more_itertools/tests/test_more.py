@@ -362,6 +362,22 @@ def test_ilen():
     eq_(ilen(filter(lambda x: x % 10 == 0, range(101))), 11)
 
 
+def test_with_file():
+    """Make sure ``with_file`` write to the file and closes things correctly."""
+    s = StringIO('')
+    output = [(print(i, file=s),s.getvalue())[1] 
+              for s in with_file(closing(s)) 
+              for i in range(3)]
+    eq_(output, ['0\n', '0\n1\n', '0\n1\n2\n'])
+
+    # Make sure closing happened:
+    try:
+        list(s)
+    except ValueError:  # "I/O operation on closed file"
+        pass
+    else:
+        raise AssertionError('StringIO object was not closed.')
+
 def test_with_iter():
     """Make sure ``with_iter`` iterates over and closes things correctly."""
     s = StringIO('One fish\nTwo fish')
