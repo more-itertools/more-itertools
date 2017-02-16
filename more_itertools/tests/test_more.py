@@ -1,4 +1,4 @@
-from __future__ import division, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 from contextlib import closing
 from functools import reduce
@@ -616,6 +616,31 @@ class SideEffectTests(TestCase):
         result = list(side_effect(func, range(10), 2))
         eq_(result, list(range(10)))
         eq_(counter[0], 5)
+
+    def test_optional_args(self):
+        collector = []
+
+        def func(item, x, y=0):
+            collector.append((item, x, y))
+
+        it = [1, 2]
+        func_args = ['X']
+        func_kwargs = {'y': 'Y'}
+        result = list(
+            side_effect(func, it, func_args=func_args, func_kwargs=func_kwargs)
+        )
+
+        self.assertEqual(result, it)
+        self.assertEqual(collector, [(1, 'X', 'Y'), (2, 'X', 'Y')])
+
+    def test_file_obj(self):
+        """File objects should be closed after iterating"""
+        f = StringIO()
+        it = [u'a', u'b']
+        func_kwargs = {'file': f}
+        consume(side_effect(print, it, func_kwargs=func_kwargs, file_obj=f))
+        self.assertTrue(f.closed)
+
 
 
 class SlicedTests(TestCase):

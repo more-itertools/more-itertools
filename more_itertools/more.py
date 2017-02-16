@@ -743,12 +743,24 @@ def collapse(iterable, base_type=None, levels=None):
         yield x
 
 
-def side_effect(func, iterable, chunk_size=None):
+def side_effect(
+    func,
+    iterable,
+    chunk_size=None,
+    func_args=None,
+    func_kwargs=None,
+    file_obj=None,
+):
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
     of items) before yielding the item.
 
-    `func` must be a function that takes a single argument.  Its return value
-    will be discarded.
+    `func` must be a function that takes an item from the iterable as its first
+    argument. Specify subsequent arguments by passing an
+    *func_args* (an iterable) and *func_kwargs* (a mapping).
+    Any returned values are discarded.
+
+    If *file_obj* is given, it will be closed after iterating. This can be
+    useful if the side effect is operating on files.
 
     `side_effect` can be used for logging, updating progress bars, or anything
     that is not functionally "pure."
@@ -770,16 +782,34 @@ def side_effect(func, iterable, chunk_size=None):
         >>> list(pair_sums)
         [1, 5, 9]
 
+    Writing to a file-like object:
+
+        >>> from io import StringIO
+        >>> from more_itertools import consume
+        >>> it = [u'a', u'b', u'c']
+        >>> f = StringIO()
+        >>> consume(
+        ...     side_effect(print, it, func_kwargs={'file': f}, file_obj=f)
+        ... )
+        >>> f.closed
+        True
+
     """
-    if chunk_size is None:
-        for item in iterable:
-            func(item)
-            yield item
-    else:
-        for chunk in chunked(iterable, chunk_size):
-            func(chunk)
-            for item in chunk:
+    func_args = [] if func_args is None else func_args
+    func_kwargs = {} if func_kwargs is None else func_kwargs
+    try:
+        if chunk_size is None:
+            for item in iterable:
+                func(item, *func_args, **func_kwargs)
                 yield item
+        else:
+            for chunk in chunked(iterable, chunk_size):
+                func(chunk, *func_args, **func_kwargs)
+                for item in chunk:
+                    yield item
+    finally:
+        if file_obj is not None:
+            file_obj.close()
 
 
 def sliced(seq, n):
