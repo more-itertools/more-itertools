@@ -10,7 +10,8 @@ python:
     - "3.6"
 
 install:
-    - "pip install -U coveralls nose six"
+    - "pip install ."
+    - "pip install -U coveralls nose"
 
 script:
     - "coverage run --include='more_itertools/*.py' --omit='more_itertools/tests/*' -m nose more_itertools -v --with-doctest"
