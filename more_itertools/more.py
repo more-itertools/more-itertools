@@ -126,8 +126,8 @@ class peekable(object):
         >>> list(p)
         [11, 12, 1, 2, 3]
 
-    Prepended items are treated by other peekable methods exactly as if they had
-    come from the source iterator.
+    Prepended items are treated by other peekable methods exactly as if they
+    had come from the source iterator.
 
     You may index the peekable to look ahead by more than one item.
     The values up to the index you specified will be cached.
@@ -200,7 +200,8 @@ class peekable(object):
 
     def prepend(self, *items):
         """Stack up items to be the next ones returned from ``next()`` or
-        ``self.peek()``. The items will be returned in first-in first-out order:
+        ``self.peek()``. The items will be returned in
+        first in, first out order::
 
             >>> p = peekable([1, 2, 3])
             >>> p.prepend(10, 11, 12)
@@ -780,9 +781,7 @@ def side_effect(func, iterable, chunk_size=None, file_obj=None):
         >>> f = StringIO()
         >>> func = lambda x: print(x, file=f)
         >>> it = [u'a', u'b', u'c']
-        >>> consume(
-        ...     side_effect(func, it, file_obj=f)
-        ... )
+        >>> consume(side_effect(func, it, file_obj=f))
         >>> f.closed
         True
 
