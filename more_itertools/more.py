@@ -126,8 +126,8 @@ class peekable(object):
         >>> list(p)
         [11, 12, 1, 2, 3]
 
-    Prepended items are treated by other peekable methods exactly as if they had
-    come from the source iterator.
+    Prepended items are treated by other peekable methods exactly as if they
+    had come from the source iterator.
 
     You may index the peekable to look ahead by more than one item.
     The values up to the index you specified will be cached.
@@ -200,7 +200,8 @@ class peekable(object):
 
     def prepend(self, *items):
         """Stack up items to be the next ones returned from ``next()`` or
-        ``self.peek()``. The items will be returned in first-in first-out order:
+        ``self.peek()``. The items will be returned in
+        first in, first out order::
 
             >>> p = peekable([1, 2, 3])
             >>> p.prepend(10, 11, 12)
@@ -743,12 +744,15 @@ def collapse(iterable, base_type=None, levels=None):
         yield x
 
 
-def side_effect(func, iterable, chunk_size=None):
+def side_effect(func, iterable, chunk_size=None, file_obj=None):
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
     of items) before yielding the item.
 
-    `func` must be a function that takes a single argument.  Its return value
+    `func` must be a function that takes a single argument. Its return value
     will be discarded.
+
+    If *file_obj* is given, it will be closed after iterating. This can be
+    useful if the side effect is operating on files.
 
     `side_effect` can be used for logging, updating progress bars, or anything
     that is not functionally "pure."
@@ -770,16 +774,31 @@ def side_effect(func, iterable, chunk_size=None):
         >>> list(pair_sums)
         [1, 5, 9]
 
+    Writing to a file-like object:
+
+        >>> from io import StringIO
+        >>> from more_itertools import consume
+        >>> f = StringIO()
+        >>> func = lambda x: print(x, file=f)
+        >>> it = [u'a', u'b', u'c']
+        >>> consume(side_effect(func, it, file_obj=f))
+        >>> f.closed
+        True
+
     """
-    if chunk_size is None:
-        for item in iterable:
-            func(item)
-            yield item
-    else:
-        for chunk in chunked(iterable, chunk_size):
-            func(chunk)
-            for item in chunk:
+    try:
+        if chunk_size is None:
+            for item in iterable:
+                func(item)
                 yield item
+        else:
+            for chunk in chunked(iterable, chunk_size):
+                func(chunk)
+                for item in chunk:
+                    yield item
+    finally:
+        if file_obj is not None:
+            file_obj.close()
 
 
 def sliced(seq, n):
