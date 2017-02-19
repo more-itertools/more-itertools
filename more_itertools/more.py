@@ -1110,10 +1110,9 @@ def always_iterable(obj):
     return obj
 
 def adjacent(predicate, iterable, distance=1):
-    """
-    Returns an iterable over ``(bool, item)`` tuples where the ``item`` is drawn
-    from the underlying *iterable* and the ``bool`` indicates whether that item
-    satisfies the *predicate* or is adjacent to one that does. For example:
+    """Return an iterable over ``(bool, item)`` tuples where the ``item`` is
+    drawn from the underlying *iterable* and the ``bool`` indicates whether that
+    item satisfies the *predicate* or is adjacent to one that does. For example:
 
         >>> list(adjacent(lambda x: x % 4 == 2, range(6)))
         [(False, 0), (True, 1), (True, 2), (True, 3), (False, 4), (False, 5)]
@@ -1124,15 +1123,10 @@ def adjacent(predicate, iterable, distance=1):
         [(True, 0), (True, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
 
     In this case any elements within 2 positions of the one that satisfies the
-    predicate are paired with ``True``. *distance* can be any nonnegative
-    integer. If *distance* is zero, this reduces to ``map()`` and ``zip()``:
+    predicate are paired with ``True``.
 
-        >>> predicate = lambda x: x % 4 == 2
-        >>> iterable = range(1000)
-        >>> with_adjacent    = adjacent(predicate, iterable, 0)
-        >>> without_adjacent = zip(map(predicate, iterable), iterable)
-        >>> all(a == b for a, b in zip(without_adjacent, with_adjacent))
-        True
+    *distance* can be any nonnegative integer. If *distance* is zero,
+    the same behavior can be achieved with ``map()`` and ``zip()``.
 
     This tool could be used to render contextual diffs, for example.
 
@@ -1150,41 +1144,39 @@ def adjacent(predicate, iterable, distance=1):
     i1, i2 = tee(iterable)
     padding = [False] * distance
     selected = chain(padding, map(predicate, i1), padding)
-    adjacent = map(any, windowed(selected, 2 * distance + 1))
-    return zip(adjacent, i2)
+    adjacent_to_selected = map(any, windowed(selected, 2 * distance + 1))
+    return zip(adjacent_to_selected, i2)
 
 def groupby_transform(iterable, keyfunc=None, valuefunc=None):
-    """
-    A wrapper for ``itertools.groupby()`` which computes the values in the group
-    by applying *valuefunc* to the items in the iterable.
+    """Make an iterator that groups consecutive items from the *iterable* which
+    compare equal according to *keyfunc*, like ``itertools.groupby()``, but
+    applies *valuefunc* to obtain the members of the group.
 
         >>> grouper = groupby_transform(range(10),
-        ...                             lambda x: int(x / 5), lambda x: x + 2)
+        ...                             lambda x: x // 5, lambda x: x + 2)
         >>> [(k, list(g)) for k, g in grouper]
         [(0, [2, 3, 4, 5, 6]), (1, [7, 8, 9, 10, 11])]
 
     This is particularly useful when grouping elements of an iterable using
     a separate, parallel iterable as the grouping key: ``zip()`` the iterables
     and pass a *keyfunc* which extracts the first element and a *valuefunc*
-    which extracts the second element. Since this is likely to be such
-    a common use case, ``groupby_transform()`` defaults to this behavior if
-    neither *keyfunc* nor *valuefunc* are specified.
+    which extracts the second element.
 
+        >>> from operator import itemgetter
         >>> keys = [0, 0, 1, 1, 1, 2, 2, 2, 3]
         >>> values = 'abcdefghi'
-        >>> [(k, ''.join(g)) for k, g in groupby_transform(zip(keys, values))]
+        >>> grouper = groupby_transform(zip(keys, values), itemgetter(0), itemgetter(1))
+        >>> [(k, ''.join(g)) for k, g in grouper]
         [(0, 'ab'), (1, 'cde'), (2, 'fgh'), (3, 'i')]
 
     If ``None`` or an identity function is passed for *valuefunc*, the behavior
     is identical to ``itertools.groupby()``.
     """
-    if valuefunc is None and keyfunc is not None:
-        for key, group in groupby(iterable, keyfunc):
-            yield key, group
-    else:
-        if valuefunc is None and keyfunc is None:
-            # itemgetter is about 2.2x as fast as lambda functions in some tests
-            keyfunc = itemgetter(0)
-            valuefunc = itemgetter(1)
-        for key, group in groupby(iterable, keyfunc):
-            yield key, map(valuefunc, group)
+    # Implementation note: there are several ways to implement this function.
+    # The one used here is among the fastest. The leading competitor is
+    #    if valuefunc is None: yield from groupby(iterable, keyfunc)
+    #    else: (the for loop)
+    # but this saves one line of code and is just as fast.
+    valuefunc = (lambda x: x) if valuefunc is None else valuefunc
+    for key, group in groupby(iterable, keyfunc):
+        yield key, map(valuefunc, group)

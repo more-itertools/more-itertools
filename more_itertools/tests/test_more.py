@@ -4,6 +4,7 @@ from contextlib import closing
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, repeat
+from operator import itemgetter
 from unittest import TestCase
 
 from nose.tools import eq_, assert_raises
@@ -1004,9 +1005,22 @@ class AdjacentTests(TestCase):
         expected = list(zip(repeat(False), iterable))
         self.assertEqual(actual, expected)
 
+    def test_zero_distance(self):
+        """Test that adjacent() reduces to zip+map when distance is 0"""
+        iterable = range(1000)
+        predicate = lambda x: x % 4 == 2
+        actual = adjacent(predicate, iterable, 0)
+        expected = zip(map(predicate, iterable), iterable)
+        self.assertTrue(all(a == e for a, e in zip(actual, expected)))
+
+    def test_negative_distance(self):
+        """Test that adjacent() raises an error with negative distance"""
+        self.assertRaises(ValueError, lambda: adjacent(lambda x: x, range(1000), -1))
+        self.assertRaises(ValueError, lambda: adjacent(lambda x: x, range(10), -10))
+
     def test_grouping(self):
         """Test interaction of adjacent() with groupby_transform()"""
-        grouper = groupby_transform(adjacent(lambda x: x % 5 == 0, range(10)))
+        grouper = groupby_transform(adjacent(lambda x: x % 5 == 0, range(10)), itemgetter(0), itemgetter(1))
         actual = [(k, list(g)) for k, g in grouper]
         expected = [(True, [0, 1]), (False, [2, 3]), (True, [4, 5, 6]), (False, [7, 8, 9])]
         self.assertEqual(actual, expected)
@@ -1035,13 +1049,16 @@ class GroupByTransformTests(TestCase):
         self.assertRaises(StopIteration, lambda: next(groupby2))
 
     def test_default_funcs(self):
-        iterable = [(int(x / 5), x) for x in range(10)]
-        actual = [(k, list(g)) for k, g in groupby_transform(iterable)]
-        expected = [(0, [0, 1, 2, 3, 4]), (1, [5, 6, 7 ,8, 9])]
-        self.assertEqual(actual, expected)
+        """Test that groupby_transform() with default args reproduces groupby()"""
+        iterable = [(x // 5, x) for x in range(1000)]
+        actual = groupby_transform(iterable)
+        expected = groupby(iterable)
+        self.assertAllGroupsEqual(actual, expected)
 
     def test_valuefunc(self):
         iterable = [(int(x / 5), int(x / 3), x) for x in range(10)]
+
+        # Test the "standard" usage of grouping one iterable using another for keys
         grouper = groupby_transform(iterable, keyfunc=lambda t: t[0], valuefunc=lambda t: t[-1])
         actual = [(k, list(g)) for k, g in grouper]
         expected = [(0, [0, 1, 2, 3, 4]), (1, [5, 6, 7, 8, 9])]
@@ -1054,7 +1071,7 @@ class GroupByTransformTests(TestCase):
 
         # and now for something a little different
         d = dict(zip(range(10), 'abcdefghij'))
-        grouper = groupby_transform(range(10), keyfunc=lambda x: int(x / 5), valuefunc=d.get)
+        grouper = groupby_transform(range(10), keyfunc=lambda x: x // 5, valuefunc=d.get)
         actual = [(k, ''.join(g)) for k, g in grouper]
         expected = [(0, 'abcde'), (1, 'fghij')]
         self.assertEqual(actual, expected)
@@ -1062,7 +1079,7 @@ class GroupByTransformTests(TestCase):
     def test_no_valuefunc(self):
         iterable = range(1000)
         def key(x):
-            return int(x / 5)
+            return x // 5
 
         actual = groupby_transform(iterable, key, valuefunc=None)
         expected = groupby(iterable, key)
