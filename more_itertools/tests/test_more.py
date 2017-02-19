@@ -1,8 +1,8 @@
-from __future__ import division, unicode_literals
+from __future__ import division, unicode_literals, print_function
 
 from contextlib import closing
 from functools import reduce
-from io import StringIO
+from io import StringIO, BytesIO
 from itertools import chain, count, permutations
 from unittest import TestCase
 
@@ -11,7 +11,8 @@ import six
 from six.moves import filter, range
 
 from more_itertools import *  # Test all the symbols are in __all__.
-
+import sys
+PY3 = sys.version_info[0] == 3
 
 class CollateTests(TestCase):
     """Unit tests for ``collate()``"""
@@ -361,6 +362,28 @@ def test_ilen():
     """Sanity-check ``ilen()``."""
     eq_(ilen(filter(lambda x: x % 10 == 0, range(101))), 11)
 
+
+def test_with_file():
+    """Make sure ``with_file`` write to the file and closes things correctly."""
+    if PY3:
+        s = StringIO('')
+    else:
+        s = BytesIO(b'')
+    output = [(print(i, file=s),s.getvalue())[1] 
+              for s in with_file(closing(s)) 
+              for i in range(3)]
+    if PY3:
+        eq_(output, ['0\n', '0\n1\n', '0\n1\n2\n'])
+    else:
+        eq_(output, [b'0\n', b'0\n1\n', b'0\n1\n2\n'])
+
+    # Make sure closing happened:
+    try:
+        list(s)
+    except ValueError:  # "I/O operation on closed file"
+        pass
+    else:
+        raise AssertionError('StringIO object was not closed.')
 
 def test_with_iter():
     """Make sure ``with_iter`` iterates over and closes things correctly."""

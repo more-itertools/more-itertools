@@ -40,6 +40,7 @@ __all__ = [
     'stagger',
     'unique_to_each',
     'windowed',
+    'with_file',
     'with_iter',
     'zip_offset',
 ]
@@ -380,6 +381,21 @@ def iterate(func, start):
         yield start
         start = func(start)
 
+
+def with_file(file_handle):
+    """Wrap a file context manager in a ``with`` statement, so it closes once consumed.
+
+    For example, this will close the file when the iterator is consumed::
+
+        from more_itertools import consume
+        consume(print(line, file=outfile)
+                for outfile in with_file(open("temp.tmp", "w"))
+                for line in range(3))
+
+
+    """
+    with file_handle as f:
+        yield f
 
 def with_iter(context_manager):
     """Wrap an iterable in a ``with`` statement, so it closes once exhausted.
