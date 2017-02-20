@@ -8,6 +8,7 @@ API Reference
 New Routines
 ============
 
+.. autofunction:: adjacent
 .. autofunction:: always_iterable
 .. autofunction:: bucket
 .. autofunction:: chunked
@@ -18,6 +19,7 @@ New Routines
 .. autofunction:: distribute
 .. autofunction:: divide
 .. autofunction:: first(iterable[, default])
+.. autofunction:: groupby_transform
 .. autofunction:: ilen
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
