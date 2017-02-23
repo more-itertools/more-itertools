@@ -2,6 +2,15 @@
 Version History
 ===============
 
+2.6.0
+    * New itertools:
+        * ``adjacent`` and ``groupby_transform`` (Thanks to diazona)
+        * ``always_iterable`` (Thanks to jaraco)
+        * ``divide`` (Thanks to mozbhearsum)
+    * Improvements to existing itertools:
+        * ``peekable`` can now prepend items to an iterable. (Thanks to diazona)
+        * ``side_effect`` can now close file objects. (Thanks to yardsale8)
+
 2.5.0
     * New itertools:
         * ``distribute`` (Thanks to mozbhearsum and coady)
