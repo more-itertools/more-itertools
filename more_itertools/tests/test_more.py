@@ -1,6 +1,5 @@
 from __future__ import division, print_function, unicode_literals
 
-from contextlib import closing
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, repeat
@@ -366,16 +365,12 @@ def test_ilen():
 def test_with_iter():
     """Make sure ``with_iter`` iterates over and closes things correctly."""
     s = StringIO('One fish\nTwo fish')
-    initial_words = [line.split()[0] for line in with_iter(closing(s))]
-    eq_(initial_words, ['One', 'Two'])
+    initial_words = [line.split()[0] for line in with_iter(s)]
 
-    # Make sure closing happened:
-    try:
-        list(s)
-    except ValueError:  # "I/O operation on closed file"
-        pass
-    else:
-        raise AssertionError('StringIO object was not closed.')
+    # Iterable's items should be faithfully represented
+    eq_(initial_words, ['One', 'Two'])
+    # The file object should be closed
+    eq_(s.closed, True)
 
 
 def test_one():
