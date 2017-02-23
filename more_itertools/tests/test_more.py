@@ -618,8 +618,7 @@ class SideEffectTests(TestCase):
         eq_(result, list(range(10)))
         eq_(counter[0], 5)
 
-    def test_file_obj(self):
-        """File objects should be closed after iterating"""
+    def test_before_after(self):
         f = StringIO()
         collector = []
 
@@ -627,9 +626,23 @@ class SideEffectTests(TestCase):
             print(item, file=f)
             collector.append(f.getvalue())
 
-        it = [u'a', u'b']
-        consume(side_effect(func, it, file_obj=f))
-        self.assertEqual(collector, [u'a\n', u'a\nb\n'])
+        def it():
+            yield u'a'
+            yield u'b'
+            raise Exception('kaboom')
+
+        before = lambda: print('HEADER', file=f)
+        after = lambda: f.close()
+
+        try:
+            consume(side_effect(func, it(), before=before, after=after))
+        except Exception:
+            pass
+
+        # The iterable should have been written to the file
+        self.assertEqual(collector, [u'HEADER\na\n', u'HEADER\na\nb\n'])
+
+        # The file should be closed even though something bad happened
         self.assertTrue(f.closed)
 
 
