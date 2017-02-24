@@ -1128,10 +1128,12 @@ def always_iterable(obj):
 
     return obj
 
+
 def adjacent(predicate, iterable, distance=1):
     """Return an iterable over ``(bool, item)`` tuples where the ``item`` is
-    drawn from the underlying *iterable* and the ``bool`` indicates whether that
-    item satisfies the *predicate* or is adjacent to one that does. For example:
+    drawn from the underlying *iterable* and the ``bool`` indicates whether
+    that item satisfies the *predicate* or is adjacent to one that does.
+    For example:
 
         >>> list(adjacent(lambda x: x % 4 == 2, range(6)))
         [(False, 0), (True, 1), (True, 2), (True, 3), (False, 4), (False, 5)]
@@ -1166,6 +1168,7 @@ def adjacent(predicate, iterable, distance=1):
     adjacent_to_selected = map(any, windowed(selected, 2 * distance + 1))
     return zip(adjacent_to_selected, i2)
 
+
 def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     """Make an iterator that groups consecutive items from the *iterable* which
     compare equal according to *keyfunc*, like ``itertools.groupby()``, but
@@ -1184,7 +1187,8 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
         >>> from operator import itemgetter
         >>> keys = [0, 0, 1, 1, 1, 2, 2, 2, 3]
         >>> values = 'abcdefghi'
-        >>> grouper = groupby_transform(zip(keys, values), itemgetter(0), itemgetter(1))
+        >>> iterable = zip(keys, values)
+        >>> grouper = groupby_transform(iterable, itemgetter(0), itemgetter(1))
         >>> [(k, ''.join(g)) for k, g in grouper]
         [(0, 'ab'), (1, 'cde'), (2, 'fgh'), (3, 'i')]
 
