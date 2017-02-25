@@ -783,8 +783,8 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
         >>> f = StringIO()
         >>> func = lambda x: print(x, file=f)
         >>> before = lambda: print(u'HEADER', file=f)
+        >>> after = f.close
         >>> it = [u'a', u'b', u'c']
-        >>> after = lambda: f.close()
         >>> consume(side_effect(func, it, before=before, after=after))
         >>> f.closed
         True

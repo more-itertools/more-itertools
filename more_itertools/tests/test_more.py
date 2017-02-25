@@ -632,7 +632,7 @@ class SideEffectTests(TestCase):
             raise Exception('kaboom')
 
         before = lambda: print('HEADER', file=f)
-        after = lambda: f.close()
+        after = f.close
 
         try:
             consume(side_effect(func, it(), before=before, after=after))
