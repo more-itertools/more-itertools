@@ -1131,32 +1131,31 @@ def always_iterable(obj):
 
 def adjacent(predicate, iterable, distance=1):
     """Return an iterable over ``(bool, item)`` tuples where the ``item`` is
-    drawn from the underlying *iterable* and the ``bool`` indicates whether
-    that item satisfies the *predicate* or is adjacent to one that does.
-    For example:
+    drawn from *iterable* and the ``bool`` indicates whether
+    that item satisfies the *predicate* or is adjacent to an item that does.
 
-        >>> list(adjacent(lambda x: x % 4 == 2, range(6)))
-        [(False, 0), (True, 1), (True, 2), (True, 3), (False, 4), (False, 5)]
+    For example, to find whether items are adjacent to a ``3``::
 
-    The *distance* used to determine what counts as adjacent can be configured:
+        >>> list(adjacent(lambda x: x == 3, range(6)))
+        [(False, 0), (False, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
 
-        >>> list(adjacent(lambda x: x % 4 == 2, range(6), 2))
-        [(True, 0), (True, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
+    Set *distance* to change what counts as adjacent. For example, To find
+    whether items are two places away from a ``3``:
 
-    In this case any elements within 2 positions of the one that satisfies the
-    predicate are paired with ``True``.
+        >>> list(adjacent(lambda x: x == 3, range(6), distance=2))
+        [(False, 0), (True, 1), (True, 2), (True, 3), (True, 4), (True, 5)]
 
-    *distance* can be any nonnegative integer. If *distance* is zero,
-    the same behavior can be achieved with ``map()`` and ``zip()``.
+    This is useful for contextualizing the results of a search function.
+    For example, a code comparison tool might want to identify lines that
+    have changed, but also surrounding lines to give the viewer of the diff
+    context.
 
-    This tool could be used to render contextual diffs, for example.
+    The predicate function will only be called once for each item in the
+    iterable.
 
-    ``adjacent()`` is designed to avoid calling *predicate* more than once per
-    item in the *iterable*, and thus is suitable for computationally expensive
-    *predicate*s.
+    See also ``groupby_transform()``, which can be used with this function
+    to group ranges of items with the same ``bool`` value.
 
-    To group consecutive elements which are associated with the same boolean
-    value, see ``groupby_transform()``.
     """
     # Allow distance=0 mainly for testing that it reproduces results with map()
     if distance < 0:
