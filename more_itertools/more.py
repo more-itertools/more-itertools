@@ -1169,19 +1169,28 @@ def adjacent(predicate, iterable, distance=1):
 
 
 def groupby_transform(iterable, keyfunc=None, valuefunc=None):
-    """Make an iterator that groups consecutive items from the *iterable* which
-    compare equal according to *keyfunc*, like ``itertools.groupby()``, but
-    applies *valuefunc* to obtain the members of the group.
+    """Make an iterator that returns consecutive keys and groups from the
+    *iterable*. *keyfunc* is a function used to compute a grouping key for each
+    item. *valuefunc* is a function for tranforming the items after grouping.
 
-        >>> grouper = groupby_transform(range(10),
-        ...                             lambda x: x // 5, lambda x: x + 2)
+    *keyfunc* and *valuefunc* default to identity functions if they are not
+    specified. When *valuefunc* is not specified, ``groupby_transform`` is the
+    same as ``itertools.groupby()``.
+
+    For example, to group a list of numbers by rounding down to the nearest 10,
+    and then tranform them into strings:
+
+        >>> iterable = [0, 1, 12, 13, 23, 24]
+        >>> keyfunc = lambda x: 10 * (x // 10)
+        >>> valuefunc = lambda x: str(x)
+        >>> grouper = groupby_transform(iterable, keyfunc, valuefunc)
         >>> [(k, list(g)) for k, g in grouper]
-        [(0, [2, 3, 4, 5, 6]), (1, [7, 8, 9, 10, 11])]
+        [(0, ['0', '1']), (10, ['12', '13']), (20, ['23', '24'])]
 
-    This is particularly useful when grouping elements of an iterable using
-    a separate, parallel iterable as the grouping key: ``zip()`` the iterables
-    and pass a *keyfunc* which extracts the first element and a *valuefunc*
-    which extracts the second element.
+    ``groupby_transform`` is useful when grouping elements of an iterable using
+    a separate iterable as the key. To do this,  ``zip()`` the iterables
+    and pass a *keyfunc* that extracts the first element and a *valuefunc*
+    that extracts the second element::
 
         >>> from operator import itemgetter
         >>> keys = [0, 0, 1, 1, 1, 2, 2, 2, 3]
@@ -1191,14 +1200,6 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
         >>> [(k, ''.join(g)) for k, g in grouper]
         [(0, 'ab'), (1, 'cde'), (2, 'fgh'), (3, 'i')]
 
-    If ``None`` or an identity function is passed for *valuefunc*, the behavior
-    is identical to ``itertools.groupby()``.
     """
-    # Implementation note: there are several ways to implement this function.
-    # The one used here is among the fastest. The leading competitor is
-    #    if valuefunc is None: yield from groupby(iterable, keyfunc)
-    #    else: (the for loop)
-    # but this saves one line of code and is just as fast.
     valuefunc = (lambda x: x) if valuefunc is None else valuefunc
-    for key, group in groupby(iterable, keyfunc):
-        yield key, map(valuefunc, group)
+    return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
