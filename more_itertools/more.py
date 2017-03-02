@@ -368,6 +368,24 @@ def ilen(iterable):
     This does, of course, consume the iterable, so handle it with care.
 
     """
+    try:
+        return len(iterable)
+    except TypeError:
+        pass
+
+    d = deque(enumerate(iterable, 1), maxlen=1)
+    return d[0][0] if d else 0
+
+
+def ilen_2(iterable):
+    """Return the number of items in ``iterable``.
+
+        >>> ilen(x for x in range(1000000) if x % 3 == 0)
+        333334
+
+    This does, of course, consume the iterable, so handle it with care.
+
+    """
     d = deque(enumerate(iterable, 1), maxlen=1)
     return d[0][0] if d else 0
 
