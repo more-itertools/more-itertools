@@ -365,7 +365,8 @@ def ilen(iterable):
         >>> ilen(x for x in range(1000000) if x % 3 == 0)
         333334
 
-    This does, of course, consume the iterable, so handle it with care.
+    This consumes the iterable (unless it has a ``__len__`` method), so handle
+    with care.
 
     """
     try:
