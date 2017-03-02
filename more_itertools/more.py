@@ -368,7 +368,8 @@ def ilen(iterable):
     This does, of course, consume the iterable, so handle it with care.
 
     """
-    return sum(1 for _ in iterable)
+    d = deque(enumerate(iterable, 1), maxlen=1)
+    return d[0][0] if d else 0
 
 
 def iterate(func, start):
