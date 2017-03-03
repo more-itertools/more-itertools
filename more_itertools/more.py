@@ -365,15 +365,9 @@ def ilen(iterable):
         >>> ilen(x for x in range(1000000) if x % 3 == 0)
         333334
 
-    This consumes the iterable (unless it has a ``__len__`` method), so handle
-    with care.
+    This consumes the iterable, so handle with care.
 
     """
-    try:
-        return len(iterable)
-    except TypeError:
-        pass
-
     d = deque(enumerate(iterable, 1), maxlen=1)
     return d[0][0] if d else 0
 
