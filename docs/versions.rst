@@ -8,6 +8,7 @@ Version History
         * ``always_iterable`` (Thanks to jaraco)
         * ``divide`` (Thanks to mozbhearsum)
     * Improvements to existing itertools:
+        * ``ilen`` is now slightly faster. (Thanks to wbolster)
         * ``peekable`` can now prepend items to an iterable. (Thanks to diazona)
         * ``side_effect`` can now close file objects. (Thanks to yardsale8)
 
