@@ -359,8 +359,15 @@ def test_distinct_permutations():
 
 
 def test_ilen():
-    """Sanity-check ``ilen()``."""
+    """Sanity-checks for ``ilen()``."""
+    # Non-empty
     eq_(ilen(filter(lambda x: x % 10 == 0, range(101))), 11)
+
+    # Empty
+    eq_(ilen((x for x in range(0))), 0)
+
+    # Iterable with __len__
+    eq_(ilen(list(range(6))), 6)
 
 
 def test_with_iter():
