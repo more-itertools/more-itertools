@@ -625,20 +625,6 @@ class SideEffectTests(TestCase):
         eq_(result, list(range(10)))
         eq_(counter[0], 5)
 
-    def test_file_obj(self):
-        """File objects should be closed after iterating"""
-        f = StringIO()
-        collector = []
-
-        def func(item):
-            print(item, file=f)
-            collector.append(f.getvalue())
-
-        it = [u'a', u'b']
-        consume(side_effect(func, it, file_obj=f))
-        self.assertEqual(collector, [u'a\n', u'a\nb\n'])
-        self.assertTrue(f.closed)
-
 
 class SlicedTests(TestCase):
     """Tests for ``sliced()``"""
