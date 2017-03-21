@@ -780,7 +780,7 @@ def side_effect(func, iterable, chunk_size=None):
         >>> from io import StringIO
         >>> from more_itertools import consume
         >>> with StringIO() as f:
-        ...     func = lambda x: print(x, end=',', file=f)
+        ...     func = lambda x: print(x, end=u',', file=f)
         ...     it = [u'a', u'b', u'c']
         ...     consume(side_effect(func, it))
         ...     print(f.getvalue())
