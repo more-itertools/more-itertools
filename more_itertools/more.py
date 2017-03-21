@@ -1166,14 +1166,14 @@ def adjacent(predicate, iterable, distance=1):
 def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     """Make an iterator that returns consecutive keys and groups from the
     *iterable*. *keyfunc* is a function used to compute a grouping key for each
-    item. *valuefunc* is a function for tranforming the items after grouping.
+    item. *valuefunc* is a function for transforming the items after grouping.
 
     *keyfunc* and *valuefunc* default to identity functions if they are not
     specified. When *valuefunc* is not specified, ``groupby_transform`` is the
     same as ``itertools.groupby()``.
 
     For example, to group a list of numbers by rounding down to the nearest 10,
-    and then tranform them into strings:
+    and then transform them into strings:
 
         >>> iterable = [0, 1, 12, 13, 23, 24]
         >>> keyfunc = lambda x: 10 * (x // 10)
