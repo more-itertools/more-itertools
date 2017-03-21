@@ -1104,12 +1104,12 @@ class ContextTestCase(TestCase):
 
         @contextmanager
         def managed():
-            before.append(1)
-            yield 2
-            after.append(3)
+            before.append('open')
+            yield 'running'
+            after.append('close')
 
         actual = [(c, x) for c in context(managed()) for x in range(3)]
-        expected = [(2, 0), (2, 1), (2, 2)]
+        expected = [('running', 0), ('running', 1), ('running', 2)]
         self.assertEqual(actual, expected)
-        self.assertEqual(before, [1])
-        self.assertEqual(after, [3])
+        self.assertEqual(before, ['open'])
+        self.assertEqual(after, ['close'])
