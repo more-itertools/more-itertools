@@ -1,6 +1,6 @@
 from __future__ import division, print_function, unicode_literals
 
-from contextlib import closing
+from contextlib import closing, contextmanager
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, repeat
@@ -1095,3 +1095,21 @@ class GroupByTransformTests(TestCase):
         actual = groupby_transform(iterable, key) # default valuefunc
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
+
+
+class ContextTestCase(TestCase):
+    def test_basic(self):
+        before = []
+        after = []
+
+        @contextmanager
+        def managed():
+            before.append(1)
+            yield 1
+            after.append(1)
+
+        actual = [(c, x) for c in context(managed()) for x in range(3)]
+        expected = [(1, 0), (1, 1), (1, 2)]
+        self.assertEqual(actual, expected)
+        self.assertEqual(before, [1])
+        self.assertEqual(after, [1])
