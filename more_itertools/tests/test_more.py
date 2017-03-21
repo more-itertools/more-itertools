@@ -1105,11 +1105,11 @@ class ContextTestCase(TestCase):
         @contextmanager
         def managed():
             before.append(1)
-            yield 1
-            after.append(1)
+            yield 2
+            after.append(3)
 
         actual = [(c, x) for c in context(managed()) for x in range(3)]
-        expected = [(1, 0), (1, 1), (1, 2)]
+        expected = [(2, 0), (2, 1), (2, 2)]
         self.assertEqual(actual, expected)
         self.assertEqual(before, [1])
-        self.assertEqual(after, [1])
+        self.assertEqual(after, [3])
