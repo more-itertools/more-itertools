@@ -1215,7 +1215,7 @@ def context(obj):
         True
 
     Be sure to iterate over the returned context manager in the outermost
-    loop of a nested loop structure::
+    loop of a nested loop structure so it only enters and exits once::
 
         >>> # Right
         >>> file_obj = StringIO()
