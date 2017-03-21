@@ -1214,6 +1214,19 @@ def context(obj):
         >>> file_obj.closed
         True
 
+    Be sure to iterate over the returned context manager in the outermost
+    loop of a nested loop structure::
+
+        >>> # Right
+        >>> file_obj = StringIO()
+        >>> consume(print(x, file=f) for f in context(file_obj) for x in it)
+
+        >>> # Wrong
+        >>> file_obj = StringIO()
+        >>> consume(print(x, file=f) for x in it for f in context(file_obj))
+        Traceback (most recent call last):
+        ...
+        ValueError: I/O operation on closed file.
     """
     with obj as context_obj:
         yield context_obj
