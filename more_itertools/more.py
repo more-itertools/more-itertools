@@ -20,6 +20,7 @@ __all__ = [
     'collapse',
     'collate',
     'consumer',
+    'context',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -747,15 +748,12 @@ def collapse(iterable, base_type=None, levels=None):
         yield x
 
 
-def side_effect(func, iterable, chunk_size=None, file_obj=None):
+def side_effect(func, iterable, chunk_size=None):
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
     of items) before yielding the item.
 
     `func` must be a function that takes a single argument. Its return value
     will be discarded.
-
-    If *file_obj* is given, it will be closed after iterating. This can be
-    useful if the side effect is operating on files.
 
     `side_effect` can be used for logging, updating progress bars, or anything
     that is not functionally "pure."
@@ -781,27 +779,23 @@ def side_effect(func, iterable, chunk_size=None, file_obj=None):
 
         >>> from io import StringIO
         >>> from more_itertools import consume
-        >>> f = StringIO()
-        >>> func = lambda x: print(x, file=f)
-        >>> it = [u'a', u'b', u'c']
-        >>> consume(side_effect(func, it, file_obj=f))
-        >>> f.closed
-        True
+        >>> with StringIO() as f:
+        ...     func = lambda x: print(x, end=u',', file=f)
+        ...     it = [u'a', u'b', u'c']
+        ...     consume(side_effect(func, it))
+        ...     print(f.getvalue())
+        a,b,c,
 
     """
-    try:
-        if chunk_size is None:
-            for item in iterable:
-                func(item)
+    if chunk_size is None:
+        for item in iterable:
+            func(item)
+            yield item
+    else:
+        for chunk in chunked(iterable, chunk_size):
+            func(chunk)
+            for item in chunk:
                 yield item
-        else:
-            for chunk in chunked(iterable, chunk_size):
-                func(chunk)
-                for item in chunk:
-                    yield item
-    finally:
-        if file_obj is not None:
-            file_obj.close()
 
 
 def sliced(seq, n):
@@ -1204,3 +1198,39 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     """
     valuefunc = (lambda x: x) if valuefunc is None else valuefunc
     return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
+
+
+def context(obj):
+    """Wrap *obj*, an object that supports the context manager protocol,
+    in a ``with`` statement and then yield the resultant object.
+
+    The object's ``__enter__()`` method runs before this function yields, and
+    its ``__exit__()`` method runs after control returns to this function.
+
+    This can be used to operate on objects that can close automatically when
+    using a ``with`` statement, like IO objects:
+
+        >>> from io import StringIO
+        >>> from more_itertools import consume
+        >>> it = [u'1', u'2', u'3']
+        >>> file_obj = StringIO()
+        >>> consume(print(x, file=f) for f in context(file_obj) for x in it)
+        >>> file_obj.closed
+        True
+
+    Be sure to iterate over the returned context manager in the outermost
+    loop of a nested loop structure so it only enters and exits once::
+
+        >>> # Right
+        >>> file_obj = StringIO()
+        >>> consume(print(x, file=f) for f in context(file_obj) for x in it)
+
+        >>> # Wrong
+        >>> file_obj = StringIO()
+        >>> consume(print(x, file=f) for x in it for f in context(file_obj))
+        Traceback (most recent call last):
+        ...
+        ValueError: I/O operation on closed file.
+    """
+    with obj as context_obj:
+        yield context_obj

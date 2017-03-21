@@ -1,5 +1,6 @@
 from __future__ import division, print_function, unicode_literals
 
+from contextlib import contextmanager
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, repeat
@@ -618,20 +619,6 @@ class SideEffectTests(TestCase):
         eq_(result, list(range(10)))
         eq_(counter[0], 5)
 
-    def test_file_obj(self):
-        """File objects should be closed after iterating"""
-        f = StringIO()
-        collector = []
-
-        def func(item):
-            print(item, file=f)
-            collector.append(f.getvalue())
-
-        it = [u'a', u'b']
-        consume(side_effect(func, it, file_obj=f))
-        self.assertEqual(collector, [u'a\n', u'a\nb\n'])
-        self.assertTrue(f.closed)
-
 
 class SlicedTests(TestCase):
     """Tests for ``sliced()``"""
@@ -1009,7 +996,6 @@ class AdjacentTests(TestCase):
                     (True, 5), (True, 6), (True, 7), (True, 8), (False, 9)]
         self.assertEqual(actual, expected)
 
-
     def test_large_distance(self):
         """Test distance larger than the length of the iterable"""
         iterable = range(10)
@@ -1110,6 +1096,7 @@ class GroupByTransformTests(TestCase):
 
     def test_no_valuefunc(self):
         iterable = range(1000)
+
         def key(x):
             return x // 5
 
@@ -1120,3 +1107,21 @@ class GroupByTransformTests(TestCase):
         actual = groupby_transform(iterable, key)  # default valuefunc
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
+
+
+class ContextTestCase(TestCase):
+    def test_basic(self):
+        before = []
+        after = []
+
+        @contextmanager
+        def managed():
+            before.append('open')
+            yield 'running'
+            after.append('close')
+
+        actual = [(c, x) for c in context(managed()) for x in range(3)]
+        expected = [('running', 0), ('running', 1), ('running', 2)]
+        self.assertEqual(actual, expected)
+        self.assertEqual(before, ['open'])
+        self.assertEqual(after, ['close'])
