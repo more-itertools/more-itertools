@@ -2,6 +2,9 @@
 More Itertools
 ==============
 
+.. image:: https://coveralls.io/repos/github/erikrose/more-itertools/badge.svg?branch=master
+  :target: https://coveralls.io/github/erikrose/more-itertools?branch=master
+
 I love itertools; it's one of the most beautiful, composable standard libs.
 Whenever I have an iteration problem, there's almost always an itertools
 routine that fits it perfectly. Sometimes, however, neither itertools nor the

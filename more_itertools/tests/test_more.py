@@ -1,6 +1,6 @@
 from __future__ import division, print_function, unicode_literals
 
-from contextlib import closing, contextmanager
+from contextlib import contextmanager
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, repeat
@@ -27,10 +27,11 @@ class CollateTests(TestCase):
     def test_key(self):
         """Test using a custom `key` function."""
         iterables = [range(5, 0, -1), range(4, 0, -1)]
-        eq_(list(sorted(reduce(list.__add__,
-                                        [list(it) for it in iterables]),
-                        reverse=True)),
-            list(collate(*iterables, key=lambda x: -x)))
+        actual = sorted(
+            reduce(list.__add__, [list(it) for it in iterables]), reverse=True
+        )
+        expected = list(collate(*iterables, key=lambda x: -x))
+        eq_(actual, expected)
 
     def test_empty(self):
         """Be nice if passed an empty list of iterables."""
@@ -190,10 +191,7 @@ class PeekableTests(TestCase):
     # prepend() behavior tests
 
     def test_prepend(self):
-        """Test calling ``prepend()`` at various points interspersed with calls
-        to ``next()``. This covers ``prepend()`` before the first call to ``next()``,
-        ``prepend()`` after the last call to ``next()`` that touches the source
-        iterable, and ``prepend()`` in the middle."""
+        """Tests intersperesed ``prepend()`` and ``next()`` calls"""
         it = peekable(range(2))
         actual = []
 
@@ -213,7 +211,7 @@ class PeekableTests(TestCase):
         eq_(actual, expected)
 
     def test_multi_prepend(self):
-        """Tests prepending multiple elements and getting them in proper order"""
+        """Tests prepending multiple items and getting them in proper order"""
         it = peekable(range(5))
         actual = [next(it), next(it)]
         it.prepend(10, 11, 12)
@@ -260,7 +258,7 @@ class PeekableTests(TestCase):
         eq_(actual, expected)
 
     def test_prepend_after_stop(self):
-        """Tests that prepending after StopIteration makes the iterator valid again"""
+        """Test resuming iteration after a previous exhaustion"""
         it = peekable(range(3))
         eq_(list(it), [0, 1, 2])
         self.assertRaises(StopIteration, lambda: next(it))
@@ -274,7 +272,7 @@ class PeekableTests(TestCase):
         p = peekable(seq)
 
         p.prepend(30, 40, 50)
-        pseq = [30, 40, 50] + seq # pseq for prepended_seq
+        pseq = [30, 40, 50] + seq  # pseq for prepended_seq
 
         # adapt the specific tests from test_slicing
         eq_(p[0], 30)
@@ -292,9 +290,7 @@ class PeekableTests(TestCase):
         p = peekable(seq)
 
         p.prepend(30, 40, 50)
-        pseq = [30, 40, 50] + seq # pseq for prepended_seq
 
-        # adapt the specific tests from test_indexing
         eq_(p[0], 30)
         eq_(next(p), 30)
         eq_(p[2], 0)
@@ -308,10 +304,10 @@ class PeekableTests(TestCase):
         self.assertRaises(IndexError, lambda: p[-21])
 
     def test_prepend_iterable(self):
-        """Tests prepending from an iterable (because if this doesn't work, the
-        output from ``test_prepend_many()`` is going to be messy)"""
+        """Tests prepending from an iterable"""
         it = peekable(range(5))
-        # Don't directly use the range() object to avoid any range-specific optimizations
+        # Don't directly use the range() object to avoid any range-specific
+        # optimizations
         it.prepend(*(x for x in range(5)))
         actual = list(it)
         expected = list(chain(range(5), range(5)))
@@ -320,7 +316,8 @@ class PeekableTests(TestCase):
     def test_prepend_many(self):
         """Tests that prepending a huge number of elements works"""
         it = peekable(range(5))
-        # Don't directly use the range() object to avoid any range-specific optimizations
+        # Don't directly use the range() object to avoid any range-specific
+        # optimizations
         it.prepend(*(x for x in range(20000)))
         actual = list(it)
         expected = list(chain(range(20000), range(5)))
@@ -333,6 +330,7 @@ class PeekableTests(TestCase):
         actual = list(it)
         expected = [12, 11, 10, 0, 1, 2]
         eq_(actual, expected)
+
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""
@@ -373,16 +371,12 @@ def test_ilen():
 def test_with_iter():
     """Make sure ``with_iter`` iterates over and closes things correctly."""
     s = StringIO('One fish\nTwo fish')
-    initial_words = [line.split()[0] for line in with_iter(closing(s))]
-    eq_(initial_words, ['One', 'Two'])
+    initial_words = [line.split()[0] for line in with_iter(s)]
 
-    # Make sure closing happened:
-    try:
-        list(s)
-    except ValueError:  # "I/O operation on closed file"
-        pass
-    else:
-        raise AssertionError('StringIO object was not closed.')
+    # Iterable's items should be faithfully represented
+    eq_(initial_words, ['One', 'Two'])
+    # The file object should be closed
+    eq_(s.closed, True)
 
 
 def test_one():
@@ -961,6 +955,7 @@ class TestAlwaysIterable(TestCase):
 
         self.assertEqual(list(always_iterable(_gen())), [0, 1])
 
+
 class AdjacentTests(TestCase):
     def test_typical(self):
         actual = list(adjacent(lambda x: x % 5 == 0, range(10)))
@@ -1022,27 +1017,37 @@ class AdjacentTests(TestCase):
 
     def test_negative_distance(self):
         """Test that adjacent() raises an error with negative distance"""
-        self.assertRaises(ValueError, lambda: adjacent(lambda x: x, range(1000), -1))
-        self.assertRaises(ValueError, lambda: adjacent(lambda x: x, range(10), -10))
+        pred = lambda x: x
+        self.assertRaises(ValueError, lambda: adjacent(pred, range(1000), -1))
+        self.assertRaises(ValueError, lambda: adjacent(pred, range(10), -10))
 
     def test_grouping(self):
         """Test interaction of adjacent() with groupby_transform()"""
-        grouper = groupby_transform(adjacent(lambda x: x % 5 == 0, range(10)), itemgetter(0), itemgetter(1))
+        iterable = adjacent(lambda x: x % 5 == 0, range(10))
+        grouper = groupby_transform(iterable, itemgetter(0), itemgetter(1))
         actual = [(k, list(g)) for k, g in grouper]
-        expected = [(True, [0, 1]), (False, [2, 3]), (True, [4, 5, 6]), (False, [7, 8, 9])]
+        expected = [
+            (True, [0, 1]),
+            (False, [2, 3]),
+            (True, [4, 5, 6]),
+            (False, [7, 8, 9]),
+        ]
         self.assertEqual(actual, expected)
 
     def test_call_once(self):
-        """Test that the predicate is only called once per item in the iterable."""
+        """Test that the predicate is only called once per item."""
         already_seen = set()
         iterable = range(10)
+
         def predicate(item):
             self.assertNotIn(item, already_seen)
             already_seen.add(item)
             return True
+
         actual = list(adjacent(predicate, iterable))
         expected = [(True, x) for x in iterable]
         self.assertEqual(actual, expected)
+
 
 class GroupByTransformTests(TestCase):
     def assertAllGroupsEqual(self, groupby1, groupby2):
@@ -1056,7 +1061,7 @@ class GroupByTransformTests(TestCase):
         self.assertRaises(StopIteration, lambda: next(groupby2))
 
     def test_default_funcs(self):
-        """Test that groupby_transform() with default args reproduces groupby()"""
+        """Test that groupby_transform() with default args mimics groupby()"""
         iterable = [(x // 5, x) for x in range(1000)]
         actual = groupby_transform(iterable)
         expected = groupby(iterable)
@@ -1065,26 +1070,33 @@ class GroupByTransformTests(TestCase):
     def test_valuefunc(self):
         iterable = [(int(x / 5), int(x / 3), x) for x in range(10)]
 
-        # Test the "standard" usage of grouping one iterable using another for keys
-        grouper = groupby_transform(iterable, keyfunc=lambda t: t[0], valuefunc=lambda t: t[-1])
+        # Test the standard usage of grouping one iterable using another's keys
+        grouper = groupby_transform(
+            iterable, keyfunc=itemgetter(0), valuefunc=itemgetter(-1)
+        )
         actual = [(k, list(g)) for k, g in grouper]
         expected = [(0, [0, 1, 2, 3, 4]), (1, [5, 6, 7, 8, 9])]
         self.assertEqual(actual, expected)
 
-        grouper = groupby_transform(iterable, keyfunc=lambda t: t[1], valuefunc=lambda t: t[-1])
+        grouper = groupby_transform(
+            iterable, keyfunc=itemgetter(1), valuefunc=itemgetter(-1)
+        )
         actual = [(k, list(g)) for k, g in grouper]
         expected = [(0, [0, 1, 2]), (1, [3, 4, 5]), (2, [6, 7, 8]), (3, [9])]
         self.assertEqual(actual, expected)
 
         # and now for something a little different
         d = dict(zip(range(10), 'abcdefghij'))
-        grouper = groupby_transform(range(10), keyfunc=lambda x: x // 5, valuefunc=d.get)
+        grouper = groupby_transform(
+            range(10), keyfunc=lambda x: x // 5, valuefunc=d.get
+        )
         actual = [(k, ''.join(g)) for k, g in grouper]
         expected = [(0, 'abcde'), (1, 'fghij')]
         self.assertEqual(actual, expected)
 
     def test_no_valuefunc(self):
         iterable = range(1000)
+
         def key(x):
             return x // 5
 
@@ -1092,7 +1104,7 @@ class GroupByTransformTests(TestCase):
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
 
-        actual = groupby_transform(iterable, key) # default valuefunc
+        actual = groupby_transform(iterable, key)  # default valuefunc
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
 

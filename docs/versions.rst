@@ -2,6 +2,16 @@
 Version History
 ===============
 
+2.6.0
+    * New itertools:
+        * ``adjacent`` and ``groupby_transform`` (Thanks to diazona)
+        * ``always_iterable`` (Thanks to jaraco)
+        * ``context`` (Thanks to yardsale8)
+        * ``divide`` (Thanks to mozbhearsum)
+    * Improvements to existing itertools:
+        * ``ilen`` is now slightly faster. (Thanks to wbolster)
+        * ``peekable`` can now prepend items to an iterable. (Thanks to diazona)
+
 2.5.0
     * New itertools:
         * ``distribute`` (Thanks to mozbhearsum and coady)
