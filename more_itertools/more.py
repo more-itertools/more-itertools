@@ -810,8 +810,8 @@ def sliced(seq, n):
         >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
         [(1, 2, 3), (4, 5, 6), (7, 8)]
 
-    This function will only work for sliceable objects. For non-sliceable
-    iterable, see ``chunked()``.
+    This function will only work for iterables that support slicing.
+    For non-sliceable iterables, see ``chunked()``.
 
     """
     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
