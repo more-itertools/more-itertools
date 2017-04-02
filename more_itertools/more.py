@@ -760,7 +760,7 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
     will be discarded.
 
     *before* and *after* are optional functions that take no arguments. They
-    will be executed before iteration starts and after it ends, respetively.
+    will be executed before iteration starts and after it ends, respectively.
 
     `side_effect` can be used for logging, updating progress bars, or anything
     that is not functionally "pure."
