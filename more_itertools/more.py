@@ -752,12 +752,15 @@ def collapse(iterable, base_type=None, levels=None):
         yield x
 
 
-def side_effect(func, iterable, chunk_size=None):
+def side_effect(func, iterable, chunk_size=None, before=None, after=None):
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
     of items) before yielding the item.
 
     `func` must be a function that takes a single argument. Its return value
     will be discarded.
+
+    *before* and *after* are optional functions that take no arguments. They
+    will be executed before iteration starts and after it ends, respetively.
 
     `side_effect` can be used for logging, updating progress bars, or anything
     that is not functionally "pure."
@@ -783,23 +786,32 @@ def side_effect(func, iterable, chunk_size=None):
 
         >>> from io import StringIO
         >>> from more_itertools import consume
-        >>> with StringIO() as f:
-        ...     func = lambda x: print(x, end=u',', file=f)
-        ...     it = [u'a', u'b', u'c']
-        ...     consume(side_effect(func, it))
-        ...     print(f.getvalue())
-        a,b,c,
+        >>> f = StringIO()
+        >>> func = lambda x: print(x, file=f)
+        >>> before = lambda: print(u'HEADER', file=f)
+        >>> after = f.close
+        >>> it = [u'a', u'b', u'c']
+        >>> consume(side_effect(func, it, before=before, after=after))
+        >>> f.closed
+        True
 
     """
-    if chunk_size is None:
-        for item in iterable:
-            func(item)
-            yield item
-    else:
-        for chunk in chunked(iterable, chunk_size):
-            func(chunk)
-            for item in chunk:
+    if before is not None:
+        before()
+
+    try:
+        if chunk_size is None:
+            for item in iterable:
+                func(item)
                 yield item
+        else:
+            for chunk in chunked(iterable, chunk_size):
+                func(chunk)
+                for item in chunk:
+                    yield item
+    finally:
+        if after is not None:
+            after()
 
 
 def sliced(seq, n):
