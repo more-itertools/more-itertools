@@ -11,6 +11,7 @@ Version History
 * Improvements to existing itertools:
     * ``side_effect`` now supports ``before`` and ``after`` keyword
       arguments. (Thanks to yardsale8)
+* PyPy and PyPy3 are now supported.
 
 The major version change is due to the removal of the ``context`` function.
 Replace it with standard ``with`` statement context management
