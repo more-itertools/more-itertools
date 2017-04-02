@@ -20,7 +20,6 @@ __all__ = [
     'collapse',
     'collate',
     'consumer',
-    'context',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -688,11 +687,14 @@ def spy(iterable, n=1):
 
 def interleave(*iterables):
     """Return a new iterable yielding from each iterable in turn,
-    until the shortest is exhausted. Note that this is the same as
-    ``chain(*zip(*iterables))``.
+    until the shortest is exhausted.
 
         >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
         [1, 4, 6, 2, 5, 7]
+
+    Note that this is the same as ``chain(*zip(*iterables))``.
+    For a version that doesn't terminate after the shortest iterable is
+    exhausted, see ``interleave_longest()``.
 
     """
     return chain.from_iterable(zip(*iterables))
@@ -700,11 +702,13 @@ def interleave(*iterables):
 
 def interleave_longest(*iterables):
     """Return a new iterable yielding from each iterable in turn,
-    skipping any that are exhausted. Note that this is not the same as
-    ``chain(*zip_longest(*iterables))``.
+    skipping any that are exhausted.
 
         >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
         [1, 4, 6, 2, 5, 7, 3, 8]
+
+    Note that this is an alternate implementation of ``roundrobin()`` from the
+    itertools documentation.
 
     """
     i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
@@ -748,12 +752,15 @@ def collapse(iterable, base_type=None, levels=None):
         yield x
 
 
-def side_effect(func, iterable, chunk_size=None):
+def side_effect(func, iterable, chunk_size=None, before=None, after=None):
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
     of items) before yielding the item.
 
     `func` must be a function that takes a single argument. Its return value
     will be discarded.
+
+    *before* and *after* are optional functions that take no arguments. They
+    will be executed before iteration starts and after it ends, respectively.
 
     `side_effect` can be used for logging, updating progress bars, or anything
     that is not functionally "pure."
@@ -779,23 +786,32 @@ def side_effect(func, iterable, chunk_size=None):
 
         >>> from io import StringIO
         >>> from more_itertools import consume
-        >>> with StringIO() as f:
-        ...     func = lambda x: print(x, end=u',', file=f)
-        ...     it = [u'a', u'b', u'c']
-        ...     consume(side_effect(func, it))
-        ...     print(f.getvalue())
-        a,b,c,
+        >>> f = StringIO()
+        >>> func = lambda x: print(x, file=f)
+        >>> before = lambda: print(u'HEADER', file=f)
+        >>> after = f.close
+        >>> it = [u'a', u'b', u'c']
+        >>> consume(side_effect(func, it, before=before, after=after))
+        >>> f.closed
+        True
 
     """
-    if chunk_size is None:
-        for item in iterable:
-            func(item)
-            yield item
-    else:
-        for chunk in chunked(iterable, chunk_size):
-            func(chunk)
-            for item in chunk:
+    try:
+        if before is not None:
+            before()
+
+        if chunk_size is None:
+            for item in iterable:
+                func(item)
                 yield item
+        else:
+            for chunk in chunked(iterable, chunk_size):
+                func(chunk)
+                for item in chunk:
+                    yield item
+    finally:
+        if after is not None:
+            after()
 
 
 def sliced(seq, n):
@@ -1198,39 +1214,3 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     """
     valuefunc = (lambda x: x) if valuefunc is None else valuefunc
     return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
-
-
-def context(obj):
-    """Wrap *obj*, an object that supports the context manager protocol,
-    in a ``with`` statement and then yield the resultant object.
-
-    The object's ``__enter__()`` method runs before this function yields, and
-    its ``__exit__()`` method runs after control returns to this function.
-
-    This can be used to operate on objects that can close automatically when
-    using a ``with`` statement, like IO objects:
-
-        >>> from io import StringIO
-        >>> from more_itertools import consume
-        >>> it = [u'1', u'2', u'3']
-        >>> file_obj = StringIO()
-        >>> consume(print(x, file=f) for f in context(file_obj) for x in it)
-        >>> file_obj.closed
-        True
-
-    Be sure to iterate over the returned context manager in the outermost
-    loop of a nested loop structure so it only enters and exits once::
-
-        >>> # Right
-        >>> file_obj = StringIO()
-        >>> consume(print(x, file=f) for f in context(file_obj) for x in it)
-
-        >>> # Wrong
-        >>> file_obj = StringIO()
-        >>> consume(print(x, file=f) for x in it for f in context(file_obj))
-        Traceback (most recent call last):
-        ...
-        ValueError: I/O operation on closed file.
-    """
-    with obj as context_obj:
-        yield context_obj

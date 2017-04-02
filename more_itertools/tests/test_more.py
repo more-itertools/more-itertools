@@ -619,6 +619,49 @@ class SideEffectTests(TestCase):
         eq_(result, list(range(10)))
         eq_(counter[0], 5)
 
+    def test_before_after(self):
+        f = StringIO()
+        collector = []
+
+        def func(item):
+            print(item, file=f)
+            collector.append(f.getvalue())
+
+        def it():
+            yield u'a'
+            yield u'b'
+            raise Exception('kaboom')
+
+        before = lambda: print('HEADER', file=f)
+        after = f.close
+
+        try:
+            consume(side_effect(func, it(), before=before, after=after))
+        except Exception:
+            pass
+
+        # The iterable should have been written to the file
+        self.assertEqual(collector, [u'HEADER\na\n', u'HEADER\na\nb\n'])
+
+        # The file should be closed even though something bad happened
+        self.assertTrue(f.closed)
+
+    def test_before_fails(self):
+        f = StringIO()
+        func = lambda x: print(x, file=f)
+
+        def before():
+            raise Exception('ouch')
+
+        try:
+            consume(side_effect(func, u'abc', before=before, after=f.close))
+        except Exception:
+            pass
+
+        # The file should be closed even though something bad happened in the
+        # before function
+        self.assertTrue(f.closed)
+
 
 class SlicedTests(TestCase):
     """Tests for ``sliced()``"""
@@ -1107,21 +1150,3 @@ class GroupByTransformTests(TestCase):
         actual = groupby_transform(iterable, key)  # default valuefunc
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
-
-
-class ContextTestCase(TestCase):
-    def test_basic(self):
-        before = []
-        after = []
-
-        @contextmanager
-        def managed():
-            before.append('open')
-            yield 'running'
-            after.append('close')
-
-        actual = [(c, x) for c in context(managed()) for x in range(3)]
-        expected = [('running', 0), ('running', 1), ('running', 2)]
-        self.assertEqual(actual, expected)
-        self.assertEqual(before, ['open'])
-        self.assertEqual(after, ['close'])
