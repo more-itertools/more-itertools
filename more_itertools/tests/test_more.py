@@ -646,6 +646,22 @@ class SideEffectTests(TestCase):
         # The file should be closed even though something bad happened
         self.assertTrue(f.closed)
 
+    def test_before_fails(self):
+        f = StringIO()
+        func = lambda x: print(x, file=f)
+
+        def before():
+            raise Exception('ouch')
+
+        try:
+            consume(side_effect(func, u'abc', before=before, after=f.close))
+        except Exception:
+            pass
+
+        # The file should be closed even though something bad happened in the
+        # before function
+        self.assertTrue(f.closed)
+
 
 class SlicedTests(TestCase):
     """Tests for ``sliced()``"""

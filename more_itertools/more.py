@@ -796,10 +796,10 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
         True
 
     """
-    if before is not None:
-        before()
-
     try:
+        if before is not None:
+            before()
+
         if chunk_size is None:
             for item in iterable:
                 func(item)
