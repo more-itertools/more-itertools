@@ -6,27 +6,26 @@ Version History
 -----
 
 * Removed itertools:
-    * ``context`` has been removed due to a design flaw.
-      (See below - thanks to NeilGirdhar)
+    * ``context`` has been removed due to a design flaw - see below for
+      replacement options. (thanks to NeilGirdhar)
 * Improvements to existing itertools:
     * ``side_effect`` now supports ``before`` and ``after`` keyword
       arguments. (Thanks to yardsale8)
 * PyPy and PyPy3 are now supported.
 
 The major version change is due to the removal of the ``context`` function.
-Replace it with standard ``with`` statement context management
+Replace it with standard ``with`` statement context management:
 
 .. code-block:: python
 
-    # Don't do this anymore
+    # Don't use context() anymore
     file_obj = StringIO()
     consume(print(x, file=f) for f in context(file_obj) for x in u'123')
 
-    # Do this instead
+    # Use a with statement instead
     file_obj = StringIO()
     with file_obj as f:
         consume(print(x, file=f) for x in u'123')
-
 
 2.6.0
 -----
