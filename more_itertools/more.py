@@ -20,7 +20,6 @@ __all__ = [
     'collapse',
     'collate',
     'consumer',
-    'context',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -1198,39 +1197,3 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     """
     valuefunc = (lambda x: x) if valuefunc is None else valuefunc
     return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
-
-
-def context(obj):
-    """Wrap *obj*, an object that supports the context manager protocol,
-    in a ``with`` statement and then yield the resultant object.
-
-    The object's ``__enter__()`` method runs before this function yields, and
-    its ``__exit__()`` method runs after control returns to this function.
-
-    This can be used to operate on objects that can close automatically when
-    using a ``with`` statement, like IO objects:
-
-        >>> from io import StringIO
-        >>> from more_itertools import consume
-        >>> it = [u'1', u'2', u'3']
-        >>> file_obj = StringIO()
-        >>> consume(print(x, file=f) for f in context(file_obj) for x in it)
-        >>> file_obj.closed
-        True
-
-    Be sure to iterate over the returned context manager in the outermost
-    loop of a nested loop structure so it only enters and exits once::
-
-        >>> # Right
-        >>> file_obj = StringIO()
-        >>> consume(print(x, file=f) for f in context(file_obj) for x in it)
-
-        >>> # Wrong
-        >>> file_obj = StringIO()
-        >>> consume(print(x, file=f) for x in it for f in context(file_obj))
-        Traceback (most recent call last):
-        ...
-        ValueError: I/O operation on closed file.
-    """
-    with obj as context_obj:
-        yield context_obj

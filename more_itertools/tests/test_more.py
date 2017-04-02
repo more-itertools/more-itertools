@@ -1107,21 +1107,3 @@ class GroupByTransformTests(TestCase):
         actual = groupby_transform(iterable, key)  # default valuefunc
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
-
-
-class ContextTestCase(TestCase):
-    def test_basic(self):
-        before = []
-        after = []
-
-        @contextmanager
-        def managed():
-            before.append('open')
-            yield 'running'
-            after.append('close')
-
-        actual = [(c, x) for c in context(managed()) for x in range(3)]
-        expected = [('running', 0), ('running', 1), ('running', 2)]
-        self.assertEqual(actual, expected)
-        self.assertEqual(before, ['open'])
-        self.assertEqual(after, ['close'])
