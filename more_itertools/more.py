@@ -68,7 +68,26 @@ def chunked(iterable, n):
     return iter(partial(take, n, iter(iterable)), [])
 
 
-def first(iterable, default=_marker):
+def first(iterable, default=None):
+    """Return the first item of an iterable, ``default`` if there is none.
+
+        >>> first(xrange(4))
+        0
+        >>> first(xrange(0), 'some default')
+        'some default'
+
+    If ``default`` is not provided and there are no items in the iterable,
+    return ``None``.
+
+    ``first()`` is useful when you have a generator of expensive-to-retrieve
+    values and want any arbitrary one. It is marginally shorter than
+    ``next(iter(...), default)``.
+
+    """
+    return next(iter(iterable), default)
+
+
+def old(iterable, default=_marker):
     """Return the first item of an iterable, ``default`` if there is none.
 
         >>> first([0, 1, 2, 3])
