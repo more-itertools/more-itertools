@@ -15,6 +15,7 @@ New Routines
 .. autofunction:: collapse
 .. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: consumer
+.. autofunction:: count_cycle
 .. autofunction:: distinct_permutations
 .. autofunction:: distribute
 .. autofunction:: divide

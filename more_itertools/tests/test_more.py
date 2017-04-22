@@ -1186,3 +1186,24 @@ class ArithmeticSequenceTests(TestCase):
         self.assertRaises(
             ValueError, lambda: list(numeric_range(1, 2, 0))
         )
+
+
+class CountCycleTests(TestCase):
+    def test_basic(self):
+        expected = [
+            (0, 'a'), (0, 'b'), (0, 'c'),
+            (1, 'a'), (1, 'b'), (1, 'c'),
+            (2, 'a'), (2, 'b'), (2, 'c'),
+        ]
+        for actual in [
+            take(9, count_cycle('abc')),  # n=None
+            list(count_cycle('abc', 3)),  # n=3
+        ]:
+            self.assertEqual(actual, expected)
+
+    def test_empty(self):
+        self.assertEqual(list(count_cycle('')), [])
+        self.assertEqual(list(count_cycle('', 2)), [])
+
+    def test_negative(self):
+        self.assertEqual(list(count_cycle('abc', -3)), [])
