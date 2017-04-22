@@ -30,6 +30,7 @@ __all__ = [
     'interleave',
     'intersperse',
     'iterate',
+    'numeric_range',
     'one',
     'padded',
     'peekable',
@@ -1214,3 +1215,65 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     """
     valuefunc = (lambda x: x) if valuefunc is None else valuefunc
     return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
+
+
+def numeric_range(*args):
+    """An extension of the built-in ``range()`` function whose arguments can
+    be any orderable numeric type.
+
+    If the *start* argument is omitted, it defaults to ``0``. If the *step*
+    argument is omitted, it defaults to ``1``. If *step* is zero,
+    ``ValueError`` is rasied.
+
+    With only *stop* specified:
+
+        >>> list(numeric_range(3.5))
+        [0, 1, 2, 3]
+
+    With *start* and *stop* specified:
+
+        >>> from decimal import Decimal
+        >>> start = Decimal('2.1')
+        >>> stop = Decimal('5.1')
+        >>> list(numeric_range(start, stop))
+        [Decimal('2.1'), Decimal('3.1'), Decimal('4.1')]
+
+    With *start*, *stop*, and *step* defined:
+
+        >>> from fractions import Fraction
+        >>> start = Fraction(1, 2)  # Start at 1/2
+        >>> stop = Fraction(5, 2)  # End at 5/2
+        >>> step = Fraction(1, 2)  # Count by 1/2
+        >>> list(numeric_range(start, stop, step))
+        [Fraction(1, 2), Fraction(1, 1), Fraction(3, 2), Fraction(2, 1)]
+
+    Negative steps are supported:
+
+        >>> list(numeric_range(3, -1, -1.0))
+        [3.0, 2.0, 1.0, 0.0]
+
+    Be aware of the limitations of floating point numbers; the representation
+    of the yielded numbers may be surprising.
+
+    """
+    argc = len(args)
+    if argc == 1:
+        start = 0
+        stop, = args
+        step = 1
+    elif argc == 2:
+        start, stop = args
+        step = 1
+    elif argc == 3:
+        start, stop, step = args
+    else:
+        err_msg = 'numeric_range takes at most 3 arguments, got {}'
+        raise TypeError(err_msg.format(argc))
+
+    values = (start + (step * n) for n in count())
+    if step > 0:
+        return takewhile(lambda x: x < stop, values)
+    elif step < 0:
+        return takewhile(lambda x: x > stop, values)
+    else:
+        raise ValueError('numeric_range arg 3 must not be zero')

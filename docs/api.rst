@@ -25,6 +25,7 @@ New Routines
 .. autofunction:: interleave_longest
 .. autofunction:: intersperse
 .. autofunction:: iterate
+.. autofunction:: numeric_range(start, stop, step)
 .. autofunction:: one
 .. autofunction:: padded
 .. autoclass:: peekable
