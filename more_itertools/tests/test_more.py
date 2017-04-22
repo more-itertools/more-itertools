@@ -1173,16 +1173,16 @@ class ArithmeticSequenceTests(TestCase):
             ((Fraction(2, 1),), [Fraction(0, 1), Fraction(1, 1)]),
             ((Decimal('2.0'),), [Decimal('0.0'), Decimal('1.0')]),
         ]:
-            actual = list(arithmetic_sequence(*args))
+            actual = list(numeric_range(*args))
             self.assertEqual(actual, expected)
 
     def test_arg_count(self):
-        self.assertRaises(TypeError, lambda: list(arithmetic_sequence()))
+        self.assertRaises(TypeError, lambda: list(numeric_range()))
         self.assertRaises(
-            TypeError, lambda: list(arithmetic_sequence(0, 1, 2, 3))
+            TypeError, lambda: list(numeric_range(0, 1, 2, 3))
         )
 
     def test_zero_step(self):
         self.assertRaises(
-            ValueError, lambda: list(arithmetic_sequence(1, 2, 0))
+            ValueError, lambda: list(numeric_range(1, 2, 0))
         )

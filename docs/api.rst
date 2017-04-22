@@ -10,7 +10,6 @@ New Routines
 
 .. autofunction:: adjacent
 .. autofunction:: always_iterable
-.. autofunction:: arithmetic_sequence(start, stop, step)
 .. autofunction:: bucket
 .. autofunction:: chunked
 .. autofunction:: collapse
@@ -26,6 +25,7 @@ New Routines
 .. autofunction:: interleave_longest
 .. autofunction:: intersperse
 .. autofunction:: iterate
+.. autofunction:: numeric_range(start, stop, step)
 .. autofunction:: one
 .. autofunction:: padded
 .. autoclass:: peekable
