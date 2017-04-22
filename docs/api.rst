@@ -10,6 +10,7 @@ New Routines
 
 .. autofunction:: adjacent
 .. autofunction:: always_iterable
+.. autofunction:: arithmetic_sequence(start, stop, step)
 .. autofunction:: bucket
 .. autofunction:: chunked
 .. autofunction:: collapse

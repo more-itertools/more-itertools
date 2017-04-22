@@ -1,6 +1,7 @@
 from __future__ import division, print_function, unicode_literals
 
-from contextlib import contextmanager
+from decimal import Decimal
+from fractions import Fraction
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, repeat
@@ -1150,3 +1151,27 @@ class GroupByTransformTests(TestCase):
         actual = groupby_transform(iterable, key)  # default valuefunc
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
+
+
+class ArithmeticSequenceTests(TestCase):
+    def test_basic(self):
+        for args, expected in [
+            ((4,), [0, 1, 2, 3]),
+            ((4.0,), [0.0, 1.0, 2.0, 3.0]),
+            ((1, 4), [1, 2, 3]),
+            ((1.0, 5), [1.0, 2.0, 3.0, 4.0]),
+            ((0, 20, 5), [0, 5, 10, 15]),
+            ((0, 20, 5.0), [0.0, 5.0, 10.0, 15.0]),
+            ((0, 10, 3), [0, 3, 6, 9]),
+            ((0, 10, 3.0), [0.0, 3.0, 6.0, 9.0]),
+            ((0, -5, -1), [0, -1, -2, -3, -4]),
+            ((0.0, -5, -1), [0.0, -1.0, -2.0, -3.0, -4.0]),
+            ((0,), []),
+            ((0.0,), []),
+            ((1, 0), []),
+            ((1.0, 0.0), []),
+            ((Fraction(2, 1),), [Fraction(0, 1), Fraction(1, 1)]),
+            ((Decimal('2.0'),), [Decimal('0.0'), Decimal('1.0')]),
+        ]:
+            actual = list(arithmetic_sequence(*args))
+            self.assertEqual(actual, expected)
