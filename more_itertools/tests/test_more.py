@@ -1175,3 +1175,14 @@ class ArithmeticSequenceTests(TestCase):
         ]:
             actual = list(arithmetic_sequence(*args))
             self.assertEqual(actual, expected)
+
+    def test_arg_count(self):
+        self.assertRaises(TypeError, lambda: list(arithmetic_sequence()))
+        self.assertRaises(
+            TypeError, lambda: list(arithmetic_sequence(0, 1, 2, 3))
+        )
+
+    def test_zero_step(self):
+        self.assertRaises(
+            ValueError, lambda: list(arithmetic_sequence(1, 2, 0))
+        )
