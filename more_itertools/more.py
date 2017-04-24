@@ -20,6 +20,7 @@ __all__ = [
     'collapse',
     'collate',
     'consumer',
+    'count_cycle',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -1277,3 +1278,19 @@ def numeric_range(*args):
         return takewhile(lambda x: x > stop, values)
     else:
         raise ValueError('numeric_range arg 3 must not be zero')
+
+
+def count_cycle(iterable, n=None):
+    """Cycle through the items from *iterable* up to *n* times, yielding
+    the number of completed cycles along with each item. If *n* is omitted the
+    process repeats indefinitely.
+
+    >>> list(count_cycle('AB', 3))
+    [(0, 'A'), (0, 'B'), (1, 'A'), (1, 'B'), (2, 'A'), (2, 'B')]
+
+    """
+    iterable = tuple(iterable)
+    if not iterable:
+        return iter(())
+    counter = count() if n is None else range(n)
+    return ((i, item) for i in counter for item in iterable)
