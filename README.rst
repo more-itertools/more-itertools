@@ -1,3 +1,7 @@
+==============
+More Itertools
+==============
+
 .. image:: https://coveralls.io/repos/github/erikrose/more-itertools/badge.svg?branch=master
   :target: https://coveralls.io/github/erikrose/more-itertools?branch=master
 
