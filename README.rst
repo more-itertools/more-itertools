@@ -56,4 +56,4 @@ Development
 ``more-itertools`` is maintained by `@erikrose <https://github.com/erikrose>`_
 and `@bbayles <https://github.com/bbayles>`_, with help from `many others <https://github.com/erikrose/more-itertools/graphs/contributors>`_.
 If you have a problem or suggestion, please file a bug or pull request in this
-repository - thanks for contributing!
+repository. Thanks for contributing!
