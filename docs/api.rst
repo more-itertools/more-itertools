@@ -140,7 +140,7 @@ These yools yield certain items from an iterable.
 
 ----
 
-**New itertools**
+**Itertools recipes**
 
 .. autofunction:: take
 .. autofunction:: tail
