@@ -48,7 +48,7 @@ Several new recipes are available as well:
 
 
 
-For the full listing of functions, see the API documentation at `more-itertools.readthedocs.io <https://more-itertools.readthedocs.io/en/latest/api.html>`_.
+For the full listing of functions, see the `API documentation <https://more-itertools.readthedocs.io/en/latest/api.html>`_.
 
 Development
 ===========
