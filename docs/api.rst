@@ -174,7 +174,7 @@ Wrapping
 ========
 
 These tools provide wrappers to smooth working with objects that produce or
-consume iterable.
+consume iterables.
 
 ----
 
