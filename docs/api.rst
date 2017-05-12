@@ -170,6 +170,27 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: random_combination_with_replacement
 
 
+Wrapping
+========
+
+These tools provide wrappers to smooth working with objects that produce or
+consume iterable.
+
+----
+
+**New itertools**
+
+.. autofunction:: always_iterable
+.. autofunction:: consumer
+.. autofunction:: with_iter
+
+----
+
+**Itertools recipes**
+
+.. autofunction:: iter_except
+
+
 Others
 ======
 
@@ -177,10 +198,7 @@ Others
 
 .. autofunction:: numeric_range(start, stop, step)
 .. autofunction:: side_effect
-.. autofunction:: always_iterable
-.. autofunction:: consumer
 .. autofunction:: iterate
-.. autofunction:: with_iter
 
 ----
 
@@ -190,4 +208,3 @@ Others
 .. autofunction:: accumulate
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc
-.. autofunction:: iter_except
