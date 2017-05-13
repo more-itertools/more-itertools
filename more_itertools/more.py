@@ -1222,16 +1222,13 @@ def numeric_range(*args):
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
 
-    If the *start* argument is omitted, it defaults to ``0``. If the *step*
-    argument is omitted, it defaults to ``1``. If *step* is zero,
-    ``ValueError`` is rasied.
-
-    With only *stop* specified:
+    With only *stop* is specified, *start* defaults to ``0`` and *step*
+    defaults to ``1``:
 
         >>> list(numeric_range(3.5))
         [0.0, 1.0, 2.0, 3.0]
 
-    With *start* and *stop* specified:
+    With only *start* and *stop* are specified, *step* defaults to ``1``:
 
         >>> from decimal import Decimal
         >>> start = Decimal('2.1')
@@ -1239,7 +1236,7 @@ def numeric_range(*args):
         >>> list(numeric_range(start, stop))
         [Decimal('2.1'), Decimal('3.1'), Decimal('4.1')]
 
-    With *start*, *stop*, and *step* defined:
+    With *start*, *stop*, and *step*  are specified:
 
         >>> from fractions import Fraction
         >>> start = Fraction(1, 2)  # Start at 1/2
@@ -1248,10 +1245,12 @@ def numeric_range(*args):
         >>> list(numeric_range(start, stop, step))
         [Fraction(1, 2), Fraction(1, 1), Fraction(3, 2), Fraction(2, 1)]
 
-    Negative steps are supported:
+    If *step* is zero,``ValueError`` is rasied. Negative steps are supported:
 
         >>> list(numeric_range(3, -1, -1.0))
         [3.0, 2.0, 1.0, 0.0]
+
+    The yielded items will have the same type as the first argument.
 
     Be aware of the limitations of floating point numbers; the representation
     of the yielded numbers may be surprising.
