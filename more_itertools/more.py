@@ -1247,7 +1247,7 @@ def numeric_range(*args):
         >>> list(numeric_range(start, stop, step))
         [Fraction(1, 2), Fraction(1, 1), Fraction(3, 2), Fraction(2, 1)]
 
-    If *step* is zero,``ValueError`` is rasied. Negative steps are supported:
+    If *step* is zero, ``ValueError`` is rasied. Negative steps are supported:
 
         >>> list(numeric_range(3, -1, -1.0))
         [3.0, 2.0, 1.0, 0.0]
