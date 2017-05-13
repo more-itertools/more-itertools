@@ -1228,7 +1228,7 @@ def numeric_range(*args):
         >>> list(numeric_range(3.5))
         [0.0, 1.0, 2.0, 3.0]
 
-    With only *start* and *stop* are specified, *step* defaults to ``1``:
+    With only *start* and *stop* specified, *step* defaults to ``1``:
 
         >>> from decimal import Decimal
         >>> start = Decimal('2.1')
@@ -1236,7 +1236,7 @@ def numeric_range(*args):
         >>> list(numeric_range(start, stop))
         [Decimal('2.1'), Decimal('3.1'), Decimal('4.1')]
 
-    With *start*, *stop*, and *step*  are specified:
+    With *start*, *stop*, and *step*  specified:
 
         >>> from fractions import Fraction
         >>> start = Fraction(1, 2)  # Start at 1/2
