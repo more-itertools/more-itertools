@@ -1260,9 +1260,8 @@ def numeric_range(*args):
     argc = len(args)
     if argc == 1:
         stop, = args
-        arg_type = type(stop)
-        start = arg_type(0)
-        step = arg_type(1)
+        start = type(stop)(0)
+        step = 1
     elif argc == 2:
         start, stop = args
         step = 1

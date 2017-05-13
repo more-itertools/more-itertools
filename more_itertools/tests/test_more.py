@@ -1175,6 +1175,9 @@ class ArithmeticSequenceTests(TestCase):
         ]:
             actual = list(numeric_range(*args))
             self.assertEqual(actual, expected)
+            self.assertTrue(
+                all(type(a) == type(e) for a, e in zip(actual, expected))
+            )
 
     def test_arg_count(self):
         self.assertRaises(TypeError, lambda: list(numeric_range()))
