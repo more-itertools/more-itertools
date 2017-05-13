@@ -1222,7 +1222,7 @@ def numeric_range(*args):
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
 
-    With only *stop* is specified, *start* defaults to ``0`` and *step*
+    With only *stop* specified, *start* defaults to ``0`` and *step*
     defaults to ``1``. The output items will match the type of *stop*:
 
         >>> list(numeric_range(3.5))
