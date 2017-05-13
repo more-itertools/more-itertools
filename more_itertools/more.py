@@ -1229,7 +1229,7 @@ def numeric_range(*args):
     With only *stop* specified:
 
         >>> list(numeric_range(3.5))
-        [0, 1, 2, 3]
+        [0.0, 1.0, 2.0, 3.0]
 
     With *start* and *stop* specified:
 
@@ -1259,9 +1259,10 @@ def numeric_range(*args):
     """
     argc = len(args)
     if argc == 1:
-        start = 0
         stop, = args
-        step = 1
+        arg_type = type(stop)
+        start = arg_type(0)
+        step = arg_type(1)
     elif argc == 2:
         start, stop = args
         step = 1
