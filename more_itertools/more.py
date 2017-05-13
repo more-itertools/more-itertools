@@ -1152,7 +1152,7 @@ def adjacent(predicate, iterable, distance=1):
         >>> list(adjacent(lambda x: x == 3, range(6)))
         [(False, 0), (False, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
 
-    Set *distance* to change what counts as adjacent. For example, To find
+    Set *distance* to change what counts as adjacent. For example, to find
     whether items are two places away from a ``3``:
 
         >>> list(adjacent(lambda x: x == 3, range(6), distance=2))

@@ -88,7 +88,7 @@ def tabulate(function, start=0):
 
 def tail(n, iterable):
     """
-    Return an iterator over the last n items"
+    Return an iterator over the last n items.
 
         >>> t = tail(3, 'ABCDEFG')
         >>> list(t)
