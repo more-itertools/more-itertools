@@ -4,7 +4,7 @@ from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
 from itertools import chain, count, groupby, islice, repeat, takewhile, tee
-from operator import itemgetter
+from operator import itemgetter, lt, gt
 from sys import version_info
 
 from six import binary_type, string_types, text_type
@@ -286,7 +286,7 @@ def _collate(*iterables, **kwargs):
     key = kwargs.pop('key', lambda a: a)
     reverse = kwargs.pop('reverse', False)
 
-    min_or_max = partial(max if reverse else min, key=lambda a_b: a_b[0])
+    min_or_max = partial(max if reverse else min, key=itemgetter(0))
     peekables = [peekable(it) for it in iterables]
     peekables = [p for p in peekables if p]  # Kill empties.
     while peekables:
@@ -1273,9 +1273,9 @@ def numeric_range(*args):
 
     values = (start + (step * n) for n in count())
     if step > 0:
-        return takewhile(lambda x: x < stop, values)
+        return takewhile(partial(gt, stop), values)
     elif step < 0:
-        return takewhile(lambda x: x > stop, values)
+        return takewhile(partial(lt, stop), values)
     else:
         raise ValueError('numeric_range arg 3 must not be zero')
 
