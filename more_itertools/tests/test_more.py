@@ -1158,7 +1158,8 @@ class ArithmeticSequenceTests(TestCase):
         for args, expected in [
             ((4,), [0, 1, 2, 3]),
             ((4.0,), [0.0, 1.0, 2.0, 3.0]),
-            ((1, 4), [1, 2, 3]),
+            ((1.0, 4), [1.0, 2.0, 3.0]),
+            ((1, 4.0), [1, 2, 3]),
             ((1.0, 5), [1.0, 2.0, 3.0, 4.0]),
             ((0, 20, 5), [0, 5, 10, 15]),
             ((0, 20, 5.0), [0.0, 5.0, 10.0, 15.0]),
@@ -1166,6 +1167,7 @@ class ArithmeticSequenceTests(TestCase):
             ((0, 10, 3.0), [0.0, 3.0, 6.0, 9.0]),
             ((0, -5, -1), [0, -1, -2, -3, -4]),
             ((0.0, -5, -1), [0.0, -1.0, -2.0, -3.0, -4.0]),
+            ((1, 2, Fraction(1, 2)), [Fraction(1, 1), Fraction(3, 2)]),
             ((0,), []),
             ((0.0,), []),
             ((1, 0), []),
@@ -1175,6 +1177,9 @@ class ArithmeticSequenceTests(TestCase):
         ]:
             actual = list(numeric_range(*args))
             self.assertEqual(actual, expected)
+            self.assertTrue(
+                all(type(a) == type(e) for a, e in zip(actual, expected))
+            )
 
     def test_arg_count(self):
         self.assertRaises(TypeError, lambda: list(numeric_range()))
