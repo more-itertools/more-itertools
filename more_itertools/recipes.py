@@ -307,6 +307,7 @@ def powerset(iterable):
 def unique_everseen(iterable, key=None):
     """
     Yield unique elements, preserving order.
+
         >>> list(unique_everseen('AAAABBBCCDAABBB'))
         ['A', 'B', 'C', 'D']
         >>> list(unique_everseen('ABBCcAD', str.lower))
