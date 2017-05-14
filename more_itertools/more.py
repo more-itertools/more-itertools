@@ -52,38 +52,44 @@ _marker = object()
 
 
 def chunked(iterable, n):
-    """Break an iterable into lists of a given length::
+    """Break *iterable* into lists of length *n*:
 
-        >>> list(chunked([1, 2, 3, 4, 5, 6, 7], 3))
-        [[1, 2, 3], [4, 5, 6], [7]]
+        >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
+        [[1, 2, 3], [4, 5, 6]]
 
-    If the length of ``iterable`` is not evenly divisible by ``n``, the last
-    returned list will be shorter.
+    If the length of *iterable* is not evenly divisible by *n*, the last
+    returned list will be shorter:
 
-    This is useful for splitting up a computation on a large number of keys
-    into batches, to be pickled and sent off to worker processes. One example
-    is operations on rows in MySQL, which does not implement server-side
-    cursors properly and would otherwise load the entire dataset into RAM on
-    the client.
+        >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
+        [[1, 2, 3], [4, 5, 6], [7, 8]]
+
+    To use a fill-in value instead, see the :func:`grouper` recipe.
+
+    :func:`chunked` is useful for splitting up a computation on a large number
+    of keys into batches, to be pickled and sent off to worker processes. One
+    example is operations on rows in MySQL, which does not implement
+    server-side cursors properly and would otherwise load the entire dataset
+    into RAM on the client.
 
     """
     return iter(partial(take, n, iter(iterable)), [])
 
 
 def first(iterable, default=_marker):
-    """Return the first item of an iterable, ``default`` if there is none.
+    """Return the first item of *iterable*, or *default* if *iterable* is
+    empty.
 
         >>> first([0, 1, 2, 3])
         0
         >>> first([], 'some default')
         'some default'
 
-    If ``default`` is not provided and there are no items in the iterable,
+    If *default* is not provided and there are no items in the iterable,
     raise ``ValueError``.
 
-    ``first()`` is useful when you have a generator of expensive-to-retrieve
+    :func:`first` is useful when you have a generator of expensive-to-retrieve
     values and want any arbitrary one. It is marginally shorter than
-    ``next(iter(...), default)``.
+    ``next(iter(iterable), default)``.
 
     """
     try:
@@ -102,8 +108,8 @@ def first(iterable, default=_marker):
 class peekable(object):
     """Wrap an iterator to allow lookahead and prepending elements.
 
-    Call ``peek()`` on the result to get the value that will next pop out of
-    ``next()``, without advancing the iterator:
+    Call :meth:`peek` on the result to get the value that will be returned
+    by :func:`next`. This won't advance the iterator:
 
         >>> p = peekable(['a', 'b'])
         >>> p.peek()
@@ -111,15 +117,15 @@ class peekable(object):
         >>> next(p)
         'a'
 
-    Pass ``peek()`` a default value to return that instead of raising
+    Pass :meth:`peek` a default value to return that instead of raising
     ``StopIteration`` when the iterator is exhausted.
 
         >>> p = peekable([])
         >>> p.peek('hi')
         'hi'
 
-    peekables also offer a ``prepend()`` method which will insert items before
-    the remaining part of the underlying source iterator.
+    peekables also offer a :meth:`prepend` method, which "inserts" items
+    at the head of the iterable:
 
         >>> p = peekable([1, 2, 3])
         >>> p.prepend(10, 11, 12)
@@ -130,13 +136,9 @@ class peekable(object):
         >>> list(p)
         [11, 12, 1, 2, 3]
 
-    Prepended items are treated by other peekable methods exactly as if they
-    had come from the source iterator.
-
-    You may index the peekable to look ahead by more than one item.
-    The values up to the index you specified will be cached.
-    Index 0 is the item that will be returned by ``next()``, index 1 is the
-    item after that, and so on:
+    peekables can be indexed. Index 0 is the item that will be returned by
+    :func:`next`, index 1 is the item after that, and so on:
+    The values up to the given index will be cached.
 
         >>> p = peekable(['a', 'b', 'c', 'd'])
         >>> p[0]
@@ -145,27 +147,20 @@ class peekable(object):
         'b'
         >>> next(p)
         'a'
-        >>> p.prepend('x')
-        >>> p[1]
-        'b'
-        >>> next(p)
-        'x'
-        >>> next(p)
-        'b'
 
     Negative indexes are supported, but be aware that they will cache the
     remaining items in the source iterator, which may require significant
     storage.
 
-    To test whether there are more items in the iterator, examine the
-    peekable's truth value. If it is truthy, there are more items (which may
-    have been prepended or obtained from the source iterator).
+    To check whether a peekable is exhausted, check its truth value:
 
-        >>> assert peekable([1])
-        >>> p = peekable([])
-        >>> assert not p
-        >>> p.prepend(1)
-        >>> assert p
+        >>> p = peekable(['a', 'b'])
+        >>> if p:  # peekable has items
+        ...     list(p)
+        ['a', 'b']
+        >>> if not p:  # peekable is exhaused
+        ...     list(p)
+        []
 
     """
     def __init__(self, iterable):
@@ -303,7 +298,7 @@ def collate(*iterables, **kwargs):
         ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
 
     Works lazily, keeping only the next value from each iterable in memory. Use
-    ``collate()`` to, for example, perform a n-way mergesort of items that
+    :func:`collate` to, for example, perform a n-way mergesort of items that
     don't fit in memory.
 
     :arg key: A function that returns a comparison value for an item. Defaults
@@ -316,7 +311,7 @@ def collate(*iterables, **kwargs):
     unexpected results.
 
     If neither of the keyword arguments are specified, this function delegates
-    to ``heapq.merge()``.
+    to :func:`heapq.merge`.
 
     """
     if not kwargs:
@@ -362,7 +357,7 @@ def consumer(func):
 
 
 def ilen(iterable):
-    """Return the number of items in ``iterable``.
+    """Return the number of items in *iterable*.
 
         >>> ilen(x for x in range(1000000) if x % 3 == 0)
         333334
@@ -434,7 +429,7 @@ def one(iterable):
 
 
 def distinct_permutations(iterable):
-    """Yield successive distinct permutations of the elements in the iterable.
+    """Yield successive distinct permutations of the elements in *iterable*.
 
         >>> sorted(distinct_permutations([1, 0, 1]))
         [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
@@ -445,8 +440,8 @@ def distinct_permutations(iterable):
 
     Duplicate permutations arise when there are duplicated elements in the
     input iterable. The number of items returned is
-    ``n! / (x_1! * x_2! * ... * x_n!)``, where ``n`` is the total number of
-    items input, and each ``x_i`` is the count of a distinct item in the input
+    `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
+    items input, and each `x_i` is the count of a distinct item in the input
     sequence.
 
     """
@@ -482,7 +477,7 @@ def distinct_permutations(iterable):
 
 
 def intersperse(e, iterable):
-    """Intersperse element ``e`` between the elements of *iterable*.
+    """Intersperse object *e* between the items of *iterable*.
 
         >>> list(intersperse('x', 'ABCD'))
         ['A', 'x', 'B', 'x', 'C', 'x', 'D']
@@ -537,13 +532,13 @@ def windowed(seq, n, fillvalue=None, step=1):
         >>> list(all_windows)
         [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
 
-    When the window is larger than the iterable, ``fillvalue`` is used in place
+    When the window is larger than the iterable, *fillvalue* is used in place
     of missing values::
 
         >>> list(windowed([1, 2, 3], 4))
         [(1, 2, 3, None)]
 
-    Each window will advance in increments of *step*::
+    Each window will advance in increments of *step*:
 
         >>> list(windowed([1, 2, 3, 4, 5, 6], 3, fillvalue='!', step=2))
         [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
@@ -583,8 +578,8 @@ def windowed(seq, n, fillvalue=None, step=1):
 
 
 class bucket(object):
-    """Wrap an iterable and return an object that buckets the iterable into
-    child iterables based on a ``key`` function.
+    """Wrap *iterable* and return an object that buckets it iterable into
+    child iterables based on a *key* function.
 
         >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
         >>> s = bucket(iterable, key=lambda s: s[0])
@@ -598,6 +593,7 @@ class bucket(object):
 
     The original iterable will be advanced and its items will be cached until
     they are used by the child iterables. This may require significant storage.
+
     Be aware that attempting to select a bucket that no items correspond to
     will exhaust the iterable and cache all values.
 
@@ -694,9 +690,8 @@ def interleave(*iterables):
         >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
         [1, 4, 6, 2, 5, 7]
 
-    Note that this is the same as ``chain(*zip(*iterables))``.
     For a version that doesn't terminate after the shortest iterable is
-    exhausted, see ``interleave_longest()``.
+    exhausted, see :func:`interleave_longest`.
 
     """
     return chain.from_iterable(zip(*iterables))
@@ -709,26 +704,33 @@ def interleave_longest(*iterables):
         >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
         [1, 4, 6, 2, 5, 7, 3, 8]
 
-    Note that this is an alternate implementation of ``roundrobin()`` from the
-    itertools documentation.
-
     """
     i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
     return filter(lambda x: x is not _marker, i)
 
 
 def collapse(iterable, base_type=None, levels=None):
-    """Flatten an iterable containing some iterables (themselves containing
-    some iterables, etc.) into non-iterable types, strings, elements
-    matching ``isinstance(element, base_type)``, and elements that are
-    ``levels`` levels down.
+    """Flatten an iterable with multiple levels of nesting (e.g., a list of
+    lists of tuples) into non-iterable types.
 
-        >>> list(collapse([[1], 2, [[3], 4], [[[5]]], 'abc']))
-        [1, 2, 3, 4, 5, 'abc']
-        >>> list(collapse([[1], 2, [[3], 4], [[[5]]]], levels=2))
-        [1, 2, 3, 4, [5]]
-        >>> list(collapse((1, [2], (3, [4, (5,)])), list))
-        [1, [2], 3, [4, (5,)]]
+        >>> iterable = [(1, 2), ([3, 4], [[5], [6]])]
+        >>> list(collapse(iterable))
+        [1, 2, 3, 4, 5, 6]
+
+    String types are not considered iterable and will not be collapsed.
+    To avoid collapsing other types, specify *base_type*:
+
+        >>> iterable = ['ab', ('cd', 'ef'), ['gh', 'ij']]
+        >>> list(collapse(iterable, base_type=tuple))
+        ['ab', ('cd', 'ef'), 'gh', 'ij']
+
+    Specify *levels* to stop flattening after a certain level:
+
+    >>> iterable = [('a', ['b']), ('c', ['d'])]
+    >>> list(collapse(iterable))  # Fully flattened
+    ['a', 'b', 'c', 'd']
+    >>> list(collapse(iterable, levels=1))  # Only one level flattened
+    ['a', ['b'], 'c', ['d']]
 
     """
     def walk(node, level):
@@ -829,7 +831,7 @@ def sliced(seq, n):
         [(1, 2, 3), (4, 5, 6), (7, 8)]
 
     This function will only work for iterables that support slicing.
-    For non-sliceable iterables, see ``chunked()``.
+    For non-sliceable iterables, see :func:`chunked`.
 
     """
     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
@@ -918,23 +920,23 @@ def distribute(n, iterable):
         >>> list(group_2)
         [2, 4, 6]
 
-    If the length of the iterable is not evenly divisible by n, then the
-    length of the smaller iterables will not be identical::
+    If the length of *iterable* is not evenly divisible by *n*, then the
+    length of the returned iterables will not be identical:
 
         >>> children = distribute(3, [1, 2, 3, 4, 5, 6, 7])
         >>> [list(c) for c in children]
         [[1, 4, 7], [2, 5], [3, 6]]
 
-    If the length of the iterable is smaller than n, then the last returned
+    If the length of *iterable* is smaller than *n*, then the last returned
     iterables will be empty:
 
         >>> children = distribute(5, [1, 2, 3])
         >>> [list(c) for c in children]
         [[1], [2], [3], [], []]
 
-    This function uses ``itertools.tee`` and may require significant storage.
-    If you need the order items in the smaller iterables to match the original
-    iterable, see ``divide()``.
+    This function uses :func:`itertools.tee` and may require significant
+    storage. If you need the order items in the smaller iterables to match the
+    original iterable, see :func:`divide`.
 
     """
     if n < 1:
@@ -1058,8 +1060,8 @@ def divide(n, iterable):
         >>> list(group_2)
         [4, 5, 6]
 
-    If the length of the iterable is not evenly divisible by n, then the
-    length of the smaller iterables will not be identical::
+    If the length of *iterable* is not evenly divisible by *n*, then the
+    length of the returned iterables will not be identical:
 
         >>> children = divide(3, [1, 2, 3, 4, 5, 6, 7])
         >>> [list(c) for c in children]
@@ -1073,7 +1075,7 @@ def divide(n, iterable):
         [[1], [2], [3], [], []]
 
     This function will exhaust the iterable before returning and may require
-    significant storage. If order is not important, see ``distribute()``,
+    significant storage. If order is not important, see :func:`distribute`,
     which does not first pull the iterable into memory.
 
     """
@@ -1166,7 +1168,7 @@ def adjacent(predicate, iterable, distance=1):
     The predicate function will only be called once for each item in the
     iterable.
 
-    See also ``groupby_transform()``, which can be used with this function
+    See also :func:`groupby_transform`, which can be used with this function
     to group ranges of items with the same ``bool`` value.
 
     """
@@ -1182,26 +1184,23 @@ def adjacent(predicate, iterable, distance=1):
 
 
 def groupby_transform(iterable, keyfunc=None, valuefunc=None):
-    """Make an iterator that returns consecutive keys and groups from the
-    *iterable*. *keyfunc* is a function used to compute a grouping key for each
-    item. *valuefunc* is a function for transforming the items after grouping.
+    """An extension of :func:`itertools.groupby` that transforms the values of
+    *iterable* after grouping them.
+    *keyfunc* is a function used to compute a grouping key for each item.
+    *valuefunc* is a function for transforming the items after grouping.
+
+        >>> iterable = 'AaaABbBCcA'
+        >>> keyfunc = lambda x: x.upper()
+        >>> valuefunc = lambda x: x.lower()
+        >>> grouper = groupby_transform(iterable, keyfunc, valuefunc)
+        >>> [(k, ''.join(g)) for k, g in grouper]
+        [('A', 'aaaa'), ('B', 'bbb'), ('C', 'cc'), ('A', 'a')]
 
     *keyfunc* and *valuefunc* default to identity functions if they are not
-    specified. When *valuefunc* is not specified, ``groupby_transform`` is the
-    same as ``itertools.groupby()``.
+    specified.
 
-    For example, to group a list of numbers by rounding down to the nearest 10,
-    and then transform them into strings:
-
-        >>> iterable = [0, 1, 12, 13, 23, 24]
-        >>> keyfunc = lambda x: 10 * (x // 10)
-        >>> valuefunc = lambda x: str(x)
-        >>> grouper = groupby_transform(iterable, keyfunc, valuefunc)
-        >>> [(k, list(g)) for k, g in grouper]
-        [(0, ['0', '1']), (10, ['12', '13']), (20, ['23', '24'])]
-
-    ``groupby_transform`` is useful when grouping elements of an iterable using
-    a separate iterable as the key. To do this,  ``zip()`` the iterables
+    :func:`groupby_transform` is useful when grouping elements of an iterable
+    using a separate iterable as the key. To do this, :func:`zip` the iterables
     and pass a *keyfunc* that extracts the first element and a *valuefunc*
     that extracts the second element::
 

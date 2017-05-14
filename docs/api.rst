@@ -32,11 +32,12 @@ These tools yield groups of items from a source iterable.
 Lookahead
 =========
 
+These tools peek at an iterable's values without advancing it.
+
 ----
 
 **New itertools**
 
-These tools peek at an iterable's values without advancing it.
 
 .. autofunction:: spy
 .. autoclass:: peekable
