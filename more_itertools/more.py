@@ -3,7 +3,16 @@ from __future__ import print_function
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, count, groupby, islice, repeat, takewhile, tee
+from itertools import (
+    chain,
+    compress,
+    count,
+    groupby,
+    islice,
+    repeat,
+    takewhile,
+    tee
+)
 from operator import itemgetter, lt, gt
 from sys import version_info
 
@@ -1380,4 +1389,4 @@ def locate(iterable, pred=bool, n=0):
         6
 
     """
-    return nth((i for i, item in enumerate(iterable) if pred(item)), n)
+    return nth(compress(count(), map(pred, iterable)), n)
