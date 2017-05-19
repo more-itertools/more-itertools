@@ -31,7 +31,7 @@ def accumulate(iterable, func=operator.add):
     """
     Return an iterator whose items are the accumulated results of a function
     (specified by the optional *func* argument) that takes two arguments.
-    By default, returns accumulated sums with ``operator.add()``.
+    By default, returns accumulated sums with :func:`operator.add`.
 
         >>> list(accumulate([1, 2, 3, 4, 5]))  # Running sum
         [1, 3, 6, 10, 15]
@@ -58,7 +58,7 @@ def accumulate(iterable, func=operator.add):
 
 
 def take(n, iterable):
-    """Return first n items of the iterable as a list
+    """Return first *n* items of the iterable as a list.
 
         >>> take(3, range(10))
         [0, 1, 2]
@@ -73,14 +73,18 @@ def take(n, iterable):
 
 
 def tabulate(function, start=0):
-    """Return an iterator mapping the function over linear input.
+    """Return an iterator over the results of ``func(start)``,
+    ``func(start + 1)``, ``func(start + 2)``...
 
-    The start argument will be increased by 1 each time the iterator is called
-    and fed into the function.
+    *func* should be a function that accepts one integer argument.
 
-        >>> t = tabulate(lambda x: x**2, -3)
-        >>> take(3, t)
-        [9, 4, 1]
+    If *start* is not specified it defaults to 0. It will be incremented each
+    time the iterator is advanced.
+
+        >>> square = lambda x: x ** 2
+        >>> iterator = tabulate(square, -3)
+        >>> take(4, iterator)
+        [9, 4, 1, 0]
 
     """
     return map(function, count(start))
@@ -88,7 +92,7 @@ def tabulate(function, start=0):
 
 def tail(n, iterable):
     """
-    Return an iterator over the last n items.
+    Return an iterator over the last *n* items of *iterable*.
 
         >>> t = tail(3, 'ABCDEFG')
         >>> list(t)
@@ -99,7 +103,8 @@ def tail(n, iterable):
 
 
 def consume(iterator, n=None):
-    """Advance the iterator n-steps ahead. If n is none, consume entirely.
+    """Advance *iterable* by *n* steps. If *n* is ``None``, consume it
+    entirely.
 
     Efficiently exhausts an iterator without returning values. Defaults to
     consuming the whole iterator, but an optional second argument may be
@@ -138,7 +143,7 @@ def consume(iterator, n=None):
 
 
 def nth(iterable, n, default=None):
-    """Returns the nth item or a default value
+    """Returns the nth item or a default value.
 
         >>> l = range(10)
         >>> nth(l, 3)
@@ -152,7 +157,7 @@ def nth(iterable, n, default=None):
 
 def all_equal(iterable):
     """
-    Returns True if all the elements are equal to each other.
+    Returns ``True`` if all the elements are equal to each other.
 
         >>> all_equal('aaaa')
         True
@@ -165,7 +170,7 @@ def all_equal(iterable):
 
 
 def quantify(iterable, pred=bool):
-    """Return the how many times the predicate is true
+    """Return the how many times the predicate is true.
 
         >>> quantify([True, False, True])
         2
@@ -175,19 +180,21 @@ def quantify(iterable, pred=bool):
 
 
 def padnone(iterable):
-    """Returns the sequence of elements and then returns None indefinitely.
+    """Returns the sequence of elements and then returns ``None`` indefinitely.
 
         >>> take(5, padnone(range(3)))
         [0, 1, 2, None, None]
 
-    Useful for emulating the behavior of the built-in map() function.
+    Useful for emulating the behavior of the built-in :func:`map` function.
+
+    See also :func:`padded`.
 
     """
     return chain(iterable, repeat(None))
 
 
 def ncycles(iterable, n):
-    """Returns the sequence elements n times
+    """Returns the sequence elements *n* times
 
         >>> list(ncycles(["a", "b"], 3))
         ['a', 'b', 'a', 'b', 'a', 'b']
@@ -197,7 +204,7 @@ def ncycles(iterable, n):
 
 
 def dotproduct(vec1, vec2):
-    """Returns the dot product of the two iterables
+    """Returns the dot product of the two iterables.
 
         >>> dotproduct([10, 10], [20, 20])
         400
@@ -207,22 +214,37 @@ def dotproduct(vec1, vec2):
 
 
 def flatten(listOfLists):
-    """Return an iterator flattening one level of nesting in a list of lists
+    """Return an iterator flattening one level of nesting in a list of lists.
 
         >>> list(flatten([[0, 1], [2, 3]]))
         [0, 1, 2, 3]
+
+    See also :func:`collapse`, which can flatten multiple levels of nesting.
 
     """
     return chain.from_iterable(listOfLists)
 
 
 def repeatfunc(func, times=None, *args):
-    """Repeat calls to func with specified arguments.
+    """Call *func* with *args* repeatedly, returning an iterable over the
+    results.
 
-        >>> list(repeatfunc(lambda: 5, 3))
-        [5, 5, 5]
-        >>> list(repeatfunc(lambda x: x ** 2, 3, 3))
-        [9, 9, 9]
+    If *times* is specified, the iterable will terminate after that many
+    repetitions:
+
+        >>> from operator import add
+        >>> times = 4
+        >>> args = 3, 5
+        >>> list(repeatfunc(add, times, *args))
+        [8, 8, 8, 8]
+
+    If *times* is ``None`` the iterable will not terminate:
+
+        >>> from random import randrange
+        >>> times = None
+        >>> args = 1, 11
+        >>> take(6, repeatfunc(randrange, times, *args))  # doctest:+SKIP
+        [2, 4, 8, 1, 8, 4]
 
     """
     if times is None:
@@ -243,7 +265,7 @@ def pairwise(iterable):
 
 
 def grouper(n, iterable, fillvalue=None):
-    """Collect data into fixed-length chunks or blocks
+    """Collect data into fixed-length chunks or blocks.
 
         >>> list(grouper(3, 'ABCDEFG', 'x'))
         [('A', 'B', 'C'), ('D', 'E', 'F'), ('G', 'x', 'x')]
@@ -254,10 +276,12 @@ def grouper(n, iterable, fillvalue=None):
 
 
 def roundrobin(*iterables):
-    """Yields an item from each iterable, alternating between them
+    """Yields an item from each iterable, alternating between them.
 
         >>> list(roundrobin('ABC', 'D', 'EF'))
         ['A', 'D', 'E', 'B', 'F', 'C']
+
+    See :func:`interleave_longest` for a slightly faster implementation.
 
     """
     # Recipe credited to George Sakkis
@@ -294,7 +318,7 @@ def partition(pred, iterable):
 
 
 def powerset(iterable):
-    """Yields all possible subsets of the iterable
+    """Yields all possible subsets of the iterable.
 
         >>> list(powerset([1,2,3]))
         [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
@@ -307,13 +331,14 @@ def powerset(iterable):
 def unique_everseen(iterable, key=None):
     """
     Yield unique elements, preserving order.
+
         >>> list(unique_everseen('AAAABBBCCDAABBB'))
         ['A', 'B', 'C', 'D']
         >>> list(unique_everseen('ABBCcAD', str.lower))
         ['A', 'B', 'C', 'D']
 
     Sequences with a mix of hashable and unhashable items can be used.
-    The function will be slower (i.e., O(N^2)) for unhashable items.
+    The function will be slower (i.e., `O(n^2)`) for unhashable items.
 
     """
     seenset = set()
@@ -359,8 +384,8 @@ def iter_except(func, exception, first=None):
     """Yields results from a function repeatedly until an exception is raised.
 
     Converts a call-until-exception interface to an iterator interface.
-    Like __builtin__.iter(func, sentinel) but uses an exception instead
-    of a sentinel to end the loop.
+    Like ``iter(func, sentinel)``, but uses an exception instead of a sentinel
+    to end the loop.
 
         >>> l = [0, 1, 2]
         >>> list(iter_except(l.pop, IndexError))
@@ -397,13 +422,19 @@ def first_true(iterable, default=False, pred=None):
 
 
 def random_product(*args, **kwds):
-    """Returns a random pairing of items from each iterable argument
+    """Draw an item at random from each of the input iterables.
 
-    If `repeat` is provided as a kwarg, it's value will be used to indicate
-    how many pairings should be chosen.
+        >>> random_product('abc', range(4), 'XYZ')  # doctest:+SKIP
+        ('c', 3, 'Z')
 
-        >>> random_product(['a', 'b', 'c'], [1, 2], repeat=2) # doctest:+SKIP
-        ('b', '2', 'c', '2')
+    If *repeat* is provided as a keyword argument, that many items will be
+    drawn from each iterable.
+
+        >>> random_product('abcd', range(4), repeat=2)  # doctest:+SKIP
+        ('a', 2, 'd', 3)
+
+    This equivalent to taking a random selection from
+    ``itertools.product(*args, **kwarg)``.
 
     """
     pools = [tuple(pool) for pool in args] * kwds.get('repeat', 1)
@@ -411,12 +442,16 @@ def random_product(*args, **kwds):
 
 
 def random_permutation(iterable, r=None):
-    """Returns a random permutation.
+    """Return a random *r* length permutation of the elements in *iterable*.
 
-    If r is provided, the permutation is truncated to length r.
+    If *r* is not specified or is ``None``, then *r* defaults to the length of
+    *iterable*.
 
-        >>> random_permutation(range(5)) # doctest:+SKIP
+        >>> random_permutation(range(5))  # doctest:+SKIP
         (3, 4, 0, 1, 2)
+
+    This equivalent to taking a random selection from
+    ``itertools.permutations(iterable, r)``.
 
     """
     pool = tuple(iterable)
@@ -425,10 +460,13 @@ def random_permutation(iterable, r=None):
 
 
 def random_combination(iterable, r):
-    """Returns a random combination of length r, chosen without replacement.
+    """Return a random *r* length subsequence of the elements in *iterable*.
 
-        >>> random_combination(range(5), 3) # doctest:+SKIP
+        >>> random_combination(range(5), 3)  # doctest:+SKIP
         (2, 3, 4)
+
+    This equivalent to taking a random selection from
+    ``itertools.combinations(iterable, r)``.
 
     """
     pool = tuple(iterable)
@@ -438,10 +476,14 @@ def random_combination(iterable, r):
 
 
 def random_combination_with_replacement(iterable, r):
-    """Returns a random combination of length r, chosen with replacement.
+    """Return a random *r* length subsequence of elements in *iterable*,
+    allowing individual elements to be repeated.
 
-        >>> random_combination_with_replacement(range(3), 5) # # doctest:+SKIP
+        >>> random_combination_with_replacement(range(3), 5) # doctest:+SKIP
         (0, 0, 1, 2, 2)
+
+    This equivalent to taking a random selection from
+    ``itertools.combinations_with_replacement(iterable, r)``.
 
     """
     pool = tuple(iterable)
