@@ -200,6 +200,7 @@ Others
 .. autofunction:: numeric_range(start, stop, step)
 .. autofunction:: side_effect
 .. autofunction:: iterate
+.. autofunction:: sub_index
 
 ----
 
