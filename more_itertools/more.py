@@ -948,8 +948,8 @@ def distribute(n, iterable):
 
 def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     """Yield tuples whose elements are offset from *iterable*.
-    The amount by which the ``i``-th item in each tuple is offset is given by
-    the ``i``-th item in *offsets*.
+    The amount by which the `i`-th item in each tuple is offset is given by
+    the `i`-th item in *offsets*.
 
         >>> list(stagger([0, 1, 2, 3]))
         [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
@@ -975,8 +975,8 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
 
 
 def zip_offset(*iterables, **kwargs):
-    """``zip`` the input *iterables* together, but offset the ``i``-th iterable
-    by the ``i``-th item in *offsets*.
+    """``zip`` the input *iterables* together, but offset the `i`-th iterable
+    by the `i`-th item in *offsets*.
 
         >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1)))
         [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e')]
@@ -1145,8 +1145,8 @@ def always_iterable(obj):
 
 
 def adjacent(predicate, iterable, distance=1):
-    """Return an iterable over ``(bool, item)`` tuples where the ``item`` is
-    drawn from *iterable* and the ``bool`` indicates whether
+    """Return an iterable over `(bool, item)` tuples where the `item` is
+    drawn from *iterable* and the `bool` indicates whether
     that item satisfies the *predicate* or is adjacent to an item that does.
 
     For example, to find whether items are adjacent to a ``3``::
@@ -1169,7 +1169,7 @@ def adjacent(predicate, iterable, distance=1):
     iterable.
 
     See also :func:`groupby_transform`, which can be used with this function
-    to group ranges of items with the same ``bool`` value.
+    to group ranges of items with the same `bool` value.
 
     """
     # Allow distance=0 mainly for testing that it reproduces results with map()
