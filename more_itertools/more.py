@@ -1310,9 +1310,14 @@ def locate(iterable, pred=bool):
 
     *pred* defaults to ``bool``, which will select truthy items:
 
-        >>> iterable = [0, 1, 1, 0, 1, 0, 0]
-        >>> list(locate(iterable))
+        >>> list(locate([0, 1, 1, 0, 1, 0, 0]))
         [1, 2, 4]
+
+    Set *pred* to a custom function to, e.g., find the indexes for a particular
+    item.
+
+        >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
+        [1, 3]
 
     """
     return compress(count(), map(pred, iterable))
