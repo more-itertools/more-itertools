@@ -1214,48 +1214,6 @@ class CountCycleTests(TestCase):
         self.assertEqual(list(count_cycle('abc', -3)), [])
 
 
-class ItemIndexTests(TestCase):
-    def test_basic(self):
-        for item, kwargs, expected in [
-            ('a', {}, 0),
-            ('a', {'start': 1}, 8),
-            ('D', {'start': 8, 'end': 15}, None),
-            ('E', {'end': 16}, None),
-        ]:
-            iterable = (x for x in 'abcdABCDabcdABCDE')
-            try:
-                actual = item_index(iterable, item, **kwargs)
-            except ValueError:
-                actual = None
-
-            self.assertEqual(actual, expected)
-
-    def test_invalid_index(self):
-        with self.assertRaises(ValueError):
-            item_index('abcd', 'a', start=-1)
-
-
-class SubIndexTests(TestCase):
-    def test_basic(self):
-        for sub, kwargs, expected in [
-            ('abc', {}, 0),
-            ('abc', {'start': 1}, 8),
-            ('DE', {'start': 8, 'end': 15}, None),
-            ('E', {'end': 16}, None),
-        ]:
-            iterable = (x for x in 'abcdABCDabcdABCDE')
-            try:
-                actual = sub_index(iterable, sub, **kwargs)
-            except ValueError:
-                actual = None
-
-            self.assertEqual(actual, expected)
-
-    def test_invalid_index(self):
-        with self.assertRaises(ValueError):
-            sub_index(['a', 'b', 'c', 'd'], ['a', 'b'], start=-1)
-
-
 class LocateTests(TestCase):
     def test_default_pred(self):
         iterable = [0, 1, 1, 0, 1, 0, 0]

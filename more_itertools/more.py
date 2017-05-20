@@ -40,7 +40,6 @@ __all__ = [
     'interleave',
     'intersperse',
     'iterate',
-    'item_index',
     'locate',
     'numeric_range',
     'one',
@@ -53,7 +52,6 @@ __all__ = [
     'split_before',
     'spy',
     'stagger',
-    'sub_index',
     'unique_to_each',
     'windowed',
     'with_iter',
@@ -1304,65 +1302,6 @@ def count_cycle(iterable, n=None):
         return iter(())
     counter = count() if n is None else range(n)
     return ((i, item) for i in counter for item in iterable)
-
-
-def item_index(iterable, item, start=0, end=None):
-    """An extension of :func:`list.index` for iterables that returns the index
-    of *item* in *iterable*. Raises ``ValueError`` if it is not present.
-
-        >>> item_index(['mercury', 'venus', 'earth', 'mars'], 'earth')
-        2
-
-    Specify *start* and/or *end* to restrict the search:
-
-        >>> iterable = ['a', 'b', 'c', 'd', 'a', 'b', 'c', 'd']
-        >>> item = 'b'
-        >>> item_index(iterable, item, start=3, end=6)
-        5
-
-    Unlike its list-based counterpart, this function does not accept negative
-    *start* or *stop* values.
-
-    To search for a sub-sequence, see :func:`sub_index`.
-
-    """
-    it = filter(
-        lambda x: x[1] == item,
-        enumerate(islice(iterable, start, end), start),
-    )
-    return first(it)[0]
-
-
-def sub_index(iterable, sub, start=0, end=None):
-    """An extension of :func:`str.index` for iterables that returns the index
-    of sub-sequence *sub* in *iterable*. Raises ``ValueError`` if it is not
-    present.
-
-        >>> iterable = ['george', 'lucille', 'gob', 'michael', 'lindsay']
-        >>> sub = ['michael', 'lindsay']
-        >>> sub_index(iterable, sub)
-        3
-
-    Specify *start* and/or *end* to restrict the search:
-
-        >>> iterable = ['a', 'b', 'c', 'd', 'a', 'b', 'c', 'd']
-        >>> sub = ['a', 'b']
-        >>> sub_index(iterable, sub, start=1, end=6)
-        4
-
-    Unlike its str-based counterpart, this function does not accept negative
-    *start* or *stop* values.
-
-    Note that *sub* more be an iterable. It will be exhausted. To search for a
-    single item instead of a sub-sequence, see :func:`item_index`.
-
-    """
-    sub = tuple(sub)
-    it = filter(
-        lambda x: x[1] == sub,
-        enumerate(windowed(islice(iterable, start, end), len(sub)), start)
-    )
-    return first(it)[0]
 
 
 def locate(iterable, pred=bool, n=0):
