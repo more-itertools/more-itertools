@@ -1305,7 +1305,7 @@ def count_cycle(iterable, n=None):
 
 
 def locate(iterable, pred=bool):
-    """Yield the index of each item in *iterable* for whic *pred* returns
+    """Yield the index of each item in *iterable* for which *pred* returns
     ``True``.
 
     *pred* defaults to ``bool``, which will select truthy items:
