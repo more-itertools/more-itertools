@@ -1217,16 +1217,18 @@ class CountCycleTests(TestCase):
 class LocateTests(TestCase):
     def test_default_pred(self):
         iterable = [0, 1, 1, 0, 1, 0, 0]
-        self.assertEqual(locate(iterable), 1)
-        self.assertEqual(locate(iterable, n=1), 2)
-        self.assertEqual(locate(iterable, n=2), 4)
-        self.assertEqual(locate(iterable, n=3), None)
+        actual = list(locate(iterable))
+        expected = [1, 2, 4]
+        self.assertEqual(actual, expected)
+
+    def test_no_matches(self):
+        iterable = [0, 0, 0]
+        actual = list(locate(iterable))
+        expected = []
 
     def test_custom_pred(self):
-        iterable = [0, 1, 1, 0, 1, 0, 0]
-        pred = lambda x: bool(x) == False
-        self.assertEqual(locate(iterable, pred), 0)
-        self.assertEqual(locate(iterable, pred, 1), 3)
-        self.assertEqual(locate(iterable, pred, 2), 5)
-        self.assertEqual(locate(iterable, pred, 3), 6)
-        self.assertEqual(locate(iterable, pred, 4), None)
+        iterable = ['0', 1, 1, '0', 1, '0', '0']
+        pred = lambda x: x == '0'
+        actual = list(locate(iterable, pred))
+        expected = [0, 3, 5, 6]
+        self.assertEqual(actual, expected)

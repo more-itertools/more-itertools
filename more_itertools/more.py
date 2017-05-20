@@ -1304,28 +1304,15 @@ def count_cycle(iterable, n=None):
     return ((i, item) for i in counter for item in iterable)
 
 
-def locate(iterable, pred=bool, n=0):
-    """Return the index of the first item for which callable *pred* returns
-    ``True``, optionally skipping the first *n* such items.
-    Returns ``None`` if there are no such items.
+def locate(iterable, pred=bool):
+    """Yield the index of each item in *iterable* for whic *pred* returns
+    ``True``.
 
     *pred* defaults to ``bool``, which will select truthy items:
 
         >>> iterable = [0, 1, 1, 0, 1, 0, 0]
-        >>> locate(iterable)
-        1
-        >>> locate(iterable, n=1)  # Skip the first match
-        2
-
-    This function can be used to determine the index `n`-th occurrence of an
-    item in an iterable, if we consider `n` to be  zero-based:
-
-        >>> iterable = '_a_aaaa'
-        >>> pred = lambda x: x == 'a'
-        >>> locate(iterable, pred, 0)  # The index of the 0th instance of 'a'
-        1
-        >>> locate(iterable, pred, 4)  # The index of the 4th instance of 'a'
-        6
+        >>> list(locate(iterable))
+        [1, 2, 4]
 
     """
-    return nth(compress(count(), map(pred, iterable)), n)
+    return compress(count(), map(pred, iterable))
