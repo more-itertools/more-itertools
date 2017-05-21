@@ -554,37 +554,24 @@ def windowed(seq, n, fillvalue=None, step=1):
         [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
 
     """
+    from fractions import gcd
+
+    def lcm(a, b):
+        return abs(a * b) // gcd(a, b)
     if n < 0:
         raise ValueError('n must be >= 0')
     if n == 0:
-        yield tuple()
-        return
+        return iter([tuple()])
     if step < 1:
         raise ValueError('step must be >= 1')
 
+    longest = step > n
     it = iter(seq)
-    window = deque([], n)
-    append = window.append
+    # it = padded(seq, fillvalue=fillvalue, n=lcm(n, step))
+    it = stagger(it, offsets=range(n), longest=longest, fillvalue=fillvalue)
+    it = islice(it, None, None, step)
+    return it
 
-    # Initial deque fill
-    for _ in range(n):
-        append(next(it, fillvalue))
-    yield tuple(window)
-
-    # Appending new items to the right causes old items to fall off the left
-    i = 0
-    for item in it:
-        append(item)
-        i = (i + 1) % step
-        if i % step == 0:
-            yield tuple(window)
-
-    # If there are items from the iterable in the window, pad with the given
-    # value and emit them.
-    if (i % step) and (step - i < n):
-        for _ in range(step - i):
-            append(fillvalue)
-        yield tuple(window)
 
 
 class bucket(object):
@@ -1308,13 +1295,13 @@ def locate(iterable, pred=bool):
     """Yield the index of each item in *iterable* for which *pred* returns
     ``True``.
 
-    *pred* defaults to ``bool``, which will select truthy items:
+    *pred* defaults to :func:`bool`, which will select truthy items:
 
         >>> list(locate([0, 1, 1, 0, 1, 0, 0]))
         [1, 2, 4]
 
     Set *pred* to a custom function to, e.g., find the indexes for a particular
-    item.
+    item:
 
         >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
         [1, 3]
