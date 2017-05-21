@@ -123,8 +123,6 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: first(iterable[, default])
 .. autofunction:: one
 .. autofunction:: unique_to_each
-.. autofunction:: item_index
-.. autofunction:: sub_index
 .. autofunction:: locate
 
 ----
