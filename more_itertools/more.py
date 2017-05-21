@@ -19,7 +19,7 @@ from sys import version_info
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
-from .recipes import flatten, nth, take
+from .recipes import flatten, take
 
 __all__ = [
     'adjacent',
