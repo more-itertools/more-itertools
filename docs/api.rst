@@ -113,7 +113,7 @@ These tools combine multiple iterables.
 Summarizing
 ===========
 
-These tools return summarized or aggregate data from an iterable.
+These tools return summarized or aggregated data from an iterable.
 
 ----
 
@@ -123,6 +123,7 @@ These tools return summarized or aggregate data from an iterable.
 .. autofunction:: first(iterable[, default])
 .. autofunction:: one
 .. autofunction:: unique_to_each
+.. autofunction:: locate
 
 ----
 

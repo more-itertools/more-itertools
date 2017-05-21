@@ -1212,3 +1212,23 @@ class CountCycleTests(TestCase):
 
     def test_negative(self):
         self.assertEqual(list(count_cycle('abc', -3)), [])
+
+
+class LocateTests(TestCase):
+    def test_default_pred(self):
+        iterable = [0, 1, 1, 0, 1, 0, 0]
+        actual = list(locate(iterable))
+        expected = [1, 2, 4]
+        self.assertEqual(actual, expected)
+
+    def test_no_matches(self):
+        iterable = [0, 0, 0]
+        actual = list(locate(iterable))
+        expected = []
+
+    def test_custom_pred(self):
+        iterable = ['0', 1, 1, '0', 1, '0', '0']
+        pred = lambda x: x == '0'
+        actual = list(locate(iterable, pred))
+        expected = [0, 3, 5, 6]
+        self.assertEqual(actual, expected)

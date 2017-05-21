@@ -3,7 +3,16 @@ from __future__ import print_function
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
-from itertools import chain, count, groupby, islice, repeat, takewhile, tee
+from itertools import (
+    chain,
+    compress,
+    count,
+    groupby,
+    islice,
+    repeat,
+    takewhile,
+    tee
+)
 from operator import itemgetter, lt, gt
 from sys import version_info
 
@@ -31,6 +40,7 @@ __all__ = [
     'interleave',
     'intersperse',
     'iterate',
+    'locate',
     'numeric_range',
     'one',
     'padded',
@@ -1292,3 +1302,22 @@ def count_cycle(iterable, n=None):
         return iter(())
     counter = count() if n is None else range(n)
     return ((i, item) for i in counter for item in iterable)
+
+
+def locate(iterable, pred=bool):
+    """Yield the index of each item in *iterable* for which *pred* returns
+    ``True``.
+
+    *pred* defaults to :func:`bool`, which will select truthy items:
+
+        >>> list(locate([0, 1, 1, 0, 1, 0, 0]))
+        [1, 2, 4]
+
+    Set *pred* to a custom function to, e.g., find the indexes for a particular
+    item:
+
+        >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
+        [1, 3]
+
+    """
+    return compress(count(), map(pred, iterable))
