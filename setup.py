@@ -4,6 +4,7 @@ try:
     import multiprocessing
 except ImportError:
     pass
+from re import sub
 
 from setuptools import setup, find_packages
 
@@ -13,8 +14,9 @@ setup(
     version='3.1.0',
     description='More routines for operating on iterables, beyond itertools',
     long_description=open('README.rst').read() + '\n\n' +
-                     '\n'.join(open('docs/versions.rst').read()
-                                                        .splitlines()[1:]),
+                     sub(r':func:`([a-zA-Z0-9_]+)`', r'\1', '\n'.join(open('docs/versions.rst').read()
+                                                                                         .splitlines()[1:])
+                                                           .replace('.. automodule:: more_itertools', '')),
     author='Erik Rose',
     author_email='erikrose@grinchcentral.com',
     license='MIT',
