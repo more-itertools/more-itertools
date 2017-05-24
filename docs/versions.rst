@@ -2,6 +2,22 @@
 Version History
 ===============
 
+.. automodule:: more_itertools
+
+3.1.0
+-----
+
+* New itertools:
+    * :func:`numeric_range` (Thanks to BebeSparkelSparkel and MSeifert04)
+    * :func:`count_cycle` (Thanks to BebeSparkelSparkel)
+    * :func:`locate` (Thanks to pylang and MSeifert04)
+* Improvements to existing itertools:
+    * A few itertools are now slightly faster due to some function
+      optimizations. (Thanks to MSeifert04)
+* The docs have been substantially revised with installation notes,
+  categories for library functions, links, and more. (Thanks to pylang)
+
+
 3.0.0
 -----
 
