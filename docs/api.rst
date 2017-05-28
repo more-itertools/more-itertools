@@ -142,6 +142,13 @@ These yools yield certain items from an iterable.
 
 ----
 
+**New itertools**
+
+.. autofunction:: lstrip
+.. autofunction:: rstrip
+
+----
+
 **Itertools recipes**
 
 .. autofunction:: take

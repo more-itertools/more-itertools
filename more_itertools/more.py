@@ -7,13 +7,14 @@ from itertools import (
     chain,
     compress,
     count,
+    dropwhile,
     groupby,
     islice,
     repeat,
     takewhile,
     tee
 )
-from operator import itemgetter, lt, gt
+from operator import contains, itemgetter, lt, gt
 from sys import version_info
 
 from six import binary_type, string_types, text_type
@@ -41,10 +42,12 @@ __all__ = [
     'intersperse',
     'iterate',
     'locate',
+    'lstrip',
     'numeric_range',
     'one',
     'padded',
     'peekable',
+    'rstrip',
     'side_effect',
     'sliced',
     'sort_together',
@@ -1321,3 +1324,44 @@ def locate(iterable, pred=bool):
 
     """
     return compress(count(), map(pred, iterable))
+
+
+def lstrip(iterable, skip_items):
+    """Yield the items from *iterable*, but strip any that match *skip_items*
+    from the beginning.
+
+        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+        >>> list(lstrip(iterable, (None, False, '')))
+        [1, 2, None, 3, False, None]
+
+    This function is analagous to :func:`str.lstrip`.
+    Note that the *skip_items* argument is not a prefix; any items that it
+    contains will be stripped.
+
+    """
+    return dropwhile(partial(contains, set(skip_items)), iterable)
+
+
+def rstrip(iterable, skip_items):
+    """Yield the items from *iterable*, but strip any that match *skip_items*
+    from the end.
+
+        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+        >>> list(rstrip(iterable, (None, False, '')))
+        [None, False, None, 1, 2, None, 3]
+
+    This function is analagous to :func:`str.rstrip`.
+    Note that the *skip_items* argument is not a suffix; any items that it
+    contains will be stripped.
+
+    """
+    skip_items = set(skip_items)
+    cache = []
+    for x in iterable:
+        if x in skip_items:
+            cache.append(x)
+        else:
+            for y in cache:
+                yield y
+            cache = []
+            yield x
