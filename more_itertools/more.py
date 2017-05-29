@@ -14,7 +14,7 @@ from itertools import (
     takewhile,
     tee
 )
-from operator import contains, itemgetter, lt, gt
+from operator import itemgetter, lt, gt
 from sys import version_info
 
 from six import binary_type, string_types, text_type
@@ -55,6 +55,7 @@ __all__ = [
     'split_before',
     'spy',
     'stagger',
+    'strip',
     'unique_to_each',
     'windowed',
     'with_iter',
@@ -1339,7 +1340,12 @@ def lstrip(iterable, skip_items):
     contains will be stripped.
 
     """
-    return dropwhile(partial(contains, set(skip_items)), iterable)
+    try:
+        skip_items = set(skip_items)
+    except TypeError:
+        skip_items = list(skip_items)
+
+    return dropwhile(skip_items.__contains__, iterable)
 
 
 def rstrip(iterable, skip_items):
@@ -1355,13 +1361,34 @@ def rstrip(iterable, skip_items):
     contains will be stripped.
 
     """
-    skip_items = set(skip_items)
+    try:
+        skip_items = set(skip_items)
+    except TypeError:
+        skip_items = list(skip_items)
+
     cache = []
+    cache_append = cache.append
     for x in iterable:
         if x in skip_items:
-            cache.append(x)
+            cache_append(x)
         else:
             for y in cache:
                 yield y
-            cache = []
+            del cache[:]
             yield x
+
+
+def strip(iterable, skip_items):
+    """Yield the items from *iterable*, but strip any that match *skip_items*
+    from the beginning and end.
+
+        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+        >>> list(strip(iterable, (None, False, '')))
+        [1, 2, None, 3]
+
+    This function is analagous to :func:`str.strip`.
+    Note that the *skip_items* argument is not a prefix or suffix; any items
+    that it contains will be stripped.
+
+    """
+    return rstrip(lstrip(iterable, skip_items), skip_items)

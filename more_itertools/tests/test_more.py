@@ -1232,3 +1232,29 @@ class LocateTests(TestCase):
         actual = list(locate(iterable, pred))
         expected = [0, 3, 5, 6]
         self.assertEqual(actual, expected)
+
+
+class StripFunctionTests(TestCase):
+    def test_hashable(self):
+        iterable = list('www.example.com')
+        skip_items = list('cmowz.')
+
+        self.assertEqual(
+            list(lstrip(iterable, skip_items)), list('example.com')
+        )
+        self.assertEqual(
+            list(rstrip(iterable, skip_items)), list('www.example')
+        )
+        self.assertEqual(
+            list(strip(iterable, skip_items)), list('example')
+        )
+
+    def test_not_hashable(self):
+        iterable = [
+            list('http://'), list('www'), list('.example'), list('.com')
+        ]
+        skip_items = [list('http://'), list('www'), list('.com')]
+
+        self.assertEqual(list(lstrip(iterable, skip_items)), iterable[2:])
+        self.assertEqual(list(rstrip(iterable, skip_items)), iterable[:3])
+        self.assertEqual(list(strip(iterable, skip_items)), iterable[2: 3])
