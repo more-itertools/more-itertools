@@ -1323,6 +1323,15 @@ def locate(iterable, pred=bool):
         >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
         [1, 3]
 
+    Use with :func:`windowed` to find the indexes of a sub-sequence:
+
+        >>> from more_itertools import windowed
+        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+        >>> sub = [1, 2, 3]
+        >>> pred = lambda w: w == tuple(sub)  # windowed() returns tuples
+        >>> list(locate(windowed(iterable, len(sub)), pred=pred))
+        [1, 5, 9]
+
     """
     return compress(count(), map(pred, iterable))
 
