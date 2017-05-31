@@ -1336,49 +1336,41 @@ def locate(iterable, pred=bool):
     return compress(count(), map(pred, iterable))
 
 
-def lstrip(iterable, skip_items):
-    """Yield the items from *iterable*, but strip any that match *skip_items*
-    from the beginning.
+def lstrip(iterable, pred):
+    """Yield the items from *iterable*, but strip any from the beginning
+    for which *pred* returns ``True``.
+
+    For example, to remove a set of items from the start of an iterable:
 
         >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
-        >>> list(lstrip(iterable, (None, False, '')))
+        >>> pred = lambda x: x in {None, False, ''}
+        >>> list(lstrip(iterable, pred))
         [1, 2, None, 3, False, None]
 
-    This function is analagous to :func:`str.lstrip`.
-    Note that the *skip_items* argument is not a prefix; any items that it
-    contains will be stripped.
+    This function is analagous to to :func:`str.lstrip`.
 
     """
-    try:
-        skip_items = set(skip_items)
-    except TypeError:
-        skip_items = list(skip_items)
-
-    return dropwhile(skip_items.__contains__, iterable)
+    return dropwhile(pred, iterable)
 
 
-def rstrip(iterable, skip_items):
-    """Yield the items from *iterable*, but strip any that match *skip_items*
-    from the end.
+def rstrip(iterable, pred):
+    """Yield the items from *iterable*, but strip any from the end
+    for which *pred* returns ``True```.
+
+    For example, to remove a set of items from the end of an iterable:
 
         >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
-        >>> list(rstrip(iterable, (None, False, '')))
+        >>> pred = lambda x: x in {None, False, ''}
+        >>> list(rstrip(iterable, pred))
         [None, False, None, 1, 2, None, 3]
 
     This function is analagous to :func:`str.rstrip`.
-    Note that the *skip_items* argument is not a suffix; any items that it
-    contains will be stripped.
 
     """
-    try:
-        skip_items = set(skip_items)
-    except TypeError:
-        skip_items = list(skip_items)
-
     cache = []
     cache_append = cache.append
     for x in iterable:
-        if x in skip_items:
+        if pred(x):
             cache_append(x)
         else:
             for y in cache:
@@ -1387,17 +1379,18 @@ def rstrip(iterable, skip_items):
             yield x
 
 
-def strip(iterable, skip_items):
-    """Yield the items from *iterable*, but strip any that match *skip_items*
-    from the beginning and end.
+def strip(iterable, pred):
+    """Yield the items from *iterable*, but strip from the beginning and end
+    for which *pred* returns ``True``.
+
+    For example, to remove a set of items from both ends of an iterable:
 
         >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
-        >>> list(strip(iterable, (None, False, '')))
+        >>> pred = lambda x: x in {None, False, ''}
+        >>> list(strip(iterable, pred))
         [1, 2, None, 3]
 
     This function is analagous to :func:`str.strip`.
-    Note that the *skip_items* argument is not a prefix or suffix; any items
-    that it contains will be stripped.
 
     """
-    return rstrip(lstrip(iterable, skip_items), skip_items)
+    return rstrip(lstrip(iterable, pred), pred)
