@@ -36,10 +36,12 @@ __all__ = [
     'divide',
     'first',
     'groupby_transform',
+    'head',
     'ilen',
     'interleave_longest',
     'interleave',
     'intersperse',
+    'islice_extended',
     'iterate',
     'locate',
     'lstrip',
@@ -1394,3 +1396,119 @@ def strip(iterable, pred):
 
     """
     return rstrip(lstrip(iterable, pred), pred)
+
+
+def head(n, iterable, minus=False):
+    """Return an iterator over the first *n* items of *iterable*.
+
+        >>> h = head(3, 'ABCDEFG')
+        >>> list(h)
+        ['A', 'B', 'C']
+
+    If *minus* is ``True``, return an iterator over all but the last *n* items
+    of *iterable*.
+
+        >>> h = head(3, 'ABCDEFG', minus=True)
+        >>> list(h)
+        ['A', 'B', 'C', 'D']
+
+    """
+    def _minus_helper(iterable):
+        it = iter(iterable)
+
+        cache = deque(islice(it, n), n)
+        if len(cache) < n:
+            return
+
+        for item in it:
+            yield cache.popleft()
+            cache.append(item)
+
+    if n < 0:
+        raise ValueError('n must be >= 0')
+
+    if minus:
+        return iter(iterable) if n == 0 else _minus_helper(iterable)
+    else:
+        return islice(iterable, n)
+
+
+def islice_extended(iterable, *args):
+    """An extension of :func:`itertools.islice` that supports negative values
+    for *stop* and *start* (but not *step*).
+
+        >>> it = [0, 1, 2, 3, 4, 5, 6, 7]
+
+        >>> assert list(islice_extended(it, -7, -2)) == it[-7:-2]
+        >>> assert list(islice_extended(it, -7, -2, 2)) == it[-7:-2:2]
+        >>> assert list(islice_extended(it, -7, -2, 3)) == it[-7:-2:3]
+        >>> assert list(islice_extended(it, -7, -2, 4)) == it[-7:-2:4]
+
+        >>> assert list(islice_extended(it, -7, 7)) == it[-7:7]
+        >>> assert list(islice_extended(it, -7, 7, 2)) == it[-7:7:2]
+        >>> assert list(islice_extended(it, -7, 7, 3)) == it[-7:7:3]
+        >>> assert list(islice_extended(it, -7, 7, 4)) == it[-7:7:4]
+
+        >>> assert list(islice_extended(it, 2, -2)) == it[2:-2]
+        >>> assert list(islice_extended(it, 2, -2, 2)) == it[2:-2:2]
+        >>> assert list(islice_extended(it, 2, -2, 3)) == it[2:-2:3]
+        >>> assert list(islice_extended(it, 2, -2, 4)) == it[2:-2:4]
+
+        >>> assert list(islice_extended(it, 2, 7)) == it[2:7]
+
+    """
+    argc = len(args)
+    if argc == 1:
+        stop, = args
+        start = type(stop)(0)
+        step = 1
+    elif argc == 2:
+        start, stop = args
+        step = 1
+    elif argc == 3:
+        start, stop, step = args
+    else:
+        err_msg = 'islice_extended takes at most 4 arguments, got {}'
+        raise TypeError(err_msg.format(argc))
+
+    if step <= 0:
+        raise ValueError('step argument must be a positive integer')
+
+    it = iter(iterable)
+
+    if (start is not None) and (start < 0):
+        # Consume all but the last -start items
+        cache = deque(enumerate(it, 1), maxlen=-start)
+        len_iter = cache[-1][0] if cache else 0
+
+        # Yield from the left side of the cache
+        i = max(len_iter + start, 0)
+
+        if stop is None:
+            j = len_iter
+        elif stop >= 0:
+            j = min(stop, len_iter)
+        else:
+            j = max(len_iter + stop, 0)
+
+        for index in range(j - i):
+            item = cache.popleft()[1]
+            if index % step == 0:
+                yield item
+    elif (stop is not None) and (stop < 0):
+        # Advance to the start position
+        next(islice(it, start, start), None)
+
+        # When stop is negative, we have to carry -stop items while
+        # iterating
+        cache = deque(islice(it, -stop), maxlen=-stop)
+
+        for index, item in enumerate(it):
+            cached_item = cache.popleft()
+            if index % step == 0:
+                yield cached_item
+            cache.append(item)
+    else:
+        # When both start and stop are positive we have the normal case
+        for item in islice(it, start, stop, step):
+            yield item
