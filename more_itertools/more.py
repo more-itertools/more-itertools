@@ -40,6 +40,7 @@ __all__ = [
     'interleave_longest',
     'interleave',
     'intersperse',
+    'islice_extended',
     'iterate',
     'locate',
     'lstrip',
@@ -1394,3 +1395,116 @@ def strip(iterable, pred):
 
     """
     return rstrip(lstrip(iterable, pred), pred)
+
+
+def islice_extended(iterable, *args):
+    """An extension of :func:`itertools.islice` that supports negative values
+    for *stop*, *start*, and *step*.
+
+        >>> from more_itertools import ncycles
+        >>> iterable = iter('abcdefgh')
+        >>> list(islice_extended(iterable, -4, -1))
+        ['e', 'f', 'g']
+
+    Slices with negative values require some caching of *iterable*, but this
+    function takes care to minimize the amount of memory required.
+
+    For example, you can use a negative step with an infinite iterator:
+
+        >>> from itertools import count
+        >>> list(islice_extended(count(), 110, 99, -2))
+        [110, 108, 106, 104, 102, 100]
+
+    """
+    argc = len(args)
+    if argc == 1:
+        stop, = args
+        start = type(stop)(0)
+        step = 1
+    elif argc == 2:
+        start, stop = args
+        step = 1
+    elif argc == 3:
+        start, stop, step = args
+    else:
+        err_msg = 'islice_extended takes at most 4 arguments, got {}'
+        raise TypeError(err_msg.format(argc))
+
+    if step == 0:
+        raise ValueError('step argument must be nonzero')
+
+    if step is None:
+        step = 1
+
+    it = iter(iterable)
+
+    if step > 0:
+        if (start is not None) and (start < 0):
+            # Consume all but the last -start items
+            cache = deque(enumerate(it, 1), maxlen=-start)
+            len_iter = cache[-1][0] if cache else 0
+
+            # Adjust start to be positive
+            i = max(len_iter + start, 0)
+
+            # Adjust stop to be positive
+            if stop is None:
+                j = len_iter
+            elif stop >= 0:
+                j = min(stop, len_iter)
+            else:
+                j = max(len_iter + stop, 0)
+
+            # Slice the cache
+            for index, item in islice(cache, None, j - i, step):
+                yield item
+        elif (stop is not None) and (stop < 0):
+            # Advance to the start position
+            if start is not None:
+                next(islice(it, start, start), None)
+
+            # When stop is negative, we have to carry -stop items while
+            # iterating
+            cache = deque(islice(it, -stop), maxlen=-stop)
+
+            for index, item in enumerate(it):
+                cached_item = cache.popleft()
+                if index % step == 0:
+                    yield cached_item
+                cache.append(item)
+        else:
+            # When both start and stop are positive we have the normal case
+            for item in islice(it, start, stop, step):
+                yield item
+    else:
+        if (stop is not None) and (stop < 0):
+            # Consume all but the last -stop items
+            cache = deque(enumerate(it, 1), maxlen=-stop)
+            len_iter = cache[-1][0] if cache else 0
+
+            # Adjust the index of the start to be negative and then slice
+            if start is None:
+                i = None
+            elif start >= 0:
+                i = None if (start >= len_iter) else start - len_iter
+            else:
+                i = start
+
+            for index, item in list(cache)[i:stop:step]:
+                yield item
+        else:
+            # Advance to the stop position
+            if stop is not None:
+                i = stop + 1
+                next(islice(it, i, i), None)
+
+            # Grab n items and reverse them
+            if (start is None) or (start < 0):
+                n = None
+            else:
+                n = start - stop
+            cache = reversed(list(islice(it, n)))
+
+            # Slice the reversed cache
+            for item in islice(cache, None, None, -step):
+                yield item
