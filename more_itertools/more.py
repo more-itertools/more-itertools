@@ -1474,6 +1474,9 @@ def islice_extended(iterable, *args):
     if step == 0:
         raise ValueError('step argument must be nonzero')
 
+    if step is None:
+        step = 1
+
     it = iter(iterable)
 
     if step > 0:
@@ -1541,7 +1544,7 @@ def islice_extended(iterable, *args):
                 n = None
             else:
                 n = start - stop
-            cache = reverse(list(islice(it, n)))
+            cache = reversed(list(islice(it, n)))
 
             # Slice the reversed cache
             for item in islice(cache, None, None, -step):
