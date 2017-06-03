@@ -110,28 +110,15 @@ def tabulate(function, start=0):
     return map(function, count(start))
 
 
-def tail(n, iterable, plus=False):
+def tail(n, iterable):
     """Return an iterator over the last *n* items of *iterable*.
 
         >>> t = tail(3, 'ABCDEFG')
         >>> list(t)
         ['E', 'F', 'G']
 
-    If *plus* is ``True``, return an iterator over the items of *iterable*,
-    starting with the `n`-th one.
-
-        >>> t = tail(3, 'ABCDEFG', plus=True)
-        >>> list(t)
-        ['D', 'E', 'F', 'G']
-
     """
-    if plus:
-        if n < 0:
-            raise ValueError('n must be >= 0')
-
-        return islice(iterable, n, None)
-    else:
-        return iter(deque(iterable, maxlen=n))
+    return iter(deque(iterable, maxlen=n))
 
 
 def consume(iterator, n=None):

@@ -36,7 +36,6 @@ __all__ = [
     'divide',
     'first',
     'groupby_transform',
-    'head',
     'ilen',
     'interleave_longest',
     'interleave',
@@ -1396,41 +1395,6 @@ def strip(iterable, pred):
 
     """
     return rstrip(lstrip(iterable, pred), pred)
-
-
-def head(n, iterable, minus=False):
-    """Return an iterator over the first *n* items of *iterable*.
-
-        >>> h = head(3, 'ABCDEFG')
-        >>> list(h)
-        ['A', 'B', 'C']
-
-    If *minus* is ``True``, return an iterator over all but the last *n* items
-    of *iterable*.
-
-        >>> h = head(3, 'ABCDEFG', minus=True)
-        >>> list(h)
-        ['A', 'B', 'C', 'D']
-
-    """
-    def _minus_helper(iterable):
-        it = iter(iterable)
-
-        cache = deque(islice(it, n), n)
-        if len(cache) < n:
-            return
-
-        for item in it:
-            yield cache.popleft()
-            cache.append(item)
-
-    if n < 0:
-        raise ValueError('n must be >= 0')
-
-    if minus:
-        return iter(iterable) if n == 0 else _minus_helper(iterable)
-    else:
-        return islice(iterable, n)
 
 
 def islice_extended(iterable, *args):
