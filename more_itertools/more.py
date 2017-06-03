@@ -1471,44 +1471,69 @@ def islice_extended(iterable, *args):
         err_msg = 'islice_extended takes at most 4 arguments, got {}'
         raise TypeError(err_msg.format(argc))
 
-    if step <= 0:
-        raise ValueError('step argument must be a positive integer')
+    if step == 0:
+        raise ValueError('step argument must be nonzero')
 
     it = iter(iterable)
 
-    if (start is not None) and (start < 0):
-        # Consume all but the last -start items
-        cache = deque(enumerate(it, 1), maxlen=-start)
-        len_iter = cache[-1][0] if cache else 0
+    forward = step > 0
 
-        # Yield from the left side of the cache
-        i = max(len_iter + start, 0)
+    if forward:
+        if (start is not None) and (start < 0):
+            # Consume all but the last -start items
+            cache = deque(enumerate(it, 1), maxlen=-start)
+            len_iter = cache[-1][0] if cache else 0
 
-        if stop is None:
-            j = len_iter
-        elif stop >= 0:
-            j = min(stop, len_iter)
+            # Yield from the left side of the cache
+            i = max(len_iter + start, 0)
+
+            if stop is None:
+                j = len_iter
+            elif stop >= 0:
+                j = min(stop, len_iter)
+            else:
+                j = max(len_iter + stop, 0)
+
+            for index in range(j - i):
+                item = cache.popleft()[1]
+                if index % step == 0:
+                    yield item
+        elif (stop is not None) and (stop < 0):
+            # Advance to the start position
+            next(islice(it, start, start), None)
+
+            # When stop is negative, we have to carry -stop items while
+            # iterating
+            cache = deque(islice(it, -stop), maxlen=-stop)
+
+            for index, item in enumerate(it):
+                cached_item = cache.popleft()
+                if index % step == 0:
+                    yield cached_item
+                cache.append(item)
         else:
-            j = max(len_iter + stop, 0)
-
-        for index in range(j - i):
-            item = cache.popleft()[1]
-            if index % step == 0:
+            # When both start and stop are positive we have the normal case
+            for item in islice(it, start, stop, step):
                 yield item
-    elif (stop is not None) and (stop < 0):
-        # Advance to the start position
-        next(islice(it, start, start), None)
-
-        # When stop is negative, we have to carry -stop items while
-        # iterating
-        cache = deque(islice(it, -stop), maxlen=-stop)
-
-        for index, item in enumerate(it):
-            cached_item = cache.popleft()
-            if index % step == 0:
-                yield cached_item
-            cache.append(item)
     else:
-        # When both start and stop are positive we have the normal case
-        for item in islice(it, start, stop, step):
-            yield item
+        if (start < 0) and (stop < 0):
+            pass
+        elif (start < 0) and (stop >= 0):
+            pass
+        elif (start >=0) and (stop < 0):
+            pass
+        elif (start >=0) and (stop >= 0):
+            if start <= stop:
+                return
+
+            # Advance to the stop position
+            i = stop + 1
+            next(islice(it, i, i), None)
+
+            # Grab n items and reverse them
+            n = start - stop
+            cache = reversed(list(islice(it, n)))
+
+            # Slice the reversed cache
+            for item in islice(cache, None, None, abs(step)):
+                yield item
