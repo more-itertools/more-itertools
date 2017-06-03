@@ -1419,7 +1419,7 @@ def islice_extended(iterable, *args):
     argc = len(args)
     if argc == 1:
         stop, = args
-        start = type(stop)(0)
+        start = 0
         step = 1
     elif argc == 2:
         start, stop = args
