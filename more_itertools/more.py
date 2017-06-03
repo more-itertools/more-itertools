@@ -1516,14 +1516,22 @@ def islice_extended(iterable, *args):
             for item in islice(it, start, stop, step):
                 yield item
     else:
-        if (start < 0) and (stop < 0):
+        if (stop is not None) and (stop < 0):
             # Consume all but the last -stop items
-            cache = deque(it, maxlen=-stop)
+            cache = deque(enumerate(it, 1), maxlen=-stop)
+            len_iter = cache[-1][0] if cache else 0
 
-            # Slice normally
-            for item in list(cache)[start:stop:step]:
+            # Adjust the index of the start to be negative and then slice
+            if start is None:
+                i = None
+            elif start >= 0:
+                i = None if (start >= len_iter) else start - len_iter
+            else:
+                i = start
+
+            for index, item in list(cache)[i:stop:step]:
                 yield item
-        elif (start < 0) and (stop >= 0):
+        elif (start is not None) and (start < 0):
             # Advance to the stop position
             i = stop + 1
             next(islice(it, i, i), None)
@@ -1535,22 +1543,14 @@ def islice_extended(iterable, *args):
             j = stop - len_iter
             for item in cache[start:j:step]:
                 yield item
-        elif (start >= 0) and (stop < 0):
-            # Consume all but the last -stop items
-            cache = deque(enumerate(it, 1), maxlen=-stop)
-            len_iter = cache[-1][0] if cache else 0
-
-            # Adjust the index of the start to be negative and then slice
-            i = start - len_iter
-            for index, item in list(cache)[i:stop:step]:
-                yield item
-        elif (start >= 0) and (stop >= 0):
+        else:
             # Advance to the stop position
-            i = stop + 1
-            next(islice(it, i, i), None)
+            if stop is not None:
+                i = stop + 1
+                next(islice(it, i, i), None)
 
             # Grab n items and reverse them
-            n = start - stop
+            n = None if (start is None) else start - stop
             cache = reversed(list(islice(it, n)))
 
             # Slice the reversed cache
