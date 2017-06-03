@@ -144,6 +144,7 @@ These yools yield certain items from an iterable.
 
 **New itertools**
 
+.. autofunction:: islice_extended(start, stop, step)
 .. autofunction:: strip
 .. autofunction:: lstrip
 .. autofunction:: rstrip
