@@ -7,6 +7,7 @@ from itertools import (
     chain,
     compress,
     count,
+    dropwhile,
     groupby,
     islice,
     repeat,
@@ -41,10 +42,12 @@ __all__ = [
     'intersperse',
     'iterate',
     'locate',
+    'lstrip',
     'numeric_range',
     'one',
     'padded',
     'peekable',
+    'rstrip',
     'side_effect',
     'sliced',
     'sort_together',
@@ -52,6 +55,7 @@ __all__ = [
     'split_before',
     'spy',
     'stagger',
+    'strip',
     'unique_to_each',
     'windowed',
     'with_iter',
@@ -1319,5 +1323,74 @@ def locate(iterable, pred=bool):
         >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
         [1, 3]
 
+    Use with :func:`windowed` to find the indexes of a sub-sequence:
+
+        >>> from more_itertools import windowed
+        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+        >>> sub = [1, 2, 3]
+        >>> pred = lambda w: w == tuple(sub)  # windowed() returns tuples
+        >>> list(locate(windowed(iterable, len(sub)), pred=pred))
+        [1, 5, 9]
+
     """
     return compress(count(), map(pred, iterable))
+
+
+def lstrip(iterable, pred):
+    """Yield the items from *iterable*, but strip any from the beginning
+    for which *pred* returns ``True``.
+
+    For example, to remove a set of items from the start of an iterable:
+
+        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+        >>> pred = lambda x: x in {None, False, ''}
+        >>> list(lstrip(iterable, pred))
+        [1, 2, None, 3, False, None]
+
+    This function is analagous to to :func:`str.lstrip`.
+
+    """
+    return dropwhile(pred, iterable)
+
+
+def rstrip(iterable, pred):
+    """Yield the items from *iterable*, but strip any from the end
+    for which *pred* returns ``True```.
+
+    For example, to remove a set of items from the end of an iterable:
+
+        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+        >>> pred = lambda x: x in {None, False, ''}
+        >>> list(rstrip(iterable, pred))
+        [None, False, None, 1, 2, None, 3]
+
+    This function is analagous to :func:`str.rstrip`.
+
+    """
+    cache = []
+    cache_append = cache.append
+    for x in iterable:
+        if pred(x):
+            cache_append(x)
+        else:
+            for y in cache:
+                yield y
+            del cache[:]
+            yield x
+
+
+def strip(iterable, pred):
+    """Yield the items from *iterable*, but strip from the beginning and end
+    for which *pred* returns ``True``.
+
+    For example, to remove a set of items from both ends of an iterable:
+
+        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+        >>> pred = lambda x: x in {None, False, ''}
+        >>> list(strip(iterable, pred))
+        [1, 2, None, 3]
+
+    This function is analagous to :func:`str.strip`.
+
+    """
+    return rstrip(lstrip(iterable, pred), pred)
