@@ -1476,17 +1476,16 @@ def islice_extended(iterable, *args):
 
     it = iter(iterable)
 
-    forward = step > 0
-
-    if forward:
+    if step > 0:
         if (start is not None) and (start < 0):
             # Consume all but the last -start items
             cache = deque(enumerate(it, 1), maxlen=-start)
             len_iter = cache[-1][0] if cache else 0
 
-            # Yield from the left side of the cache
+            # Adjust start to be positive
             i = max(len_iter + start, 0)
 
+            # Adjust stop to be positive
             if stop is None:
                 j = len_iter
             elif stop >= 0:
@@ -1494,13 +1493,13 @@ def islice_extended(iterable, *args):
             else:
                 j = max(len_iter + stop, 0)
 
-            for index in range(j - i):
-                item = cache.popleft()[1]
-                if index % step == 0:
-                    yield item
+            # Slice the cache
+            for index, item in islice(cache, None, j - i, step):
+                yield item
         elif (stop is not None) and (stop < 0):
             # Advance to the start position
-            next(islice(it, start, start), None)
+            if start is not None:
+                next(islice(it, start, start), None)
 
             # When stop is negative, we have to carry -stop items while
             # iterating
@@ -1531,18 +1530,6 @@ def islice_extended(iterable, *args):
 
             for index, item in list(cache)[i:stop:step]:
                 yield item
-        elif (start is not None) and (start < 0):
-            # Advance to the stop position
-            i = stop + 1
-            next(islice(it, i, i), None)
-
-            # Grab the rest of the items
-            cache = list(it)
-            len_iter = len(cache) + i
-
-            j = stop - len_iter
-            for item in cache[start:j:step]:
-                yield item
         else:
             # Advance to the stop position
             if stop is not None:
@@ -1550,9 +1537,12 @@ def islice_extended(iterable, *args):
                 next(islice(it, i, i), None)
 
             # Grab n items and reverse them
-            n = None if (start is None) else start - stop
-            cache = reversed(list(islice(it, n)))
+            if (start is None) or (start < 0):
+                n = None
+            else:
+                n = start - stop
+            cache = reverse(list(islice(it, n)))
 
             # Slice the reversed cache
-            for item in islice(cache, None, None, abs(step)):
+            for item in islice(cache, None, None, -step):
                 yield item
