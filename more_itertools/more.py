@@ -1526,11 +1526,17 @@ def islice_extended(iterable, *args):
             # Slice normally
             for item in list(cache)[start:stop:step]:
                 yield item
-
         elif (start < 0) and (stop >= 0):
             pass
-        elif (start >=0) and (stop < 0):
-            pass
+        elif (start >= 0) and (stop < 0):
+            # Consume all but the last -stop items
+            cache = deque(enumerate(it, 1), maxlen=-stop)
+            len_iter = cache[-1][0] if cache else 0
+
+            # Adjust the index of the start to be negative and then slice
+            i = start - len_iter
+            for index, item in list(cache)[i:stop:step]:
+                yield item
         elif (start >=0) and (stop >= 0):
             if start <= stop:
                 return
