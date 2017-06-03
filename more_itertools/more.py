@@ -1517,7 +1517,16 @@ def islice_extended(iterable, *args):
                 yield item
     else:
         if (start < 0) and (stop < 0):
-            pass
+            if stop >= start:
+                return
+
+            # Consume all but the last -stop items
+            cache = deque(it, maxlen=-stop)
+
+            # Slice normally
+            for item in list(cache)[start:stop:step]:
+                yield item
+
         elif (start < 0) and (stop >= 0):
             pass
         elif (start >=0) and (stop < 0):
