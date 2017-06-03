@@ -1517,9 +1517,6 @@ def islice_extended(iterable, *args):
                 yield item
     else:
         if (start < 0) and (stop < 0):
-            if stop >= start:
-                return
-
             # Consume all but the last -stop items
             cache = deque(it, maxlen=-stop)
 
@@ -1527,7 +1524,17 @@ def islice_extended(iterable, *args):
             for item in list(cache)[start:stop:step]:
                 yield item
         elif (start < 0) and (stop >= 0):
-            pass
+            # Advance to the stop position
+            i = stop + 1
+            next(islice(it, i, i), None)
+
+            # Grab the rest of the items
+            cache = list(it)
+            len_iter = len(cache) + i
+
+            j = stop - len_iter
+            for item in cache[start:j:step]:
+                yield item
         elif (start >= 0) and (stop < 0):
             # Consume all but the last -stop items
             cache = deque(enumerate(it, 1), maxlen=-stop)
@@ -1537,10 +1544,7 @@ def islice_extended(iterable, *args):
             i = start - len_iter
             for index, item in list(cache)[i:stop:step]:
                 yield item
-        elif (start >=0) and (stop >= 0):
-            if start <= stop:
-                return
-
+        elif (start >= 0) and (stop >= 0):
             # Advance to the stop position
             i = stop + 1
             next(islice(it, i, i), None)
