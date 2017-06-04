@@ -1416,25 +1416,12 @@ def islice_extended(iterable, *args):
         [110, 108, 106, 104, 102, 100]
 
     """
-    argc = len(args)
-    if argc == 1:
-        stop, = args
-        start = 0
-        step = 1
-    elif argc == 2:
-        start, stop = args
-        step = 1
-    elif argc == 3:
-        start, stop, step = args
-    else:
-        err_msg = 'islice_extended takes at most 4 arguments, got {}'
-        raise TypeError(err_msg.format(argc))
-
-    if step == 0:
-        raise ValueError('step argument must be nonzero')
-
-    if step is None:
-        step = 1
+    s = slice(*args)
+    start = s.start
+    stop = s.stop
+    if s.step == 0:
+        raise ValueError('step argument must be a non-zero integer or None.')
+    step = s.step or 1
 
     it = iter(iterable)
 

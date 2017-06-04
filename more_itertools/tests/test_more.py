@@ -1225,6 +1225,7 @@ class LocateTests(TestCase):
         iterable = [0, 0, 0]
         actual = list(locate(iterable))
         expected = []
+        self.assertEqual(actual, expected)
 
     def test_custom_pred(self):
         iterable = ['0', 1, 1, '0', 1, '0', '0']
@@ -1298,3 +1299,7 @@ class IsliceExtendedTests(TestCase):
             actual = list(islice_extended(iterable, *slice_args))
             expected = iterable[slice(*slice_args)]
             self.assertEqual(actual, expected, slice_args)
+
+    def test_zero_step(self):
+        with self.assertRaises(ValueError):
+            list(islice_extended([1, 2, 3], 0, 1, 0))
