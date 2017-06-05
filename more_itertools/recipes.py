@@ -303,7 +303,7 @@ def partition(pred, iterable):
     """
     Returns a 2-tuple of iterables derived from the input iterable.
     The first yields the items that have ``pred(item) == False``.
-    The first yields the items that have ``pred(item) == False``.
+    The second yields the items that have ``pred(item) == True``.
 
         >>> is_odd = lambda x: x % 2 != 0
         >>> iterable = range(10)
