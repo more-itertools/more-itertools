@@ -1267,7 +1267,7 @@ class IsliceExtendedTests(TestCase):
     def test_all(self):
         iterable = ['0', '1', '2', '3', '4', '5']
         indexes = list(range(-4, len(iterable) + 4))
-        steps = [1, -1]
+        steps = [1, 2, 3, 4, -1, -2, -3, 4]
         for slice_args in product(indexes, indexes, steps):
             try:
                 actual = list(islice_extended(iterable, *slice_args))
