@@ -4,7 +4,7 @@ from decimal import Decimal
 from fractions import Fraction
 from functools import reduce
 from io import StringIO
-from itertools import chain, count, groupby, permutations, repeat
+from itertools import chain, count, groupby, permutations, product, repeat
 from operator import itemgetter
 from unittest import TestCase
 
@@ -1266,37 +1266,14 @@ class StripFunctionTests(TestCase):
 class IsliceExtendedTests(TestCase):
     def test_all(self):
         iterable = ['0', '1', '2', '3', '4', '5']
+        indexes = list(range(-3, len(iterable) + 3))
+        steps = [1, 1]
+        for slice_args in product(indexes, indexes, steps):
+            try:
+                actual = list(islice_extended(iterable, *slice_args))
+            except Exception as e:
+                self.fail((slice_args, e))
 
-        for slice_args in [
-            (None, None, None),
-            (0, None, None),
-            (0, 0, None),
-            (0, 5, None),
-            (0, 6, None),
-            (None, 1, None),
-            (0, 2, None),
-            (0, -3, None),
-            (0, 4, None),
-            (0, -1, None),
-            (0, 6, None),
-            (1, None, None),
-            (2, 6, None),
-            (3, 6, None),
-            (-2, None, None),
-            (-1, None, None),
-            (1, -1, None),
-            (2, -2, None),
-            (3, -3, None),
-            (-5, 5, None),
-            (None, None, -1),
-            (None, None, 1),
-            (None, None, 2),
-            (None, None, 3),
-            (1, -1, 2),
-            (5, 1, -1),
-            (5, 1, -2),
-        ]:
-            actual = list(islice_extended(iterable, *slice_args))
             expected = iterable[slice(*slice_args)]
             self.assertEqual(actual, expected, slice_args)
 

@@ -1443,7 +1443,11 @@ def islice_extended(iterable, *args):
                 j = max(len_iter + stop, 0)
 
             # Slice the cache
-            for index, item in islice(cache, None, j - i, step):
+            n = j - i
+            if n <= 0:
+                return
+
+            for index, item in islice(cache, None, n, step):
                 yield item
         elif (stop is not None) and (stop < 0):
             # Advance to the start position
@@ -1464,34 +1468,42 @@ def islice_extended(iterable, *args):
             for item in islice(it, start, stop, step):
                 yield item
     else:
-        if (stop is not None) and (stop < 0):
-            # Consume all but the last -stop items
-            cache = deque(enumerate(it, 1), maxlen=-stop)
+        if ((start is None) or (start < 0)) and ((stop is None) or (stop < 0)):
+            # Consume all but the last items
+            n = None if (stop is None) else -stop - 1
+            cache = deque(enumerate(it, 1), maxlen=n)
             len_iter = cache[-1][0] if cache else 0
 
-            # Adjust the index of the start to be negative and then slice
-            if start is None:
-                i = None
-            elif start >= 0:
-                i = None if (start >= len_iter) else start - len_iter
-            else:
-                i = start
+            for index, item in list(cache)[start:stop:step]:
+                yield item
+        elif ((start is None) or (start < 0)) and (stop >= 0):
+            # Advance to the stop position
+            n = stop + 1
+            next(islice(it, n, n), None)
 
-            for index, item in list(cache)[i:stop:step]:
+            for item in list(it)[start::step]:
+                yield item
+        elif (start >= 0) and ((stop is None) or (stop < 0)):
+            # Consume all but the last items
+            n = None if (stop is None) else -stop - 1
+            cache = deque(enumerate(it, 1), maxlen=n)
+            len_iter = cache[-1][0] if cache else 0
+
+            # Adjust start to be negative
+            i = min(start - len_iter, -1)
+
+            for index, item in list(cache)[i::step]:
                 yield item
         else:
             # Advance to the stop position
-            if stop is not None:
-                i = stop + 1
-                next(islice(it, i, i), None)
+            i = stop + 1
+            next(islice(it, i, i), None)
 
-            # Grab n items and reverse them
-            if (start is None) or (start < 0):
-                n = None
-            else:
-                n = start - stop
-            cache = reversed(list(islice(it, n)))
+            # Grab n items
+            n = start - stop
+            if n <= 0:
+                return
+            cache = list(islice(it, n))
 
-            # Slice the reversed cache
-            for item in islice(cache, None, None, -step):
+            for item in cache[::step]:
                 yield item
