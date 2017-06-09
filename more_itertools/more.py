@@ -1471,42 +1471,39 @@ def islice_extended(iterable, *args):
     else:
         start = -1 if (start is None) else start
 
-        if (start < 0) and ((stop is None) or (stop < 0)):
+        if (stop is None) or (stop < 0):
             # Consume all but the last items
             n = None if (stop is None) else -stop - 1
             cache = deque(enumerate(it, 1), maxlen=n)
             len_iter = cache[-1][0] if cache else 0
 
-            for index, item in list(cache)[start:stop:step]:
-                yield item
-        elif (start < 0) and (stop >= 0):
-            # Advance to the stop position
-            n = stop + 1
-            next(islice(it, n, n), None)
+            # If start and stop are both negative they are comparable and
+            # we can just slice. Otherwise we can adjust start to be negative
+            # and then slice.
+            if start < 0:
+                i, j = start, stop
+            else:
+                i, j = min(start - len_iter, -1), None
 
-            for item in list(it)[start::step]:
-                yield item
-        elif (start >= 0) and ((stop is None) or (stop < 0)):
-            # Consume all but the last items
-            n = None if (stop is None) else -stop - 1
-            cache = deque(enumerate(it, 1), maxlen=n)
-            len_iter = cache[-1][0] if cache else 0
-
-            # Adjust start to be negative
-            i = min(start - len_iter, -1)
-
-            for index, item in list(cache)[i::step]:
+            for index, item in list(cache)[i:j:step]:
                 yield item
         else:
             # Advance to the stop position
-            i = stop + 1
-            next(islice(it, i, i), None)
+            m = stop + 1
+            next(islice(it, m, m), None)
 
-            # Grab n items
-            n = start - stop
-            if n <= 0:
-                return
+            # If start and stop are both positive they are comparable and
+            # we can just grab the number of items we need. Otherwise
+            # we'll need the remaining items.
+            if start >= 0:
+                i = None
+                if start <= stop:
+                    return
+                n = start - stop
+            else:
+                i = start
+                n = None
             cache = list(islice(it, n))
 
-            for item in cache[::step]:
+            for item in cache[i::step]:
                 yield item
