@@ -4,7 +4,7 @@ from decimal import Decimal
 from fractions import Fraction
 from functools import reduce
 from io import StringIO
-from itertools import chain, count, groupby, permutations, repeat
+from itertools import chain, count, groupby, permutations, product,   repeat
 from operator import itemgetter
 from unittest import TestCase
 
@@ -168,18 +168,17 @@ class PeekableTests(TestCase):
 
     def test_slicing_reset(self):
         """Test slicing on a fresh iterable each time"""
-        seq = list(range(11))
-        for index in [
-            slice(None, None, None),
-            slice(1, None, None),
-            slice(None, 1, None),
-            slice(1, 8, 3),
-            slice(8, 1, -3),
-            slice(8, -9, -3),
-        ]:
-            p = peekable(seq)
+        iterable = ['0', '1', '2', '3', '4', '5']
+        indexes = list(range(-4, len(iterable) + 4)) + [None]
+        steps = [1, 2, 3, 4, -1, -2, -3, 4]
+        for slice_args in product(indexes, indexes, steps):
+            it = iter(iterable)
+            p = peekable(it)
             next(p)
-            eq_(p[index], seq[1:][index])
+            index = slice(*slice_args)
+            actual = p[index]
+            expected = iterable[1:][index]
+            self.assertEqual(actual, expected, slice_args)
 
     def test_passthrough(self):
         """Iterating a peekable without using ``peek()`` or ``prepend()``
