@@ -1471,9 +1471,9 @@ def islice_extended(iterable, *args):
     else:
         start = -1 if (start is None) else start
 
-        if (stop is None) or (stop < 0):
+        if (stop is not None) and (stop < 0):
             # Consume all but the last items
-            n = None if (stop is None) else -stop - 1
+            n = -stop - 1
             cache = deque(enumerate(it, 1), maxlen=n)
             len_iter = cache[-1][0] if cache else 0
 
@@ -1489,20 +1489,27 @@ def islice_extended(iterable, *args):
                 yield item
         else:
             # Advance to the stop position
-            m = stop + 1
-            next(islice(it, m, m), None)
+            if stop is not None:
+                m = stop + 1
+                next(islice(it, m, m), None)
 
-            # If start and stop are both positive they are comparable and
-            # we can just grab the number of items we need. Otherwise
-            # we'll need the remaining items.
-            if start >= 0:
-                i = None
-                if start <= stop:
-                    return
-                n = start - stop
-            else:
+            # stop is positive, so if start is negative they are not comparable
+            # and we need the rest of the items.
+            if start < 0:
                 i = start
                 n = None
+            # stop is None and start is positive, so we just need items up to
+            # the start index.
+            elif stop is None:
+                i = None
+                n = start + 1
+            # Both stop and start are positive, so they are comparable.
+            else:
+                i = None
+                n = start - stop
+                if n <= 0:
+                    return
+
             cache = list(islice(it, n))
 
             for item in cache[i::step]:
