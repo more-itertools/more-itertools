@@ -1360,7 +1360,7 @@ def lstrip(iterable, pred):
 
 def rstrip(iterable, pred):
     """Yield the items from *iterable*, but strip any from the end
-    for which *pred* returns ``True```.
+    for which *pred* returns ``True``.
 
     For example, to remove a set of items from the end of an iterable:
 
@@ -1385,8 +1385,8 @@ def rstrip(iterable, pred):
 
 
 def strip(iterable, pred):
-    """Yield the items from *iterable*, but strip from the beginning and end
-    for which *pred* returns ``True``.
+    """Yield the items from *iterable*, but strip any from the
+    beginning and end for which *pred* returns ``True``.
 
     For example, to remove a set of items from both ends of an iterable:
 
