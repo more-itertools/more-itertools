@@ -15,7 +15,7 @@ from itertools import (
     tee
 )
 from operator import itemgetter, lt, gt
-from sys import version_info
+from sys import maxsize, version_info
 
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
@@ -253,24 +253,28 @@ class peekable(object):
         return self.__next__()
 
     def _get_slice(self, index):
-        start = index.start
-        stop = index.stop
+        # Normalize the slice's arguments
+        step = 1 if (index.step is None) else index.step
+        if step > 0:
+            start = 0 if (index.start is None) else index.start
+            stop = maxsize if (index.stop is None) else index.stop
+        elif step < 0:
+            start = -1 if (index.start is None) else index.start
+            stop = (-maxsize - 1) if (index.stop is None) else index.stop
+        else:
+            raise ValueError('slice step cannot be zero')
 
-        if (
-            ((start is not None) and (start < 0)) or
-            ((stop is not None) and (stop < 0))
-        ):
-            stop = None
-        elif (
-            (start is not None) and (stop is not None) and (start > stop)
-        ):
-            stop = start + 1
-
-        cache_len = len(self._cache)
-        if stop is None:
+        # If either the start or stop index is negative, we'll need to cache
+        # the rest of the iterable in order to slice from the right side.
+        if (start < 0) or (stop < 0):
             self._cache.extend(self._it)
-        elif stop >= cache_len:
-            self._cache.extend(islice(self._it, stop - cache_len))
+        # Otherwise we'll need to find the rightmost index and cache to that
+        # point.
+        else:
+            n = min(max(start, stop) + 1, maxsize)
+            cache_len = len(self._cache)
+            if n >= cache_len:
+                self._cache.extend(islice(self._it, n - cache_len))
 
         return list(self._cache)[index]
 
