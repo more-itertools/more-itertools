@@ -180,6 +180,22 @@ class PeekableTests(TestCase):
             expected = iterable[1:][index]
             self.assertEqual(actual, expected, slice_args)
 
+    def test_slicing_error(self):
+        iterable = '01234567'
+        p = peekable(iter(iterable))
+
+        # Prime the cache
+        p.peek()
+        old_cache = list(p._cache)
+
+        # Illegal slice
+        with self.assertRaises(ValueError):
+            p[1:-1:0]
+
+        # Neither the cache nor the iteration should be affected
+        self.assertEqual(old_cache, list(p._cache))
+        self.assertEqual(list(p), list(iterable))
+
     def test_passthrough(self):
         """Iterating a peekable without using ``peek()`` or ``prepend()``
         should just give the underlying iterable's elements (a trivial test but
