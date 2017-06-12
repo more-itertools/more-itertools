@@ -18,12 +18,32 @@ from six import PY2
 from six.moves import filter, filterfalse, map, range, zip, zip_longest
 
 __all__ = [
-    'accumulate', 'all_equal', 'consume', 'dotproduct', 'first_true',
-    'flatten', 'grouper', 'iter_except', 'ncycles', 'nth', 'padnone',
-    'pairwise', 'partition', 'powerset', 'quantify',
-    'random_combination_with_replacement', 'random_combination',
-    'random_permutation', 'random_product', 'repeatfunc', 'roundrobin',
-    'tabulate', 'tail', 'take', 'unique_everseen', 'unique_justseen'
+    'accumulate',
+    'all_equal',
+    'consume',
+    'dotproduct',
+    'first_true',
+    'flatten',
+    'grouper',
+    'iter_except',
+    'ncycles',
+    'nth',
+    'padnone',
+    'pairwise',
+    'partition',
+    'powerset',
+    'quantify',
+    'random_combination_with_replacement',
+    'random_combination',
+    'random_permutation',
+    'random_product',
+    'repeatfunc',
+    'roundrobin',
+    'tabulate',
+    'tail',
+    'take',
+    'unique_everseen',
+    'unique_justseen',
 ]
 
 
@@ -91,8 +111,7 @@ def tabulate(function, start=0):
 
 
 def tail(n, iterable):
-    """
-    Return an iterator over the last *n* items of *iterable*.
+    """Return an iterator over the last *n* items of *iterable*.
 
         >>> t = tail(3, 'ABCDEFG')
         >>> list(t)
