@@ -1401,7 +1401,6 @@ def islice_extended(iterable, *args):
     """An extension of :func:`itertools.islice` that supports negative values
     for *stop*, *start*, and *step*.
 
-        >>> from more_itertools import ncycles
         >>> iterable = iter('abcdefgh')
         >>> list(islice_extended(iterable, -4, -1))
         ['e', 'f', 'g']
