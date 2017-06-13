@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='more-itertools',
-    version='3.1.0',
+    version='3.2.0',
     description='More routines for operating on iterables, beyond itertools',
     long_description=open('README.rst').read() + '\n\n' +
                      sub(r':func:`([a-zA-Z0-9_]+)`', r'\1', '\n'.join(open('docs/versions.rst').read()

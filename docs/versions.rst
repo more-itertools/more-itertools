@@ -4,6 +4,15 @@ Version History
 
 .. automodule:: more_itertools
 
+3.2.0
+-----
+* New itertools:
+    * :func:`lstrip`, :func:`rstrip`, and :func:`strip`
+      (thanks to MSeifert04 and pylang)
+    * :func:`islice_extended`
+* Improvements to existing itertools:
+    * Some bugs with slicing :func:`peekable`-wrapped iterables were fixed
+
 3.1.0
 -----
 
