@@ -20,7 +20,7 @@ from sys import maxsize, version_info
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
-from .recipes import flatten, take
+from .recipes import take
 
 __all__ = [
     'adjacent',
@@ -495,20 +495,35 @@ def distinct_permutations(iterable):
                               len(iterable) - 1)
 
 
-def intersperse(e, iterable):
-    """Intersperse object *e* between the items of *iterable*.
+def intersperse(e, iterable, n=1):
+    """Intersperse filler element *e* between the items of *iterable*.
 
-        >>> list(intersperse('x', 'ABCD'))
-        ['A', 'x', 'B', 'x', 'C', 'x', 'D']
-        >>> list(intersperse(None, [1, 2, 3]))
-        [1, None, 2, None, 3]
+        >>> list(intersperse(' ', ['here', 'we', 'go!']))
+        ['here', ' ', 'we', ' ', 'go!']
+
+    Set *n* to set the spacing between filler elements:
+
+        >>> list(intersperse(',', '1234567', n=3))
+        ['1', '2', '3', ',', '4', '5', '6', ',', '7']
 
     """
-    it = iter(iterable)
-    filler = repeat(e)
-    zipped = flatten(zip(filler, it))
-    next(zipped)
-    return zipped
+    if n == 0:
+        raise ValueError('n must be >= 0')
+    elif n == 1:
+        # zip(repeat(e), iterable) -> (e, x_0), (e, x_1), (e, x_2)...
+        # chain.from_iterable(...) -> e, x_0, e, x_1, e, x_2...
+        # islice(..., 1, None) -> x_0, e, x_1, e, x_2...
+        return islice(chain.from_iterable(zip(repeat(e), iterable)), 1, None)
+    else:
+        # zip(filler, chunks) -> ([e], [x_0, x_1]), ([e], [x_2, x_3])...
+        # chain.from_iterable(...) -> [e], [x_0, x_1], [e], [x_2, x_3]...
+        # islice(..., 1, None) -> [x_0, x_1], [e], [x_2, x_3]...
+        # chain.from_iterable(...) -> x_0, x_1, e, x_2, x_3...
+        filler = repeat([e])
+        chunks = chunked(iterable, n)
+        return chain.from_iterable(
+            islice(chain.from_iterable(zip(filler, chunks)), 1, None)
+        )
 
 
 def unique_to_each(*iterables):
