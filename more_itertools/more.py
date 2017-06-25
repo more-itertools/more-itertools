@@ -496,15 +496,14 @@ def distinct_permutations(iterable):
 
 
 def intersperse(e, iterable, n=1):
-    """Intersperse filler element *e* between the items of *iterable*.
+    """Intersperse filler element *e* among the items in *iterable*, leaving
+    *n* items between each filler element.
 
-        >>> list(intersperse(' ', ['here', 'we', 'go!']))
-        ['here', ' ', 'we', ' ', 'go!']
+        >>> list(intersperse('!', [1, 2, 3, 4, 5]))
+        [1, '!', 2, '!', 3, '!', 4, '!', 5]
 
-    Set *n* to set the spacing between filler elements:
-
-        >>> list(intersperse(',', '1234567', n=3))
-        ['1', '2', '3', ',', '4', '5', '6', ',', '7']
+        >>> list(intersperse(None, [1, 2, 3, 4, 5], n=2))
+        [1, 2, None, 3, 4, None, 5]
 
     """
     if n == 0:
