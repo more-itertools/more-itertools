@@ -508,7 +508,7 @@ def intersperse(e, iterable, n=1):
 
     """
     if n == 0:
-        raise ValueError('n must be >= 0')
+        raise ValueError('n must be > 0')
     elif n == 1:
         # zip(repeat(e), iterable) -> (e, x_0), (e, x_1), (e, x_2)...
         # chain.from_iterable(...) -> e, x_0, e, x_1, e, x_2...
