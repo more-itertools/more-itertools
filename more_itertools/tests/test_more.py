@@ -420,6 +420,22 @@ class IntersperseTest(TestCase):
         assert_raises(TypeError, lambda: intersperse('x', 1))
 
 
+class TransitionTest(TestCase):
+    """Tests for ``transition``"""
+
+    def test_basic(self):
+        iterables = [{1: 2, 3: 4}, {2: 5, 4: 6}]
+        eq_(transition(*iterables), {1: 5, 3: 6})
+
+    def test_multiple_sources(self):
+        iterables = [{1: 3, 2: 3}, {3: 4}]
+        eq_(transition(*iterables), {1: 4, 2: 4})
+
+    def test_gap(self):
+        iterables = [{1: 2, 3: 4}, {}, {2: 5, 4: 6}]
+        eq_(transition(*iterables), {})
+
+
 class UniqueToEachTests(TestCase):
     """Tests for ``unique_to_each()``"""
 
