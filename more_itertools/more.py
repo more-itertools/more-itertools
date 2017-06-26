@@ -17,7 +17,7 @@ from itertools import (
 from operator import itemgetter, lt, gt
 from sys import maxsize, version_info
 
-from six import binary_type, string_types, text_type
+from six import binary_type, iteritems, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
 from .recipes import flatten, take
@@ -556,7 +556,7 @@ def transition(*iterables):
     curr = next(it)
 
     for next_ in it:
-        curr = {k: next_[v] for (k, v) in curr.iteritems() if v in next_}
+        curr = {k: next_[v] for (k, v) in iteritems(curr) if v in next_}
     return curr
 
 
