@@ -439,6 +439,7 @@ class IntersperseTest(TestCase):
             actual = list(intersperse(element, iterable, n=n))
             eq_(actual, expected)
 
+    def test_n_zero(self):
         assert_raises(ValueError, lambda: list(intersperse('x', '012', n=0)))
 
 class UniqueToEachTests(TestCase):
