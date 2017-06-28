@@ -558,18 +558,19 @@ def transition(*iterables):
     it = iter(iterables)
     curr = take(1, it)
 
-    # Yield the starting state unchanged
+    # Yield starting state unchanged
     if curr:
-        yield curr[0]
+        yield curr[0].copy()
     else:
         yield {}
         raise StopIteration
 
-    # Compute the next transition state and yield it
+    # Compute and yield next transition state
     curr = curr[0]
     for next_ in it:
         curr = {k: next_[v] for (k, v) in iteritems(curr) if v in next_}
-        if not curr: break
+        if not curr:
+            raise StopIteration
         yield curr
 
 
