@@ -17,7 +17,7 @@ from itertools import (
 from operator import itemgetter, lt, gt
 from sys import maxsize, version_info
 
-from six import binary_type, string_types, text_type
+from six import binary_type, iteritems, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
 from .recipes import flatten, take
@@ -57,6 +57,7 @@ __all__ = [
     'spy',
     'stagger',
     'strip',
+    'transition',
     'unique_to_each',
     'windowed',
     'with_iter',
@@ -519,6 +520,68 @@ def intersperse(e, iterable, n=1):
         filler = repeat([e])
         chunks = chunked(iterable, n)
         return flatten(islice(interleave(filler, chunks), 1, None))
+
+
+def transition(*iterables):
+    """Return a dictionary, mapping source items to sink items, from iterables
+    representing a flow network. Each of the iterables is itself a dictionary.
+
+    Essentially, the flow (or transition) mapping is created by linking values
+    from iterable ``i`` to keys from iterable ``i+1``. The sink items are the
+    keys of the first iterable, and the source items are the values of the last
+    one.
+
+    The resulting dictionary contains only sink items which can be successfully
+    linked - via a chain of transition links, between the input iterables - to
+    source items.
+
+        >>> list(transition({1: 6, 2: 6, 3: 7, 4: 8, 5: None}, {7: 9, 6: 10}))
+        [{1: 6, 2: 6, 3: 7, 4: 8, 5: None}, {1: 10, 2: 10, 3: 9}]
+
+    Gaps break the transition::
+
+        >>> list(transition({1: 1, 2: 2, 3: 3}, {}))
+        [{1: 1, 2: 2, 3: 3}]
+
+        >>> list(transition({1: 1, 2: 2, 3: 3}, {}, {1: 4, 2: 5, 3: 6}))
+        [{1: 1, 2: 2, 3: 3}]
+
+    Multiple values from iterable ``i`` may link to a single key from iterable
+    `i+1``::
+
+        >>> list(transition({1: None, 2: None, 3: None, 4: None}, {None: 5}))
+        [{1: None, 2: None, 3: None, 4: None}, {1: 5, 2: 5, 3: 5, 4: 5}]
+
+        >>> list(transition({1: 4, 2: 5, 3: 5}, {5: None}))
+        [{1: 4, 2: 5, 3: 5}, {2: None, 3: None}]
+
+    The resulting dictionary does not contain source items, whose keys cannot be
+    linked to values from the previous iterable in the transition chain::
+
+        >>> list(transition({1: 2, 3: 4}, {2: 5, 5: 6}))
+        [{1: 2, 3: 4}, {1: 5}]
+
+    Note that modifying ``transition()`` results during interation may exhibit
+    unexpected behavior.
+
+    """
+    it = iter(iterables)
+    curr = take(1, it)
+
+    # Yield starting state unchanged
+    if curr:
+        yield curr[0].copy()
+    else:
+        yield {}
+        raise StopIteration
+
+    # Compute and yield next transition state
+    curr = curr[0]
+    for next_ in it:
+        curr = {k: next_[v] for (k, v) in iteritems(curr) if v in next_}
+        if not curr:
+            raise StopIteration
+        yield curr
 
 
 def unique_to_each(*iterables):
