@@ -407,18 +407,40 @@ class IntersperseTest(TestCase):
     """ Tests for intersperse() """
 
     def test_even(self):
-        eq_(list(intersperse(None, '01')), ['0', None, '1'])
+        iterable = (x for x in '01')
+        eq_(list(intersperse(None, iterable)), ['0', None, '1'])
 
     def test_odd(self):
-        eq_(list(intersperse(None, '012')), ['0', None, '1', None, '2'])
-
-    def test_generator(self):
         iterable = (x for x in '012')
         eq_(list(intersperse(None, iterable)), ['0', None, '1', None, '2'])
 
-    def test_intersperse_not_iterable(self):
+    def test_nested(self):
+        element = ('a', 'b')
+        iterable = (x for x in '012')
+        actual = list(intersperse(element, iterable))
+        expected = ['0', ('a', 'b'), '1', ('a', 'b'), '2']
+        eq_(actual, expected)
+
+    def test_not_iterable(self):
         assert_raises(TypeError, lambda: intersperse('x', 1))
 
+    def test_n(self):
+        for n, element, expected in [
+            (1, '_', ['0', '_', '1', '_', '2', '_', '3', '_', '4', '_', '5']),
+            (2, '_', ['0', '1', '_', '2', '3', '_', '4', '5']),
+            (3, '_', ['0', '1', '2', '_', '3', '4', '5']),
+            (4, '_', ['0', '1', '2', '3', '_', '4', '5']),
+            (5, '_' , ['0', '1', '2', '3', '4', '_', '5']),
+            (6, '_' , ['0', '1', '2', '3', '4', '5']),
+            (7, '_' , ['0', '1', '2', '3', '4', '5']),
+            (3, ['a', 'b'], ['0', '1', '2', ['a', 'b'], '3', '4', '5']),
+        ]:
+            iterable = (x for x in '012345')
+            actual = list(intersperse(element, iterable, n=n))
+            eq_(actual, expected)
+
+    def test_n_zero(self):
+        assert_raises(ValueError, lambda: list(intersperse('x', '012', n=0)))
 
 class UniqueToEachTests(TestCase):
     """Tests for ``unique_to_each()``"""
