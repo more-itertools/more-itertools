@@ -487,9 +487,7 @@ def distinct_permutations(iterable):
                     yield x
                 item_counts[item] += 1
 
-    item_counts = {}
-    for item in iterable:
-        item_counts[item] = item_counts.get(item, 0) + 1
+    item_counts = Counter(iterable)
 
     return perm_unique_helper(item_counts, [None] * len(iterable),
                               len(iterable) - 1)
