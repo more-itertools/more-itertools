@@ -8,12 +8,11 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
-    - "pypy"
+    - "pypy-5.4.1"
     - "pypy3"
 
 install:
     - "pip install ."
-    - "pip install cryptography==1.8.2"
     - "pip install -U coveralls nose"
 
 script:
