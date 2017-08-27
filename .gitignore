@@ -26,3 +26,6 @@ _build
 
 # Environment
 .env
+
+# IDE files
+.idea
