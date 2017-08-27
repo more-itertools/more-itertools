@@ -249,9 +249,7 @@ class peekable(object):
 
         return next(self._it)
 
-    def next(self):
-        # For Python 2 compatibility
-        return self.__next__()
+    next = __next__  # For Python 2 compatibility
 
     def _get_slice(self, index):
         # Normalize the slice's arguments
