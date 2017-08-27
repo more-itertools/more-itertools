@@ -1362,7 +1362,7 @@ def lstrip(iterable, pred):
         >>> list(lstrip(iterable, pred))
         [1, 2, None, 3, False, None]
 
-    This function is analagous to to :func:`str.lstrip`.
+    This function is analogous to to :func:`str.lstrip`.
 
     """
     return dropwhile(pred, iterable)
@@ -1379,7 +1379,7 @@ def rstrip(iterable, pred):
         >>> list(rstrip(iterable, pred))
         [None, False, None, 1, 2, None, 3]
 
-    This function is analagous to :func:`str.rstrip`.
+    This function is analogous to :func:`str.rstrip`.
 
     """
     cache = []
@@ -1405,7 +1405,7 @@ def strip(iterable, pred):
         >>> list(strip(iterable, pred))
         [1, 2, None, 3]
 
-    This function is analagous to :func:`str.strip`.
+    This function is analogous to :func:`str.strip`.
 
     """
     return rstrip(lstrip(iterable, pred), pred)
