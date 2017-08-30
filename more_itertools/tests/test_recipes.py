@@ -9,7 +9,7 @@ from more_itertools import *
 
 def load_tests(loader, tests, ignore):
     # Add the doctests
-    tests.addTests(DocTestSuite('more_itertools.more'))
+    tests.addTests(DocTestSuite('more_itertools.recipes'))
     return tests
 
 
