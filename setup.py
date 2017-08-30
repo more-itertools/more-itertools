@@ -22,8 +22,7 @@ setup(
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
     install_requires=['six>=1.0.0,<2.0.0'],
-    tests_require=['nose'],
-    test_suite='nose.collector',
+    test_suite='more_itertools.tests',
     url='https://github.com/erikrose/more-itertools',
     include_package_data=True,
     classifiers=[

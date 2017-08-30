@@ -7,7 +7,7 @@ from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, product, repeat
 from operator import itemgetter
-from unittest import skip, TestCase
+from unittest import TestCase
 
 import six
 from six.moves import filter, range, zip
@@ -15,7 +15,6 @@ from six.moves import filter, range, zip
 from more_itertools import *  # Test all the symbols are in __all__.
 
 
-@skip("This isn't a test")
 def load_tests(loader, tests, ignore):
     # Add the doctests
     tests.addTests(DocTestSuite('more_itertools.more'))

@@ -1,13 +1,12 @@
 from doctest import DocTestSuite
 from random import seed
-from unittest import skip, TestCase
+from unittest import TestCase
 
 from six.moves import range
 
 from more_itertools import *
 
 
-@skip("This isn't a test")
 def load_tests(loader, tests, ignore):
     # Add the doctests
     tests.addTests(DocTestSuite('more_itertools.more'))
