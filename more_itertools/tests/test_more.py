@@ -8,7 +8,6 @@ from itertools import chain, count, groupby, permutations, product, repeat
 from operator import itemgetter
 from unittest import TestCase
 
-from nose.tools import assert_raises
 import six
 from six.moves import filter, range, zip
 
@@ -89,7 +88,7 @@ class FirstTests(TestCase):
 
     def test_empty_stop_iteration(self):
         """It should raise StopIteration for empty iterables."""
-        assert_raises(ValueError, first, [])
+        self.assertRaises(ValueError, lambda: first([]))
 
     def test_default(self):
         """It should return the provided default arg for empty iterables."""
@@ -411,7 +410,7 @@ class OneTests(TestCase):
         """Test the ``one()`` cases that aren't covered by its doctests."""
         # Infinite iterables
         numbers = count()
-        assert_raises(ValueError, one, numbers)  # burn 0 and 1
+        self.assertRaises(ValueError, lambda: one(numbers))  # burn 0 and 1
         self.assertEqual(next(numbers), 2)
 
 
@@ -436,7 +435,7 @@ class IntersperseTest(TestCase):
         self.assertEqual(actual, expected)
 
     def test_not_iterable(self):
-        assert_raises(TypeError, lambda: intersperse('x', 1))
+        self.assertRaises(TypeError, lambda: intersperse('x', 1))
 
     def test_n(self):
         for n, element, expected in [
@@ -454,7 +453,9 @@ class IntersperseTest(TestCase):
             self.assertEqual(actual, expected)
 
     def test_n_zero(self):
-        assert_raises(ValueError, lambda: list(intersperse('x', '012', n=0)))
+        self.assertRaises(
+            ValueError, lambda: list(intersperse('x', '012', n=0))
+        )
 
 
 class UniqueToEachTests(TestCase):
