@@ -1,13 +1,17 @@
+from doctest import DocTestSuite
 from random import seed
-from unittest import TestCase
+from unittest import skip, TestCase
 
 from six.moves import range
 
 from more_itertools import *
 
 
-def setup_module():
-    seed(1337)
+@skip("This isn't a test")
+def load_tests(loader, tests, ignore):
+    # Add the doctests
+    tests.addTests(DocTestSuite('more_itertools.more'))
+    return tests
 
 
 class AccumulateTests(TestCase):

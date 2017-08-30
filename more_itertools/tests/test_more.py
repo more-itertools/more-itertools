@@ -1,17 +1,25 @@
 from __future__ import division, print_function, unicode_literals
 
 from decimal import Decimal
+from doctest import DocTestSuite
 from fractions import Fraction
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, product, repeat
 from operator import itemgetter
-from unittest import TestCase
+from unittest import skip, TestCase
 
 import six
 from six.moves import filter, range, zip
 
 from more_itertools import *  # Test all the symbols are in __all__.
+
+
+@skip("This isn't a test")
+def load_tests(loader, tests, ignore):
+    # Add the doctests
+    tests.addTests(DocTestSuite('more_itertools.more'))
+    return tests
 
 
 class CollateTests(TestCase):
