@@ -2,14 +2,9 @@
 Testing
 =======
 
-more-itertools uses nose for its tests. First, install nose::
+To run install dependencies and run tests, use this command::
 
-    pip install nose
-
-Then, run the tests like this::
-
-    nosetests --with-doctest
-
+    python setup.py test
 
 Multiple Python Versions
 ========================
