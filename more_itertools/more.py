@@ -1358,7 +1358,8 @@ def lstrip(iterable, pred):
         >>> list(lstrip(iterable, pred))
         [1, 2, None, 3, False, None]
 
-    This function is analogous to to :func:`str.lstrip`.
+    This function is analogous to to :func:`str.lstrip`, and is essentially
+    an wrapper for :func:`itertools.dropwhile`.
 
     """
     return dropwhile(pred, iterable)
