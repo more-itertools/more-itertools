@@ -370,7 +370,7 @@ def unique_everseen(iterable, key=None):
                 if element not in seenset:
                     seenset_add(element)
                     yield element
-            except TypeError as e:
+            except TypeError:
                 if element not in seenlist:
                     seenlist_add(element)
                     yield element
