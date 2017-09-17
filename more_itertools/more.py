@@ -1459,7 +1459,7 @@ def islice_extended(iterable, *args):
             if n <= 0:
                 return
 
-            for index, item in islice(cache, None, n, step):
+            for index, item in islice(cache, 0, n, step):
                 yield item
         elif (stop is not None) and (stop < 0):
             # Advance to the start position
