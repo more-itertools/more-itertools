@@ -833,7 +833,9 @@ class PaddedTest(TestCase):
         self.assertEqual(list(mi.padded(seq, n=5)), [1, 2, 3, 4, 5])
 
         # No fillvalue
-        self.assertEqual(list(mi.padded(seq, n=7)), [1, 2, 3, 4, 5, None, None])
+        self.assertEqual(
+            list(mi.padded(seq, n=7)), [1, 2, 3, 4, 5, None, None]
+        )
 
         # With fillvalue
         self.assertEqual(
