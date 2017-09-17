@@ -1,5 +1,4 @@
 from doctest import DocTestSuite
-from random import seed
 from unittest import TestCase
 
 from six.moves import range

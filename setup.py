@@ -1,7 +1,7 @@
 # Hack to prevent stupid error on exit of `python setup.py test`. (See
 # http://www.eby-sarna.com/pipermail/peak/2010-May/003357.html.)
 try:
-    import multiprocessing
+    import multiprocessing  # noqa
 except ImportError:
     pass
 from re import sub
