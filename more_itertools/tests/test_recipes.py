@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from six.moves import range
 
-from more_itertools import *
+import more_itertools as mi
 
 
 def load_tests(loader, tests, ignore):
@@ -18,21 +18,21 @@ class AccumulateTests(TestCase):
 
     def test_empty(self):
         """Test that an empty input returns an empty output"""
-        self.assertEqual(list(accumulate([])), [])
+        self.assertEqual(list(mi.accumulate([])), [])
 
     def test_default(self):
         """Test accumulate with the default function (addition)"""
-        self.assertEqual(list(accumulate([1, 2, 3])), [1, 3, 6])
+        self.assertEqual(list(mi.accumulate([1, 2, 3])), [1, 3, 6])
 
     def test_bogus_function(self):
         """Test accumulate with an invalid function"""
         with self.assertRaises(TypeError):
-            list(accumulate([1, 2, 3], func=lambda x: x))
+            list(mi.accumulate([1, 2, 3], func=lambda x: x))
 
     def test_custom_function(self):
         """Test accumulate with a custom function"""
         self.assertEqual(
-            list(accumulate((1, 2, 3, 2, 1), func=max)), [1, 2, 3, 3, 3]
+            list(mi.accumulate((1, 2, 3, 2, 1), func=max)), [1, 2, 3, 3, 3]
         )
 
 
@@ -41,24 +41,24 @@ class TakeTests(TestCase):
 
     def test_simple_take(self):
         """Test basic usage"""
-        t = take(5, range(10))
+        t = mi.take(5, range(10))
         self.assertEqual(t, [0, 1, 2, 3, 4])
 
     def test_null_take(self):
         """Check the null case"""
-        t = take(0, range(10))
+        t = mi.take(0, range(10))
         self.assertEqual(t, [])
 
     def test_negative_take(self):
         """Make sure taking negative items results in a ValueError"""
-        self.assertRaises(ValueError, lambda: take(-3, range(10)))
+        self.assertRaises(ValueError, lambda: mi.take(-3, range(10)))
 
     def test_take_too_much(self):
         """Taking more than an iterator has remaining should return what the
         iterator has remaining.
 
         """
-        t = take(10, range(5))
+        t = mi.take(10, range(5))
         self.assertEqual(t, [0, 1, 2, 3, 4])
 
 
@@ -67,13 +67,13 @@ class TabulateTests(TestCase):
 
     def test_simple_tabulate(self):
         """Test the happy path"""
-        t = tabulate(lambda x: x)
+        t = mi.tabulate(lambda x: x)
         f = tuple([next(t) for _ in range(3)])
         self.assertEqual(f, (0, 1, 2))
 
     def test_count(self):
         """Ensure tabulate accepts specific count"""
-        t = tabulate(lambda x: 2 * x, -1)
+        t = mi.tabulate(lambda x: 2 * x, -1)
         f = (next(t), next(t), next(t))
         self.assertEqual(f, (-2, 0, 2))
 
@@ -83,18 +83,18 @@ class TailTests(TestCase):
 
     def test_greater(self):
         """Length of iterable is greather than requested tail"""
-        self.assertEqual(list(tail(3, 'ABCDEFG')), ['E', 'F', 'G'])
+        self.assertEqual(list(mi.tail(3, 'ABCDEFG')), ['E', 'F', 'G'])
 
     def test_equal(self):
         """Length of iterable is equal to the requested tail"""
         self.assertEqual(
-            list(tail(7, 'ABCDEFG')), ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+            list(mi.tail(7, 'ABCDEFG')), ['A', 'B', 'C', 'D', 'E', 'F', 'G']
         )
 
     def test_less(self):
         """Length of iterable is less than requested tail"""
         self.assertEqual(
-            list(tail(8, 'ABCDEFG')), ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+            list(mi.tail(8, 'ABCDEFG')), ['A', 'B', 'C', 'D', 'E', 'F', 'G']
         )
 
 
@@ -104,24 +104,24 @@ class ConsumeTests(TestCase):
     def test_sanity(self):
         """Test basic functionality"""
         r = (x for x in range(10))
-        consume(r, 3)
+        mi.consume(r, 3)
         self.assertEqual(3, next(r))
 
     def test_null_consume(self):
         """Check the null case"""
         r = (x for x in range(10))
-        consume(r, 0)
+        mi.consume(r, 0)
         self.assertEqual(0, next(r))
 
     def test_negative_consume(self):
         """Check that negative consumsion throws an error"""
         r = (x for x in range(10))
-        self.assertRaises(ValueError, lambda: consume(r, -1))
+        self.assertRaises(ValueError, lambda: mi.consume(r, -1))
 
     def test_total_consume(self):
         """Check that iterator is totally consumed by default"""
         r = (x for x in range(10))
-        consume(r)
+        mi.consume(r)
         self.assertRaises(StopIteration, lambda: next(r))
 
 
@@ -132,16 +132,16 @@ class NthTests(TestCase):
         """Make sure the nth item is returned"""
         l = range(10)
         for i, v in enumerate(l):
-            self.assertEqual(nth(l, i), v)
+            self.assertEqual(mi.nth(l, i), v)
 
     def test_default(self):
         """Ensure a default value is returned when nth item not found"""
         l = range(3)
-        self.assertEqual(nth(l, 100, "zebra"), "zebra")
+        self.assertEqual(mi.nth(l, 100, "zebra"), "zebra")
 
     def test_negative_item_raises(self):
         """Ensure asking for a negative item raises an exception"""
-        self.assertRaises(ValueError, lambda: nth(range(10), -3))
+        self.assertRaises(ValueError, lambda: mi.nth(range(10), -3))
 
 
 class AllEqualTests(TestCase):
@@ -149,28 +149,28 @@ class AllEqualTests(TestCase):
 
     def test_true(self):
         """Everything is equal"""
-        self.assertTrue(all_equal('aaaaaa'))
-        self.assertTrue(all_equal([0, 0, 0, 0]))
+        self.assertTrue(mi.all_equal('aaaaaa'))
+        self.assertTrue(mi.all_equal([0, 0, 0, 0]))
 
     def test_false(self):
         """Not everything is equal"""
-        self.assertFalse(all_equal('aaaaab'))
-        self.assertFalse(all_equal([0, 0, 0, 1]))
+        self.assertFalse(mi.all_equal('aaaaab'))
+        self.assertFalse(mi.all_equal([0, 0, 0, 1]))
 
     def test_tricky(self):
         """Not everything is identical, but everything is equal"""
         items = [1, complex(1, 0), 1.0]
-        self.assertTrue(all_equal(items))
+        self.assertTrue(mi.all_equal(items))
 
     def test_empty(self):
         """Return True if the iterable is empty"""
-        self.assertTrue(all_equal(''))
-        self.assertTrue(all_equal([]))
+        self.assertTrue(mi.all_equal(''))
+        self.assertTrue(mi.all_equal([]))
 
     def test_one(self):
         """Return True if the iterable is singular"""
-        self.assertTrue(all_equal('0'))
-        self.assertTrue(all_equal([0]))
+        self.assertTrue(mi.all_equal('0'))
+        self.assertTrue(mi.all_equal([0]))
 
 
 class QuantifyTests(TestCase):
@@ -179,12 +179,12 @@ class QuantifyTests(TestCase):
     def test_happy_path(self):
         """Make sure True count is returned"""
         q = [True, False, True]
-        self.assertEqual(quantify(q), 2)
+        self.assertEqual(mi.quantify(q), 2)
 
     def test_custom_predicate(self):
         """Ensure non-default predicates return as expected"""
         q = range(10)
-        self.assertEqual(quantify(q, lambda x: x % 2 == 0), 5)
+        self.assertEqual(mi.quantify(q, lambda x: x % 2 == 0), 5)
 
 
 class PadnoneTests(TestCase):
@@ -193,7 +193,7 @@ class PadnoneTests(TestCase):
     def test_happy_path(self):
         """wrapper iterator should return None indefinitely"""
         r = range(2)
-        p = padnone(r)
+        p = mi.padnone(r)
         self.assertEqual([0, 1, None, None], [next(p) for _ in range(4)])
 
 
@@ -203,7 +203,7 @@ class NcyclesTests(TestCase):
     def test_happy_path(self):
         """cycle a sequence three times"""
         r = ["a", "b", "c"]
-        n = ncycles(r, 3)
+        n = mi.ncycles(r, 3)
         self.assertEqual(
             ["a", "b", "c", "a", "b", "c", "a", "b", "c"],
             list(n)
@@ -211,12 +211,12 @@ class NcyclesTests(TestCase):
 
     def test_null_case(self):
         """asking for 0 cycles should return an empty iterator"""
-        n = ncycles(range(100), 0)
+        n = mi.ncycles(range(100), 0)
         self.assertRaises(StopIteration, lambda: next(n))
 
     def test_pathalogical_case(self):
         """asking for negative cycles should return an empty iterator"""
-        n = ncycles(range(100), -10)
+        n = mi.ncycles(range(100), -10)
         self.assertRaises(StopIteration, lambda: next(n))
 
 
@@ -225,7 +225,7 @@ class DotproductTests(TestCase):
 
     def test_happy_path(self):
         """simple dotproduct example"""
-        self.assertEqual(400, dotproduct([10, 10], [20, 20]))
+        self.assertEqual(400, mi.dotproduct([10, 10], [20, 20]))
 
 
 class FlattenTests(TestCase):
@@ -234,12 +234,12 @@ class FlattenTests(TestCase):
     def test_basic_usage(self):
         """ensure list of lists is flattened one level"""
         f = [[0, 1, 2], [3, 4, 5]]
-        self.assertEqual(list(range(6)), list(flatten(f)))
+        self.assertEqual(list(range(6)), list(mi.flatten(f)))
 
     def test_single_level(self):
         """ensure list of lists is flattened only one level"""
         f = [[0, [1, 2]], [[3, 4], 5]]
-        self.assertEqual([0, [1, 2], [3, 4], 5], list(flatten(f)))
+        self.assertEqual([0, [1, 2], [3, 4], 5], list(mi.flatten(f)))
 
 
 class RepeatfuncTests(TestCase):
@@ -247,22 +247,22 @@ class RepeatfuncTests(TestCase):
 
     def test_simple_repeat(self):
         """test simple repeated functions"""
-        r = repeatfunc(lambda: 5)
+        r = mi.repeatfunc(lambda: 5)
         self.assertEqual([5, 5, 5, 5, 5], [next(r) for _ in range(5)])
 
     def test_finite_repeat(self):
         """ensure limited repeat when times is provided"""
-        r = repeatfunc(lambda: 5, times=5)
+        r = mi.repeatfunc(lambda: 5, times=5)
         self.assertEqual([5, 5, 5, 5, 5], list(r))
 
     def test_added_arguments(self):
         """ensure arguments are applied to the function"""
-        r = repeatfunc(lambda x: x, 2, 3)
+        r = mi.repeatfunc(lambda x: x, 2, 3)
         self.assertEqual([3, 3], list(r))
 
     def test_null_times(self):
         """repeat 0 should return an empty iterator"""
-        r = repeatfunc(range, 0, 3)
+        r = mi.repeatfunc(range, 0, 3)
         self.assertRaises(StopIteration, lambda: next(r))
 
 
@@ -271,12 +271,12 @@ class PairwiseTests(TestCase):
 
     def test_base_case(self):
         """ensure an iterable will return pairwise"""
-        p = pairwise([1, 2, 3])
+        p = mi.pairwise([1, 2, 3])
         self.assertEqual([(1, 2), (2, 3)], list(p))
 
     def test_short_case(self):
         """ensure an empty iterator if there's not enough values to pair"""
-        p = pairwise("a")
+        p = mi.pairwise("a")
         self.assertRaises(StopIteration, lambda: next(p))
 
 
@@ -289,7 +289,7 @@ class GrouperTests(TestCase):
 
         """
         self.assertEqual(
-            list(grouper(3, 'ABCDEF')), [('A', 'B', 'C'), ('D', 'E', 'F')]
+            list(mi.grouper(3, 'ABCDEF')), [('A', 'B', 'C'), ('D', 'E', 'F')]
         )
 
     def test_odd(self):
@@ -298,13 +298,14 @@ class GrouperTests(TestCase):
 
         """
         self.assertEqual(
-            list(grouper(3, 'ABCDE')), [('A', 'B', 'C'), ('D', 'E', None)]
+            list(mi.grouper(3, 'ABCDE')), [('A', 'B', 'C'), ('D', 'E', None)]
         )
 
     def test_fill_value(self):
         """Test that the fill value is used to pad the final group"""
         self.assertEqual(
-            list(grouper(3, 'ABCDE', 'x')), [('A', 'B', 'C'), ('D', 'E', 'x')]
+            list(mi.grouper(3, 'ABCDE', 'x')),
+            [('A', 'B', 'C'), ('D', 'E', 'x')]
         )
 
 
@@ -314,14 +315,14 @@ class RoundrobinTests(TestCase):
     def test_even_groups(self):
         """Ensure ordered output from evenly populated iterables"""
         self.assertEqual(
-            list(roundrobin('ABC', [1, 2, 3], range(3))),
+            list(mi.roundrobin('ABC', [1, 2, 3], range(3))),
             ['A', 1, 0, 'B', 2, 1, 'C', 3, 2]
         )
 
     def test_uneven_groups(self):
         """Ensure ordered output from unevenly populated iterables"""
         self.assertEqual(
-            list(roundrobin('ABCD', [1, 2], range(0))),
+            list(mi.roundrobin('ABCD', [1, 2], range(0))),
             ['A', 1, 'B', 2, 'C', 'D']
         )
 
@@ -331,13 +332,13 @@ class PartitionTests(TestCase):
 
     def test_bool(self):
         """Test when pred() returns a boolean"""
-        lesser, greater = partition(lambda x: x > 5, range(10))
+        lesser, greater = mi.partition(lambda x: x > 5, range(10))
         self.assertEqual(list(lesser), [0, 1, 2, 3, 4, 5])
         self.assertEqual(list(greater), [6, 7, 8, 9])
 
     def test_arbitrary(self):
         """Test when pred() returns an integer"""
-        divisibles, remainders = partition(lambda x: x % 3, range(10))
+        divisibles, remainders = mi.partition(lambda x: x % 3, range(10))
         self.assertEqual(list(divisibles), [0, 3, 6, 9])
         self.assertEqual(list(remainders), [1, 2, 4, 5, 7, 8])
 
@@ -347,7 +348,7 @@ class PowersetTests(TestCase):
 
     def test_combinatorics(self):
         """Ensure a proper enumeration"""
-        p = powerset([1, 2, 3])
+        p = mi.powerset([1, 2, 3])
         self.assertEqual(
             list(p),
             [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
@@ -359,7 +360,7 @@ class UniqueEverseenTests(TestCase):
 
     def test_everseen(self):
         """ensure duplicate elements are ignored"""
-        u = unique_everseen('AAAABBBBCCDAABBB')
+        u = mi.unique_everseen('AAAABBBBCCDAABBB')
         self.assertEqual(
             ['A', 'B', 'C', 'D'],
             list(u)
@@ -367,19 +368,19 @@ class UniqueEverseenTests(TestCase):
 
     def test_custom_key(self):
         """ensure the custom key comparison works"""
-        u = unique_everseen('aAbACCc', key=str.lower)
+        u = mi.unique_everseen('aAbACCc', key=str.lower)
         self.assertEqual(list('abC'), list(u))
 
     def test_unhashable(self):
         """ensure things work for unhashable items"""
         iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
-        u = unique_everseen(iterable)
+        u = mi.unique_everseen(iterable)
         self.assertEqual(list(u), ['a', [1, 2, 3]])
 
     def test_unhashable_key(self):
         """ensure things work for unhashable items with a custom key"""
         iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
-        u = unique_everseen(iterable, key=lambda x: x)
+        u = mi.unique_everseen(iterable, key=lambda x: x)
         self.assertEqual(list(u), ['a', [1, 2, 3]])
 
 
@@ -388,12 +389,12 @@ class UniqueJustseenTests(TestCase):
 
     def test_justseen(self):
         """ensure only last item is remembered"""
-        u = unique_justseen('AAAABBBCCDABB')
+        u = mi.unique_justseen('AAAABBBCCDABB')
         self.assertEqual(list('ABCDAB'), list(u))
 
     def test_custom_key(self):
         """ensure the custom key comparison works"""
-        u = unique_justseen('AABCcAD', str.lower)
+        u = mi.unique_justseen('AABCcAD', str.lower)
         self.assertEqual(list('ABCAD'), list(u))
 
 
@@ -403,26 +404,26 @@ class IterExceptTests(TestCase):
     def test_exact_exception(self):
         """ensure the exact specified exception is caught"""
         l = [1, 2, 3]
-        i = iter_except(l.pop, IndexError)
+        i = mi.iter_except(l.pop, IndexError)
         self.assertEqual(list(i), [3, 2, 1])
 
     def test_generic_exception(self):
         """ensure the generic exception can be caught"""
         l = [1, 2]
-        i = iter_except(l.pop, Exception)
+        i = mi.iter_except(l.pop, Exception)
         self.assertEqual(list(i), [2, 1])
 
     def test_uncaught_exception_is_raised(self):
         """ensure a non-specified exception is raised"""
         l = [1, 2, 3]
-        i = iter_except(l.pop, KeyError)
+        i = mi.iter_except(l.pop, KeyError)
         self.assertRaises(IndexError, lambda: list(i))
 
     def test_first(self):
         """ensure first is run before the function"""
         l = [1, 2, 3]
         f = lambda: 25
-        i = iter_except(l.pop, IndexError, f)
+        i = mi.iter_except(l.pop, IndexError, f)
         self.assertEqual(list(i), [25, 3, 2, 1])
 
 
@@ -431,19 +432,21 @@ class FirstTrueTests(TestCase):
 
     def test_something_true(self):
         """Test with no keywords"""
-        self.assertEqual(first_true(range(10)), 1)
+        self.assertEqual(mi.first_true(range(10)), 1)
 
     def test_nothing_true(self):
         """Test default return value."""
-        self.assertEqual(first_true([0, 0, 0]), False)
+        self.assertEqual(mi.first_true([0, 0, 0]), False)
 
     def test_default(self):
         """Test with a default keyword"""
-        self.assertEqual(first_true([0, 0, 0], default='!'), '!')
+        self.assertEqual(mi.first_true([0, 0, 0], default='!'), '!')
 
     def test_pred(self):
         """Test with a custom predicate"""
-        self.assertEqual(first_true([2, 4, 6], pred=lambda x: x % 3 == 0), 6)
+        self.assertEqual(
+            mi.first_true([2, 4, 6], pred=lambda x: x % 3 == 0), 6
+        )
 
 
 class RandomProductTests(TestCase):
@@ -466,7 +469,7 @@ class RandomProductTests(TestCase):
         """
         nums = [1, 2, 3]
         lets = ['a', 'b', 'c']
-        n, m = zip(*[random_product(nums, lets) for _ in range(100)])
+        n, m = zip(*[mi.random_product(nums, lets) for _ in range(100)])
         n, m = set(n), set(m)
         self.assertEqual(n, set(nums))
         self.assertEqual(m, set(lets))
@@ -480,7 +483,7 @@ class RandomProductTests(TestCase):
         """
         nums = [1, 2, 3]
         lets = ['a', 'b', 'c']
-        r = list(random_product(nums, lets, repeat=100))
+        r = list(mi.random_product(nums, lets, repeat=100))
         self.assertEqual(2 * 100, len(r))
         n, m = set(r[::2]), set(r[1::2])
         self.assertEqual(n, set(nums))
@@ -500,7 +503,7 @@ class RandomPermutationTests(TestCase):
 
         """
         i = range(15)
-        r = random_permutation(i)
+        r = mi.random_permutation(i)
         self.assertEqual(set(i), set(r))
         if i == r:
             raise AssertionError("Values were not permuted")
@@ -520,7 +523,7 @@ class RandomPermutationTests(TestCase):
         item_set = set(items)
         all_items = set()
         for _ in range(100):
-            permutation = random_permutation(items, 5)
+            permutation = mi.random_permutation(items, 5)
             self.assertEqual(len(permutation), 5)
             permutation_set = set(permutation)
             self.assertLessEqual(permutation_set, item_set)
@@ -537,7 +540,7 @@ class RandomCombinationTests(TestCase):
         items = range(15)
         all_items = set()
         for _ in range(50):
-            combination = random_combination(items, 5)
+            combination = mi.random_combination(items, 5)
             all_items |= set(combination)
         self.assertEqual(all_items, set(items))
 
@@ -545,10 +548,10 @@ class RandomCombinationTests(TestCase):
         """ensure that elements are sampled without replacement"""
         items = range(15)
         for _ in range(50):
-            combination = random_combination(items, len(items))
+            combination = mi.random_combination(items, len(items))
             self.assertEqual(len(combination), len(set(combination)))
         self.assertRaises(
-            ValueError, lambda: random_combination(items, len(items) + 1)
+            ValueError, lambda: mi.random_combination(items, len(items) + 1)
         )
 
 
@@ -558,7 +561,7 @@ class RandomCombinationWithReplacementTests(TestCase):
     def test_replacement(self):
         """ensure that elements are sampled with replacement"""
         items = range(5)
-        combo = random_combination_with_replacement(items, len(items) * 2)
+        combo = mi.random_combination_with_replacement(items, len(items) * 2)
         self.assertEqual(2 * len(items), len(combo))
         if len(set(combo)) == len(combo):
             raise AssertionError("Combination contained no duplicates")
@@ -569,6 +572,6 @@ class RandomCombinationWithReplacementTests(TestCase):
         items = range(15)
         all_items = set()
         for _ in range(50):
-            combination = random_combination_with_replacement(items, 5)
+            combination = mi.random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         self.assertEqual(all_items, set(items))
