@@ -17,6 +17,7 @@ install:
 
 script:
     - "coverage run --include='more_itertools/*.py' --omit='more_itertools/tests/*' setup.py test"
+    - "flake8 ."
 
 notifications:
   email: false
