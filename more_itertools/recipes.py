@@ -344,7 +344,7 @@ def powerset(iterable):
 
     """
     s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
 
 def unique_everseen(iterable, key=None):
@@ -370,7 +370,7 @@ def unique_everseen(iterable, key=None):
                 if element not in seenset:
                     seenset_add(element)
                     yield element
-            except TypeError as e:
+            except TypeError:
                 if element not in seenlist:
                     seenlist_add(element)
                     yield element
@@ -381,7 +381,7 @@ def unique_everseen(iterable, key=None):
                 if k not in seenset:
                     seenset_add(k)
                     yield element
-            except TypeError as e:
+            except TypeError:
                 if k not in seenlist:
                     seenlist_add(k)
                     yield element
