@@ -1122,8 +1122,10 @@ class TestAlwaysIterable(TestCase):
     def test_iterables(self):
         self.assertEqual(mi.always_iterable([0, 1]), [0, 1])
         self.assertEqual(mi.always_iterable([0, 1], base_type=list), ([0, 1],))
-        self.assertEqual(list(iter('foo')), ['f', 'o', 'o'])
-        self.assertEqual(list([]), [])
+        self.assertEqual(
+            list(mi.always_iterable(iter('foo'))), ['f', 'o', 'o']
+        )
+        self.assertEqual(list(mi.always_iterable([])), [])
 
     def test_none(self):
         self.assertEqual(mi.always_iterable(None), ())
