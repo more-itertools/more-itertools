@@ -1106,8 +1106,22 @@ class TestAlwaysIterable(TestCase):
         self.assertEqual(mi.always_iterable(six.b('bar')), (six.b('bar'),))
         self.assertEqual(mi.always_iterable(six.u(b'baz')), (six.u(b'baz'),))
 
+    def test_base_type(self):
+        obj = {'a': 1, 'b': 2}
+
+        # Default: dicts are iterable like they normally are
+        default_actual = list(mi.always_iterable(obj))
+        default_expected = list(obj)
+        self.assertEqual(default_actual, default_expected)
+
+        # Base type set: dicts are not iterable
+        custom_actual = list(mi.always_iterable(obj, base_type=dict))
+        custom_expected = [obj]
+        self.assertEqual(custom_actual, custom_expected)
+
     def test_iterables(self):
         self.assertEqual(mi.always_iterable([0, 1]), [0, 1])
+        self.assertEqual(mi.always_iterable([0, 1], base_type=list), ([0, 1],))
         self.assertEqual(list(iter('foo')), ['f', 'o', 'o'])
         self.assertEqual(list([]), [])
 

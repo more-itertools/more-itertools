@@ -1119,7 +1119,7 @@ def divide(n, iterable):
     return ret
 
 
-def always_iterable(obj):
+def always_iterable(obj, base_type=None):
     """
     Given an object, always return an iterable.
 
@@ -1139,10 +1139,15 @@ def always_iterable(obj):
         >>> always_iterable([1, 2, 3])
         [1, 2, 3]
 
-    Strings (binary or unicode) are not considered to be iterable::
+    By default, strings (binary or unicode) are not considered to be iterable::
 
         >>> always_iterable('foo')
         ('foo',)
+
+    To consider other types as non-iterable, set *base_type*::
+
+        >>> always_iterable({'a': 1})
+        {'a': 1}
 
     This function is useful in applications where a passed parameter may be
     either a single item or a collection of items::
@@ -1162,8 +1167,9 @@ def always_iterable(obj):
     if obj is None:
         return ()
 
-    string_like_types = (text_type, binary_type)
-    if isinstance(obj, string_like_types) or not hasattr(obj, '__iter__'):
+    base_type = (text_type, binary_type) if base_type is None else base_type
+
+    if isinstance(obj, base_type) or not hasattr(obj, '__iter__'):
         return obj,
 
     return obj
