@@ -1119,7 +1119,7 @@ def divide(n, iterable):
     return ret
 
 
-def always_iterable(obj, base_type=None):
+def always_iterable(obj, base_type=(text_type, binary_type)):
     """
     Given an object, always return an iterable.
 
@@ -1166,8 +1166,6 @@ def always_iterable(obj, base_type=None):
     """
     if obj is None:
         return ()
-
-    base_type = (text_type, binary_type) if base_type is None else base_type
 
     if isinstance(obj, base_type) or not hasattr(obj, '__iter__'):
         return obj,
