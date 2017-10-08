@@ -1139,35 +1139,42 @@ def always_iterable(obj, base_type=(text_type, binary_type)):
         >>> always_iterable([1, 2, 3])
         [1, 2, 3]
 
-    By default, strings (binary or unicode) are not considered to be iterable::
 
-        >>> always_iterable('foo')
-        ('foo',)
+    The *base_type* keyword can override which types are considered iterable.
+    By default, ``str`` and ``bytes`` types are not considered iterable::
 
-    To consider other types as non-iterable, set *base_type*::
+        >>> obj = 'foo'
+        >>> list(always_iterable(obj))  # Default behavior
+        ['foo']
+        >>> list(always_iterable(obj, base_type=None))  # No special handling
+        ['f', 'o', 'o']
 
-        >>> always_iterable({'a': 1})
-        {'a': 1}
+        >>> obj = {'a': 1}
+        >>> list(always_iterable(obj))  # Default behavior
+        ['a']
+        >>> list(always_iterable(obj, base_type=dict))
+        [{'a': 1}]
+
 
     This function is useful in applications where a passed parameter may be
     either a single item or a collection of items::
 
-        >>> def item_sum(param):
-        ...     total = 0
-        ...     for item in always_iterable(param):
-        ...         total += item
-        ...
-        ...     return total
-        >>> item_sum(10)
-        10
-        >>> item_sum([10, 20])
+        >>> arg = [10, 20]
+        >>> sum(always_iterable(arg))
         30
+
+        >>> arg = 10
+        >>> sum(always_iterable(arg))
+        10
 
     """
     if obj is None:
         return ()
 
-    if isinstance(obj, base_type) or not hasattr(obj, '__iter__'):
+    is_base_type = False if base_type is None else isinstance(obj, base_type)
+    is_iterable = hasattr(obj, '__iter__')
+
+    if is_base_type or not is_iterable:
         return obj,
 
     return obj
