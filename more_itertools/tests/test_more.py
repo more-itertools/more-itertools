@@ -1119,12 +1119,6 @@ class TestAlwaysIterable(TestCase):
         custom_expected = [obj]
         self.assertEqual(custom_actual, custom_expected)
 
-    def test_base_type_none(self):
-        obj = 'string'
-        actual = list(mi.always_iterable(obj, base_type=None))
-        expected = list(obj)
-        self.assertEqual(actual, expected)
-
     def test_iterables(self):
         self.assertEqual(mi.always_iterable([0, 1]), [0, 1])
         self.assertEqual(mi.always_iterable([0, 1], base_type=list), ([0, 1],))

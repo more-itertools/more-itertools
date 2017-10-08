@@ -1146,8 +1146,6 @@ def always_iterable(obj, base_type=(text_type, binary_type)):
         >>> obj = 'foo'
         >>> list(always_iterable(obj))  # Default behavior
         ['foo']
-        >>> list(always_iterable(obj, base_type=None))  # No special handling
-        ['f', 'o', 'o']
 
         >>> obj = {'a': 1}
         >>> list(always_iterable(obj))  # Default behavior
@@ -1171,10 +1169,7 @@ def always_iterable(obj, base_type=(text_type, binary_type)):
     if obj is None:
         return ()
 
-    is_base_type = False if base_type is None else isinstance(obj, base_type)
-    is_iterable = hasattr(obj, '__iter__')
-
-    if is_base_type or not is_iterable:
+    if isinstance(obj, base_type) or not hasattr(obj, '__iter__'):
         return obj,
 
     return obj
