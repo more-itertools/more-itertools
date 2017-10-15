@@ -1126,7 +1126,7 @@ def always_iterable(obj, base_type=(text_type, binary_type)):
         >>> list(always_iterable(obj))
         [1, 2, 3]
 
-    If *obj* is not iterable, return an one-item iterable containing *obj*::
+    If *obj* is not iterable, return a one-item iterable containing *obj*::
 
         >>> obj = 1
         >>> list(always_iterable(obj))
