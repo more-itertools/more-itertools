@@ -9,7 +9,6 @@ from itertools import chain, count, groupby, permutations, product, repeat
 from operator import itemgetter
 from unittest import TestCase
 
-import six
 from six.moves import filter, range, zip
 
 import more_itertools as mi
@@ -1098,21 +1097,44 @@ class DivideTest(TestCase):
 class TestAlwaysIterable(TestCase):
     """Tests for always_iterable()"""
     def test_single(self):
-        self.assertEqual(mi.always_iterable(1), (1,))
         self.assertEqual(list(mi.always_iterable(1)), [1])
 
     def test_strings(self):
-        self.assertEqual(mi.always_iterable('foo'), ('foo',))
-        self.assertEqual(mi.always_iterable(six.b('bar')), (six.b('bar'),))
-        self.assertEqual(mi.always_iterable(six.u(b'baz')), (six.u(b'baz'),))
+        for obj in ['foo', b'bar', u'baz']:
+            actual = list(mi.always_iterable(obj))
+            expected = [obj]
+            self.assertEqual(actual, expected)
+
+    def test_base_type(self):
+        dict_obj = {'a': 1, 'b': 2}
+        str_obj = '123'
+
+        # Default: dicts are iterable like they normally are
+        default_actual = list(mi.always_iterable(dict_obj))
+        default_expected = list(dict_obj)
+        self.assertEqual(default_actual, default_expected)
+
+        # Unitary types set: dicts are not iterable
+        custom_actual = list(mi.always_iterable(dict_obj, base_type=dict))
+        custom_expected = [dict_obj]
+        self.assertEqual(custom_actual, custom_expected)
+
+        # With unitary types set, strings are iterable
+        str_actual = list(mi.always_iterable(str_obj, base_type=None))
+        str_expected = list(str_obj)
+        self.assertEqual(str_actual, str_expected)
 
     def test_iterables(self):
-        self.assertEqual(mi.always_iterable([0, 1]), [0, 1])
-        self.assertEqual(list(iter('foo')), ['f', 'o', 'o'])
-        self.assertEqual(list([]), [])
+        self.assertEqual(list(mi.always_iterable([0, 1])), [0, 1])
+        self.assertEqual(
+            list(mi.always_iterable([0, 1], base_type=list)), [[0, 1]]
+        )
+        self.assertEqual(
+            list(mi.always_iterable(iter('foo'))), ['f', 'o', 'o']
+        )
+        self.assertEqual(list(mi.always_iterable([])), [])
 
     def test_none(self):
-        self.assertEqual(mi.always_iterable(None), ())
         self.assertEqual(list(mi.always_iterable(None)), [])
 
     def test_generator(self):

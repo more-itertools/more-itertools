@@ -1119,54 +1119,60 @@ def divide(n, iterable):
     return ret
 
 
-def always_iterable(obj):
-    """
-    Given an object, always return an iterable.
+def always_iterable(obj, base_type=(text_type, binary_type)):
+    """If *obj* is iterable, return an iterator over its items::
 
-    If the object is not already iterable, return a tuple containing containing
-    the object::
-
-        >>> always_iterable(1)
-        (1,)
-
-    If the object is ``None``, return an empty iterable::
-
-        >>> always_iterable(None)
-        ()
-
-    Otherwise, return the object itself::
-
-        >>> always_iterable([1, 2, 3])
+        >>> obj = (1, 2, 3)
+        >>> list(always_iterable(obj))
         [1, 2, 3]
 
-    Strings (binary or unicode) are not considered to be iterable::
+    If *obj* is not iterable, return a one-item iterable containing *obj*::
 
-        >>> always_iterable('foo')
-        ('foo',)
+        >>> obj = 1
+        >>> list(always_iterable(obj))
+        [1]
 
-    This function is useful in applications where a passed parameter may be
-    either a single item or a collection of items::
 
-        >>> def item_sum(param):
-        ...     total = 0
-        ...     for item in always_iterable(param):
-        ...         total += item
-        ...
-        ...     return total
-        >>> item_sum(10)
-        10
-        >>> item_sum([10, 20])
-        30
+    If *obj* is ``None``, return an empty iterable:
+
+        >>> obj = None
+        >>> list(always_iterable(None))
+        []
+
+    By default, binary and text strings are not considered iterable::
+
+        >>> obj = 'foo'
+        >>> list(always_iterable(obj))
+        ['foo']
+
+    If *base_type* is set, objects for which ``isinstance(obj, base_type)``
+    returns ``True`` won't be considered iterable.
+
+        >>> obj = {'a': 1}
+        >>> list(always_iterable(obj))  # Iterate over the dict's keys
+        ['a']
+        >>> list(always_iterable(obj, base_type=dict))  # Treat dicts as a unit
+        [{'a': 1}]
+
+    Set *base_type* to ``None`` to avoid any special handling and treat objects
+    Python considers iterable as iterable:
+
+        >>> obj = 'foo'
+        >>> list(always_iterable(obj, base_type=None))
+        ['f', 'o', 'o']
+
 
     """
     if obj is None:
-        return ()
+        return iter(())
 
-    string_like_types = (text_type, binary_type)
-    if isinstance(obj, string_like_types) or not hasattr(obj, '__iter__'):
-        return obj,
+    if (base_type is not None) and isinstance(obj, base_type):
+        return iter((obj,))
 
-    return obj
+    try:
+        return iter(obj)
+    except TypeError:
+        return iter((obj,))
 
 
 def adjacent(predicate, iterable, distance=1):
