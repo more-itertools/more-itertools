@@ -382,6 +382,7 @@ class PeekableTests(TestCase):
         # There was no advancing of the source iterator
         self.assertEqual(list(it), list(source_iterable))
 
+
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""
 
