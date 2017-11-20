@@ -168,7 +168,7 @@ class peekable(object):
     storage.
 
     To locate the position of the first instance of some value in the
-    iterable, use :meth:`index`. This won't advance the source iterator.
+    iterable, use :meth:`index`. This won't advance the iterator.
 
         >>> p = peekable(iter('abcdabcd'))
         >>> p.index('b')
@@ -305,19 +305,19 @@ class peekable(object):
     def index(self, value, start=0, stop=None):
         """Return the index ``k`` of the first instance *value* in the
         iterable, optionally starting from the *start* index and finishing
-        before the *stop* index. Does not advance the source iterator.
+        before the *stop* index. Does not advance the iterator.
         """
-        cache_len = len(self._cache)
-
         # Check the cache first
-        cache_stop = cache_len if stop is None else stop
-        try:
-            return self._cache.index(value, start, cache_stop)
-        except ValueError:
-            pass
+        for i, item in enumerate(self._cache):
+            if i < start:
+                continue
+            if (stop is not None) and (i >= stop):
+                raise ValueError('{} not found'.format(repr(value)))
+            if item == value:
+                return i
 
         # Continue searching through the iterable, caching values as we go
-        for i, item in enumerate(self._it, cache_len):
+        for i, item in enumerate(self._it, len(self._cache)):
             self._cache.append(item)
             if i < start:
                 continue
