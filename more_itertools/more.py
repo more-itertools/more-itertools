@@ -607,7 +607,7 @@ class bucket(object):
     child iterables based on a *key* function.
 
         >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
-        >>> s = bucket(iterable, key=lambda s: s[0])
+        >>> s = bucket(iterable, key=lambda x: x[0])
         >>> a_iterable = s['a']
         >>> next(a_iterable)
         'a1'
@@ -619,16 +619,32 @@ class bucket(object):
     The original iterable will be advanced and its items will be cached until
     they are used by the child iterables. This may require significant storage.
 
-    Be aware that attempting to select a bucket that no items correspond to
-    will exhaust the iterable and cache all values.
+    By default, attempting to select a bucket to which no items belong  will
+    exhaust the iterable and cache all values.
+    If you specify a *validator* function, selected buckets will instead be
+    checked against it.
+
+        >>> from itertools import count
+        >>> it = count(1, 2)  # Infinite sequence of odd numbers
+        >>> key = lambda x: x % 10  # Bucket by last digit
+        >>> validator = lambda x: x in {1, 3, 5, 7, 9}  # Odd digits only
+        >>> s = bucket(it, key=key, validator=validator)
+        >>> 2 in s
+        False
+        >>> list(s[2])
+        []
 
     """
-    def __init__(self, iterable, key):
+    def __init__(self, iterable, key, validator=None):
         self._it = iter(iterable)
         self._key = key
         self._cache = defaultdict(deque)
+        self._validator = validator or (lambda x: True)
 
     def __contains__(self, value):
+        if not self._validator(value):
+            return False
+
         try:
             item = next(self[value])
         except StopIteration:
@@ -662,6 +678,9 @@ class bucket(object):
                         self._cache[item_value].append(item)
 
     def __getitem__(self, value):
+        if not self._validator(value):
+            return iter(())
+
         return self._get_values(value)
 
 

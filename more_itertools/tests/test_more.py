@@ -582,6 +582,15 @@ class BucketTests(TestCase):
         # Checking in-ness shouldn't advance the iterator
         self.assertEqual(next(D[10]), 10)
 
+    def test_validator(self):
+        iterable = count(1)  # All numbers starting with 1
+        key = lambda x: int(str(x)[0])  # First digit of each number
+        validator = lambda x: 0 < x < 10  # No leading zeros
+        D = mi.bucket(iterable, key, validator=validator)
+        self.assertNotIn(0, D)
+        self.assertEqual(list(D[0]), [])
+        self.assertEqual(mi.take(3, D[1]), [1, 10, 11])
+
 
 class SpyTests(TestCase):
     """Tests for ``spy()``"""
