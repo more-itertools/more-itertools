@@ -362,6 +362,25 @@ class PeekableTests(TestCase):
         expected = [12, 11, 10, 0, 1, 2]
         self.assertEqual(actual, expected)
 
+    def test_index(self):
+        source_iterable = 'abbcccabbccc'
+        it = mi.peekable(iter(source_iterable))
+
+        # Not in the cache yet
+        self.assertEqual(it.index('b'), 1)
+
+        # Now in the cache - using deque.index
+        self.assertEqual(it.index('b'), 1)
+        self.assertEqual(it.index('b', 0), 1)
+        self.assertEqual(it.index('b', 0, 2), 1)
+        self.assertRaises(ValueError, lambda: it.index('b', 0, 1))
+
+        # Outside the cache, skip over some values
+        self.assertEqual(it.index('c', 4), 4)
+        self.assertRaises(ValueError, lambda: it.index('c', 6, 9))
+
+        # There was no advancing of the source iterator
+        self.assertEqual(list(it), list(source_iterable))
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""

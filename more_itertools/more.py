@@ -152,7 +152,7 @@ class peekable(object):
         [11, 12, 1, 2, 3]
 
     peekables can be indexed. Index 0 is the item that will be returned by
-    :func:`next`, index 1 is the item after that, and so on:
+    :func:`next`, index 1 is the item after that, and so on.
     The values up to the given index will be cached.
 
         >>> p = peekable(['a', 'b', 'c', 'd'])
@@ -166,6 +166,19 @@ class peekable(object):
     Negative indexes are supported, but be aware that they will cache the
     remaining items in the source iterator, which may require significant
     storage.
+
+    To locate the position of the first instance of some value in the
+    iterable, use :meth:`index`. This won't advance the source iterator.
+
+        >>> p = peekable(iter('abcdabcd'))
+        >>> p.index('b')
+        1
+        >>> p.index('b', 2)
+        5
+        >>> p.index('b', 2, 4)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: 'b' not found
 
     To check whether a peekable is exhausted, check its truth value:
 
@@ -288,6 +301,32 @@ class peekable(object):
             self._cache.extend(islice(self._it, index + 1 - cache_len))
 
         return self._cache[index]
+
+    def index(self, value, start=0, stop=None):
+        """Return the index ``k`` of the first instance *value* in the
+        iterable, optionally starting from the *start* index and finishing
+        before the *stop* index. Does not advance the source iterator.
+        """
+        cache_len = len(self._cache)
+
+        # Check the cache first
+        cache_stop = cache_len if stop is None else stop
+        try:
+            return self._cache.index(value, start, cache_stop)
+        except ValueError:
+            pass
+
+        # Continue searching through the iterable, caching values as we go
+        for i, item in enumerate(self._it, cache_len):
+            self._cache.append(item)
+            if i < start:
+                continue
+            if (stop is not None) and (i >= stop):
+                break
+            if item == value:
+                return i
+
+        raise ValueError('{} not found'.format(repr(value)))
 
 
 def _collate(*iterables, **kwargs):
