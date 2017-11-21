@@ -29,6 +29,7 @@ __all__ = [
     'chunked',
     'collapse',
     'collate',
+    'consecutive_groups',
     'consumer',
     'count_cycle',
     'distinct_permutations',
@@ -1586,3 +1587,44 @@ def islice_extended(iterable, *args):
 
             for item in cache[i::step]:
                 yield item
+
+
+def consecutive_groups(iterable, ordering=range(maxsize)):
+    """Yield groups of consecutive items using :func:`itertools.groupby`.
+    Two items are considered to be consecutive if their first appearances in
+    *ordering* are adjacent.
+
+    By default, *ordering* works with numbers up to ``sys.maxsize``. To find
+    runs of sorted numbers:
+
+        >>> iterable = [1, 10, 11, 12, 20, 30, 31, 32, 33, 40]
+        >>> for group in consecutive_groups(iterable):
+        ...     print(list(group))
+        [1]
+        [10, 11, 12]
+        [20]
+        [30, 31, 32, 33]
+        [40]
+
+    Note that the *ordering* iterable will be advanced and its items cached,
+    which may require significant storage.
+
+    For runs of adjacent letters, use ``string.ascii_lowercase`` for
+    *ordering*:
+
+        >>> from string import ascii_lowercase
+        >>> iterable = 'abcdfgilmnop'
+        >>> ordering = ascii_lowercase
+        >>> for group in consecutive_groups(iterable, ordering):
+        ...     print(list(group))
+        ['a', 'b', 'c', 'd']
+        ['f', 'g']
+        ['i']
+        ['l', 'm', 'n', 'o', 'p']
+
+    """
+    ordering = peekable(ordering)
+    for k, g in groupby(
+        enumerate(iterable), key=lambda x: x[0] - ordering.index(x[1])
+    ):
+        yield map(itemgetter(1), g)
