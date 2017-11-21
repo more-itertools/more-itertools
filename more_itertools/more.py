@@ -1623,7 +1623,7 @@ def consecutive_groups(iterable, ordering=range(maxsize)):
         ['l', 'm', 'n', 'o', 'p']
 
     """
-    ordering = peekable(ordering)
+    ordering = ordering if hasattr(ordering, 'index') else peekable(ordering)
     for k, g in groupby(
         enumerate(iterable), key=lambda x: x[0] - ordering.index(x[1])
     ):
