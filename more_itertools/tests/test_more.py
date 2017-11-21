@@ -382,6 +382,21 @@ class PeekableTests(TestCase):
         # There was no advancing of the source iterator
         self.assertEqual(list(it), list(source_iterable))
 
+    def test_contains(self):
+        source_iterable = 'abbcccabbccc'
+        it = mi.peekable(iter(source_iterable))
+
+        # Search twice, once not already cached and once cached
+        self.assertIn('a', it)
+        self.assertIn('a', it)
+        self.assertEqual(list(it._cache), ['a'])
+
+        self.assertIn('c', it)
+        self.assertIn('c', it)
+        self.assertEqual(list(it._cache), ['a', 'b', 'b', 'c'])
+
+        self.assertEqual(list(it), list(source_iterable))
+
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""

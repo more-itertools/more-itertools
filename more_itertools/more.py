@@ -164,11 +164,12 @@ class peekable(object):
         'a'
 
     Negative indexes are supported, but be aware that they will cache the
-    remaining items in the source iterator, which may require significant
+    remaining items of the source iterator, which may require significant
     storage.
 
     To locate the position of the first instance of some value in the
-    iterable, use :meth:`index`. This won't advance the iterator.
+    iterable, use :meth:`index`. This won't advance the iterator (but it will
+    cache values up to the first instance).
 
         >>> p = peekable(iter('abcdabcd'))
         >>> p.index('b')
@@ -179,6 +180,14 @@ class peekable(object):
         Traceback (most recent call last):
         ...
         ValueError: 'b' not found
+
+    Similarly, the `in` operator can be used without advancing the iterator:
+
+        >>> p = peekable(iter('abcdabcd'))
+        >>> 'b' in p  # Caches up to the first instance of 'b'
+        True
+        >>> 'x' in p  # Caches the remaining values in the iterator
+        False
 
     To check whether a peekable is exhausted, check its truth value:
 
@@ -204,6 +213,14 @@ class peekable(object):
         except StopIteration:
             return False
         return True
+
+    def __contains__(self, value):
+        try:
+            self.index(value)
+        except ValueError:
+            return False
+        else:
+            return True
 
     def __nonzero__(self):
         # For Python 2 compatibility
