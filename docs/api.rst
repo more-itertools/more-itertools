@@ -124,6 +124,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: one
 .. autofunction:: unique_to_each
 .. autofunction:: locate
+.. autofunction:: consecutive_groups
 
 ----
 

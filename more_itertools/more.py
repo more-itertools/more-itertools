@@ -29,6 +29,7 @@ __all__ = [
     'chunked',
     'collapse',
     'collate',
+    'consecutive_groups',
     'consumer',
     'count_cycle',
     'distinct_permutations',
@@ -1530,3 +1531,40 @@ def islice_extended(iterable, *args):
 
             for item in cache[i::step]:
                 yield item
+
+
+def consecutive_groups(iterable, ordering=lambda x: x):
+    """Yield groups of consecutive items using :func:`itertools.groupby`.
+    The *ordering* function determines whether two items are adjacent by
+    returning their position.
+
+    By default, the ordering function is the identity function. This is
+    suitable for finding runs of numbers:
+
+        >>> iterable = [1, 10, 11, 12, 20, 30, 31, 32, 33, 40]
+        >>> for group in consecutive_groups(iterable):
+        ...     print(list(group))
+        [1]
+        [10, 11, 12]
+        [20]
+        [30, 31, 32, 33]
+        [40]
+
+    For finding runs of adjacent letters, try using the :meth:`index` method
+    of a string of letters:
+
+        >>> from string import ascii_lowercase
+        >>> iterable = 'abcdfgilmnop'
+        >>> ordering = ascii_lowercase.index
+        >>> for group in consecutive_groups(iterable, ordering):
+        ...     print(list(group))
+        ['a', 'b', 'c', 'd']
+        ['f', 'g']
+        ['i']
+        ['l', 'm', 'n', 'o', 'p']
+
+    """
+    for k, g in groupby(
+        enumerate(iterable), key=lambda x: x[0] - ordering(x[1])
+    ):
+        yield map(itemgetter(1), g)
