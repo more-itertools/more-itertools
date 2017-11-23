@@ -320,25 +320,15 @@ class peekable(object):
         return self._cache[index]
 
     def index(self, value, start=0, stop=None):
-        """Return the index ``k`` of the first instance *value* in the
+        """Return the index of the first instance *value* in the
         iterable, optionally starting from the *start* index and finishing
         before the *stop* index. Does not advance the iterator.
         """
-        # Check the cache first
-        for i, item in enumerate(self._cache):
-            if i < start:
-                continue
-            if (stop is not None) and (i >= stop):
-                raise ValueError('{} not found'.format(repr(value)))
-            if item == value:
-                return i
-
-        # Continue searching through the iterable, caching values as we go
-        for i, item in enumerate(self._it, len(self._cache)):
-            self._cache.append(item)
-            if i < start:
-                continue
-            if (stop is not None) and (i >= stop):
+        indexes = count(start) if stop is None else range(start, stop)
+        for i in indexes:
+            try:
+                item = self[i]
+            except IndexError:
                 break
             if item == value:
                 return i
