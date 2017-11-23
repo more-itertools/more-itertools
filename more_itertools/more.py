@@ -674,7 +674,7 @@ class bucket(object):
                     if item_value == value:
                         yield item
                         break
-                    else:
+                    elif self._validator(item_value):
                         self._cache[item_value].append(item)
 
     def __getitem__(self, value):

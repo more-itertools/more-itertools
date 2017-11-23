@@ -583,13 +583,14 @@ class BucketTests(TestCase):
         self.assertEqual(next(D[10]), 10)
 
     def test_validator(self):
-        iterable = count(1)  # All numbers starting with 1
+        iterable = count(0)
         key = lambda x: int(str(x)[0])  # First digit of each number
         validator = lambda x: 0 < x < 10  # No leading zeros
         D = mi.bucket(iterable, key, validator=validator)
-        self.assertNotIn(0, D)
-        self.assertEqual(list(D[0]), [])
         self.assertEqual(mi.take(3, D[1]), [1, 10, 11])
+        self.assertNotIn(0, D)  # Non-valid entries don't return True
+        self.assertNotIn(0, D._cache)  # Don't store non-valid entries
+        self.assertEqual(list(D[0]), [])
 
 
 class SpyTests(TestCase):
