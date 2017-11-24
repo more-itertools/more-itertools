@@ -1620,10 +1620,9 @@ class seekable(object):
             else:
                 return item
 
-        if self._cache_iter is None:
-            item = next(self._source)
-            self._cache.append(item)
-            return item
+        item = next(self._source)
+        self._cache.append(item)
+        return item
 
     next = __next__
 
