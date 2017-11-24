@@ -1600,6 +1600,9 @@ class seekable(object):
         >>> it.seek(20)  # Seeking past the end of the source isn't a problem
         >>> list(it)
         []
+        >>> it.seek(0)  # Resetting works even after hitting the end
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
 
     """
 
