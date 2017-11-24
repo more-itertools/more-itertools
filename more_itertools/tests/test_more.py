@@ -1507,3 +1507,32 @@ class SeekableTest(TestCase):
 
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
+
+    def test_getitem(self):
+        iterable = ['0', '1', '2', '3', '4', '5']
+        it = mi.seekable(iterable)
+        valid_indexes = list(range(-len(iterable), len(iterable)))
+        for i in valid_indexes:
+            try:
+                self.assertEqual(iterable[i], it[i])
+            except Exception as e:
+                self.fail((i, e))
+
+        self.assertRaises(IndexError, lambda: it[len(iterable)])
+        self.assertRaises(IndexError, lambda: it[-len(iterable) - 1])
+        self.assertRaises(TypeError, lambda: it[None])
+
+    def test_getitem_slice(self):
+        iterable = ['0', '1', '2', '3', '4', '5']
+        it = mi.seekable(iterable)
+
+        indexes = list(range(-len(iterable) - 4, len(iterable) + 4)) + [None]
+        steps = [1, 2, 3, 4, -1, -2, -3, 4]
+        for slice_args in product(indexes, indexes, steps):
+            try:
+                actual = it[slice(*slice_args)]
+            except Exception as e:
+                self.fail((slice_args, e))
+
+            expected = iterable[slice(*slice_args)]
+            self.assertEqual(actual, expected, slice_args)

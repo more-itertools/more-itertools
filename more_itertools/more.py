@@ -1604,12 +1604,45 @@ class seekable(object):
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
 
+    seekables can be indexed and sliced. This won't change the iterator's
+    position (negative indexes will cause the entire source iterable to be
+    cached).
+
+        >>> it = seekable((str(n) for n in range(10)))
+        >>> it[4]
+        '4'
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> it.seek(0)
+        >>> it[2:-2]
+        ['2', '3', '4', '5', '6', '7']
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+
+
     """
 
     def __init__(self, iterable):
         self._source = iter(iterable)
         self._cache = []
         self._cache_iter = None
+        self._cursor = 0
+
+    def __getitem__(self, index):
+        cursor = self._cursor
+        try:
+            if isinstance(index, slice):
+                return list(
+                    islice_extended(self, index.start, index.stop, index.step)
+                )
+
+            dir_ = 1 if index >= 0 else -1
+            try:
+                return next(islice_extended(self, index, index + dir_, dir_))
+            except StopIteration:
+                raise IndexError('index out of range')
+        finally:
+            self.seek(cursor)
 
     def __iter__(self):
         return self
@@ -1621,10 +1654,12 @@ class seekable(object):
             except StopIteration:
                 self._cache_iter = None
             else:
+                self._cursor += 1
                 return item
 
         item = next(self._source)
         self._cache.append(item)
+        self._cursor += 1
         return item
 
     next = __next__
@@ -1637,3 +1672,5 @@ class seekable(object):
         remainder = index - len(self._cache)
         if remainder > 0:
             consume(self, remainder)
+
+        self._cursor = index
