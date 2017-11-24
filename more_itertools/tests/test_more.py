@@ -1429,3 +1429,36 @@ class IsliceExtendedTests(TestCase):
     def test_zero_step(self):
         with self.assertRaises(ValueError):
             list(mi.islice_extended([1, 2, 3], 0, 1, 0))
+
+
+class ConsecutiveGroupsTest(TestCase):
+    def test_numbers(self):
+        iterable = [-10, -8, -7, -6, 1, 2, 4, 5, -1, 7]
+        actual = [list(g) for g in mi.consecutive_groups(iterable)]
+        expected = [[-10], [-8, -7, -6], [1, 2], [4, 5], [-1], [7]]
+        self.assertEqual(actual, expected)
+
+    def test_custom_ordering(self):
+        iterable = ['1', '10', '11', '20', '21', '22', '30', '31']
+        ordering = lambda x: int(x)
+        actual = [list(g) for g in mi.consecutive_groups(iterable, ordering)]
+        expected = [['1'], ['10', '11'], ['20', '21', '22'], ['30', '31']]
+        self.assertEqual(actual, expected)
+
+    def test_exotic_ordering(self):
+        iterable = [
+            ('a', 'b', 'c', 'd'),
+            ('a', 'c', 'b', 'd'),
+            ('a', 'c', 'd', 'b'),
+            ('a', 'd', 'b', 'c'),
+            ('d', 'b', 'c', 'a'),
+            ('d', 'c', 'a', 'b'),
+        ]
+        ordering = list(permutations('abcd')).index
+        actual = [list(g) for g in mi.consecutive_groups(iterable, ordering)]
+        expected = [
+            [('a', 'b', 'c', 'd')],
+            [('a', 'c', 'b', 'd'), ('a', 'c', 'd', 'b'), ('a', 'd', 'b', 'c')],
+            [('d', 'b', 'c', 'a'), ('d', 'c', 'a', 'b')],
+        ]
+        self.assertEqual(actual, expected)
