@@ -153,7 +153,7 @@ class peekable(object):
         [11, 12, 1, 2, 3]
 
     peekables can be indexed. Index 0 is the item that will be returned by
-    :func:`next`, index 1 is the item after that, and so on:
+    :func:`next`, index 1 is the item after that, and so on.
     The values up to the given index will be cached.
 
         >>> p = peekable(['a', 'b', 'c', 'd'])
@@ -165,8 +165,30 @@ class peekable(object):
         'a'
 
     Negative indexes are supported, but be aware that they will cache the
-    remaining items in the source iterator, which may require significant
+    remaining items of the source iterator, which may require significant
     storage.
+
+    To locate the position of the first instance of some value in the
+    iterable, use :meth:`index`. This won't advance the iterator (but it will
+    cache values up to the first instance).
+
+        >>> p = peekable(iter('abcdabcd'))
+        >>> p.index('b')
+        1
+        >>> p.index('b', 2)
+        5
+        >>> p.index('b', 2, 4)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: 'b' not found
+
+    Similarly, the `in` operator can be used without advancing the iterator:
+
+        >>> p = peekable(iter('abcdabcd'))
+        >>> 'b' in p  # Caches up to the first instance of 'b'
+        True
+        >>> 'x' in p  # Caches the remaining values in the iterator
+        False
 
     To check whether a peekable is exhausted, check its truth value:
 
@@ -192,6 +214,14 @@ class peekable(object):
         except StopIteration:
             return False
         return True
+
+    def __contains__(self, value):
+        try:
+            self.index(value)
+        except ValueError:
+            return False
+        else:
+            return True
 
     def __nonzero__(self):
         # For Python 2 compatibility
@@ -289,6 +319,22 @@ class peekable(object):
             self._cache.extend(islice(self._it, index + 1 - cache_len))
 
         return self._cache[index]
+
+    def index(self, value, start=0, stop=None):
+        """Return the index of the first instance *value* in the
+        iterable, optionally starting from the *start* index and finishing
+        before the *stop* index. Does not advance the iterator.
+        """
+        indexes = count(start) if stop is None else range(start, stop)
+        for i in indexes:
+            try:
+                item = self[i]
+            except IndexError:
+                break
+            if item == value:
+                return i
+
+        raise ValueError('{} not found'.format(repr(value)))
 
 
 def _collate(*iterables, **kwargs):
