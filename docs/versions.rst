@@ -4,8 +4,32 @@ Version History
 
 .. automodule:: more_itertools
 
+4.0.0
+-----
+
+* New itertools:
+    * :func:`consecutive_groups` (Based on the example in the `Python 2.4 docs <https://docs.python.org/release/2.4.4/lib/itertools-example.html>`_)
+    * :func:`seekable` (If you're looking for how to "reset" an iterator,
+      you're in luck!)
+    * :func:`exactly_n` (thanks to michael-celani)
+    * :func:`run_length.encode` and :func:`run_length.decode`
+    * :func:`difference`, for inverting :func:`accumulate`
+
+* Improvements to existing itertools:
+    * The number of items between filler elements in :func:`intersperse` can
+      now be specified (thanks to pylang)
+    * :func:`distinct_permutations` and :func:`peekable` got some minor
+      adjustments (thanks to MSeifert04)
+    * :func:`always_iterable` now returns an iterator object. It also now
+      allows different types to be considered iterable (thanks to jaraco)
+    * :func:`bucket` can now limit the keys it stores in memory
+* Other changes:
+    * A few typos were fixed (thanks to EdwardBetts)
+    * All tests can now be run with ``python setup.py test``
+
 3.2.0
 -----
+
 * New itertools:
     * :func:`lstrip`, :func:`rstrip`, and :func:`strip`
       (thanks to MSeifert04 and pylang)
