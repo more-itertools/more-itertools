@@ -35,6 +35,7 @@ __all__ = [
     'distinct_permutations',
     'distribute',
     'divide',
+    'exactly_n',
     'first',
     'groupby_transform',
     'ilen',
@@ -1587,3 +1588,23 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         enumerate(iterable), key=lambda x: x[0] - ordering(x[1])
     ):
         yield map(itemgetter(1), g)
+
+def exactly_n(iterable, n):
+    """Return ``True`` if exactly ``n`` items in the iterable are ``True``.
+
+        >>> exactly_n([True, True, False], 2)
+        True
+        >>> exactly_n([True, True, False], 1)
+        False
+
+    """
+    if n < 0:
+        return False
+
+    num_true = 0
+    for _ in filter(bool, iterable):
+        num_true += 1
+        if num_true > n:
+            return False
+
+    return num_true == n

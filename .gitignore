@@ -29,3 +29,4 @@ _build
 
 # IDE files
 .idea
+.vscode
