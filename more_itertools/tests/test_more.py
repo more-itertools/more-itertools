@@ -184,16 +184,15 @@ class PeekableTests(TestCase):
     def test_slicing_reset(self):
         """Test slicing on a fresh iterable each time"""
         iterable = ['0', '1', '2', '3', '4', '5']
-        indexes = list(range(-4, len(iterable) + 4)) + [None]
+        indexes = list(range(-len(iterable) - 1, len(iterable) + 1)) + [None]
         steps = [1, 2, 3, 4, -1, -2, -3, 4]
         for slice_args in product(indexes, indexes, steps):
             it = iter(iterable)
             p = mi.peekable(it)
             next(p)
             index = slice(*slice_args)
-            actual = p[index]
-            expected = iterable[1:][index]
-            self.assertEqual(actual, expected, slice_args)
+            self.assertEqual(p[index], iterable[1:][index], slice_args)
+            self.assertEqual(next(p), iterable[1])
 
     def test_slicing_error(self):
         iterable = '01234567'
