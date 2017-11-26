@@ -1589,6 +1589,7 @@ def consecutive_groups(iterable, ordering=lambda x: x):
     ):
         yield map(itemgetter(1), g)
 
+
 def exactly_n(iterable, n):
     """Return ``True`` if exactly ``n`` items in the iterable are ``True``.
 

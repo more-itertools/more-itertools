@@ -1473,6 +1473,7 @@ class ConsecutiveGroupsTest(TestCase):
         ]
         self.assertEqual(actual, expected)
 
+
 class ExactlyNTests(TestCase):
     """Tests for ``exactly_n()``"""
 
@@ -1492,4 +1493,4 @@ class ExactlyNTests(TestCase):
     def test_empty(self):
         """Return ``True`` if the iterable is empty and ``n`` is 0"""
         self.assertTrue(mi.exactly_n([], 0))
-        self.assertFalse(mi.exactly_n([],1))
+        self.assertFalse(mi.exactly_n([], 1))
