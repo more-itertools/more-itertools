@@ -1609,18 +1609,19 @@ class seekable(object):
     def __init__(self, iterable):
         self._source = iter(iterable)
         self._cache = []
-        self._cache_iter = None
+        self._index = None
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self._cache_iter is not None:
+        if self._index is not None:
             try:
-                item = next(self._cache_iter)
-            except StopIteration:
-                self._cache_iter = None
+                item = self._cache[self._index]
+            except IndexError:
+                self._index = None
             else:
+                self._index += 1
                 return item
 
         item = next(self._source)
@@ -1630,10 +1631,7 @@ class seekable(object):
     next = __next__
 
     def seek(self, index):
-        self._cache_iter = iter(self._cache)
-
-        consume(self._cache_iter, index)
-
+        self._index = index
         remainder = index - len(self._cache)
         if remainder > 0:
             consume(self, remainder)
