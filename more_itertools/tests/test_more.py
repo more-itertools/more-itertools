@@ -6,7 +6,7 @@ from fractions import Fraction
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, product, repeat
-from operator import itemgetter
+from operator import add, itemgetter
 from unittest import TestCase
 
 from six.moves import filter, range, zip
@@ -1472,3 +1472,29 @@ class ConsecutiveGroupsTest(TestCase):
             [('d', 'b', 'c', 'a'), ('d', 'c', 'a', 'b')],
         ]
         self.assertEqual(actual, expected)
+
+
+class DifferenceTest(TestCase):
+    def test_normal(self):
+        iterable = [10, 20, 30, 40, 50]
+        actual = list(mi.difference(iterable))
+        expected = [10, 10, 10, 10, 10]
+        self.assertEqual(actual, expected)
+
+    def test_custom(self):
+        iterable = [10, 20, 30, 40, 50]
+        actual = list(mi.difference(iterable, add))
+        expected = [10, 30, 50, 70, 90]
+        self.assertEqual(actual, expected)
+
+    def test_roundtrip(self):
+        original = list(range(100))
+        accumulated = mi.accumulate(original)
+        actual = list(mi.difference(accumulated))
+        self.assertEqual(actual, original)
+
+    def test_one(self):
+        self.assertEqual(list(mi.difference([0])), [0])
+
+    def test_empty(self):
+        self.assertEqual(list(mi.difference([])), [])
