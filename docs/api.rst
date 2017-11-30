@@ -29,8 +29,8 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: partition
 
 
-Lookahead
-=========
+Lookahead and lookback
+======================
 
 These tools peek at an iterable's values without advancing it.
 
@@ -41,6 +41,7 @@ These tools peek at an iterable's values without advancing it.
 
 .. autofunction:: spy
 .. autoclass:: peekable
+.. autoclass:: seekable
 
 
 Windowing
@@ -125,6 +126,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: unique_to_each
 .. autofunction:: locate
 .. autofunction:: consecutive_groups
+.. autofunction:: exactly_n
 
 ----
 

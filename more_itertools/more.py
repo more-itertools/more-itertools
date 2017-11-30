@@ -20,7 +20,7 @@ from sys import maxsize, version_info
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
-from .recipes import flatten, take
+from .recipes import consume, flatten, take
 
 __all__ = [
     'adjacent',
@@ -36,6 +36,7 @@ __all__ = [
     'distinct_permutations',
     'distribute',
     'divide',
+    'exactly_n',
     'first',
     'groupby_transform',
     'ilen',
@@ -51,6 +52,7 @@ __all__ = [
     'padded',
     'peekable',
     'rstrip',
+    'seekable',
     'side_effect',
     'sliced',
     'sort_together',
@@ -1626,3 +1628,88 @@ def difference(iterable, func=sub):
     except StopIteration:
         return iter([])
     return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
+class seekable(object):
+    """Wrap an iterator to allow for seeking backward and forward. This
+    progressively caches the items in the source iterable so they can be
+    re-visited.
+
+    Call :meth:`seek` with an index to seek to that position in the source
+    iterable.
+
+    To "reset" an iterator, seek to ``0``:
+
+        >>> from itertools import count
+        >>> it = seekable((str(n) for n in count()))
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> it.seek(0)
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> next(it)
+        '3'
+
+    You can also seek forward:
+
+        >>> it = seekable((str(n) for n in range(20)))
+        >>> it.seek(10)
+        >>> next(it)
+        '10'
+        >>> it.seek(20)  # Seeking past the end of the source isn't a problem
+        >>> list(it)
+        []
+        >>> it.seek(0)  # Resetting works even after hitting the end
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+
+    The cache grows as the source iterable progresses, so beware of wrapping
+    very large or infinite iterables.
+
+    """
+
+    def __init__(self, iterable):
+        self._source = iter(iterable)
+        self._cache = []
+        self._index = None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index is not None:
+            try:
+                item = self._cache[self._index]
+            except IndexError:
+                self._index = None
+            else:
+                self._index += 1
+                return item
+
+        item = next(self._source)
+        self._cache.append(item)
+        return item
+
+    next = __next__
+
+    def seek(self, index):
+        self._index = index
+        remainder = index - len(self._cache)
+        if remainder > 0:
+            consume(self, remainder)
+
+
+def exactly_n(iterable, n, predicate=bool):
+    """Return ``True`` if exactly ``n`` items in the iterable are ``True``
+    according to the *predicate* function.
+
+        >>> exactly_n([True, True, False], 2)
+        True
+        >>> exactly_n([True, True, False], 1)
+        False
+        >>> exactly_n([0, 1, 2, 3, 4, 5], 3, lambda x: x < 3)
+        True
+
+    The iterable will be advanced until ``n + 1`` truthy items are encountered,
+    so avoid calling it on infinite iterables.
+
+    """
+    return len(take(n + 1, filter(predicate, iterable))) == n
