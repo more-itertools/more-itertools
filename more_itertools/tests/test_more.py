@@ -1474,6 +1474,51 @@ class ConsecutiveGroupsTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class SeekableTest(TestCase):
+    def test_exhaustion_reset(self):
+        iterable = [str(n) for n in range(10)]
+
+        s = mi.seekable(iterable)
+        self.assertEqual(list(s), iterable)  # Normal iteration
+        self.assertEqual(list(s), [])  # Iterable is exhausted
+
+        s.seek(0)
+        self.assertEqual(list(s), iterable)  # Back in action
+
+    def test_partial_reset(self):
+        iterable = [str(n) for n in range(10)]
+
+        s = mi.seekable(iterable)
+        self.assertEqual(mi.take(5, s), iterable[:5])  # Normal iteration
+
+        s.seek(1)
+        self.assertEqual(list(s), iterable[1:])  # Get the rest of the iterable
+
+    def test_forward(self):
+        iterable = [str(n) for n in range(10)]
+
+        s = mi.seekable(iterable)
+        self.assertEqual(mi.take(1, s), iterable[:1])  # Normal iteration
+
+        s.seek(3)  # Skip over index 2
+        self.assertEqual(list(s), iterable[3:])  # Result is similar to slicing
+
+        s.seek(0)  # Back to 0
+        self.assertEqual(list(s), iterable)  # No difference in result
+
+    def test_past_end(self):
+        iterable = [str(n) for n in range(10)]
+
+        s = mi.seekable(iterable)
+        self.assertEqual(mi.take(1, s), iterable[:1])  # Normal iteration
+
+        s.seek(20)
+        self.assertEqual(list(s), [])  # Iterable is exhausted
+
+        s.seek(0)  # Back to 0
+        self.assertEqual(list(s), iterable)  # No difference in result
+
+
 class ExactlyNTests(TestCase):
     """Tests for ``exactly_n()``"""
 
