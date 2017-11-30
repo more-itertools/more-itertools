@@ -1604,6 +1604,9 @@ class seekable(object):
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
 
+    The cache grows as the source iterable progresses, so beware of wrapping
+    very large or infinite iterables.
+
     """
 
     def __init__(self, iterable):
