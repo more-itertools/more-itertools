@@ -1590,8 +1590,13 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         yield map(itemgetter(1), g)
 
 
-def exactly_n(iterable, n):
-    """Return ``True`` if exactly ``n`` items in the iterable are ``True``.
+def exactly_n(iterable, n, predicate=bool):
+    """Return ``True`` if exactly ``n`` items in the iterable are ``True``
+    according to the predicate, a function of one argument which returns
+    a boolean.
+    
+    This function will short circuit as soon as it finds n + 1 ``True``
+    elements.
 
         >>> exactly_n([True, True, False], 2)
         True
@@ -1599,13 +1604,4 @@ def exactly_n(iterable, n):
         False
 
     """
-    if n < 0:
-        return False
-
-    num_true = 0
-    for _ in filter(bool, iterable):
-        num_true += 1
-        if num_true > n:
-            return False
-
-    return num_true == n
+    return len(take(n + 1, filter(predicate, iterable))) == n
