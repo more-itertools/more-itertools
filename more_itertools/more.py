@@ -1628,6 +1628,8 @@ def difference(iterable, func=sub):
     except StopIteration:
         return iter([])
     return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
+
+
 class seekable(object):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be

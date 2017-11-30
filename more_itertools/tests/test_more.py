@@ -1498,6 +1498,8 @@ class DifferenceTest(TestCase):
 
     def test_empty(self):
         self.assertEqual(list(mi.difference([])), [])
+
+
 class SeekableTest(TestCase):
     def test_exhaustion_reset(self):
         iterable = [str(n) for n in range(10)]
