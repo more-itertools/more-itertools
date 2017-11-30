@@ -20,7 +20,7 @@ from sys import maxsize, version_info
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
-from .recipes import flatten, take
+from .recipes import consume, flatten, take
 
 __all__ = [
     'adjacent',
@@ -51,6 +51,7 @@ __all__ = [
     'peekable',
     'rstrip',
     'run_length',
+    'seekable',
     'side_effect',
     'sliced',
     'sort_together',
@@ -1588,6 +1589,75 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         enumerate(iterable), key=lambda x: x[0] - ordering(x[1])
     ):
         yield map(itemgetter(1), g)
+
+
+class seekable(object):
+    """Wrap an iterator to allow for seeking backward and forward. This
+    progressively caches the items in the source iterable so they can be
+    re-visited.
+
+    Call :meth:`seek` with an index to seek to that position in the source
+    iterable.
+
+    To "reset" an iterator, seek to ``0``:
+
+        >>> from itertools import count
+        >>> it = seekable((str(n) for n in count()))
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> it.seek(0)
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> next(it)
+        '3'
+
+    You can also seek forward:
+
+        >>> it = seekable((str(n) for n in range(20)))
+        >>> it.seek(10)
+        >>> next(it)
+        '10'
+        >>> it.seek(20)  # Seeking past the end of the source isn't a problem
+        >>> list(it)
+        []
+        >>> it.seek(0)  # Resetting works even after hitting the end
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+
+    The cache grows as the source iterable progresses, so beware of wrapping
+    very large or infinite iterables.
+
+    """
+
+    def __init__(self, iterable):
+        self._source = iter(iterable)
+        self._cache = []
+        self._index = None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index is not None:
+            try:
+                item = self._cache[self._index]
+            except IndexError:
+                self._index = None
+            else:
+                self._index += 1
+                return item
+
+        item = next(self._source)
+        self._cache.append(item)
+        return item
+
+    next = __next__
+
+    def seek(self, index):
+        self._index = index
+        remainder = index - len(self._cache)
+        if remainder > 0:
+            consume(self, remainder)
 
 
 class run_length(object):
