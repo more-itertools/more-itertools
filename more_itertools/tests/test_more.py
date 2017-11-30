@@ -1517,3 +1517,27 @@ class SeekableTest(TestCase):
 
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
+
+
+class ExactlyNTests(TestCase):
+    """Tests for ``exactly_n()``"""
+
+    def test_true(self):
+        """Iterable has ``n`` ``True`` elements"""
+        self.assertTrue(mi.exactly_n([True, False, True], 2))
+        self.assertTrue(mi.exactly_n([1, 1, 1, 0], 3))
+        self.assertTrue(mi.exactly_n([False, False], 0))
+        self.assertTrue(mi.exactly_n(range(100), 10, lambda x: x < 10))
+
+    def test_false(self):
+        """Iterable does not have ``n`` ``True`` elements"""
+        self.assertFalse(mi.exactly_n([True, False, False], 2))
+        self.assertFalse(mi.exactly_n([True, True, False], 1))
+        self.assertFalse(mi.exactly_n([False], 1))
+        self.assertFalse(mi.exactly_n([True], -1))
+        self.assertFalse(mi.exactly_n(repeat(True), 100))
+
+    def test_empty(self):
+        """Return ``True`` if the iterable is empty and ``n`` is 0"""
+        self.assertTrue(mi.exactly_n([], 0))
+        self.assertFalse(mi.exactly_n([], 1))
