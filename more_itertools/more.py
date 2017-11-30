@@ -35,6 +35,7 @@ __all__ = [
     'distinct_permutations',
     'distribute',
     'divide',
+    'exactly_n',
     'first',
     'groupby_transform',
     'ilen',
@@ -1657,3 +1658,20 @@ class seekable(object):
         remainder = index - len(self._cache)
         if remainder > 0:
             consume(self, remainder)
+
+
+def exactly_n(iterable, n, predicate=bool):
+    """Return ``True`` if exactly ``n`` items in the iterable are ``True``
+    according to the predicate, a function of one argument which returns
+    a boolean.
+
+    This function will short circuit as soon as it finds n + 1 ``True``
+    elements.
+
+        >>> exactly_n([True, True, False], 2)
+        True
+        >>> exactly_n([True, True, False], 1)
+        False
+
+    """
+    return len(take(n + 1, filter(predicate, iterable))) == n
