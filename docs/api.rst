@@ -127,6 +127,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: locate
 .. autofunction:: consecutive_groups
 .. autofunction:: exactly_n
+.. autoclass:: run_length
 
 ----
 

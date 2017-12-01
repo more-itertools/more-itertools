@@ -1545,6 +1545,20 @@ class SeekableTest(TestCase):
         self.assertEqual(list(s), iterable)  # No difference in result
 
 
+class RunLengthTest(TestCase):
+    def test_encode(self):
+        iterable = (int(str(n)[0]) for n in count(800))
+        actual = mi.take(4, mi.run_length.encode(iterable))
+        expected = [(8, 100), (9, 100), (1, 1000), (2, 1000)]
+        self.assertEqual(actual, expected)
+
+    def test_decode(self):
+        iterable = [('d', 4), ('c', 3), ('b', 2), ('a', 1)]
+        actual = ''.join(mi.run_length.decode(iterable))
+        expected = 'ddddcccbba'
+        self.assertEqual(actual, expected)
+
+
 class ExactlyNTests(TestCase):
     """Tests for ``exactly_n()``"""
 
