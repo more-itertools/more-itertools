@@ -420,10 +420,10 @@ def with_iter(context_manager):
             yield item
 
 
-def one(iterable):
+def one(iterable, too_short=None, too_long=None):
     """Return the only element from the iterable.
 
-    Raise ValueError if the iterable is empty or longer than 1 element. For
+    Raise an exception if the iterable is empty or longer than 1 element. For
     example, assert that a DB query returns a single, unique result.
 
         >>> one(['val'])
@@ -439,6 +439,11 @@ def one(iterable):
         ...
         ValueError: not enough values to unpack (expected 1, got 0)
 
+    By default, ``one()`` will raise a ValueError if the iterable has the wrong 
+    number of elements.  However, you can also provide custom exceptions via 
+    the ``too_short`` and ``too_long`` arguments to raise if the iterable is 
+    either too short (i.e. empty) or too long (i.e. more than one element).
+    
     ``one()`` attempts to advance the iterable twice in order to ensure there
     aren't further items. Because this discards any second item, ``one()`` is
     not suitable in situations where you want to catch its exception and then
@@ -446,8 +451,21 @@ def one(iterable):
     iterable longer than 1 item is, in fact, an error.
 
     """
-    element, = iterable
-    return element
+    it = iter(iterable)
+
+    try:
+        value = next(it)
+    except StopIteration:
+        raise too_short or ValueError("not enough values to unpack (expected 1, got 0)")
+
+    try:
+        next(it)
+    except StopIteration:
+        pass
+    else:
+        raise too_long or ValueError("too many values to unpack (expected 1)")
+
+    return value
 
 
 def distinct_permutations(iterable):
@@ -1156,7 +1174,6 @@ def always_iterable(obj, base_type=(text_type, binary_type)):
         >>> list(always_iterable(obj))
         [1]
 
-
     If *obj* is ``None``, return an empty iterable:
 
         >>> obj = None
@@ -1184,8 +1201,6 @@ def always_iterable(obj, base_type=(text_type, binary_type)):
         >>> obj = 'foo'
         >>> list(always_iterable(obj, base_type=None))
         ['f', 'o', 'o']
-
-
     """
     if obj is None:
         return iter(())

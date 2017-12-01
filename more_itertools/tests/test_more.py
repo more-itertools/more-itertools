@@ -422,6 +422,12 @@ class OneTests(TestCase):
         self.assertRaises(ValueError, lambda: mi.one(numbers))  # burn 0 and 1
         self.assertEqual(next(numbers), 2)
 
+        # Custom exceptions
+        self.assertRaises(ZeroDivisionError,
+                lambda: mi.one([], ZeroDivisionError, OverflowError))
+        self.assertRaises(OverflowError,
+                lambda: mi.one([1,2], ZeroDivisionError, OverflowError))
+
 
 class IntersperseTest(TestCase):
     """ Tests for intersperse() """
