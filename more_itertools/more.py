@@ -14,7 +14,7 @@ from itertools import (
     takewhile,
     tee
 )
-from operator import itemgetter, lt, gt
+from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
 
 from six import binary_type, string_types, text_type
@@ -32,9 +32,11 @@ __all__ = [
     'consecutive_groups',
     'consumer',
     'count_cycle',
+    'difference',
     'distinct_permutations',
     'distribute',
     'divide',
+    'exactly_n',
     'first',
     'groupby_transform',
     'ilen',
@@ -1591,6 +1593,44 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         yield map(itemgetter(1), g)
 
 
+def difference(iterable, func=sub):
+    """By default, compute the first difference of *iterable* using
+    :func:`operator.sub`.
+
+        >>> iterable = [0, 1, 3, 6, 10]
+        >>> list(difference(iterable))
+        [0, 1, 2, 3, 4]
+
+    This is the opposite of :func:`accumulate`'s default behavior:
+
+        >>> from more_itertools import accumulate
+        >>> iterable = [0, 1, 2, 3, 4]
+        >>> list(accumulate(iterable))
+        [0, 1, 3, 6, 10]
+        >>> list(difference(accumulate(iterable)))
+        [0, 1, 2, 3, 4]
+
+    By default *func* is :func:`operator.sub`, but other functions can be
+    specified. They will be applied as follows::
+
+        A, B, C, D, ... --> A, func(B, A), func(C, B), func(D, C), ...
+
+    For example, to do progressive division:
+
+        >>> iterable = [1, 2, 6, 24, 120]  # Factorial sequence
+        >>> func = lambda x, y: x // y
+        >>> list(difference(iterable, func))
+        [1, 2, 3, 4, 5]
+
+    """
+    a, b = tee(iterable)
+    try:
+        item = next(b)
+    except StopIteration:
+        return iter([])
+    return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
+
+
 class seekable(object):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
@@ -1687,3 +1727,21 @@ class run_length(object):
     @staticmethod
     def decode(iterable):
         return chain.from_iterable(repeat(k, n) for k, n in iterable)
+
+
+def exactly_n(iterable, n, predicate=bool):
+    """Return ``True`` if exactly ``n`` items in the iterable are ``True``
+    according to the *predicate* function.
+
+        >>> exactly_n([True, True, False], 2)
+        True
+        >>> exactly_n([True, True, False], 1)
+        False
+        >>> exactly_n([0, 1, 2, 3, 4, 5], 3, lambda x: x < 3)
+        True
+
+    The iterable will be advanced until ``n + 1`` truthy items are encountered,
+    so avoid calling it on infinite iterables.
+
+    """
+    return len(take(n + 1, filter(predicate, iterable))) == n

@@ -6,7 +6,7 @@ from fractions import Fraction
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, product, repeat
-from operator import itemgetter
+from operator import add, itemgetter
 from unittest import TestCase
 
 from six.moves import filter, range, zip
@@ -1474,6 +1474,32 @@ class ConsecutiveGroupsTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class DifferenceTest(TestCase):
+    def test_normal(self):
+        iterable = [10, 20, 30, 40, 50]
+        actual = list(mi.difference(iterable))
+        expected = [10, 10, 10, 10, 10]
+        self.assertEqual(actual, expected)
+
+    def test_custom(self):
+        iterable = [10, 20, 30, 40, 50]
+        actual = list(mi.difference(iterable, add))
+        expected = [10, 30, 50, 70, 90]
+        self.assertEqual(actual, expected)
+
+    def test_roundtrip(self):
+        original = list(range(100))
+        accumulated = mi.accumulate(original)
+        actual = list(mi.difference(accumulated))
+        self.assertEqual(actual, original)
+
+    def test_one(self):
+        self.assertEqual(list(mi.difference([0])), [0])
+
+    def test_empty(self):
+        self.assertEqual(list(mi.difference([])), [])
+
+
 class SeekableTest(TestCase):
     def test_exhaustion_reset(self):
         iterable = [str(n) for n in range(10)]
@@ -1531,3 +1557,27 @@ class RunLengthTest(TestCase):
         actual = ''.join(mi.run_length.decode(iterable))
         expected = 'ddddcccbba'
         self.assertEqual(actual, expected)
+
+
+class ExactlyNTests(TestCase):
+    """Tests for ``exactly_n()``"""
+
+    def test_true(self):
+        """Iterable has ``n`` ``True`` elements"""
+        self.assertTrue(mi.exactly_n([True, False, True], 2))
+        self.assertTrue(mi.exactly_n([1, 1, 1, 0], 3))
+        self.assertTrue(mi.exactly_n([False, False], 0))
+        self.assertTrue(mi.exactly_n(range(100), 10, lambda x: x < 10))
+
+    def test_false(self):
+        """Iterable does not have ``n`` ``True`` elements"""
+        self.assertFalse(mi.exactly_n([True, False, False], 2))
+        self.assertFalse(mi.exactly_n([True, True, False], 1))
+        self.assertFalse(mi.exactly_n([False], 1))
+        self.assertFalse(mi.exactly_n([True], -1))
+        self.assertFalse(mi.exactly_n(repeat(True), 100))
+
+    def test_empty(self):
+        """Return ``True`` if the iterable is empty and ``n`` is 0"""
+        self.assertTrue(mi.exactly_n([], 0))
+        self.assertFalse(mi.exactly_n([], 1))
