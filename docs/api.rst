@@ -213,12 +213,13 @@ Others
 .. autofunction:: numeric_range(start, stop, step)
 .. autofunction:: side_effect
 .. autofunction:: iterate
+.. autofunction:: difference(iterable, func=operator.sub)
 
 ----
 
 **Itertools recipes**
 
 .. autofunction:: consume
-.. autofunction:: accumulate
+.. autofunction:: accumulate(iterable, func=operator.add)
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc
