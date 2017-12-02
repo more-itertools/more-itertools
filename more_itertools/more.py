@@ -420,35 +420,46 @@ def with_iter(context_manager):
             yield item
 
 
-def one(iterable, too_short=None, too_long=None):
-    """Return the only element from the iterable.
+def one(iterable, too_short=ValueError, too_long=ValueError):
+    """Return the first item from *iterable*, which is expected to contain only
+    that item. Raise an exception *iterable* is empty or has more than one
+    item.
 
-    Raise an exception if the iterable is empty or longer than 1 element. For
-    example, assert that a DB query returns a single, unique result.
+    :func:`one` is useful for ensuring that an iterable contains only one item.
+    For example, it can be used to retrieve the result of a database query
+    that is expected to return only a single row.
 
-        >>> one(['val'])
-        'val'
+    If *iterable* is empty, ``ValueError`` will be raised. You may specify a
+    different exception type with the *too_short* keyword:
 
-        >>> one(['val', 'other'])  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> it = []
+        >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: too many values to unpack (expected 1)
-
-        >>> one([])  # doctest: +IGNORE_EXCEPTION_DETAIL
+        ValueError: too many items in iterable (expected 1)'
+        >>> one(it, too_short=IndexError)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: not enough values to unpack (expected 1, got 0)
+        IndexError: too few items in iterable (expected 1)'
 
-    By default, ``one()`` will raise a ValueError if the iterable has the wrong 
-    number of elements.  However, you can also provide custom exceptions via 
-    the ``too_short`` and ``too_long`` arguments to raise if the iterable is 
-    either too short (i.e. empty) or too long (i.e. more than one element).
-    
-    ``one()`` attempts to advance the iterable twice in order to ensure there
-    aren't further items. Because this discards any second item, ``one()`` is
-    not suitable in situations where you want to catch its exception and then
-    try an alternative treatment of the iterable. It should be used only when a
-    iterable longer than 1 item is, in fact, an error.
+    Similarly, if *iterable* contains more than one item, ``ValueError`` will
+    be raised. You may specify a different exception type with the *too_long*
+    keyword:
+
+        >>> it = ['too', 'many']
+        >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: too many items in iterable (expected 1)'
+        >>> one(it, too_long=RuntimeError)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        RuntimeError: too many items in iterable (expected 1)'
+
+    Note that :func:`one` attempts to advance *iterable* twice to ensure there
+    is only one item. If there is more than one, both items will be discarded.
+    See :func:`spy` or :func:`peekable` to check iterable contents less
+    destructively.
 
     """
     it = iter(iterable)
@@ -456,14 +467,14 @@ def one(iterable, too_short=None, too_long=None):
     try:
         value = next(it)
     except StopIteration:
-        raise too_short or ValueError("not enough values to unpack (expected 1, got 0)")
+        raise too_short('two few items in iterable (expected 1)')
 
     try:
         next(it)
     except StopIteration:
         pass
     else:
-        raise too_long or ValueError("too many values to unpack (expected 1)")
+        raise too_long('too many items in iterable (expected 1)')
 
     return value
 

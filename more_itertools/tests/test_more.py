@@ -415,18 +415,22 @@ class WithIterTests(TestCase):
 
 
 class OneTests(TestCase):
-    def test_one(self):
-        """Test the ``one()`` cases that aren't covered by its doctests."""
-        # Infinite iterables
-        numbers = count()
-        self.assertRaises(ValueError, lambda: mi.one(numbers))  # burn 0 and 1
-        self.assertEqual(next(numbers), 2)
+    def test_basic(self):
+        it = iter(['item'])
+        self.assertEqual(mi.one(it), 'item')
 
-        # Custom exceptions
-        self.assertRaises(ZeroDivisionError,
-                lambda: mi.one([], ZeroDivisionError, OverflowError))
-        self.assertRaises(OverflowError,
-                lambda: mi.one([1,2], ZeroDivisionError, OverflowError))
+    def test_too_short(self):
+        it = iter([])
+        self.assertRaises(ValueError, lambda: mi.one(it))
+        self.assertRaises(IndexError, lambda: mi.one(it, too_short=IndexError))
+
+    def test_too_long(self):
+        it = count()
+        self.assertRaises(ValueError, lambda: mi.one(it))  # burn 0 and 1
+        self.assertEqual(next(it), 2)
+        self.assertRaises(
+            OverflowError, lambda: mi.one(it, too_long=OverflowError)
+        )
 
 
 class IntersperseTest(TestCase):
