@@ -23,6 +23,7 @@ Version History
     * :func:`always_iterable` now returns an iterator object. It also now
       allows different types to be considered iterable (thanks to jaraco)
     * :func:`bucket` can now limit the keys it stores in memory
+    * :func:`one` now allows for custom exceptions (thanks to kalekundert)
 
 * Other changes:
     * A few typos were fixed (thanks to EdwardBetts)
