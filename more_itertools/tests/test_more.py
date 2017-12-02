@@ -781,26 +781,29 @@ class SlicedTests(TestCase):
 class SplitAtTests(TestCase):
     """Tests for ``split()``"""
 
+    def comp_with_str_split(self, str_to_split, delim, maxsplits):
+        pred = lambda c: c == delim
+        actual = list(map(''.join, mi.split_at(str_to_split, pred, maxsplits)))
+        expected = str_to_split.split(delim, maxsplits)
+        self.assertEqual(actual, expected)
+
     def test_seperators_with_maxsplit(self):
         test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
-        for s, sep, n in product(test_strs, 'abcd', range(-2, 3)):
-            actual = list(map(''.join, mi.split_at(s, lambda c: c == sep, n)))
-            self.assertEqual(actual, s.split(sep, n))
+        for s, delim, maxsplits in product(test_strs, 'abcd', range(-2, 3)):
+            self.comp_with_str_split(s, delim, maxsplits)
 
     def test_discard(self):
         is_b = lambda c: c == 'b'
-        spl_iter = mi.split_at('abcb', is_b, discard=False)
-
+        spl_iter = mi.split_at('abbcb', is_b, discard=False)
         actual = list(map(''.join, spl_iter))
-        expected = ['a', 'b', 'c', 'b', '']
+        expected = ['a', 'b', '', 'b', 'c', 'b', '']
         self.assertEqual(actual, expected)
 
     def test_discard_and_maxsplit(self):
         is_b = lambda c: c == 'b'
-        spl_iter = mi.split_at('abcb', is_b, maxsplit=1, discard=False)
-
+        spl_iter = mi.split_at('abbcb', is_b, maxsplit=2, discard=False)
         actual = list(map(''.join, spl_iter))
-        expected = ['a', 'b', 'cb']
+        expected = ['a', 'b', '', 'b', 'cb']
         self.assertEqual(actual, expected)
 
 
