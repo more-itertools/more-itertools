@@ -420,7 +420,7 @@ def with_iter(context_manager):
             yield item
 
 
-def one(iterable, too_short=ValueError, too_long=ValueError):
+def one(iterable, too_short=None, too_long=None):
     """Return the first item from *iterable*, which is expected to contain only
     that item. Raise an exception if *iterable* is empty or has more than one
     item.
@@ -430,20 +430,21 @@ def one(iterable, too_short=ValueError, too_long=ValueError):
     that is expected to return a single row.
 
     If *iterable* is empty, ``ValueError`` will be raised. You may specify a
-    different exception type with the *too_short* keyword:
+    different exception with the *too_short* keyword:
 
         >>> it = []
         >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
         ValueError: too many items in iterable (expected 1)'
-        >>> one(it, too_short=IndexError)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> too_short = IndexError('too few items')
+        >>> one(it, too_short=too_short)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        IndexError: too few items in iterable (expected 1)'
+        IndexError: too few items
 
     Similarly, if *iterable* contains more than one item, ``ValueError`` will
-    be raised. You may specify a different exception type with the *too_long*
+    be raised. You may specify a different exception with the *too_long*
     keyword:
 
         >>> it = ['too', 'many']
@@ -451,10 +452,11 @@ def one(iterable, too_short=ValueError, too_long=ValueError):
         Traceback (most recent call last):
         ...
         ValueError: too many items in iterable (expected 1)'
-        >>> one(it, too_long=RuntimeError)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> too_long = RuntimeError
+        >>> one(it, too_long=too_long)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        RuntimeError: too many items in iterable (expected 1)'
+        RuntimeError
 
     Note that :func:`one` attempts to advance *iterable* twice to ensure there
     is only one item. If there is more than one, both items will be discarded.
@@ -467,14 +469,14 @@ def one(iterable, too_short=ValueError, too_long=ValueError):
     try:
         value = next(it)
     except StopIteration:
-        raise too_short('two few items in iterable (expected 1)')
+        raise too_short or ValueError('too few items in iterable (expected 1)')
 
     try:
         next(it)
     except StopIteration:
         pass
     else:
-        raise too_long('too many items in iterable (expected 1)')
+        raise too_long or ValueError('too many items in iterable (expected 1)')
 
     return value
 
