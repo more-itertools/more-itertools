@@ -127,6 +127,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: locate
 .. autofunction:: consecutive_groups
 .. autofunction:: exactly_n
+.. autoclass:: run_length
 
 ----
 
@@ -213,12 +214,13 @@ Others
 .. autofunction:: numeric_range(start, stop, step)
 .. autofunction:: side_effect
 .. autofunction:: iterate
+.. autofunction:: difference(iterable, func=operator.sub)
 
 ----
 
 **Itertools recipes**
 
 .. autofunction:: consume
-.. autofunction:: accumulate
+.. autofunction:: accumulate(iterable, func=operator.add)
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc

@@ -6,7 +6,7 @@ from fractions import Fraction
 from functools import reduce
 from io import StringIO
 from itertools import chain, count, groupby, permutations, product, repeat
-from operator import itemgetter
+from operator import add, itemgetter
 from unittest import TestCase
 
 from six.moves import filter, range, zip
@@ -1474,6 +1474,32 @@ class ConsecutiveGroupsTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class DifferenceTest(TestCase):
+    def test_normal(self):
+        iterable = [10, 20, 30, 40, 50]
+        actual = list(mi.difference(iterable))
+        expected = [10, 10, 10, 10, 10]
+        self.assertEqual(actual, expected)
+
+    def test_custom(self):
+        iterable = [10, 20, 30, 40, 50]
+        actual = list(mi.difference(iterable, add))
+        expected = [10, 30, 50, 70, 90]
+        self.assertEqual(actual, expected)
+
+    def test_roundtrip(self):
+        original = list(range(100))
+        accumulated = mi.accumulate(original)
+        actual = list(mi.difference(accumulated))
+        self.assertEqual(actual, original)
+
+    def test_one(self):
+        self.assertEqual(list(mi.difference([0])), [0])
+
+    def test_empty(self):
+        self.assertEqual(list(mi.difference([])), [])
+
+
 class SeekableTest(TestCase):
     def test_exhaustion_reset(self):
         iterable = [str(n) for n in range(10)]
@@ -1517,6 +1543,20 @@ class SeekableTest(TestCase):
 
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
+
+
+class RunLengthTest(TestCase):
+    def test_encode(self):
+        iterable = (int(str(n)[0]) for n in count(800))
+        actual = mi.take(4, mi.run_length.encode(iterable))
+        expected = [(8, 100), (9, 100), (1, 1000), (2, 1000)]
+        self.assertEqual(actual, expected)
+
+    def test_decode(self):
+        iterable = [('d', 4), ('c', 3), ('b', 2), ('a', 1)]
+        actual = ''.join(mi.run_length.decode(iterable))
+        expected = 'ddddcccbba'
+        self.assertEqual(actual, expected)
 
 
 class ExactlyNTests(TestCase):
