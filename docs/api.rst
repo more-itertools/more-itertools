@@ -17,7 +17,7 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: sliced
 .. autofunction:: distribute
 .. autofunction:: divide
-.. autofunction:: split
+.. autofunction:: split_at
 .. autofunction:: split_before
 .. autofunction:: split_after
 .. autofunction:: bucket
