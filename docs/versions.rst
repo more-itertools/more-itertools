@@ -4,8 +4,49 @@ Version History
 
 .. automodule:: more_itertools
 
+4.0.0
+-----
+
+* New itertools:
+    * :func:`consecutive_groups` (Based on the example in the `Python 2.4 docs <https://docs.python.org/release/2.4.4/lib/itertools-example.html>`_)
+    * :func:`seekable` (If you're looking for how to "reset" an iterator,
+      you're in luck!)
+    * :func:`exactly_n` (thanks to michael-celani)
+    * :func:`run_length.encode` and :func:`run_length.decode`
+    * :func:`difference`
+
+* Improvements to existing itertools:
+    * The number of items between filler elements in :func:`intersperse` can
+      now be specified (thanks to pylang)
+    * :func:`distinct_permutations` and :func:`peekable` got some minor
+      adjustments (thanks to MSeifert04)
+    * :func:`always_iterable` now returns an iterator object. It also now
+      allows different types to be considered iterable (thanks to jaraco)
+    * :func:`bucket` can now limit the keys it stores in memory
+    * :func:`one` now allows for custom exceptions (thanks to kalekundert)
+
+* Other changes:
+    * A few typos were fixed (thanks to EdwardBetts)
+    * All tests can now be run with ``python setup.py test``
+
+The major version update is due to the change in the return value of :func:`always_iterable`.
+It now always returns iterator objects:
+
+.. code-block:: python
+
+    >>> from more_itertools import always_iterable
+    # Non-iterable objects are wrapped with iter(tuple(obj))
+    >>> always_iterable(12345)
+    <tuple_iterator object at 0x7fb24c9488d0>
+    >>> list(always_iterable(12345))
+    [12345]
+    # Iterable objects are wrapped with iter()
+    >>> always_iterable([1, 2, 3, 4, 5])
+    <list_iterator object at 0x7fb24c948c50>
+
 3.2.0
 -----
+
 * New itertools:
     * :func:`lstrip`, :func:`rstrip`, and :func:`strip`
       (thanks to MSeifert04 and pylang)

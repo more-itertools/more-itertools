@@ -1401,6 +1401,20 @@ def locate(iterable, pred=bool):
         >>> list(locate(windowed(iterable, len(sub)), pred=pred))
         [1, 5, 9]
 
+    Use with :func:`seekable` to find indexes and then retrieve the associated
+    items:
+
+        >>> from itertools import count
+        >>> from more_itertools import seekable
+        >>> source = (3 * n + 1 if (n % 2) else n // 2 for n in count())
+        >>> it = seekable(source)
+        >>> pred = lambda x: x > 100
+        >>> indexes = locate(it, pred=pred)
+        >>> i = next(indexes)
+        >>> it.seek(i)
+        >>> next(it)
+        106
+
     """
     return compress(count(), map(pred, iterable))
 
