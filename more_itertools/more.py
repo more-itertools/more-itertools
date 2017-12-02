@@ -885,7 +885,7 @@ def sliced(seq, n):
     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
 
 
-def split(iterable, pred, maxsplit=float('inf')):
+def split(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list is delimited by
     an item where callable *pred* returns ``True``. The lists do not include
     the delimiting items.
@@ -902,16 +902,15 @@ def split(iterable, pred, maxsplit=float('inf')):
         >>> list(split(range(10), lambda n: n % 2 == 1, 1))
         [[0], [2, 3, 4, 5, 6, 7, 8, 9]]
     """
-    buf = []
-    splits = 0
     if maxsplit < 0:
         maxsplit = float('inf')
 
+    buf = []
     for item in iterable:
-        if pred(item) and splits < maxsplit:
+        if pred(item) and maxsplit:
             yield buf
             buf = []
-            splits += 1
+            maxsplit -= 1
         else:
             buf.append(item)
     yield buf
