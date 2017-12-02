@@ -778,6 +778,16 @@ class SlicedTests(TestCase):
             list(mi.sliced(seq, 3))
 
 
+class SplitTests(TestCase):
+    """Tests for ``split()``"""
+
+    def test_seperators_with_maxsteps(self):
+        test_strs = ['','abcba','aaabbbcccddd','e']
+        for s, sep, num in product(test_strs, 'abcd', range(-2, 3)):
+            actual = list(map(''.join, mi.split(s, lambda c: c == sep, num)))
+            self.assertEqual(actual, s.split(sep, num))
+
+
 class SplitBeforeTest(TestCase):
     """Tests for ``split_before()``"""
 

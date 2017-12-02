@@ -55,6 +55,7 @@ __all__ = [
     'side_effect',
     'sliced',
     'sort_together',
+    'split',
     'split_after',
     'split_before',
     'spy',
@@ -882,6 +883,38 @@ def sliced(seq, n):
 
     """
     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
+
+
+def split(iterable, pred, maxsplit=float('inf')):
+    """Yield lists of items from *iterable*, where each list is delimited by
+    an item where callable *pred* returns ``True``. The lists do not include
+    the delimiting items.
+
+    If *maxsplit* is given, at most *maxsplit* splits are done; if *maxsplit*
+    is negative or not specified, all possible splits are made.
+
+        >>> list(split('abcdcba', lambda x: x == 'b'))
+        [['a'], ['c', 'd', 'c'], ['a']]
+
+        >>> list(split(range(10), lambda n: n % 2 == 1))
+        [[0], [2], [4], [6], [8], []]
+
+        >>> list(split(range(10), lambda n: n % 2 == 1, 1))
+        [[0], [2, 3, 4, 5, 6, 7, 8, 9]]
+    """
+    buf = []
+    splits = 0
+    if maxsplit < 0:
+        maxsplit = float('inf')
+
+    for item in iterable:
+        if pred(item) and splits < maxsplit:
+            yield buf
+            buf = []
+            splits += 1
+        else:
+            buf.append(item)
+    yield buf
 
 
 def split_before(iterable, pred):
