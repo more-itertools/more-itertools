@@ -422,12 +422,12 @@ def with_iter(context_manager):
 
 def one(iterable, too_short=ValueError, too_long=ValueError):
     """Return the first item from *iterable*, which is expected to contain only
-    that item. Raise an exception *iterable* is empty or has more than one
+    that item. Raise an exception if *iterable* is empty or has more than one
     item.
 
     :func:`one` is useful for ensuring that an iterable contains only one item.
     For example, it can be used to retrieve the result of a database query
-    that is expected to return only a single row.
+    that is expected to return a single row.
 
     If *iterable* is empty, ``ValueError`` will be raised. You may specify a
     different exception type with the *too_short* keyword:
