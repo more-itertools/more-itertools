@@ -4,6 +4,11 @@ Version History
 
 .. automodule:: more_itertools
 
+4.0.1
+-----
+
+* No code changes - this release fixes how the docs display on PyPI.
+
 4.0.0
 -----
 
