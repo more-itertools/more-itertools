@@ -30,3 +30,4 @@ _build
 # IDE files
 .idea
 .vscode
+.DS_Store

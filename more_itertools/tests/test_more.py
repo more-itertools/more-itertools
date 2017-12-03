@@ -788,6 +788,21 @@ class SlicedTests(TestCase):
             list(mi.sliced(seq, 3))
 
 
+class SplitAtTests(TestCase):
+    """Tests for ``split()``"""
+
+    def comp_with_str_split(self, str_to_split, delim):
+        pred = lambda c: c == delim
+        actual = list(map(''.join, mi.split_at(str_to_split, pred)))
+        expected = str_to_split.split(delim)
+        self.assertEqual(actual, expected)
+
+    def test_seperators(self):
+        test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
+        for s, delim in product(test_strs, 'abcd'):
+            self.comp_with_str_split(s, delim)
+
+
 class SplitBeforeTest(TestCase):
     """Tests for ``split_before()``"""
 

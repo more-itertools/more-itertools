@@ -57,6 +57,7 @@ __all__ = [
     'side_effect',
     'sliced',
     'sort_together',
+    'split_at',
     'split_after',
     'split_before',
     'spy',
@@ -915,6 +916,27 @@ def sliced(seq, n):
 
     """
     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
+
+
+def split_at(iterable, pred):
+    """Yield lists of items from *iterable*, where each list is delimited by
+    an item where callable *pred* returns ``True``. The lists do not include
+    the delimiting items.
+
+        >>> list(split_at('abcdcba', lambda x: x == 'b'))
+        [['a'], ['c', 'd', 'c'], ['a']]
+
+        >>> list(split_at(range(10), lambda n: n % 2 == 1))
+        [[0], [2], [4], [6], [8], []]
+    """
+    buf = []
+    for item in iterable:
+        if pred(item):
+            yield buf
+            buf = []
+        else:
+            buf.append(item)
+    yield buf
 
 
 def split_before(iterable, pred):
