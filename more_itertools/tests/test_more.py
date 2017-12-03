@@ -415,12 +415,22 @@ class WithIterTests(TestCase):
 
 
 class OneTests(TestCase):
-    def test_one(self):
-        """Test the ``one()`` cases that aren't covered by its doctests."""
-        # Infinite iterables
-        numbers = count()
-        self.assertRaises(ValueError, lambda: mi.one(numbers))  # burn 0 and 1
-        self.assertEqual(next(numbers), 2)
+    def test_basic(self):
+        it = iter(['item'])
+        self.assertEqual(mi.one(it), 'item')
+
+    def test_too_short(self):
+        it = iter([])
+        self.assertRaises(ValueError, lambda: mi.one(it))
+        self.assertRaises(IndexError, lambda: mi.one(it, too_short=IndexError))
+
+    def test_too_long(self):
+        it = count()
+        self.assertRaises(ValueError, lambda: mi.one(it))  # burn 0 and 1
+        self.assertEqual(next(it), 2)
+        self.assertRaises(
+            OverflowError, lambda: mi.one(it, too_long=OverflowError)
+        )
 
 
 class IntersperseTest(TestCase):
@@ -776,6 +786,21 @@ class SlicedTests(TestCase):
 
         with self.assertRaises(TypeError):
             list(mi.sliced(seq, 3))
+
+
+class SplitAtTests(TestCase):
+    """Tests for ``split()``"""
+
+    def comp_with_str_split(self, str_to_split, delim):
+        pred = lambda c: c == delim
+        actual = list(map(''.join, mi.split_at(str_to_split, pred)))
+        expected = str_to_split.split(delim)
+        self.assertEqual(actual, expected)
+
+    def test_seperators(self):
+        test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
+        for s, delim in product(test_strs, 'abcd'):
+            self.comp_with_str_split(s, delim)
 
 
 class SplitBeforeTest(TestCase):

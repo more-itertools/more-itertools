@@ -17,6 +17,7 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: sliced
 .. autofunction:: distribute
 .. autofunction:: divide
+.. autofunction:: split_at
 .. autofunction:: split_before
 .. autofunction:: split_after
 .. autofunction:: bucket
@@ -124,9 +125,9 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: first(iterable[, default])
 .. autofunction:: one
 .. autofunction:: unique_to_each
-.. autofunction:: locate
-.. autofunction:: consecutive_groups
-.. autofunction:: exactly_n
+.. autofunction:: locate(iterable, pred=bool)
+.. autofunction:: consecutive_groups(iterable, ordering=lambda x: x)
+.. autofunction:: exactly_n(iterable, n, predicate=bool)
 .. autoclass:: run_length
 
 ----
@@ -136,7 +137,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: all_equal
 .. autofunction:: first_true
 .. autofunction:: nth
-.. autofunction:: quantify
+.. autofunction:: quantify(iterable, pred=bool)
 
 
 Selecting

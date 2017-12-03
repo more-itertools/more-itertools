@@ -20,7 +20,7 @@ def get_long_description():
             line = line.rstrip().replace('.. automodule:: more_itertools', '')
             version_lines.append(line)
     version_history = '\n'.join(version_lines)
-    version_history = sub(r':func:`([a-zA-Z0-9_]+)`', r'\1', version_history)
+    version_history = sub(r':func:`([a-zA-Z0-9._]+)`', r'\1', version_history)
 
     ret = readme + '\n\n' + version_history
     return ret
@@ -28,7 +28,7 @@ def get_long_description():
 
 setup(
     name='more-itertools',
-    version='3.2.0',
+    version='4.0.1',
     description='More routines for operating on iterables, beyond itertools',
     long_description=get_long_description(),
     author='Erik Rose',
