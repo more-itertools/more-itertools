@@ -885,41 +885,22 @@ def sliced(seq, n):
     return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
 
 
-def split_at(iterable, pred, maxsplit=-1, discard=True):
+def split_at(iterable, pred):
     """Yield lists of items from *iterable*, where each list is delimited by
     an item where callable *pred* returns ``True``. The lists do not include
     the delimiting items.
-
-    If *maxsplit* is given, at most *maxsplit* splits are done; if *maxsplit*
-    is negative or not specified, all possible splits are made.
 
         >>> list(split_at('abcdcba', lambda x: x == 'b'))
         [['a'], ['c', 'd', 'c'], ['a']]
 
         >>> list(split_at(range(10), lambda n: n % 2 == 1))
         [[0], [2], [4], [6], [8], []]
-
-        >>> list(split_at(range(10), lambda n: n % 2 == 1, 1))
-        [[0], [2, 3, 4, 5, 6, 7, 8, 9]]
-
-    If the *discard* parameter is set to ``False``, instead of the function
-    omitting the delimiting items, it yields additional lists containing
-    only the delimiter:
-
-        >>> list(split_at('abcdcba', lambda x: x == 'b', discard=False))
-        [['a'], ['b'], ['c', 'd', 'c'], ['b'], ['a']]
     """
-    if maxsplit < 0:
-        maxsplit = float('inf')
-
     buf = []
     for item in iterable:
-        if pred(item) and maxsplit:
+        if pred(item):
             yield buf
-            if not discard:
-                yield [item]
             buf = []
-            maxsplit -= 1
         else:
             buf.append(item)
     yield buf
