@@ -1728,15 +1728,47 @@ class seekable(object):
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
 
+    :func:`seekable` can be used as a decorator for generator functions (and
+    other callables that return iterable objects):
+
+        >>> @seekable
+        ... def yielder(n):
+        ...     for i in range(n):
+        ...         yield str(i)
+        ...
+        >>> it = yielder(5)
+        >>> list(it)
+        ['0', '1', '2', '3', '4']
+        >>> it.seek(0)
+        >>> list(it)
+        ['0', '1', '2', '3', '4']
+        >>> it.seek(0)
+
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
 
     """
 
     def __init__(self, iterable):
-        self._source = iter(iterable)
+        # If the argument is iterable, we'll use it directly. Otherwise,
+        # we'll check to see if it's a function we can decorate.
+        try:
+            self._source = iter(iterable)
+        except TypeError:
+            if not callable(iterable):
+                raise
+            self._source = None
+            self._func = iterable
+        else:
+            self._func = None
         self._cache = []
         self._index = None
+
+    def __call__(self, *args, **kwargs):
+        if self._func is None:
+            raise TypeError('object is not callable')
+        self._source = iter(self._func(*args, **kwargs))
+        return self
 
     def __iter__(self):
         return self
