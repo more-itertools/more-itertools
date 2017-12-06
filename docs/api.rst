@@ -41,8 +41,8 @@ These tools peek at an iterable's values without advancing it.
 
 
 .. autofunction:: spy
-.. autoclass:: peekable
-.. autoclass:: seekable
+.. autofunction:: peekable(iterable)
+.. autofunction:: seekable(iterable)
 
 
 Windowing
