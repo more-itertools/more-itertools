@@ -1627,6 +1627,8 @@ class SeekableTest(TestCase):
             def __next__(self):
                 return next(self._it)
 
+            next = __next__
+
         # The class implements __iter__ and __next__
         s = Iterable(5)
         self.assertEqual(list(s), [0, 1, 2, 3, 4])
