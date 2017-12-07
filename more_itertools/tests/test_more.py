@@ -1666,6 +1666,24 @@ class SeekableTest(TestCase):
         s.seek(1)
         self.assertEqual(list(s), [1, 2, 3, 4])
 
+    def test_decorate_method(self):
+        class Methodical(object):
+            def __init__(self, n):
+                self._n = n
+
+            def __call__(self, x):
+                return self._n + x
+
+            @mi.seekable
+            def method(self, x):
+                for i in range(self._n + x):
+                    yield i
+
+        it = Methodical(5).method(1)
+        self.assertEqual(list(it), [0, 1, 2, 3, 4, 5])
+        it.seek(1)
+        self.assertEqual(list(it), [1, 2, 3, 4, 5])
+
     def test_type_failure(self):
         self.assertRaises(TypeError, lambda: mi.seekable(5))
 

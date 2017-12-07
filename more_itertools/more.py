@@ -1761,14 +1761,26 @@ class seekable(object):
             self._func = iterable
         else:
             self._func = None
+
+        self._instance = None
         self._cache = []
         self._index = None
 
     def __call__(self, *args, **kwargs):
         if self._func is None:
             raise TypeError('object is not callable')
+
+        # For decorating methods
+        if self._instance is not None:
+            args = (self._instance,) + args
+
         self._source = iter(self._func(*args, **kwargs))
         return self
+
+    def __get__(self, instance, owner):
+        self._instance = instance
+
+        return self.__call__
 
     def __iter__(self):
         return self
