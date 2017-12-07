@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from collections import Counter, defaultdict, deque
-from functools import partial, wraps
+from functools import partial, update_wrapper, wraps
 from heapq import merge
 from itertools import (
     chain,
@@ -1759,6 +1759,7 @@ class seekable(object):
                 raise
             self._source = None
             self._func = iterable
+            update_wrapper(self, iterable)
         else:
             self._func = None
 

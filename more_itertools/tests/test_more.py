@@ -1593,11 +1593,13 @@ class SeekableTest(TestCase):
     def test_decorate_regular_function(self):
         @mi.seekable
         def regular_function(n):
+            """docstring"""
             return n + n
 
         # The function isn't a generator function, nor does it return an
         # iterable
         self.assertRaises(TypeError, lambda: regular_function(5))
+        self.assertEqual(regular_function.__doc__, 'docstring')
 
     def test_decorate_reiterable_class(self):
         @mi.seekable
