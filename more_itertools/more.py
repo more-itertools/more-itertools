@@ -207,6 +207,23 @@ class _Peekable(object):
     negative indexes and slices are supported. Indexing will cache only the
     necessary items, but be aware that this may require significant storage.
 
+    :func:`peekable` can be used as a decorator for generator functions (and
+    other callables that return iterable objects):
+
+        >>> @peekable
+        ... def yielder(n):
+        ...     for i in range(n):
+        ...         yield str(i)
+        ...
+        >>> it = yielder(5)
+        >>> it.peek()
+        '0'
+        >>> list(it)
+        ['0', '1', '2', '3', '4']
+        >>> it.peek('default')
+        'default'
+
+
     """
     def __init__(self, iterable):
         self._it = iter(iterable)
@@ -1748,7 +1765,6 @@ class _Seekable(object):
         >>> it.seek(0)
         >>> list(it)
         ['0', '1', '2', '3', '4']
-        >>> it.seek(0)
 
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
