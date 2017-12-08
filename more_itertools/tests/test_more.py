@@ -1569,6 +1569,128 @@ class SeekableTest(TestCase):
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
 
+    def test_callability(self):
+        # If we're wrapping an iterable, you shouldn't be able to call the
+        # wrapped result
+        self.assertRaises(TypeError, lambda: mi.seekable([])())
+
+        # If we're wrapping a function, you should get back the
+        # seekable-wrapped object when you call it
+        s = mi.seekable(lambda n: iter(range(n)))
+        call_result = s(5)
+        self.assertEqual(list(call_result), [0, 1, 2, 3, 4])
+
+    def test_decorate_generator_function(self):
+        @mi.seekable
+        def generator_function(n):
+            return iter(range(n))
+
+        s = generator_function(5)
+        self.assertEqual(list(s), [0, 1, 2, 3, 4])
+        s.seek(1)
+        self.assertEqual(list(s), [1, 2, 3, 4])
+
+    def test_decorate_regular_function(self):
+        @mi.seekable
+        def regular_function(n):
+            """docstring"""
+            return n + n
+
+        # The function isn't a generator function, nor does it return an
+        # iterable
+        self.assertRaises(TypeError, lambda: regular_function(5))
+        self.assertEqual(regular_function.__doc__, 'docstring')
+
+    def test_decorate_reiterable_class(self):
+        @mi.seekable
+        class Reiterable(object):
+            def __init__(self, n):
+                self.n = n
+
+            def __iter__(self):
+                for i in range(self.n):
+                    yield i
+
+        # The class implements __iter__ but not __next__
+        s = Reiterable(5)
+        self.assertEqual(list(s), [0, 1, 2, 3, 4])
+        s.seek(1)
+        self.assertEqual(list(s), [1, 2, 3, 4])
+
+    def test_decorate_iterable_class(self):
+        @mi.seekable
+        class Iterable(object):
+            def __init__(self, n):
+                self._it = (i for i in range(n))
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                return next(self._it)
+
+            next = __next__
+
+        # The class implements __iter__ and __next__
+        s = Iterable(5)
+        self.assertEqual(list(s), [0, 1, 2, 3, 4])
+        s.seek(1)
+        self.assertEqual(list(s), [1, 2, 3, 4])
+
+    def test_decorate_callable_class(self):
+        @mi.seekable
+        class Callable(object):
+            def __init__(self, n):
+                self._n = n
+
+            def __call__(self, x):
+                return self._n + x
+
+        # The class implements __call__, so isn't rejected right away.
+        self.assertRaises(TypeError, lambda: Callable(5))
+
+    def test_decorate_sequence(self):
+        @mi.seekable
+        class Sequence(object):
+            def __init__(self, n):
+                self._n = n
+                self._seq = list(range(n))
+
+            def __len__(self):
+                return self._n
+
+            def __getitem__(self, index):
+                return self._seq[index]
+
+        # The class implements the Sequence protocol
+        s = Sequence(5)
+        self.assertEqual(list(s), [0, 1, 2, 3, 4])
+        s.seek(1)
+        self.assertEqual(list(s), [1, 2, 3, 4])
+
+    def test_decorate_method(self):
+        class Methodical(object):
+            def __init__(self, n):
+                self._n = n
+
+            def __call__(self, x):
+                return self._n + x
+
+            @mi.seekable
+            def method(self, x):
+                """docstring"""
+                for i in range(self._n + x):
+                    yield i
+
+        it = Methodical(5).method(1)
+        self.assertEqual(list(it), [0, 1, 2, 3, 4, 5])
+        it.seek(1)
+        self.assertEqual(list(it), [1, 2, 3, 4, 5])
+        self.assertEqual(Methodical(5).method.__doc__, 'docstring')
+
+    def test_type_failure(self):
+        self.assertRaises(TypeError, lambda: mi.seekable(5))
+
 
 class RunLengthTest(TestCase):
     def test_encode(self):

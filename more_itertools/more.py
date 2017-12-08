@@ -1695,41 +1695,10 @@ def difference(iterable, func=sub):
     return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
-class seekable(object):
-    """Wrap an iterator to allow for seeking backward and forward. This
-    progressively caches the items in the source iterable so they can be
-    re-visited.
-
-    Call :meth:`seek` with an index to seek to that position in the source
-    iterable.
-
-    To "reset" an iterator, seek to ``0``:
-
-        >>> from itertools import count
-        >>> it = seekable((str(n) for n in count()))
-        >>> next(it), next(it), next(it)
-        ('0', '1', '2')
-        >>> it.seek(0)
-        >>> next(it), next(it), next(it)
-        ('0', '1', '2')
-        >>> next(it)
-        '3'
-
-    You can also seek forward:
-
-        >>> it = seekable((str(n) for n in range(20)))
-        >>> it.seek(10)
-        >>> next(it)
-        '10'
-        >>> it.seek(20)  # Seeking past the end of the source isn't a problem
-        >>> list(it)
-        []
-        >>> it.seek(0)  # Resetting works even after hitting the end
-        >>> next(it), next(it), next(it)
-        ('0', '1', '2')
-
-    The cache grows as the source iterable progresses, so beware of wrapping
-    very large or infinite iterables.
+class _Seekable(object):
+    """Wrapper class for iterables, allowing them to seek backward and forward.
+    See :func:`seekable`, which allows this to be used as a decorator for
+    details.
 
     """
 
@@ -1762,6 +1731,74 @@ class seekable(object):
         remainder = index - len(self._cache)
         if remainder > 0:
             consume(self, remainder)
+
+
+def seekable(iterable):
+    """Wrap an iterator to allow for seeking backward and forward. This
+    progressively caches the items in the source iterable so they can be
+    re-visited.
+
+    Call :meth:`seek` with an index to seek to that position in the source
+    iterable.
+
+    To "reset" an iterator, seek to ``0``:
+
+        >>> from itertools import count
+        >>> it = seekable((str(n) for n in count()))
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> it.seek(0)
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> next(it)
+        '3'
+
+    You can also seek forward:
+
+        >>> it = seekable((str(n) for n in range(20)))
+        >>> it.seek(10)
+        >>> next(it)
+        '10'
+        >>> it.seek(20)  # Seeking past the end of the source isn't a problem
+        >>> list(it)
+        []
+        >>> it.seek(0)  # Resetting works even after hitting the end
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+
+    :func:`seekable` can be used as a decorator for generator functions (and
+    other callables that return iterable objects):
+
+        >>> @seekable
+        ... def yielder(n):
+        ...     for i in range(n):
+        ...         yield str(i)
+        ...
+        >>> it = yielder(5)
+        >>> list(it)
+        ['0', '1', '2', '3', '4']
+        >>> it.seek(0)
+        >>> list(it)
+        ['0', '1', '2', '3', '4']
+        >>> it.seek(0)
+
+    The cache grows as the source iterable progresses, so beware of wrapping
+    very large or infinite iterables.
+
+    """
+    try:
+        iter(iterable)
+    except TypeError:
+        if not callable(iterable):
+            raise
+    else:
+        return _Seekable(iterable)
+
+    @wraps(iterable)
+    def seekable_wrapper(*args, **kwargs):
+        return _Seekable(iterable(*args, **kwargs))
+
+    return seekable_wrapper
 
 
 class run_length(object):
