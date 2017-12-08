@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from collections import Counter, defaultdict, deque
-from functools import partial, update_wrapper, wraps
+from functools import partial, wraps
 from heapq import merge
 from itertools import (
     chain,
@@ -1696,6 +1696,12 @@ def difference(iterable, func=sub):
 
 
 class _Seekable(object):
+    """Wrapper class for iterables, allowing them to seek backward and forward.
+    See :func:`seekable`, which allows this to be used as a decorator for
+    details.
+
+    """
+
     def __init__(self, iterable):
         self._source = iter(iterable)
         self._cache = []
