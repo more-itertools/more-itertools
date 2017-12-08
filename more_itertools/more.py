@@ -1695,7 +1695,39 @@ def difference(iterable, func=sub):
     return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
-class seekable(object):
+class _Seekable(object):
+    def __init__(self, iterable):
+        self._source = iter(iterable)
+        self._cache = []
+        self._index = None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index is not None:
+            try:
+                item = self._cache[self._index]
+            except IndexError:
+                self._index = None
+            else:
+                self._index += 1
+                return item
+
+        item = next(self._source)
+        self._cache.append(item)
+        return item
+
+    next = __next__
+
+    def seek(self, index):
+        self._index = index
+        remainder = index - len(self._cache)
+        if remainder > 0:
+            consume(self, remainder)
+
+
+def seekable(iterable):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
     re-visited.
@@ -1748,65 +1780,19 @@ class seekable(object):
     very large or infinite iterables.
 
     """
+    try:
+        iter(iterable)
+    except TypeError:
+        if not callable(iterable):
+            raise
+    else:
+        return _Seekable(iterable)
 
-    def __init__(self, iterable):
-        # If the argument is iterable, we'll use it directly. Otherwise,
-        # we'll check to see if it's a function we can decorate.
-        try:
-            self._source = iter(iterable)
-        except TypeError:
-            if not callable(iterable):
-                raise
-            self._source = None
-            self._func = iterable
-            update_wrapper(self, iterable)
-        else:
-            self._func = None
+    @wraps(iterable)
+    def seekable_wrapper(*args, **kwargs):
+        return _Seekable(iterable(*args, **kwargs))
 
-        self._instance = None
-        self._cache = []
-        self._index = None
-
-    def __call__(self, *args, **kwargs):
-        if self._func is None:
-            raise TypeError('object is not callable')
-
-        # For decorating methods
-        if self._instance is not None:
-            args = (self._instance,) + args
-
-        self._source = iter(self._func(*args, **kwargs))
-        return self
-
-    def __get__(self, instance, owner):
-        self._instance = instance
-
-        return self.__call__
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self._index is not None:
-            try:
-                item = self._cache[self._index]
-            except IndexError:
-                self._index = None
-            else:
-                self._index += 1
-                return item
-
-        item = next(self._source)
-        self._cache.append(item)
-        return item
-
-    next = __next__
-
-    def seek(self, index):
-        self._index = index
-        remainder = index - len(self._cache)
-        if remainder > 0:
-            consume(self, remainder)
+    return seekable_wrapper
 
 
 class run_length(object):

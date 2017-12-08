@@ -1646,7 +1646,7 @@ class SeekableTest(TestCase):
             def __call__(self, x):
                 return self._n + x
 
-        # The class implements __call__, so isn't rejected in __init__.
+        # The class implements __call__, so isn't rejected right away.
         self.assertRaises(TypeError, lambda: Callable(5))
 
     def test_decorate_sequence(self):
@@ -1678,6 +1678,7 @@ class SeekableTest(TestCase):
 
             @mi.seekable
             def method(self, x):
+                """docstring"""
                 for i in range(self._n + x):
                     yield i
 
@@ -1685,6 +1686,7 @@ class SeekableTest(TestCase):
         self.assertEqual(list(it), [0, 1, 2, 3, 4, 5])
         it.seek(1)
         self.assertEqual(list(it), [1, 2, 3, 4, 5])
+        self.assertEqual(Methodical(5).method.__doc__, 'docstring')
 
     def test_type_failure(self):
         self.assertRaises(TypeError, lambda: mi.seekable(5))
