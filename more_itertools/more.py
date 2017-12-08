@@ -72,6 +72,32 @@ __all__ = [
 _marker = object()
 
 
+def _decorator_factory(cls):
+    """Allow *cls* to wrap either an iterable or a function.
+    *cls* must be a class whose constructor takes an iterable, or a callable
+    function or method that returns an iterable object.
+
+    """
+    def decorator(iterable_or_callable):
+        try:
+            iter(iterable_or_callable)
+        except TypeError:
+            if not callable(iterable_or_callable):
+                raise
+        else:
+            return cls(iterable_or_callable)
+
+        @wraps(iterable_or_callable)
+        def callable_wrapper(*args, **kwargs):
+            return cls(iterable_or_callable(*args, **kwargs))
+
+        return callable_wrapper
+
+    decorator.__doc__ = cls.__doc__
+
+    return decorator
+
+
 def chunked(iterable, n):
     """Break *iterable* into lists of length *n*:
 
@@ -127,9 +153,58 @@ def first(iterable, default=_marker):
 
 
 class _Peekable(object):
-    """Wrapper class for iterables that allows for lookahead, indexing, and
-    other features . See :func:`peekable`, which allows this to be used as a
-    decorator for details.
+    """Wrap an iterator to enable lookahead and sequence-like operations.
+
+    Call :meth:`peek` on a peekable-wrapped iterator to look ahead at the item
+    that will be returned by :func:`next`:
+
+        >>> p = peekable(['a', 'b'])
+        >>> p.peek()
+        'a'
+        >>> next(p)
+        'a'
+
+    Pass :meth:`peek` a default value to return that instead of raising
+    ``StopIteration`` when the iterator is exhausted:
+
+        >>> p = peekable([])
+        >>> p.peek('default')
+        'default'
+
+    To check whether a peekable is exhausted, check its truth value:
+
+        >>> p = peekable(['a', 'b'])
+        >>> if p:  # peekable has items
+        ...     list(p)
+        ['a', 'b']
+        >>> if not p:  # peekable is exhaused
+        ...     list(p)
+        []
+
+    Use :meth:`prepend` to insert items at the head of the peekable:
+
+        >>> p = peekable([0, 1, 2, 3])
+        >>> next(p)
+        0
+        >>> p.prepend('a', 'b', 'c')
+        >>> list(p)
+        ['a', 'b', 'c', 1, 2, 3]
+
+
+    peekables can be indexed. Index 0 is the item that will be returned by
+    :func:`next`, index 1 is the item after that, and so on.
+
+        >>> p = peekable(['a', 'b', 'c', 'd'])
+        >>> p[0]
+        'a'
+        >>> p[1]
+        'b'
+        >>> next(p), next(p)
+        ('a', 'b')
+
+    Indexing a peekable should behave like indexing a list, meaning both
+    negative indexes and slices are supported. Indexing will cache only the
+    necessary items, but be aware that this may require significant storage.
 
     """
     def __init__(self, iterable):
@@ -223,74 +298,7 @@ class _Peekable(object):
         return self._cache[index]
 
 
-def peekable(iterable):
-    """Wrap an iterator to enable lookahead and sequence-like operations.
-
-    Call :meth:`peek` on a peekable-wrapped iterator to look ahead at the item
-    that will be returned by :func:`next`:
-
-        >>> p = peekable(['a', 'b'])
-        >>> p.peek()
-        'a'
-        >>> next(p)
-        'a'
-
-    Pass :meth:`peek` a default value to return that instead of raising
-    ``StopIteration`` when the iterator is exhausted:
-
-        >>> p = peekable([])
-        >>> p.peek('default')
-        'default'
-
-    To check whether a peekable is exhausted, check its truth value:
-
-        >>> p = peekable(['a', 'b'])
-        >>> if p:  # peekable has items
-        ...     list(p)
-        ['a', 'b']
-        >>> if not p:  # peekable is exhaused
-        ...     list(p)
-        []
-
-    Use :meth:`prepend` to insert items at the head of the peekable:
-
-        >>> p = peekable([0, 1, 2, 3])
-        >>> next(p)
-        0
-        >>> p.prepend('a', 'b', 'c')
-        >>> list(p)
-        ['a', 'b', 'c', 1, 2, 3]
-
-
-    peekables can be indexed. Index 0 is the item that will be returned by
-    :func:`next`, index 1 is the item after that, and so on.
-
-        >>> p = peekable(['a', 'b', 'c', 'd'])
-        >>> p[0]
-        'a'
-        >>> p[1]
-        'b'
-        >>> next(p), next(p)
-        ('a', 'b')
-
-    Indexing a peekable should behave like indexing a list, meaning both
-    negative indexes and slices are supported. Indexing will cache only the
-    necessary items, but be aware that this may require significant storage.
-
-    """
-    try:
-        iter(iterable)
-    except TypeError:
-        if not callable(iterable):
-            raise
-    else:
-        return _Peekable(iterable)
-
-    @wraps(iterable)
-    def peekable_wrapper(*args, **kwargs):
-        return _Peekable(iterable(*args, **kwargs))
-
-    return peekable_wrapper
+peekable = _decorator_factory(_Peekable)
 
 
 def _collate(*iterables, **kwargs):
@@ -1693,44 +1701,6 @@ def difference(iterable, func=sub):
 
 
 class _Seekable(object):
-    """Wrapper class for iterables, allowing them to seek backward and forward.
-    See :func:`seekable`, which allows this to be used as a decorator for
-    details.
-
-    """
-
-    def __init__(self, iterable):
-        self._source = iter(iterable)
-        self._cache = []
-        self._index = None
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self._index is not None:
-            try:
-                item = self._cache[self._index]
-            except IndexError:
-                self._index = None
-            else:
-                self._index += 1
-                return item
-
-        item = next(self._source)
-        self._cache.append(item)
-        return item
-
-    next = __next__
-
-    def seek(self, index):
-        self._index = index
-        remainder = index - len(self._cache)
-        if remainder > 0:
-            consume(self, remainder)
-
-
-def seekable(iterable):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
     re-visited.
@@ -1783,19 +1753,39 @@ def seekable(iterable):
     very large or infinite iterables.
 
     """
-    try:
-        iter(iterable)
-    except TypeError:
-        if not callable(iterable):
-            raise
-    else:
-        return _Seekable(iterable)
 
-    @wraps(iterable)
-    def seekable_wrapper(*args, **kwargs):
-        return _Seekable(iterable(*args, **kwargs))
+    def __init__(self, iterable):
+        self._source = iter(iterable)
+        self._cache = []
+        self._index = None
 
-    return seekable_wrapper
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index is not None:
+            try:
+                item = self._cache[self._index]
+            except IndexError:
+                self._index = None
+            else:
+                self._index += 1
+                return item
+
+        item = next(self._source)
+        self._cache.append(item)
+        return item
+
+    next = __next__
+
+    def seek(self, index):
+        self._index = index
+        remainder = index - len(self._cache)
+        if remainder > 0:
+            consume(self, remainder)
+
+
+seekable = _decorator_factory(_Seekable)
 
 
 class run_length(object):
