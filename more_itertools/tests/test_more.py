@@ -9,7 +9,7 @@ from itertools import chain, count, groupby, permutations, product, repeat
 from operator import add, itemgetter
 from unittest import TestCase
 
-from six.moves import filter, range, zip
+from six.moves import filter, map, range, zip
 
 import more_itertools as mi
 
@@ -102,10 +102,6 @@ class FirstTests(TestCase):
 
 
 class PeekableTests(TestCase):
-    """Tests for ``peekable()`` behavor not incidentally covered by testing
-    ``collate()``
-
-    """
     def test_peek_default(self):
         """Make sure passing a default into ``peek()`` works."""
         p = mi.peekable([])
@@ -305,7 +301,6 @@ class PeekableTests(TestCase):
         p.prepend(30, 40, 50)
         pseq = [30, 40, 50] + seq  # pseq for prepended_seq
 
-        # adapt the specific tests from test_slicing
         self.assertEqual(p[0], 30)
         self.assertEqual(p[1:8], pseq[1:8])
         self.assertEqual(p[1:], pseq[1:])
@@ -361,6 +356,56 @@ class PeekableTests(TestCase):
         actual = list(it)
         expected = [12, 11, 10, 0, 1, 2]
         self.assertEqual(actual, expected)
+
+    def test_decorate_function(self):
+        @mi.peekable
+        def generator_function(n):
+            """docstring"""
+            return map(str, range(n))
+
+        p = generator_function(5)
+        self.assertEqual(p.peek(), '0')
+        self.assertEqual(next(p), '0')
+        self.assertEqual(list(p), ['1', '2', '3', '4'])
+        self.assertEqual(generator_function.__doc__, 'docstring')
+
+    def test_decorate_method(self):
+        class Methodical(object):
+            def __init__(self, n):
+                self._n = n
+
+            @mi.peekable
+            def method(self, x):
+                """docstring"""
+                return map(str, range(self._n + x))
+
+        p = Methodical(1).method(4)
+        self.assertEqual(p.peek(), '0')
+        self.assertEqual(next(p), '0')
+        self.assertEqual(list(p), ['1', '2', '3', '4'])
+        self.assertEqual(Methodical(1).method.__doc__, 'docstring')
+
+    def test_decorate_class(self):
+        @mi.peekable
+        class Iterable(object):
+            """docstring"""
+
+            def __init__(self, n):
+                self._it = map(str, range(n))
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                return next(self._it)
+
+            next = __next__
+
+        p = Iterable(5)
+        self.assertEqual(p.peek(), '0')
+        self.assertEqual(next(p), '0')
+        self.assertEqual(list(p), ['1', '2', '3', '4'])
+        self.assertEqual(Iterable.__doc__, 'docstring')
 
 
 class ConsumerTests(TestCase):
@@ -1620,6 +1665,8 @@ class SeekableTest(TestCase):
     def test_decorate_iterable_class(self):
         @mi.seekable
         class Iterable(object):
+            """docstring"""
+
             def __init__(self, n):
                 self._it = (i for i in range(n))
 
@@ -1636,6 +1683,7 @@ class SeekableTest(TestCase):
         self.assertEqual(list(s), [0, 1, 2, 3, 4])
         s.seek(1)
         self.assertEqual(list(s), [1, 2, 3, 4])
+        self.assertEqual(Iterable.__doc__, 'docstring')
 
     def test_decorate_callable_class(self):
         @mi.seekable
