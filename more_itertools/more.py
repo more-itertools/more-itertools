@@ -32,7 +32,6 @@ __all__ = [
     'consecutive_groups',
     'consumer',
     'count_cycle',
-    '_decorator_factory',
     'difference',
     'distinct_permutations',
     'distribute',

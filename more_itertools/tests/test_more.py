@@ -12,6 +12,7 @@ from unittest import TestCase
 from six.moves import filter, map, range, zip
 
 import more_itertools as mi
+from more_itertools.more import _decorator_factory
 
 
 def load_tests(loader, tests, ignore):
@@ -1648,7 +1649,7 @@ class _ItemCounter(object):
     next = __next__
 
 
-item_counter = mi._decorator_factory(_ItemCounter)
+item_counter = _decorator_factory(_ItemCounter)
 
 
 class DecoratorFactoryTests(TestCase):
