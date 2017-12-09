@@ -565,7 +565,7 @@ class RandomCombinationWithReplacementTests(TestCase):
         if len(set(combo)) == len(combo):
             raise AssertionError("Combination contained no duplicates")
 
-    def test_psuedorandomness(self):
+    def test_pseudorandomness(self):
         """ensure different subsets of the iterable get returned over many
         samplings of random combinations"""
         items = range(15)

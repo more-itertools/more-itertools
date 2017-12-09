@@ -174,6 +174,7 @@ These tools yield combinatorial arrangements of items from iterables.
 **New itertools**
 
 .. autofunction:: distinct_permutations
+.. autofunction:: cyclic_permutations
 
 ----
 

@@ -7,6 +7,7 @@ from itertools import (
     chain,
     compress,
     count,
+    cycle,
     dropwhile,
     groupby,
     islice,
@@ -32,6 +33,7 @@ __all__ = [
     'consecutive_groups',
     'consumer',
     'count_cycle',
+    'cyclic_permutations',
     'difference',
     'distinct_permutations',
     'distribute',
@@ -1809,3 +1811,13 @@ def exactly_n(iterable, n, predicate=bool):
 
     """
     return len(take(n + 1, filter(predicate, iterable))) == n
+
+
+def cyclic_permutations(iterable):
+    """Return a list of cyclic permutations of *iterable*.
+
+        >>> cyclic_permutations(range(4))
+        [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
+    """
+    lst = list(iterable)
+    return take(len(lst), windowed(cycle(lst), len(lst)))
