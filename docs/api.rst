@@ -21,7 +21,6 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: split_before
 .. autofunction:: split_after
 .. autofunction:: bucket
-.. autofunction:: cyclic_permutations
 
 ----
 
@@ -175,6 +174,7 @@ These tools yield combinatorial arrangements of items from iterables.
 **New itertools**
 
 .. autofunction:: distinct_permutations
+.. autofunction:: cyclic_permutations
 
 ----
 
