@@ -1629,6 +1629,22 @@ class ExactlyNTests(TestCase):
         self.assertFalse(mi.exactly_n([], 1))
 
 
+class CyclicPermutationsTests(TestCase):
+    """Tests for ``cyclic_permutations()``"""
+
+    def test_empty(self):
+        """test the empty iterator case"""
+        self.assertEqual(list(mi.cyclic_permutations([])), [])
+
+    def test_simple_cyclic_permutations(self):
+        """test the a simple iterator case"""
+        self.assertEqual(mi.cyclic_permutations(range(4)),
+                         [(0, 1, 2, 3),
+                          (1, 2, 3, 0),
+                          (2, 3, 0, 1),
+                          (3, 0, 1, 2)])
+
+
 # Dummy class for _decorator_factory tests
 
 class _ItemCounter(object):
