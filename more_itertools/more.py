@@ -315,7 +315,7 @@ def _collate(*iterables, **kwargs):
 
 def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
-    ``iterables``.
+    *iterables*.
 
         >>> list(collate('ACDZ', 'AZ', 'JKL'))
         ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
@@ -324,11 +324,19 @@ def collate(*iterables, **kwargs):
     :func:`collate` to, for example, perform a n-way mergesort of items that
     don't fit in memory.
 
-    :arg key: A function that returns a comparison value for an item. Defaults
-        to the identity function.
-    :arg reverse: If ``reverse=True``, yield results in descending order
-        rather than ascending. ``iterables`` must also yield their elements in
-        descending order.
+    If a *key* function is specified, the iterables will be sorted according
+    to its result:
+
+        >>> key = lambda s: int(s)  # Sort by numeric value, not by string
+        >>> list(collate(['1', '10'], ['2', '11'], key=key))
+        ['1', '2', '10', '11']
+
+
+    If the *iterables* are sorted in descending order, set *reverse* to
+    ``True``:
+
+        >>> list(collate([5, 3, 1], [4, 2, 0], reverse=True))
+        [5, 4, 3, 2, 1, 0]
 
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
@@ -346,7 +354,9 @@ def collate(*iterables, **kwargs):
 # If using Python version 3.5 or greater, heapq.merge() will be faster than
 # collate - use that instead.
 if version_info >= (3, 5, 0):
+    collate_docstring = collate.__doc__
     collate = merge  # noqa
+    collate.__doc__ = collate_docstring
 
 
 def consumer(func):
