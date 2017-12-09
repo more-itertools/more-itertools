@@ -1752,23 +1752,37 @@ class DecoratorFactoryTests(TestCase):
 
     def test_decorate_method(self):
         class Methodical(object):
-            def __init__(self, n):
-                self._n = n
-
-            def __call__(self, x):
-                return self._n + x
+            def __call__(self, *args, **kwargs):
+                return args, kwargs
 
             @item_counter
-            def method(self, x):
-                """docstring"""
-                return iter(range(self._n + x))
+            def regular_method(self, x):
+                """regular_method docstring"""
+                return iter(range(x))
 
-        it = Methodical(4).method(1)
-        self.assertEqual(next(it), 0)
-        self.assertEqual(it.item_count, 1)
-        self.assertEqual(list(it), [1, 2, 3, 4])
-        self.assertEqual(it.item_count, 5)
-        self.assertEqual(Methodical(4).method.__doc__, 'docstring')
+            @classmethod
+            @item_counter
+            def class_method(cls, x):
+                """class_method docstring"""
+                return iter(range(x))
+
+            @staticmethod
+            @item_counter
+            def static_method(x):
+                """static_method docstring"""
+                return iter(range(x))
+
+        for method_name in ('regular_method', 'class_method', 'static_method'):
+            obj = Methodical()
+            method = getattr(obj, method_name)
+            it = method(5)
+            self.assertEqual(next(it), 0)
+            self.assertEqual(it.item_count, 1)
+            self.assertEqual(list(it), [1, 2, 3, 4])
+            self.assertEqual(it.item_count, 5)
+            self.assertEqual(
+                method.__doc__, '{} docstring'.format(method_name)
+            )
 
     def test_type_failure(self):
         self.assertRaises(TypeError, lambda: mi.seekable(5))
