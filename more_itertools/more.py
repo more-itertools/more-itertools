@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from collections import Counter, defaultdict, deque
-from functools import partial, wraps
+from functools import partial, update_wrapper, wraps
 from heapq import merge
 from itertools import (
     chain,
@@ -74,7 +74,7 @@ __all__ = [
 _marker = object()
 
 
-def _decorator_factory(cls):
+def _wrapper_factory(cls):
     """Allow *cls* to wrap either an iterable or a function.
     *cls* must be a class whose constructor takes an iterable, or a callable
     function or method that returns an iterable object.
@@ -95,7 +95,7 @@ def _decorator_factory(cls):
 
         return callable_wrapper
 
-    decorator.__doc__ = cls.__doc__
+    update_wrapper(decorator, cls)
 
     return decorator
 
@@ -317,7 +317,7 @@ class _Peekable(object):
         return self._cache[index]
 
 
-peekable = _decorator_factory(_Peekable)
+peekable = _wrapper_factory(_Peekable)
 
 
 def _collate(*iterables, **kwargs):
@@ -1803,7 +1803,7 @@ class _Seekable(object):
             consume(self, remainder)
 
 
-seekable = _decorator_factory(_Seekable)
+seekable = _wrapper_factory(_Seekable)
 
 
 class run_length(object):

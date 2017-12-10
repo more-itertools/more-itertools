@@ -12,7 +12,7 @@ from unittest import TestCase
 from six.moves import filter, map, range, zip
 
 import more_itertools as mi
-from more_itertools.more import _decorator_factory
+from more_itertools.more import _wrapper_factory
 
 
 def load_tests(loader, tests, ignore):
@@ -1645,7 +1645,7 @@ class CyclicPermutationsTests(TestCase):
                           (3, 0, 1, 2)])
 
 
-# Dummy class for _decorator_factory tests
+# Dummy class for _wrapper_factory tests
 
 class _ItemCounter(object):
     """Call :meth:`item_count` to see how many items have been seen"""
@@ -1665,10 +1665,10 @@ class _ItemCounter(object):
     next = __next__
 
 
-item_counter = _decorator_factory(_ItemCounter)
+item_counter = _wrapper_factory(_ItemCounter)
 
 
-class DecoratorFactoryTests(TestCase):
+class WrapperFactoryTests(TestCase):
     def test_decorate_generator_function(self):
         @item_counter
         def generator_function(n):
