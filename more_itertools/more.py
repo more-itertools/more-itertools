@@ -82,12 +82,12 @@ def _wrapper_factory(cls):
     """
     def decorator(iterable_or_callable):
         try:
-            iter(iterable_or_callable)
+            it = iter(iterable_or_callable)
         except TypeError:
             if not callable(iterable_or_callable):
                 raise
         else:
-            return cls(iterable_or_callable)
+            return cls(it)
 
         @wraps(iterable_or_callable)
         def callable_wrapper(*args, **kwargs):
@@ -226,8 +226,8 @@ class _Peekable(object):
 
 
     """
-    def __init__(self, iterable):
-        self._it = iter(iterable)
+    def __init__(self, iterable, force_iter=False):
+        self._it = iter(iterable) if force_iter else iterable
         self._cache = deque()
 
     def __iter__(self):
@@ -1772,8 +1772,8 @@ class _Seekable(object):
 
     """
 
-    def __init__(self, iterable):
-        self._source = iter(iterable)
+    def __init__(self, iterable, force_iter=False):
+        self._source = iter(iterable) if force_iter else iterable
         self._cache = []
         self._index = None
 

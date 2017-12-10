@@ -370,6 +370,21 @@ class PeekableTests(TestCase):
         self.assertEqual(list(p), ['1', '2', '3', '4'])
         self.assertEqual(generator_function.__doc__, 'docstring')
 
+    def test_iter_count(self):
+        # Don't call __iter__ twice when wrapping
+        class IterCounter(list):
+            def __init__(self, *args, **kwargs):
+                super(IterCounter, self).__init__(*args, **kwargs)
+                self.iter_count = 0
+
+            def __iter__(self):
+                self.iter_count += 1
+                return super(IterCounter, self).__iter__()
+
+        obj = IterCounter()
+        mi.peekable(obj)
+        self.assertEqual(obj.iter_count, 1)
+
 
 class ConsumerTests(TestCase):
     """Tests for ``consumer()``"""
@@ -1589,6 +1604,21 @@ class SeekableTest(TestCase):
         it.seek(0)
         self.assertEqual(list(it), ['0', '1', '2', '3', '4'])
         self.assertEqual(generator_function.__doc__, 'docstring')
+
+    def test_iter_count(self):
+        # Don't call __iter__ twice when wrapping
+        class IterCounter(list):
+            def __init__(self, *args, **kwargs):
+                super(IterCounter, self).__init__(*args, **kwargs)
+                self.iter_count = 0
+
+            def __iter__(self):
+                self.iter_count += 1
+                return super(IterCounter, self).__iter__()
+
+        obj = IterCounter()
+        mi.seekable(obj)
+        self.assertEqual(obj.iter_count, 1)
 
 
 class RunLengthTest(TestCase):
