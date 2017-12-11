@@ -1821,3 +1821,60 @@ def cyclic_permutations(iterable):
     """
     lst = list(iterable)
     return take(len(lst), windowed(cycle(lst), len(lst)))
+
+
+def decorator_factory(wrapping_func, result_index=0):
+    """Return a decorator version of *wrapping_func*, which is a function that
+    modifies an iterable. *result_index* is the position in that function's
+    signature where the iterable goes.
+
+    This lets you use itertools on the "production end," i.e. at function
+    definition. This can augment what the function returns without changing the
+    function's code.
+
+    For example, to produce a decorator version of :func:`chunked`:
+
+        >>> from more_itertools import chunked
+        >>> chunker = decorator_factory(chunked, result_index=0)
+        >>> @chunker(3)
+        ... def iter_range(n):
+        ...     return iter(range(n))
+        ...
+        >>> list(iter_range(9))
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
+    To only allow truthy items to be returned:
+
+        >>> truth_serum = decorator_factory(filter, result_index=1)
+        >>> @truth_serum(bool)
+        ... def boolean_test():
+        ...     return [0, 1, '', ' ', False, True]
+        >>> list(boolean_test())
+        [1, ' ', True]
+
+    To limit the number of results yielded to the first n:
+
+        >>> from itertools import count, islice
+        >>> limiter = decorator_factory(islice, result_index=0)
+        >>> @limiter(5)
+        ... def infinite_counter(n):
+        ...     return count(n)
+        ...
+        >>> list(infinite_counter(0))
+        [0, 1, 2, 3, 4]
+
+    """
+
+    def decorator(*wrapping_args, **wrapping_kwargs):
+        def outer_wrapper(f):
+            def inner_wrapper(*args, **kwargs):
+                result = f(*args, **kwargs)
+                wrapping_args_ = list(wrapping_args)
+                wrapping_args_.insert(result_index, result)
+                return wrapping_func(*wrapping_args_, **wrapping_kwargs)
+
+            return inner_wrapper
+
+        return outer_wrapper
+
+    return decorator
