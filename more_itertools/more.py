@@ -49,6 +49,7 @@ __all__ = [
     'iterate',
     'locate',
     'lstrip',
+    'make_decorator',
     'numeric_range',
     'one',
     'padded',
@@ -1823,7 +1824,7 @@ def cyclic_permutations(iterable):
     return take(len(lst), windowed(cycle(lst), len(lst)))
 
 
-def decorator_factory(wrapping_func, result_index=0):
+def make_decorator(wrapping_func, result_index=0):
     """Return a decorator version of *wrapping_func*, which is a function that
     modifies an iterable. *result_index* is the position in that function's
     signature where the iterable goes.
@@ -1835,7 +1836,7 @@ def decorator_factory(wrapping_func, result_index=0):
     For example, to produce a decorator version of :func:`chunked`:
 
         >>> from more_itertools import chunked
-        >>> chunker = decorator_factory(chunked, result_index=0)
+        >>> chunker = make_decorator(chunked, result_index=0)
         >>> @chunker(3)
         ... def iter_range(n):
         ...     return iter(range(n))
@@ -1845,26 +1846,16 @@ def decorator_factory(wrapping_func, result_index=0):
 
     To only allow truthy items to be returned:
 
-        >>> truth_serum = decorator_factory(filter, result_index=1)
+        >>> truth_serum = make_decorator(filter, result_index=1)
         >>> @truth_serum(bool)
         ... def boolean_test():
         ...     return [0, 1, '', ' ', False, True]
         >>> list(boolean_test())
         [1, ' ', True]
 
-    To limit the number of results yielded to the first n:
-
-        >>> from itertools import count, islice
-        >>> limiter = decorator_factory(islice, result_index=0)
-        >>> @limiter(5)
-        ... def infinite_counter(n):
-        ...     return count(n)
-        ...
-        >>> list(infinite_counter(0))
-        [0, 1, 2, 3, 4]
-
     """
-
+    # See https://sites.google.com/site/bbayles/index/decorator_factory for
+    # notes on how this works.
     def decorator(*wrapping_args, **wrapping_kwargs):
         def outer_wrapper(f):
             def inner_wrapper(*args, **kwargs):
