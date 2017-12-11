@@ -1536,6 +1536,9 @@ class SeekableTest(TestCase):
         s.seek(0)
         self.assertEqual(list(s), iterable)  # Back in action
 
+        self.assertEqual(s.items(), iterable)
+        self.assertFalse(s.items() is s._cache)
+
     def test_partial_reset(self):
         iterable = [str(n) for n in range(10)]
 

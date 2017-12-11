@@ -1733,6 +1733,14 @@ class seekable(object):
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
 
+    View the contents with the :meth:`items` method:
+
+        >>> it = seekable((str(n) for n in range(10)))
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> it.items()
+        ['0', '1', '2']
+
     """
 
     def __init__(self, iterable):
@@ -1758,6 +1766,9 @@ class seekable(object):
         return item
 
     next = __next__
+
+    def items(self):
+        return self._cache[:]
 
     def seek(self, index):
         self._index = index
