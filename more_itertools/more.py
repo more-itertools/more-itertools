@@ -1850,8 +1850,26 @@ def make_decorator(wrapping_func, result_index=0):
         >>> @truth_serum(bool)
         ... def boolean_test():
         ...     return [0, 1, '', ' ', False, True]
+        ...
         >>> list(boolean_test())
         [1, ' ', True]
+
+    The :func:`peekable` and :func:`seekable` wrappers make for practical
+    decorators:
+
+        >>> from more_itertools import peekable
+        >>> peekable_function = make_decorator(peekable)
+        >>> @peekable_function()
+        ... def str_range(*args):
+        ...     return (str(x) for x in range(*args))
+        ...
+        >>> it = str_range(1, 20, 2)
+        >>> next(it), next(it), next(it)
+        ('1', '3', '5')
+        >>> it.peek()
+        '7'
+        >>> next(it)
+        '7'
 
     """
     # See https://sites.google.com/site/bbayles/index/decorator_factory for
