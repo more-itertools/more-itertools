@@ -341,8 +341,9 @@ def collate(*iterables, **kwargs):
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
-    If neither of the keyword arguments are specified, this function delegates
-    to :func:`heapq.merge`.
+    On Python 2.7, this function delegates to :func:`heapq.merge` if neither
+    of the keyword arguments are specified. On Python 3.5+, this function
+    is an alias for :func:`heapq.merge`.
 
     """
     if not kwargs:
