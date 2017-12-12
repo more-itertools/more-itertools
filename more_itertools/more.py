@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from collections import Counter, defaultdict, deque
-from functools import partial, wraps
+from functools import partial, update_wrapper, wraps
 from heapq import merge
 from itertools import (
     chain,
@@ -354,9 +354,8 @@ def collate(*iterables, **kwargs):
 # If using Python version 3.5 or greater, heapq.merge() will be faster than
 # collate - use that instead.
 if version_info >= (3, 5, 0):
-    collate_docstring = collate.__doc__
+    update_wrapper(merge, collate)
     collate = merge  # noqa
-    collate.__doc__ = collate_docstring
 
 
 def consumer(func):
