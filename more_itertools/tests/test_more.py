@@ -3,7 +3,8 @@ from __future__ import division, print_function, unicode_literals
 from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
-from functools import reduce
+from functools import partial, reduce
+from heapq import merge
 from io import StringIO
 from itertools import chain, count, groupby, permutations, product, repeat
 from operator import add, itemgetter
@@ -58,6 +59,10 @@ class CollateTests(TestCase):
         )
         expected = list(mi.collate(*iterables, reverse=True))
         self.assertEqual(actual, expected)
+
+    def test_alias(self):
+        self.assertNotEqual(merge.__doc__, mi.collate.__doc__)
+        self.assertNotEqual(partial.__doc__, mi.collate.__doc__)
 
 
 class ChunkedTests(TestCase):
