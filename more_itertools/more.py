@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict, deque, Sequence
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
@@ -1697,6 +1697,25 @@ def difference(iterable, func=sub):
     return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
+class SequenceView(Sequence):
+    """Read-only view of the target sequence.
+    Supports for indexing, slicing, and iteration like a list or tuple.
+    """
+    def __init__(self, target):
+        if not isinstance(target, Sequence):
+            raise TypeError
+        self._target = target
+
+    def __getitem__(self, index):
+        return self._target[index]
+
+    def __len__(self):
+        return len(self._target)
+
+    def __repr__(self):
+        return 'SequenceView({})'.format(repr(self._target))
+
+
 class seekable(object):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
@@ -1733,13 +1752,19 @@ class seekable(object):
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
 
-    View the contents with the :meth:`items` method:
+    Retrieve the contents of the cache with the :meth:`items` method, which
+    returns a read-only view of the cache that updates automatically:
 
         >>> it = seekable((str(n) for n in range(10)))
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
-        >>> it.items()
-        ['0', '1', '2']
+        >>> items = it.items()
+        >>> items
+        SequenceView(['0', '1', '2'])
+        >>> next(it)
+        '3'
+        >>> items
+        SequenceView(['0', '1', '2', '3'])
 
     """
 
@@ -1768,7 +1793,7 @@ class seekable(object):
     next = __next__
 
     def items(self):
-        return self._cache[:]
+        return SequenceView(self._cache)
 
     def seek(self, index):
         self._index = index
