@@ -355,8 +355,9 @@ def collate(*iterables, **kwargs):
 # If using Python version 3.5 or greater, heapq.merge() will be faster than
 # collate - use that instead.
 if version_info >= (3, 5, 0):
-    update_wrapper(merge, collate)
-    collate = merge  # noqa
+    _collate_docstring = collate.__doc__
+    collate = partial(merge)
+    collate.__doc__ = _collate_docstring
 
 
 def consumer(func):
