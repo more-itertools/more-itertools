@@ -10,9 +10,10 @@ from itertools import chain, count, groupby, permutations, product, repeat
 from operator import add, itemgetter
 from unittest import TestCase
 
-from six.moves import filter, range, zip
+from six.moves import filter, map, range, zip
 
 import more_itertools as mi
+from more_itertools.more import _wrapper_factory
 
 
 def load_tests(loader, tests, ignore):
@@ -107,10 +108,6 @@ class FirstTests(TestCase):
 
 
 class PeekableTests(TestCase):
-    """Tests for ``peekable()`` behavor not incidentally covered by testing
-    ``collate()``
-
-    """
     def test_peek_default(self):
         """Make sure passing a default into ``peek()`` works."""
         p = mi.peekable([])
@@ -310,7 +307,6 @@ class PeekableTests(TestCase):
         p.prepend(30, 40, 50)
         pseq = [30, 40, 50] + seq  # pseq for prepended_seq
 
-        # adapt the specific tests from test_slicing
         self.assertEqual(p[0], 30)
         self.assertEqual(p[1:8], pseq[1:8])
         self.assertEqual(p[1:], pseq[1:])
@@ -366,6 +362,33 @@ class PeekableTests(TestCase):
         actual = list(it)
         expected = [12, 11, 10, 0, 1, 2]
         self.assertEqual(actual, expected)
+
+    def test_decorate_function(self):
+        @mi.peekable
+        def generator_function(n):
+            """docstring"""
+            return map(str, range(n))
+
+        p = generator_function(5)
+        self.assertEqual(p.peek(), '0')
+        self.assertEqual(next(p), '0')
+        self.assertEqual(list(p), ['1', '2', '3', '4'])
+        self.assertEqual(generator_function.__doc__, 'docstring')
+
+    def test_iter_count(self):
+        # Don't call __iter__ twice when wrapping
+        class IterCounter(list):
+            def __init__(self, *args, **kwargs):
+                super(IterCounter, self).__init__(*args, **kwargs)
+                self.iter_count = 0
+
+            def __iter__(self):
+                self.iter_count += 1
+                return super(IterCounter, self).__iter__()
+
+        obj = IterCounter()
+        mi.peekable(obj)
+        self.assertEqual(obj.iter_count, 1)
 
 
 class ConsumerTests(TestCase):
@@ -1574,6 +1597,34 @@ class SeekableTest(TestCase):
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
 
+    def test_decorate_function(self):
+        @mi.seekable
+        def generator_function(n):
+            """docstring"""
+            return map(str, range(n))
+
+        it = generator_function(5)
+        it.seek(1)
+        self.assertEqual(list(it), ['1', '2', '3', '4'])
+        it.seek(0)
+        self.assertEqual(list(it), ['0', '1', '2', '3', '4'])
+        self.assertEqual(generator_function.__doc__, 'docstring')
+
+    def test_iter_count(self):
+        # Don't call __iter__ twice when wrapping
+        class IterCounter(list):
+            def __init__(self, *args, **kwargs):
+                super(IterCounter, self).__init__(*args, **kwargs)
+                self.iter_count = 0
+
+            def __iter__(self):
+                self.iter_count += 1
+                return super(IterCounter, self).__iter__()
+
+        obj = IterCounter()
+        mi.seekable(obj)
+        self.assertEqual(obj.iter_count, 1)
+
 
 class RunLengthTest(TestCase):
     def test_encode(self):
@@ -1627,3 +1678,163 @@ class CyclicPermutationsTests(TestCase):
                           (1, 2, 3, 0),
                           (2, 3, 0, 1),
                           (3, 0, 1, 2)])
+
+
+# Dummy class for _wrapper_factory tests
+
+class _ItemCounter(object):
+    """Call :meth:`item_count` to see how many items have been seen"""
+
+    def __init__(self, iterable):
+        self._iterable = iter(iterable)
+        self.item_count = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        item = next(self._iterable)
+        self.item_count += 1
+        return item
+
+    next = __next__
+
+
+item_counter = _wrapper_factory(_ItemCounter)
+
+
+class WrapperFactoryTests(TestCase):
+    def test_decorate_generator_function(self):
+        @item_counter
+        def generator_function(n):
+            """docstring"""
+            return iter(range(n))
+
+        it = generator_function(5)
+        self.assertEqual(next(it), 0)
+        self.assertEqual(it.item_count, 1)
+        self.assertEqual(list(it), [1, 2, 3, 4])
+        self.assertEqual(it.item_count, 5)
+        self.assertEqual(generator_function.__doc__, 'docstring')
+
+    def test_decorate_regular_function(self):
+        @item_counter
+        def regular_function(n):
+            """docstring"""
+            return n + n
+
+        # The function isn't a generator function, nor does it return an
+        # iterable
+        self.assertRaises(TypeError, lambda: regular_function(5))
+        self.assertEqual(regular_function.__doc__, 'docstring')
+
+    def test_decorate_reiterable_class(self):
+        @item_counter
+        class Reiterable(object):
+            """docstring"""
+            def __init__(self, n):
+                self.n = n
+
+            def __iter__(self):
+                for i in range(self.n):
+                    yield i
+
+        # The class implements __iter__ but not __next__
+        it = Reiterable(5)
+        self.assertEqual(next(it), 0)
+        self.assertEqual(it.item_count, 1)
+        self.assertEqual(list(it), [1, 2, 3, 4])
+        self.assertEqual(it.item_count, 5)
+        self.assertEqual(Reiterable.__doc__, 'docstring')
+
+    def test_decorate_iterable_class(self):
+        @item_counter
+        class Iterable(object):
+            """docstring"""
+            def __init__(self, n):
+                self._it = iter(range(n))
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                return next(self._it)
+
+            next = __next__
+
+        # The class implements __iter__ and __next__
+        it = Iterable(5)
+        self.assertEqual(next(it), 0)
+        self.assertEqual(it.item_count, 1)
+        self.assertEqual(list(it), [1, 2, 3, 4])
+        self.assertEqual(it.item_count, 5)
+        self.assertEqual(Iterable.__doc__, 'docstring')
+
+    def test_decorate_callable_class(self):
+        @item_counter
+        class Callable(object):
+            def __init__(self, n):
+                self._n = n
+
+            def __call__(self, x):
+                return self._n + x
+
+        # The class implements __call__, so isn't rejected right away.
+        self.assertRaises(TypeError, lambda: Callable(5))
+
+    def test_decorate_sequence(self):
+        @item_counter
+        class Sequence(object):
+            def __init__(self, n):
+                self._n = n
+                self._seq = list(range(n))
+
+            def __len__(self):
+                return self._n
+
+            def __getitem__(self, index):
+                return self._seq[index]
+
+        # The class implements the Sequence protocol
+        it = Sequence(5)
+        self.assertEqual(next(it), 0)
+        self.assertEqual(it.item_count, 1)
+        self.assertEqual(list(it), [1, 2, 3, 4])
+        self.assertEqual(it.item_count, 5)
+
+    def test_decorate_method(self):
+        class Methodical(object):
+            def __call__(self, *args, **kwargs):
+                return args, kwargs
+
+            @item_counter
+            def regular_method(self, x):
+                """regular_method docstring"""
+                return iter(range(x))
+
+            @classmethod
+            @item_counter
+            def class_method(cls, x):
+                """class_method docstring"""
+                return iter(range(x))
+
+            @staticmethod
+            @item_counter
+            def static_method(x):
+                """static_method docstring"""
+                return iter(range(x))
+
+        for method_name in ('regular_method', 'class_method', 'static_method'):
+            obj = Methodical()
+            method = getattr(obj, method_name)
+            it = method(5)
+            self.assertEqual(next(it), 0)
+            self.assertEqual(it.item_count, 1)
+            self.assertEqual(list(it), [1, 2, 3, 4])
+            self.assertEqual(it.item_count, 5)
+            self.assertEqual(
+                method.__doc__, '{} docstring'.format(method_name)
+            )
+
+    def test_type_failure(self):
+        self.assertRaises(TypeError, lambda: mi.seekable(5))
