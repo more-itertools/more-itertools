@@ -56,6 +56,7 @@ __all__ = [
     'rstrip',
     'run_length',
     'seekable',
+    'SequenceView',
     'side_effect',
     'sliced',
     'sort_together',
@@ -1698,8 +1699,33 @@ def difference(iterable, func=sub):
 
 
 class SequenceView(Sequence):
-    """Read-only view of the target sequence.
-    Supports for indexing, slicing, and iteration like a list or tuple.
+    """Return a read-only view of the sequence object *target*.
+
+    :class:`SequenceView` objects are analagous to Python's built-in
+    "dictionary view" types. They provide a dynamic view of a sequence's items,
+    meaning that when the sequence updates, so does the view.
+
+        >>> seq = ['0', '1', '2']
+        >>> view = SequenceView(seq)
+        >>> view
+        SequenceView(['0', '1', '2'])
+        >>> seq.append('3')
+        >>> view
+        SequenceView(['0', '1', '2', '3'])
+
+    Sequence views support indexing, slicing, and length queries. They act
+    like the underlying sequence, except they don't allow assignment:
+
+        >>> view[1]
+        '1'
+        >>> view[1:-1]
+        ['1', '2']
+        >>> len(view)
+        4
+
+    Sequence views are useful as an alternative to copying, as they don't
+    require (much) extra storage.
+
     """
     def __init__(self, target):
         if not isinstance(target, Sequence):
@@ -1713,7 +1739,7 @@ class SequenceView(Sequence):
         return len(self._target)
 
     def __repr__(self):
-        return 'SequenceView({})'.format(repr(self._target))
+        return '{}({})'.format(self.__class__.__name__, repr(self._target))
 
 
 class seekable(object):
@@ -1752,8 +1778,8 @@ class seekable(object):
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
 
-    Retrieve the contents of the cache with the :meth:`items` method, which
-    returns a read-only view of the cache that updates automatically:
+    You may view the contents of the cache with the :meth:`items` method.
+    That returns a :class:`SequenceView`, a view that updates automatically:
 
         >>> it = seekable((str(n) for n in range(10)))
         >>> next(it), next(it), next(it)

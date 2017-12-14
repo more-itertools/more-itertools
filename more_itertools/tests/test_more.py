@@ -1583,9 +1583,61 @@ class SeekableTest(TestCase):
 
         mi.take(10, s)
         self.assertEqual(list(items), [str(n) for n in range(20)])
-        self.assertEqual(len(items), 20)
 
-        self.assertRaises(TypeError, lambda: type(items)({}))
+
+class SequenceViewTests(TestCase):
+    def test_init(self):
+        view = mi.SequenceView(('a', 'b', 'c'))
+        self.assertEqual(repr(view), "SequenceView(('a', 'b', 'c'))")
+        self.assertRaises(TypeError, lambda: mi.SequenceView({}))
+
+    def test_update(self):
+        seq = ['a', 'b', 'c']
+        view = mi.SequenceView(seq)
+        self.assertEqual(len(view), 3)
+        self.assertEqual(repr(view), "SequenceView(['a', 'b', 'c'])")
+
+        seq.pop()
+        self.assertEqual(len(view), 2)
+        self.assertEqual(repr(view), "SequenceView(['a', 'b'])")
+
+    def test_indexing(self):
+        seq = ('a', 'b', 'c', 'd', 'e', 'f')
+        view = mi.SequenceView(seq)
+        for i in range(-len(seq), len(seq)):
+            self.assertEqual(view[i], seq[i])
+
+    def test_slicing(self):
+        seq = ('a', 'b', 'c', 'd', 'e', 'f')
+        view = mi.SequenceView(seq)
+        n = len(seq)
+        indexes = list(range(-n - 1, n + 1)) + [None]
+        steps = list(range(-n, n + 1))
+        steps.remove(0)
+        for slice_args in product(indexes, indexes, steps):
+            i = slice(*slice_args)
+            self.assertEqual(view[i], seq[i])
+
+    def test_abc_methods(self):
+        # collections.Sequence should provide all of this functionality
+        seq = ('a', 'b', 'c', 'd', 'e', 'f', 'f')
+        view = mi.SequenceView(seq)
+
+        # __contains__
+        self.assertIn('b', view)
+        self.assertNotIn('g', view)
+
+        # __iter__
+        self.assertEqual(list(iter(view)), list(seq))
+
+        # __reversed__
+        self.assertEqual(list(reversed(view)), list(reversed(seq)))
+
+        # index
+        self.assertEqual(view.index('b'), 1)
+
+        # count
+        self.assertEqual(seq.count('f'), 2)
 
 
 class RunLengthTest(TestCase):
