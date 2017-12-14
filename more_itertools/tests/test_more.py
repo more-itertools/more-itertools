@@ -1587,19 +1587,19 @@ class SeekableTest(TestCase):
 
 class SequenceViewTests(TestCase):
     def test_init(self):
-        view = mi.SequenceView(('a', 'b', 'c'))
-        self.assertEqual(repr(view), "SequenceView(('a', 'b', 'c'))")
+        view = mi.SequenceView((1, 2, 3))
+        self.assertEqual(repr(view), "SequenceView((1, 2, 3))")
         self.assertRaises(TypeError, lambda: mi.SequenceView({}))
 
     def test_update(self):
-        seq = ['a', 'b', 'c']
+        seq = [1, 2, 3]
         view = mi.SequenceView(seq)
         self.assertEqual(len(view), 3)
-        self.assertEqual(repr(view), "SequenceView(['a', 'b', 'c'])")
+        self.assertEqual(repr(view), "SequenceView([1, 2, 3])")
 
         seq.pop()
         self.assertEqual(len(view), 2)
-        self.assertEqual(repr(view), "SequenceView(['a', 'b'])")
+        self.assertEqual(repr(view), "SequenceView([1, 2])")
 
     def test_indexing(self):
         seq = ('a', 'b', 'c', 'd', 'e', 'f')
