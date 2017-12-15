@@ -49,6 +49,7 @@ __all__ = [
     'iterate',
     'locate',
     'lstrip',
+    'make_decorator',
     'numeric_range',
     'one',
     'padded',
@@ -318,7 +319,7 @@ def _collate(*iterables, **kwargs):
 
 def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
-    ``iterables``.
+    *iterables*.
 
         >>> list(collate('ACDZ', 'AZ', 'JKL'))
         ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
@@ -327,17 +328,26 @@ def collate(*iterables, **kwargs):
     :func:`collate` to, for example, perform a n-way mergesort of items that
     don't fit in memory.
 
-    :arg key: A function that returns a comparison value for an item. Defaults
-        to the identity function.
-    :arg reverse: If ``reverse=True``, yield results in descending order
-        rather than ascending. ``iterables`` must also yield their elements in
-        descending order.
+    If a *key* function is specified, the iterables will be sorted according
+    to its result:
+
+        >>> key = lambda s: int(s)  # Sort by numeric value, not by string
+        >>> list(collate(['1', '10'], ['2', '11'], key=key))
+        ['1', '2', '10', '11']
+
+
+    If the *iterables* are sorted in descending order, set *reverse* to
+    ``True``:
+
+        >>> list(collate([5, 3, 1], [4, 2, 0], reverse=True))
+        [5, 4, 3, 2, 1, 0]
 
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
-    If neither of the keyword arguments are specified, this function delegates
-    to :func:`heapq.merge`.
+    On Python 2.7, this function delegates to :func:`heapq.merge` if neither
+    of the keyword arguments are specified. On Python 3.5+, this function
+    is an alias for :func:`heapq.merge`.
 
     """
     if not kwargs:
@@ -349,7 +359,9 @@ def collate(*iterables, **kwargs):
 # If using Python version 3.5 or greater, heapq.merge() will be faster than
 # collate - use that instead.
 if version_info >= (3, 5, 0):
-    collate = merge  # noqa
+    _collate_docstring = collate.__doc__
+    collate = partial(merge)
+    collate.__doc__ = _collate_docstring
 
 
 def consumer(func):
@@ -1883,3 +1895,68 @@ def cyclic_permutations(iterable):
     """
     lst = list(iterable)
     return take(len(lst), windowed(cycle(lst), len(lst)))
+
+
+def make_decorator(wrapping_func, result_index=0):
+    """Return a decorator version of *wrapping_func*, which is a function that
+    modifies an iterable. *result_index* is the position in that function's
+    signature where the iterable goes.
+
+    This lets you use itertools on the "production end," i.e. at function
+    definition. This can augment what the function returns without changing the
+    function's code.
+
+    For example, to produce a decorator version of :func:`chunked`:
+
+        >>> from more_itertools import chunked
+        >>> chunker = make_decorator(chunked, result_index=0)
+        >>> @chunker(3)
+        ... def iter_range(n):
+        ...     return iter(range(n))
+        ...
+        >>> list(iter_range(9))
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
+    To only allow truthy items to be returned:
+
+        >>> truth_serum = make_decorator(filter, result_index=1)
+        >>> @truth_serum(bool)
+        ... def boolean_test():
+        ...     return [0, 1, '', ' ', False, True]
+        ...
+        >>> list(boolean_test())
+        [1, ' ', True]
+
+    The :func:`peekable` and :func:`seekable` wrappers make for practical
+    decorators:
+
+        >>> from more_itertools import peekable
+        >>> peekable_function = make_decorator(peekable)
+        >>> @peekable_function()
+        ... def str_range(*args):
+        ...     return (str(x) for x in range(*args))
+        ...
+        >>> it = str_range(1, 20, 2)
+        >>> next(it), next(it), next(it)
+        ('1', '3', '5')
+        >>> it.peek()
+        '7'
+        >>> next(it)
+        '7'
+
+    """
+    # See https://sites.google.com/site/bbayles/index/decorator_factory for
+    # notes on how this works.
+    def decorator(*wrapping_args, **wrapping_kwargs):
+        def outer_wrapper(f):
+            def inner_wrapper(*args, **kwargs):
+                result = f(*args, **kwargs)
+                wrapping_args_ = list(wrapping_args)
+                wrapping_args_.insert(result_index, result)
+                return wrapping_func(*wrapping_args_, **wrapping_kwargs)
+
+            return inner_wrapper
+
+        return outer_wrapper
+
+    return decorator

@@ -217,6 +217,7 @@ Others
 .. autofunction:: side_effect
 .. autofunction:: iterate
 .. autofunction:: difference(iterable, func=operator.sub)
+.. autofunction:: make_decorator
 .. autoclass:: SequenceView
 
 ----

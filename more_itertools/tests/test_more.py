@@ -3,9 +3,18 @@ from __future__ import division, print_function, unicode_literals
 from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
-from functools import reduce
+from functools import partial, reduce
+from heapq import merge
 from io import StringIO
-from itertools import chain, count, groupby, permutations, product, repeat
+from itertools import (
+    chain,
+    count,
+    groupby,
+    islice,
+    permutations,
+    product,
+    repeat,
+)
 from operator import add, itemgetter
 from unittest import TestCase
 
@@ -58,6 +67,10 @@ class CollateTests(TestCase):
         )
         expected = list(mi.collate(*iterables, reverse=True))
         self.assertEqual(actual, expected)
+
+    def test_alias(self):
+        self.assertNotEqual(merge.__doc__, mi.collate.__doc__)
+        self.assertNotEqual(partial.__doc__, mi.collate.__doc__)
 
 
 class ChunkedTests(TestCase):
@@ -1692,3 +1705,52 @@ class CyclicPermutationsTests(TestCase):
                           (1, 2, 3, 0),
                           (2, 3, 0, 1),
                           (3, 0, 1, 2)])
+
+
+class MakeDecoratorTests(TestCase):
+    def test_basic(self):
+        slicer = mi.make_decorator(islice)
+
+        @slicer(1, 10, 2)
+        def user_function(arg_1, arg_2, kwarg_1=None):
+            self.assertEqual(arg_1, 'arg_1')
+            self.assertEqual(arg_2, 'arg_2')
+            self.assertEqual(kwarg_1, 'kwarg_1')
+            return map(str, count())
+
+        it = user_function('arg_1', 'arg_2', kwarg_1='kwarg_1')
+        actual = list(it)
+        expected = ['1', '3', '5', '7', '9']
+        self.assertEqual(actual, expected)
+
+    def test_result_index(self):
+        def stringify(*args, **kwargs):
+            self.assertEqual(args[0], 'arg_0')
+            iterable = args[1]
+            self.assertEqual(args[2], 'arg_2')
+            self.assertEqual(kwargs['kwarg_1'], 'kwarg_1')
+            return map(str, iterable)
+
+        stringifier = mi.make_decorator(stringify, result_index=1)
+
+        @stringifier('arg_0', 'arg_2', kwarg_1='kwarg_1')
+        def user_function(n):
+            return count(n)
+
+        it = user_function(1)
+        actual = mi.take(5, it)
+        expected = ['1', '2', '3', '4', '5']
+        self.assertEqual(actual, expected)
+
+    def test_wrap_class(self):
+        seeker = mi.make_decorator(mi.seekable)
+
+        @seeker()
+        def user_function(n):
+            return map(str, range(n))
+
+        it = user_function(5)
+        self.assertEqual(list(it), ['0', '1', '2', '3', '4'])
+
+        it.seek(0)
+        self.assertEqual(list(it), ['0', '1', '2', '3', '4'])
