@@ -1582,20 +1582,20 @@ class SeekableTest(TestCase):
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
 
-    def test_items(self):
+    def test_elements(self):
         iterable = map(str, count())
 
         s = mi.seekable(iterable)
         mi.take(10, s)
 
-        items = s.items()
+        elements = s.elements()
         self.assertEqual(
-            [items[i] for i in range(10)], [str(n) for n in range(10)]
+            [elements[i] for i in range(10)], [str(n) for n in range(10)]
         )
-        self.assertEqual(len(items), 10)
+        self.assertEqual(len(elements), 10)
 
         mi.take(10, s)
-        self.assertEqual(list(items), [str(n) for n in range(20)])
+        self.assertEqual(list(elements), [str(n) for n in range(20)])
 
 
 class SequenceViewTests(TestCase):

@@ -1790,18 +1790,18 @@ class seekable(object):
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
 
-    You may view the contents of the cache with the :meth:`items` method.
+    You may view the contents of the cache with the :meth:`elements` method.
     That returns a :class:`SequenceView`, a view that updates automatically:
 
         >>> it = seekable((str(n) for n in range(10)))
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
-        >>> items = it.items()
-        >>> items
+        >>> elements = it.elements()
+        >>> elements
         SequenceView(['0', '1', '2'])
         >>> next(it)
         '3'
-        >>> items
+        >>> elements
         SequenceView(['0', '1', '2', '3'])
 
     """
@@ -1830,7 +1830,7 @@ class seekable(object):
 
     next = __next__
 
-    def items(self):
+    def elements(self):
         return SequenceView(self._cache)
 
     def seek(self, index):
