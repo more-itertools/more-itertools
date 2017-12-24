@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict, deque, Sequence
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
@@ -57,6 +57,7 @@ __all__ = [
     'rstrip',
     'run_length',
     'seekable',
+    'SequenceView',
     'side_effect',
     'sliced',
     'sort_together',
@@ -1709,6 +1710,50 @@ def difference(iterable, func=sub):
     return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
+class SequenceView(Sequence):
+    """Return a read-only view of the sequence object *target*.
+
+    :class:`SequenceView` objects are analagous to Python's built-in
+    "dictionary view" types. They provide a dynamic view of a sequence's items,
+    meaning that when the sequence updates, so does the view.
+
+        >>> seq = ['0', '1', '2']
+        >>> view = SequenceView(seq)
+        >>> view
+        SequenceView(['0', '1', '2'])
+        >>> seq.append('3')
+        >>> view
+        SequenceView(['0', '1', '2', '3'])
+
+    Sequence views support indexing, slicing, and length queries. They act
+    like the underlying sequence, except they don't allow assignment:
+
+        >>> view[1]
+        '1'
+        >>> view[1:-1]
+        ['1', '2']
+        >>> len(view)
+        4
+
+    Sequence views are useful as an alternative to copying, as they don't
+    require (much) extra storage.
+
+    """
+    def __init__(self, target):
+        if not isinstance(target, Sequence):
+            raise TypeError
+        self._target = target
+
+    def __getitem__(self, index):
+        return self._target[index]
+
+    def __len__(self):
+        return len(self._target)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self._target))
+
+
 class seekable(object):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
@@ -1745,6 +1790,20 @@ class seekable(object):
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
 
+    You may view the contents of the cache with the :meth:`elements` method.
+    That returns a :class:`SequenceView`, a view that updates automatically:
+
+        >>> it = seekable((str(n) for n in range(10)))
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> elements = it.elements()
+        >>> elements
+        SequenceView(['0', '1', '2'])
+        >>> next(it)
+        '3'
+        >>> elements
+        SequenceView(['0', '1', '2', '3'])
+
     """
 
     def __init__(self, iterable):
@@ -1770,6 +1829,9 @@ class seekable(object):
         return item
 
     next = __next__
+
+    def elements(self):
+        return SequenceView(self._cache)
 
     def seek(self, index):
         self._index = index

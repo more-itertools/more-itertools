@@ -1582,6 +1582,76 @@ class SeekableTest(TestCase):
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
 
+    def test_elements(self):
+        iterable = map(str, count())
+
+        s = mi.seekable(iterable)
+        mi.take(10, s)
+
+        elements = s.elements()
+        self.assertEqual(
+            [elements[i] for i in range(10)], [str(n) for n in range(10)]
+        )
+        self.assertEqual(len(elements), 10)
+
+        mi.take(10, s)
+        self.assertEqual(list(elements), [str(n) for n in range(20)])
+
+
+class SequenceViewTests(TestCase):
+    def test_init(self):
+        view = mi.SequenceView((1, 2, 3))
+        self.assertEqual(repr(view), "SequenceView((1, 2, 3))")
+        self.assertRaises(TypeError, lambda: mi.SequenceView({}))
+
+    def test_update(self):
+        seq = [1, 2, 3]
+        view = mi.SequenceView(seq)
+        self.assertEqual(len(view), 3)
+        self.assertEqual(repr(view), "SequenceView([1, 2, 3])")
+
+        seq.pop()
+        self.assertEqual(len(view), 2)
+        self.assertEqual(repr(view), "SequenceView([1, 2])")
+
+    def test_indexing(self):
+        seq = ('a', 'b', 'c', 'd', 'e', 'f')
+        view = mi.SequenceView(seq)
+        for i in range(-len(seq), len(seq)):
+            self.assertEqual(view[i], seq[i])
+
+    def test_slicing(self):
+        seq = ('a', 'b', 'c', 'd', 'e', 'f')
+        view = mi.SequenceView(seq)
+        n = len(seq)
+        indexes = list(range(-n - 1, n + 1)) + [None]
+        steps = list(range(-n, n + 1))
+        steps.remove(0)
+        for slice_args in product(indexes, indexes, steps):
+            i = slice(*slice_args)
+            self.assertEqual(view[i], seq[i])
+
+    def test_abc_methods(self):
+        # collections.Sequence should provide all of this functionality
+        seq = ('a', 'b', 'c', 'd', 'e', 'f', 'f')
+        view = mi.SequenceView(seq)
+
+        # __contains__
+        self.assertIn('b', view)
+        self.assertNotIn('g', view)
+
+        # __iter__
+        self.assertEqual(list(iter(view)), list(seq))
+
+        # __reversed__
+        self.assertEqual(list(reversed(view)), list(reversed(seq)))
+
+        # index
+        self.assertEqual(view.index('b'), 1)
+
+        # count
+        self.assertEqual(seq.count('f'), 2)
+
 
 class RunLengthTest(TestCase):
     def test_encode(self):
