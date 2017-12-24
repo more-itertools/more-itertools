@@ -28,6 +28,7 @@ __all__ = [
     'always_iterable',
     'bucket',
     'chunked',
+    'classify',
     'collapse',
     'collate',
     'consecutive_groups',
@@ -669,6 +670,8 @@ class bucket(object):
 
     The original iterable will be advanced and its items will be cached until
     they are used by the child iterables. This may require significant storage.
+    For a similar wrapper that doesn't automatically advance the original
+    iterable, see :class:`classify`.
 
     By default, attempting to select a bucket to which no items belong  will
     exhaust the iterable and cache all values.
@@ -1900,116 +1903,66 @@ def make_decorator(wrapping_func, result_index=0):
     return decorator
 
 
-class _CollectorBase(object):
-    def __init__(self, iterable, key=lambda x: x):
-        self._collector = self._get_collector()
-        self._source = iter(iterable)
-        self._key = key
+class classify(object):
+    """Wrap *iterable* and return an object that progressively saves its items
+    based on a *key* function.
 
-    def __contains__(self, value):
-        return value in self._collector
+        >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
+        >>> key = lambda x: x[0]  # Classify by first character
+        >>> it = classify(iterable, key=key)
+        >>> next(it), next(it), next(it)  # Advance the iterable
+        ('a1', 'b1', 'c1')
+        >>> it['a']  # 'a' items seen so far
+        ['a1']
+        >>> list(it)  # Exhaust the iterable
+        ['a2', 'b2', 'c2', 'b3']
+        >>> it['a']
+        ['a1', 'a2']
+        >>> it['b']
+        ['b1', 'b2', 'b3']
+
+    :class:`classify` automates collecting items into a ``defaultdict(list)``
+    object:
+
+        >>> from collections import defaultdict
+        >>> mapping = defaultdict(list)
+        >>> for item in iterable:
+        ...     category = key(item)
+        ...     mapping[category].append(item)
+
+    Access the underlying :obj:`defaultdict` through the :attr:`mapping`
+    attribute:
+
+        >>> 'a' in it.mapping
+        True
+        >>> 'd' in it.mapping
+        False
+        >>> len(it.mapping)
+        3
+
+    For a similar wrapper that will automatically (rather than progressively)
+    categorize items, see :class:`bucket`.
+
+    """
+
+    def __init__(self, iterable, key):
+        self._it = iter(iterable)
+        self._key = key
+        self.mapping = defaultdict(list)
+
+    def __contains__(self, key):
+        return key in self.mapping
 
     def __getitem__(self, key):
-        return self._collector[key]
+        return self.mapping[key]
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        item = next(self._source)
-        self._update(item)
+        item = next(self._it)
+        self.mapping[self._key(item)].append(item)
 
         return item
 
     next = __next__
-
-    def get(self, key, default=_marker):
-        if default is _marker:
-            return self._collector.get(key)
-
-        return self._collector.get(key, default)
-
-    def items(self):
-        return self._collector.items()
-
-
-class key_counter(_CollectorBase):
-    """Wrap an iterator and keep a progressive count of its items.
-
-        >>> iterable = 'abbccc'
-        >>> it = key_counter(iterable)
-        >>> next(it), next(it), next(it)
-        ('a', 'b', 'b')
-        >>> it['a']
-        1
-        >>> it['b']
-        2
-        >>> list(it)
-        ['c', 'c', 'c']
-        >>> it['c']
-        3
-
-    Set *key* to bucket the items before counting:
-
-        >>> from more_itertools import consume
-        >>> iterable = range(50)
-        >>> it = key_counter(iterable, key=lambda n: n // 10)
-        >>> consume(it)
-        >>> it[0]
-        10
-        >>> it[6]
-        0
-
-    Like a :func:`collections.Counter` object, wrapped iterables support
-    the ``in`` operator, the :meth:`get` method, and the :items:`method`:
-
-        >>> it = key_counter('ABBCCCDDDD')
-        >>> consume(it)
-        >>> 'A' in it
-        True
-        >>> it.get('A')
-        1
-        >>> sorted(it.items())
-        [('A', 1), ('B', 2), ('C', 3), ('D', 4)]
-
-    """
-    _get_collector = lambda self: Counter()
-
-    def _update(self, item):
-        bucket = self._key(item)
-        self._collector[bucket] += 1
-
-
-class classifier(_CollectorBase):
-    """Wrap an iterator, saving its items according to a *key* function.
-
-        >>> from more_itertools import consume
-        >>> iterable = range(50)
-        >>> it = classifier(iterable, key=lambda n: n // 10)
-        >>> consume(it)
-        >>> it[0]
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        >>> it[1]
-        [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-
-    By default, *key* is the identity function.
-
-    Like a :func:`collections.defauldict` object, wrapped iterables support
-    the ``in`` operator, the :meth:`get` method, and the :items:`method`:
-
-        >>> it = classifier('ABBCCC')
-        >>> consume(it)
-        >>> 'A' in it
-        True
-        >>> it.get('C')
-        ['C', 'C', 'C']
-        >>> sorted(it.items())
-        [('A', ['A']), ('B', ['B', 'B']), ('C', ['C', 'C', 'C'])]
-
-    """
-
-    _get_collector = lambda self: defaultdict(list)
-
-    def _update(self, item):
-        bucket = self._key(item)
-        self._collector[bucket].append(item)
