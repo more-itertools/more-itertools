@@ -74,22 +74,25 @@ class CollateTests(TestCase):
 
 
 class ChunkedTests(TestCase):
-    """Tests for ``chunked()``"""
-
     def test_even(self):
-        """Test when ``n`` divides evenly into the length of the iterable."""
-        self.assertEqual(
-            list(mi.chunked('ABCDEF', 3)), [['A', 'B', 'C'], ['D', 'E', 'F']]
-        )
+        actual = list(mi.chunked('ABCDEF', 3))
+        expected = [['A', 'B', 'C'], ['D', 'E', 'F']]
+        self.assertEqual(actual, expected)
 
     def test_odd(self):
-        """Test when ``n`` does not divide evenly into the length of the
-        iterable.
+        actual = list(mi.chunked('ABCDE', 3))
+        expected = [['A', 'B', 'C'], ['D', 'E']]
+        self.assertEqual(actual, expected)
 
-        """
-        self.assertEqual(
-            list(mi.chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']]
-        )
+    def test_none(self):
+        actual = list(mi.chunked('ABCDE', None))
+        expected = ['A', 'B', 'C', 'D', 'E']
+        self.assertEqual(actual, expected)
+
+    def test_invalid(self):
+        for n in [-1, 'a']:
+            it = mi.chunked('ABCDEF', n)
+            self.assertRaises(ValueError, lambda: list(it))
 
 
 class FirstTests(TestCase):

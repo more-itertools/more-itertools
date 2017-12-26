@@ -88,6 +88,8 @@ def chunked(iterable, n):
         >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
+    If *n* is ``None``, no chunking will be done.
+
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
     :func:`chunked` is useful for splitting up a computation on a large number
@@ -97,6 +99,9 @@ def chunked(iterable, n):
     into RAM on the client.
 
     """
+    if n is None:
+        return iter(iterable)
+
     return iter(partial(take, n, iter(iterable)), [])
 
 
