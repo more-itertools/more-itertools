@@ -1,12 +1,13 @@
 from __future__ import print_function
 
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict, deque, Sequence
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
     chain,
     compress,
     count,
+    cycle,
     dropwhile,
     groupby,
     islice,
@@ -32,6 +33,7 @@ __all__ = [
     'consecutive_groups',
     'consumer',
     'count_cycle',
+    'cyclic_permutations',
     'difference',
     'distinct_permutations',
     'distribute',
@@ -47,6 +49,7 @@ __all__ = [
     'iterate',
     'locate',
     'lstrip',
+    'make_decorator',
     'numeric_range',
     'one',
     'padded',
@@ -54,6 +57,7 @@ __all__ = [
     'rstrip',
     'run_length',
     'seekable',
+    'SequenceView',
     'side_effect',
     'sliced',
     'sort_together',
@@ -315,7 +319,7 @@ def _collate(*iterables, **kwargs):
 
 def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
-    ``iterables``.
+    *iterables*.
 
         >>> list(collate('ACDZ', 'AZ', 'JKL'))
         ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
@@ -324,17 +328,26 @@ def collate(*iterables, **kwargs):
     :func:`collate` to, for example, perform a n-way mergesort of items that
     don't fit in memory.
 
-    :arg key: A function that returns a comparison value for an item. Defaults
-        to the identity function.
-    :arg reverse: If ``reverse=True``, yield results in descending order
-        rather than ascending. ``iterables`` must also yield their elements in
-        descending order.
+    If a *key* function is specified, the iterables will be sorted according
+    to its result:
+
+        >>> key = lambda s: int(s)  # Sort by numeric value, not by string
+        >>> list(collate(['1', '10'], ['2', '11'], key=key))
+        ['1', '2', '10', '11']
+
+
+    If the *iterables* are sorted in descending order, set *reverse* to
+    ``True``:
+
+        >>> list(collate([5, 3, 1], [4, 2, 0], reverse=True))
+        [5, 4, 3, 2, 1, 0]
 
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
-    If neither of the keyword arguments are specified, this function delegates
-    to :func:`heapq.merge`.
+    On Python 2.7, this function delegates to :func:`heapq.merge` if neither
+    of the keyword arguments are specified. On Python 3.5+, this function
+    is an alias for :func:`heapq.merge`.
 
     """
     if not kwargs:
@@ -346,7 +359,9 @@ def collate(*iterables, **kwargs):
 # If using Python version 3.5 or greater, heapq.merge() will be faster than
 # collate - use that instead.
 if version_info >= (3, 5, 0):
-    collate = merge  # noqa
+    _collate_docstring = collate.__doc__
+    collate = partial(merge)
+    collate.__doc__ = _collate_docstring
 
 
 def consumer(func):
@@ -1695,6 +1710,50 @@ def difference(iterable, func=sub):
     return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
+class SequenceView(Sequence):
+    """Return a read-only view of the sequence object *target*.
+
+    :class:`SequenceView` objects are analagous to Python's built-in
+    "dictionary view" types. They provide a dynamic view of a sequence's items,
+    meaning that when the sequence updates, so does the view.
+
+        >>> seq = ['0', '1', '2']
+        >>> view = SequenceView(seq)
+        >>> view
+        SequenceView(['0', '1', '2'])
+        >>> seq.append('3')
+        >>> view
+        SequenceView(['0', '1', '2', '3'])
+
+    Sequence views support indexing, slicing, and length queries. They act
+    like the underlying sequence, except they don't allow assignment:
+
+        >>> view[1]
+        '1'
+        >>> view[1:-1]
+        ['1', '2']
+        >>> len(view)
+        4
+
+    Sequence views are useful as an alternative to copying, as they don't
+    require (much) extra storage.
+
+    """
+    def __init__(self, target):
+        if not isinstance(target, Sequence):
+            raise TypeError
+        self._target = target
+
+    def __getitem__(self, index):
+        return self._target[index]
+
+    def __len__(self):
+        return len(self._target)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self._target))
+
+
 class seekable(object):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
@@ -1731,6 +1790,20 @@ class seekable(object):
     The cache grows as the source iterable progresses, so beware of wrapping
     very large or infinite iterables.
 
+    You may view the contents of the cache with the :meth:`elements` method.
+    That returns a :class:`SequenceView`, a view that updates automatically:
+
+        >>> it = seekable((str(n) for n in range(10)))
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> elements = it.elements()
+        >>> elements
+        SequenceView(['0', '1', '2'])
+        >>> next(it)
+        '3'
+        >>> elements
+        SequenceView(['0', '1', '2', '3'])
+
     """
 
     def __init__(self, iterable):
@@ -1756,6 +1829,9 @@ class seekable(object):
         return item
 
     next = __next__
+
+    def elements(self):
+        return SequenceView(self._cache)
 
     def seek(self, index):
         self._index = index
@@ -1809,3 +1885,78 @@ def exactly_n(iterable, n, predicate=bool):
 
     """
     return len(take(n + 1, filter(predicate, iterable))) == n
+
+
+def cyclic_permutations(iterable):
+    """Return a list of cyclic permutations of *iterable*.
+
+        >>> cyclic_permutations(range(4))
+        [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
+    """
+    lst = list(iterable)
+    return take(len(lst), windowed(cycle(lst), len(lst)))
+
+
+def make_decorator(wrapping_func, result_index=0):
+    """Return a decorator version of *wrapping_func*, which is a function that
+    modifies an iterable. *result_index* is the position in that function's
+    signature where the iterable goes.
+
+    This lets you use itertools on the "production end," i.e. at function
+    definition. This can augment what the function returns without changing the
+    function's code.
+
+    For example, to produce a decorator version of :func:`chunked`:
+
+        >>> from more_itertools import chunked
+        >>> chunker = make_decorator(chunked, result_index=0)
+        >>> @chunker(3)
+        ... def iter_range(n):
+        ...     return iter(range(n))
+        ...
+        >>> list(iter_range(9))
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
+    To only allow truthy items to be returned:
+
+        >>> truth_serum = make_decorator(filter, result_index=1)
+        >>> @truth_serum(bool)
+        ... def boolean_test():
+        ...     return [0, 1, '', ' ', False, True]
+        ...
+        >>> list(boolean_test())
+        [1, ' ', True]
+
+    The :func:`peekable` and :func:`seekable` wrappers make for practical
+    decorators:
+
+        >>> from more_itertools import peekable
+        >>> peekable_function = make_decorator(peekable)
+        >>> @peekable_function()
+        ... def str_range(*args):
+        ...     return (str(x) for x in range(*args))
+        ...
+        >>> it = str_range(1, 20, 2)
+        >>> next(it), next(it), next(it)
+        ('1', '3', '5')
+        >>> it.peek()
+        '7'
+        >>> next(it)
+        '7'
+
+    """
+    # See https://sites.google.com/site/bbayles/index/decorator_factory for
+    # notes on how this works.
+    def decorator(*wrapping_args, **wrapping_kwargs):
+        def outer_wrapper(f):
+            def inner_wrapper(*args, **kwargs):
+                result = f(*args, **kwargs)
+                wrapping_args_ = list(wrapping_args)
+                wrapping_args_.insert(result_index, result)
+                return wrapping_func(*wrapping_args_, **wrapping_kwargs)
+
+            return inner_wrapper
+
+        return outer_wrapper
+
+    return decorator

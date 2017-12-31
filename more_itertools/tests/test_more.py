@@ -3,13 +3,22 @@ from __future__ import division, print_function, unicode_literals
 from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
-from functools import reduce
+from functools import partial, reduce
+from heapq import merge
 from io import StringIO
-from itertools import chain, count, groupby, permutations, product, repeat
+from itertools import (
+    chain,
+    count,
+    groupby,
+    islice,
+    permutations,
+    product,
+    repeat,
+)
 from operator import add, itemgetter
 from unittest import TestCase
 
-from six.moves import filter, range, zip
+from six.moves import filter, map, range, zip
 
 import more_itertools as mi
 
@@ -58,6 +67,10 @@ class CollateTests(TestCase):
         )
         expected = list(mi.collate(*iterables, reverse=True))
         self.assertEqual(actual, expected)
+
+    def test_alias(self):
+        self.assertNotEqual(merge.__doc__, mi.collate.__doc__)
+        self.assertNotEqual(partial.__doc__, mi.collate.__doc__)
 
 
 class ChunkedTests(TestCase):
@@ -1569,6 +1582,76 @@ class SeekableTest(TestCase):
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
 
+    def test_elements(self):
+        iterable = map(str, count())
+
+        s = mi.seekable(iterable)
+        mi.take(10, s)
+
+        elements = s.elements()
+        self.assertEqual(
+            [elements[i] for i in range(10)], [str(n) for n in range(10)]
+        )
+        self.assertEqual(len(elements), 10)
+
+        mi.take(10, s)
+        self.assertEqual(list(elements), [str(n) for n in range(20)])
+
+
+class SequenceViewTests(TestCase):
+    def test_init(self):
+        view = mi.SequenceView((1, 2, 3))
+        self.assertEqual(repr(view), "SequenceView((1, 2, 3))")
+        self.assertRaises(TypeError, lambda: mi.SequenceView({}))
+
+    def test_update(self):
+        seq = [1, 2, 3]
+        view = mi.SequenceView(seq)
+        self.assertEqual(len(view), 3)
+        self.assertEqual(repr(view), "SequenceView([1, 2, 3])")
+
+        seq.pop()
+        self.assertEqual(len(view), 2)
+        self.assertEqual(repr(view), "SequenceView([1, 2])")
+
+    def test_indexing(self):
+        seq = ('a', 'b', 'c', 'd', 'e', 'f')
+        view = mi.SequenceView(seq)
+        for i in range(-len(seq), len(seq)):
+            self.assertEqual(view[i], seq[i])
+
+    def test_slicing(self):
+        seq = ('a', 'b', 'c', 'd', 'e', 'f')
+        view = mi.SequenceView(seq)
+        n = len(seq)
+        indexes = list(range(-n - 1, n + 1)) + [None]
+        steps = list(range(-n, n + 1))
+        steps.remove(0)
+        for slice_args in product(indexes, indexes, steps):
+            i = slice(*slice_args)
+            self.assertEqual(view[i], seq[i])
+
+    def test_abc_methods(self):
+        # collections.Sequence should provide all of this functionality
+        seq = ('a', 'b', 'c', 'd', 'e', 'f', 'f')
+        view = mi.SequenceView(seq)
+
+        # __contains__
+        self.assertIn('b', view)
+        self.assertNotIn('g', view)
+
+        # __iter__
+        self.assertEqual(list(iter(view)), list(seq))
+
+        # __reversed__
+        self.assertEqual(list(reversed(view)), list(reversed(seq)))
+
+        # index
+        self.assertEqual(view.index('b'), 1)
+
+        # count
+        self.assertEqual(seq.count('f'), 2)
+
 
 class RunLengthTest(TestCase):
     def test_encode(self):
@@ -1606,3 +1689,68 @@ class ExactlyNTests(TestCase):
         """Return ``True`` if the iterable is empty and ``n`` is 0"""
         self.assertTrue(mi.exactly_n([], 0))
         self.assertFalse(mi.exactly_n([], 1))
+
+
+class CyclicPermutationsTests(TestCase):
+    """Tests for ``cyclic_permutations()``"""
+
+    def test_empty(self):
+        """test the empty iterator case"""
+        self.assertEqual(list(mi.cyclic_permutations([])), [])
+
+    def test_simple_cyclic_permutations(self):
+        """test the a simple iterator case"""
+        self.assertEqual(mi.cyclic_permutations(range(4)),
+                         [(0, 1, 2, 3),
+                          (1, 2, 3, 0),
+                          (2, 3, 0, 1),
+                          (3, 0, 1, 2)])
+
+
+class MakeDecoratorTests(TestCase):
+    def test_basic(self):
+        slicer = mi.make_decorator(islice)
+
+        @slicer(1, 10, 2)
+        def user_function(arg_1, arg_2, kwarg_1=None):
+            self.assertEqual(arg_1, 'arg_1')
+            self.assertEqual(arg_2, 'arg_2')
+            self.assertEqual(kwarg_1, 'kwarg_1')
+            return map(str, count())
+
+        it = user_function('arg_1', 'arg_2', kwarg_1='kwarg_1')
+        actual = list(it)
+        expected = ['1', '3', '5', '7', '9']
+        self.assertEqual(actual, expected)
+
+    def test_result_index(self):
+        def stringify(*args, **kwargs):
+            self.assertEqual(args[0], 'arg_0')
+            iterable = args[1]
+            self.assertEqual(args[2], 'arg_2')
+            self.assertEqual(kwargs['kwarg_1'], 'kwarg_1')
+            return map(str, iterable)
+
+        stringifier = mi.make_decorator(stringify, result_index=1)
+
+        @stringifier('arg_0', 'arg_2', kwarg_1='kwarg_1')
+        def user_function(n):
+            return count(n)
+
+        it = user_function(1)
+        actual = mi.take(5, it)
+        expected = ['1', '2', '3', '4', '5']
+        self.assertEqual(actual, expected)
+
+    def test_wrap_class(self):
+        seeker = mi.make_decorator(mi.seekable)
+
+        @seeker()
+        def user_function(n):
+            return map(str, range(n))
+
+        it = user_function(5)
+        self.assertEqual(list(it), ['0', '1', '2', '3', '4'])
+
+        it.seek(0)
+        self.assertEqual(list(it), ['0', '1', '2', '3', '4'])

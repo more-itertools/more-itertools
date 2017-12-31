@@ -174,6 +174,7 @@ These tools yield combinatorial arrangements of items from iterables.
 **New itertools**
 
 .. autofunction:: distinct_permutations
+.. autofunction:: cyclic_permutations
 
 ----
 
@@ -216,6 +217,8 @@ Others
 .. autofunction:: side_effect
 .. autofunction:: iterate
 .. autofunction:: difference(iterable, func=operator.sub)
+.. autofunction:: make_decorator
+.. autoclass:: SequenceView
 
 ----
 
