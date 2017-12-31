@@ -23,6 +23,9 @@ from six.moves import filter, map, range, zip, zip_longest
 
 from .recipes import consume, flatten, take
 
+if version_info > (3, 1, 0):
+    from collections import OrderedDict
+
 __all__ = [
     'adjacent',
     'always_iterable',
@@ -793,6 +796,28 @@ def interleave(*iterables):
     return chain.from_iterable(zip(*iterables))
 
 
+def _interleave_longest_ordered(*iterables):
+    """Helper for ``interleave_longest()``, called when the user is
+    using a version of Python with OrderedDict available.
+
+    This implementation of interleave_longest removes iterators from
+    consideration after they are exhausted instead of generating and
+    discarding instances of _marker.
+    """
+    iterables = OrderedDict(enumerate(map(iter, iterables)))
+    while iterables:
+        keys_to_clear = []
+
+        for key, iterable in iterables.items():
+            try:
+                yield next(iterable)
+            except StopIteration:
+                keys_to_clear.append(key)
+
+        for key in keys_to_clear:
+            del iterables[key]
+
+
 def interleave_longest(*iterables):
     """Return a new iterable yielding from each iterable in turn,
     skipping any that are exhausted.
@@ -803,6 +828,14 @@ def interleave_longest(*iterables):
     """
     i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
     return filter(lambda x: x is not _marker, i)
+
+
+# If available, the OrderedDict implementation has better worst-case
+# runtime guarantees than the chain implementation
+if version_info > (3, 1, 0):
+    _interleave_longest_docstring = interleave_longest.__doc__
+    interleave_longest = _interleave_longest_ordered
+    interleave_longest.__doc__ = _interleave_longest_docstring
 
 
 def collapse(iterable, base_type=None, levels=None):
