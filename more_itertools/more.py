@@ -23,8 +23,10 @@ from six.moves import filter, map, range, zip, zip_longest
 
 from .recipes import consume, flatten, take
 
-if version_info > (3, 1, 0):
+try:
     from collections import OrderedDict
+except ImportError:
+    OrderedDict = None
 
 __all__ = [
     'adjacent',
@@ -832,7 +834,7 @@ def interleave_longest(*iterables):
 
 # If available, the OrderedDict implementation has better worst-case
 # runtime guarantees than the chain implementation
-if version_info > (3, 1, 0):
+if OrderedDict is not None:
     _interleave_longest_docstring = interleave_longest.__doc__
     interleave_longest = _interleave_longest_ordered
     interleave_longest.__doc__ = _interleave_longest_docstring
