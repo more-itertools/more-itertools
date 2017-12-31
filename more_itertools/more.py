@@ -803,8 +803,8 @@ def _interleave_longest_ordered(*iterables):
     using a version of Python with OrderedDict available.
 
     This implementation of interleave_longest removes iterators from
-    consideration after they are exhausted instead of generating and
-    discarding instances of _marker.
+    consideration after they are exhausted instead of copying and
+    discarding references to _marker.
     """
     iterables = OrderedDict(enumerate(map(iter, iterables)))
     while iterables:
