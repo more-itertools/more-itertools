@@ -16,17 +16,13 @@ from itertools import (
     tee
 )
 from operator import itemgetter, lt, gt, sub
+from platform import python_implementation
 from sys import maxsize, version_info
 
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
-from .recipes import consume, flatten, take
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    OrderedDict = None
+from .recipes import consume, flatten, take, roundrobin
 
 __all__ = [
     'adjacent',
@@ -798,28 +794,6 @@ def interleave(*iterables):
     return chain.from_iterable(zip(*iterables))
 
 
-def _interleave_longest_ordered(*iterables):
-    """Helper for ``interleave_longest()``, called when the user is
-    using a version of Python with OrderedDict available.
-
-    This implementation of interleave_longest removes iterators from
-    consideration after they are exhausted instead of copying and
-    discarding references to _marker.
-    """
-    iterables = OrderedDict(enumerate(map(iter, iterables)))
-    while iterables:
-        keys_to_clear = []
-
-        for key, iterable in iterables.items():
-            try:
-                yield next(iterable)
-            except StopIteration:
-                keys_to_clear.append(key)
-
-        for key in keys_to_clear:
-            del iterables[key]
-
-
 def interleave_longest(*iterables):
     """Return a new iterable yielding from each iterable in turn,
     skipping any that are exhausted.
@@ -832,11 +806,10 @@ def interleave_longest(*iterables):
     return filter(lambda x: x is not _marker, i)
 
 
-# If available, the OrderedDict implementation has better worst-case
-# runtime guarantees than the chain implementation
-if OrderedDict is not None:
+# The performance of roundrobin is far superior to interleave_longest in PyPy
+if python_implementation() == 'PyPy':
     _interleave_longest_docstring = interleave_longest.__doc__
-    interleave_longest = _interleave_longest_ordered
+    interleave_longest = roundrobin
     interleave_longest.__doc__ = _interleave_longest_docstring
 
 
