@@ -809,7 +809,10 @@ def interleave_longest(*iterables):
 # The performance of roundrobin is far superior to interleave_longest in PyPy
 if python_implementation() == 'PyPy':
     _interleave_longest_docstring = interleave_longest.__doc__
-    interleave_longest = roundrobin
+
+    def interleave_longest(*iterables):
+        return roundrobin(*iterables)
+
     interleave_longest.__doc__ = _interleave_longest_docstring
 
 
