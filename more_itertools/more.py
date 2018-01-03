@@ -26,6 +26,7 @@ from .recipes import consume, flatten, take
 __all__ = [
     'adjacent',
     'always_iterable',
+    'always_reversible',
     'bucket',
     'chunked',
     'collapse',
@@ -54,7 +55,6 @@ __all__ = [
     'one',
     'padded',
     'peekable',
-    'reversed_extended',
     'rstrip',
     'run_length',
     'seekable',
@@ -1636,11 +1636,11 @@ def islice_extended(iterable, *args):
                 yield item
 
 
-def reversed_extended(iterable):
+def always_reversible(iterable):
     """An extension of :func:`reversed` that supports all iterables, not
     just those which implement the ``Reversible`` or ``Sequence`` protocols.
 
-        >>> print(*reversed_extended(x for x in range(3)))
+        >>> print(*always_reversible(x for x in range(3)))
         2 1 0
 
     If the iterable is already reversible, this function returns the
@@ -1651,7 +1651,7 @@ def reversed_extended(iterable):
     try:
         return reversed(iterable)
     except TypeError:
-        return reversed(deque(iterable))
+        return reversed(list(iterable))
 
 
 def consecutive_groups(iterable, ordering=lambda x: x):

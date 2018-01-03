@@ -1691,16 +1691,16 @@ class ExactlyNTests(TestCase):
         self.assertFalse(mi.exactly_n([], 1))
 
 
-class ReversedExtendedTests(TestCase):
-    """Tests for ``reversed_extended()``"""
+class AlwaysReversibleTests(TestCase):
+    """Tests for ``always_reversible()``"""
 
     def test_regular_reversed(self):
         self.assertEqual(list(reversed(range(10))),
-                         list(mi.reversed_extended(range(10))))
+                         list(mi.always_reversible(range(10))))
         self.assertEqual(list(reversed([1, 2, 3])),
-                         list(mi.reversed_extended([1, 2, 3])))
+                         list(mi.always_reversible([1, 2, 3])))
         self.assertEqual(reversed([1, 2, 3]).__class__,
-                         mi.reversed_extended([1, 2, 3]).__class__)
+                         mi.always_reversible([1, 2, 3]).__class__)
 
     def test_nonseq_reversed(self):
         # Create a non-reversible generator from a sequence
@@ -1708,11 +1708,11 @@ class ReversedExtendedTests(TestCase):
             reversed(x for x in range(10))
 
         self.assertEqual(list(reversed(range(10))),
-                         list(mi.reversed_extended(x for x in range(10))))
+                         list(mi.always_reversible(x for x in range(10))))
         self.assertEqual(list(reversed([1, 2, 3])),
-                         list(mi.reversed_extended(x for x in [1, 2, 3])))
-        self.assertNotEqual(reversed([1, 2]).__class__,
-                            mi.reversed_extended(x for x in [1, 2]).__class__)
+                         list(mi.always_reversible(x for x in [1, 2, 3])))
+        self.assertNotEqual(reversed((1, 2)).__class__,
+                            mi.always_reversible(x for x in (1, 2)).__class__)
 
 
 class CyclicPermutationsTests(TestCase):
