@@ -1672,6 +1672,25 @@ class RunLengthTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class BitmapTest(TestCase):
+    def test_encode(self):
+        iterable = "The quick brown fox jumps over the lazy dog."
+        bit_str = '11110111101110111101111101110111110111110111'
+
+        expected = (int(bit_str, 2), len(bit_str))
+        actual = mi.bitmap.encode(iterable, lambda c: c != ' ')
+        self.assertEqual(actual, expected)
+
+    def test_decode(self):
+        iterable = "The quick brown fox jumps over the lazy dog."
+        bit_str = '11110111101110111101111101110111110111110111'
+
+        bitmap_tuple = (int(bit_str, 2), len(bit_str))
+        expected = list(map(lambda c: c != ' ', iterable))
+        actual = list(mi.bitmap.decode(bitmap_tuple))
+        self.assertEqual(actual, expected)
+
+
 class ExactlyNTests(TestCase):
     """Tests for ``exactly_n()``"""
 
