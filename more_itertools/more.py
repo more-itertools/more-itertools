@@ -16,7 +16,6 @@ from itertools import (
     tee
 )
 from operator import itemgetter, lt, gt, sub
-from platform import python_implementation
 from sys import maxsize, version_info
 
 from six import binary_type, string_types, text_type
