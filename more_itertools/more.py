@@ -26,6 +26,7 @@ from .recipes import consume, flatten, take
 __all__ = [
     'adjacent',
     'always_iterable',
+    'bitmap',
     'bucket',
     'chunked',
     'collapse',
@@ -1867,6 +1868,39 @@ class run_length(object):
     @staticmethod
     def decode(iterable):
         return chain.from_iterable(repeat(k, n) for k, n in iterable)
+
+
+class bitmap(object):
+    """
+    :func:`bitmap.encode` compresses an iterable into a bitmap.
+    It applies `predicate` to all the elements in the iterable, setting
+    a bit in an integer for each ``True`` value and returning that value
+    and the length of the uncompressed iterable.
+
+        >>> uncompressed = [1, 0, 1, 1, 0]
+        >>> bitmap.encode(uncompressed)
+        (13, 5)
+
+    :func:`bitmap.decode` decompresses a bitmap value and length pair. It
+    yields the boolean value for each bit set in the value:
+
+        >>> compressed = (13, 5)
+        >>> list(bitmap.decode(compressed))
+        [True, False, True, True, False]
+    """
+
+    @staticmethod
+    def encode(iterable, predicate=bool):
+        iter_val, iter_length = 0, 0
+        for bit, result in enumerate(map(predicate, iterable)):
+            iter_val |= int(bool(result)) << bit
+            iter_length += 1
+        return iter_val, iter_length
+
+    @staticmethod
+    def decode(bitmap_tuple):
+        for bit in range(bitmap_tuple[1]):
+            yield bool(bitmap_tuple[0] & (1 << bit))
 
 
 def exactly_n(iterable, n, predicate=bool):
