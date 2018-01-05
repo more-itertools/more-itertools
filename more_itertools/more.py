@@ -22,7 +22,7 @@ from sys import maxsize, version_info
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
 
-from .recipes import consume, flatten, take, roundrobin
+from .recipes import consume, flatten, take
 
 __all__ = [
     'adjacent',
@@ -805,16 +805,6 @@ def interleave_longest(*iterables):
     """
     i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
     return filter(lambda x: x is not _marker, i)
-
-
-# The performance of roundrobin is far superior to interleave_longest in PyPy
-if python_implementation() == 'PyPy':
-    _interleave_longest_docstring = interleave_longest.__doc__
-
-    def interleave_longest(*iterables):
-        return roundrobin(*iterables)
-
-    interleave_longest.__doc__ = _interleave_longest_docstring
 
 
 def collapse(iterable, base_type=None, levels=None):
