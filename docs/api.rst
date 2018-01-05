@@ -214,7 +214,7 @@ Others
 **New itertools**
 
 .. autofunction:: numeric_range(start, stop, step)
-.. autofunction:: reversed_extended
+.. autofunction:: always_reversible
 .. autofunction:: side_effect
 .. autofunction:: iterate
 .. autofunction:: difference(iterable, func=operator.sub)
