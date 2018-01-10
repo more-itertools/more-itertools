@@ -650,34 +650,44 @@ class SpyTests(TestCase):
         self.assertEqual(list(new_iterable), ['a', 'b', 'c'])
 
 
-class TestInterleave(TestCase):
-    """Tests for ``interleave()`` and ``interleave_longest()``"""
+class InterleaveTests(TestCase):
+    def test_even(self):
+        actual = list(mi.interleave([1, 4, 7], [2, 5, 8], [3, 6, 9]))
+        expected = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.assertEqual(actual, expected)
 
-    def test_interleave(self):
-        l = [[1, 2, 3], [4, 5], [6, 7, 8]]
-        self.assertEqual(list(mi.interleave(*l)), [1, 4, 6, 2, 5, 7])
+    def test_short(self):
+        actual = list(mi.interleave([1, 4], [2, 5, 7], [3, 6, 8]))
+        expected = [1, 2, 3, 4, 5, 6]
+        self.assertEqual(actual, expected)
 
-        l = [[1, 2], [3, 4, 5], [6, 7, 8]]
-        self.assertEqual(list(mi.interleave(*l)), [1, 3, 6, 2, 4, 7])
+    def test_mixed_types(self):
+        it_list = ['a', 'b', 'c', 'd']
+        it_str = '12345'
+        it_inf = count()
+        actual = list(mi.interleave(it_list, it_str, it_inf))
+        expected = ['a', '1', 0, 'b', '2', 1, 'c', '3', 2, 'd', '4', 3]
+        self.assertEqual(actual, expected)
 
-        l = [[1, 2, 3], [4, 5, 6], [7, 8]]
-        self.assertEqual(list(mi.interleave(*l)), [1, 4, 7, 2, 5, 8])
 
-    def test_interleave_longest(self):
-        l = [[1, 2, 3], [4, 5], [6, 7, 8]]
-        self.assertEqual(
-            list(mi.interleave_longest(*l)), [1, 4, 6, 2, 5, 7, 3, 8]
-        )
+class InterleaveLongestTests(TestCase):
+    def test_even(self):
+        actual = list(mi.interleave_longest([1, 4, 7], [2, 5, 8], [3, 6, 9]))
+        expected = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.assertEqual(actual, expected)
 
-        l = [[1, 2], [3, 4, 5], [6, 7, 8]]
-        self.assertEqual(
-            list(mi.interleave_longest(*l)), [1, 3, 6, 2, 4, 7, 5, 8]
-        )
+    def test_short(self):
+        actual = list(mi.interleave_longest([1, 4], [2, 5, 7], [3, 6, 8]))
+        expected = [1, 2, 3, 4, 5, 6, 7, 8]
+        self.assertEqual(actual, expected)
 
-        l = [[1, 2, 3], [4, 5, 6], [7, 8]]
-        self.assertEqual(
-            list(mi.interleave_longest(*l)), [1, 4, 7, 2, 5, 8, 3, 6]
-        )
+    def test_mixed_types(self):
+        it_list = ['a', 'b', 'c', 'd']
+        it_str = '12345'
+        it_gen = (x for x in range(3))
+        actual = list(mi.interleave_longest(it_list, it_str, it_gen))
+        expected = ['a', '1', 0, 'b', '2', 1, 'c', '3', 2, 'd', '4', '5']
+        self.assertEqual(actual, expected)
 
 
 class TestCollapse(TestCase):
