@@ -803,7 +803,7 @@ def interleave_longest(*iterables):
 
     """
     i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
-    return filter(lambda x: x is not _marker, i)
+    return (x for x in i if x is not _marker)
 
 
 def collapse(iterable, base_type=None, levels=None):
