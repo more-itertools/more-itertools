@@ -801,9 +801,13 @@ def interleave_longest(*iterables):
         >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
         [1, 4, 6, 2, 5, 7, 3, 8]
 
+    This function produces the same output as :func:`roundrobin`, but may
+    perform better for some inputs (in particular when the number of iterables
+    is large).
+
     """
     i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
-    return filter(lambda x: x is not _marker, i)
+    return (x for x in i if x is not _marker)
 
 
 def collapse(iterable, base_type=None, levels=None):

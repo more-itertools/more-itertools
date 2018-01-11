@@ -300,7 +300,9 @@ def roundrobin(*iterables):
         >>> list(roundrobin('ABC', 'D', 'EF'))
         ['A', 'D', 'E', 'B', 'F', 'C']
 
-    See :func:`interleave_longest` for a slightly faster implementation.
+    This function produces the same output as :func:`interleave_longest`, but
+    may perform better for some inputs (in particular when the number of
+    iterables is small).
 
     """
     # Recipe credited to George Sakkis
