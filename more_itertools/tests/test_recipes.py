@@ -1,6 +1,7 @@
 from doctest import DocTestSuite
 from unittest import TestCase
 
+from itertools import combinations
 from six.moves import range
 
 import more_itertools as mi
@@ -574,3 +575,17 @@ class RandomCombinationWithReplacementTests(TestCase):
             combination = mi.random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         self.assertEqual(all_items, set(items))
+
+
+class NthCombinationTests(TestCase):
+    def test_basic(self):
+        iterable = 'abcdefg'
+        r = 4
+        for index, expected in enumerate(combinations(iterable, r)):
+            actual = mi.nth_combination(iterable, r, index)
+            self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.nth_combination(range(180), 4, 2000000)
+        expected = (2, 12, 35, 126)
+        self.assertEqual(actual, expected)
