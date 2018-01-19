@@ -12,7 +12,6 @@ Version History
     * :func:`cyclic_permutations` (thanks to hiqua)
     * :func:`make_decorator` - see the blog post `Yo, I heard you like decorators <https://sites.google.com/site/bbayles/index/decorator_factory>`_
       for a tour (thanks to pylang)
-    * :func:`cyclic_permutations` (thanks to hiqua)
     * :func:`always_reversible` (thanks to michael-celani)
     * :func:`nth_combination` (from the `Python 3.7 docs <https://docs.python.org/3.7/library/itertools.html#itertools-recipes>`_)
 
