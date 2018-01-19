@@ -1,5 +1,6 @@
 from __future__ import division, print_function, unicode_literals
 
+from collections import defaultdict
 from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
@@ -1788,3 +1789,62 @@ class MakeDecoratorTests(TestCase):
 
         it.seek(0)
         self.assertEqual(list(it), ['0', '1', '2', '3', '4'])
+
+
+class ClassifyTests(TestCase):
+    def test_contains(self):
+        iterable = map(str, count())
+        key = lambda x: x[-1]
+        it = mi.classify(iterable, key)
+        mi.take(21, it)
+
+        for i in range(10):
+            self.assertIn(str(i), it)
+
+        self.assertNotIn('a', it)
+
+    def test_getitem(self):
+        iterable = map(str, count())
+        key = lambda x: x[-1]
+        it = mi.classify(iterable, key)
+        mi.take(21, it)
+
+        for key, expected in [
+            ('0', ['0', '10', '20']),
+            ('1', ['1', '11']),
+            ('a', []),
+        ]:
+            actual = it[key]
+            self.assertEqual(actual, expected)
+
+    def test_iter(self):
+        iterable = map(str, count())
+        key = lambda x: x[-1]
+        it = mi.classify(iterable, key)
+
+        actual = mi.take(21, it)
+        expected = [str(x) for x in range(21)]
+        self.assertEqual(actual, expected)
+
+    def test_next(self):
+        iterable = map(str, count())
+        key = lambda x: x[-1]
+        it = mi.classify(iterable, key)
+
+        actual = next(it), next(it), next(it)
+        expected = ('0', '1', '2')
+        self.assertEqual(actual, expected)
+
+    def test_mapping(self):
+        iterable = map(str, count())
+        key = lambda x: x[-1]
+        it = mi.classify(iterable, key)
+        mi.take(21, it)
+
+        actual = it.mapping
+
+        expected = defaultdict(list)
+        for i in map(str, range(21)):
+            expected[key(i)].append(i)
+
+        self.assertEqual(actual, expected)

@@ -29,6 +29,7 @@ __all__ = [
     'always_reversible',
     'bucket',
     'chunked',
+    'classify',
     'collapse',
     'collate',
     'consecutive_groups',
@@ -671,6 +672,8 @@ class bucket(object):
 
     The original iterable will be advanced and its items will be cached until
     they are used by the child iterables. This may require significant storage.
+    For a similar wrapper that doesn't automatically advance the original
+    iterable, see :class:`classify`.
 
     By default, attempting to select a bucket to which no items belong  will
     exhaust the iterable and cache all values.
@@ -1983,3 +1986,68 @@ def make_decorator(wrapping_func, result_index=0):
         return outer_wrapper
 
     return decorator
+
+
+class classify(object):
+    """Wrap *iterable* and return an object that progressively saves its items
+    based on a *key* function.
+
+        >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
+        >>> key = lambda x: x[0]  # Classify by first character
+        >>> it = classify(iterable, key=key)
+        >>> next(it), next(it), next(it)  # Advance the iterable
+        ('a1', 'b1', 'c1')
+        >>> it['a']  # 'a' items seen so far
+        ['a1']
+        >>> list(it)  # Exhaust the iterable
+        ['a2', 'b2', 'c2', 'b3']
+        >>> it['a']
+        ['a1', 'a2']
+        >>> it['b']
+        ['b1', 'b2', 'b3']
+
+    :class:`classify` automates collecting items into a ``defaultdict(list)``
+    object:
+
+        >>> from collections import defaultdict
+        >>> mapping = defaultdict(list)
+        >>> for item in iterable:
+        ...     category = key(item)
+        ...     mapping[category].append(item)
+
+    Access the underlying :obj:`defaultdict` through the :attr:`mapping`
+    attribute:
+
+        >>> 'a' in it.mapping
+        True
+        >>> 'd' in it.mapping
+        False
+        >>> len(it.mapping)
+        3
+
+    For a similar wrapper that will automatically (rather than progressively)
+    categorize items, see :class:`bucket`.
+
+    """
+
+    def __init__(self, iterable, key):
+        self._it = iter(iterable)
+        self._key = key
+        self.mapping = defaultdict(list)
+
+    def __contains__(self, key):
+        return key in self.mapping
+
+    def __getitem__(self, key):
+        return self.mapping[key]
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        item = next(self._it)
+        self.mapping[self._key(item)].append(item)
+
+        return item
+
+    next = __next__
