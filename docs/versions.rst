@@ -9,7 +9,7 @@ Version History
 
 * New itertools:
     * :func:`split_at` (thanks to michael-celani)
-    * :func:`cyclic_permutations` (thanks to hiqua)
+    * :func:`circular_shifts` (thanks to hiqua)
     * :func:`make_decorator` - see the blog post `Yo, I heard you like decorators <https://sites.google.com/site/bbayles/index/decorator_factory>`_
       for a tour (thanks to pylang)
     * :func:`always_reversible` (thanks to michael-celani)

@@ -29,12 +29,12 @@ __all__ = [
     'always_reversible',
     'bucket',
     'chunked',
+    'circular_shifts',
     'collapse',
     'collate',
     'consecutive_groups',
     'consumer',
     'count_cycle',
-    'cyclic_permutations',
     'difference',
     'distinct_permutations',
     'distribute',
@@ -1910,10 +1910,10 @@ def exactly_n(iterable, n, predicate=bool):
     return len(take(n + 1, filter(predicate, iterable))) == n
 
 
-def cyclic_permutations(iterable):
-    """Return a list of cyclic permutations of *iterable*.
+def circular_shifts(iterable):
+    """Return a list of circular shifts of *iterable*.
 
-        >>> cyclic_permutations(range(4))
+        >>> circular_shifts(range(4))
         [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
     """
     lst = list(iterable)
