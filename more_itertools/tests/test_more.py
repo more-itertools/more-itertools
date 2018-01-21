@@ -689,6 +689,11 @@ class InterleaveLongestTests(TestCase):
         expected = ['a', '1', 0, 'b', '2', 1, 'c', '3', 2, 'd', '4', '5']
         self.assertEqual(actual, expected)
 
+        l = [range(100000), range(100000)]
+        self.assertEqual(
+            list(mi.interleave_longest(*l)), list(mi.interleave(*l))
+        )
+
 
 class TestCollapse(TestCase):
     """Tests for ``collapse()``"""
