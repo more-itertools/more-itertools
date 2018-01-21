@@ -1725,20 +1725,24 @@ class AlwaysReversibleTests(TestCase):
                             mi.always_reversible(x for x in (1, 2)).__class__)
 
 
-class CyclicPermutationsTests(TestCase):
-    """Tests for ``cyclic_permutations()``"""
-
+class CircularShiftsTests(TestCase):
     def test_empty(self):
-        """test the empty iterator case"""
-        self.assertEqual(list(mi.cyclic_permutations([])), [])
+        # empty iterable -> empty list
+        self.assertEqual(list(mi.circular_shifts([])), [])
 
-    def test_simple_cyclic_permutations(self):
-        """test the a simple iterator case"""
-        self.assertEqual(mi.cyclic_permutations(range(4)),
-                         [(0, 1, 2, 3),
-                          (1, 2, 3, 0),
-                          (2, 3, 0, 1),
-                          (3, 0, 1, 2)])
+    def test_simple_circular_shifts(self):
+        # test the a simple iterator case
+        self.assertEqual(
+            mi.circular_shifts(range(4)),
+            [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
+        )
+
+    def test_duplicates(self):
+        # test non-distinct entries
+        self.assertEqual(
+            mi.circular_shifts([0, 1, 0, 1]),
+            [(0, 1, 0, 1), (1, 0, 1, 0), (0, 1, 0, 1), (1, 0, 1, 0)]
+        )
 
 
 class MakeDecoratorTests(TestCase):

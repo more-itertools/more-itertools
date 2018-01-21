@@ -4,6 +4,23 @@ Version History
 
 .. automodule:: more_itertools
 
+4.1.0
+-----
+
+* New itertools:
+    * :func:`split_at` (thanks to michael-celani)
+    * :func:`circular_shifts` (thanks to hiqua)
+    * :func:`make_decorator` - see the blog post `Yo, I heard you like decorators <https://sites.google.com/site/bbayles/index/decorator_factory>`_
+      for a tour (thanks to pylang)
+    * :func:`always_reversible` (thanks to michael-celani)
+    * :func:`nth_combination` (from the `Python 3.7 docs <https://docs.python.org/3.7/library/itertools.html#itertools-recipes>`_)
+
+* Improvements to existing itertools:
+    * :func:`seekable` now has an ``elements`` method to return cached items.
+    * The performance tradeoffs between :func:`roundrobin` and
+      :func:`interleave_longest` are now documented (thanks michael-celani,
+      pylang, and MSeifert04)
+
 4.0.1
 -----
 
