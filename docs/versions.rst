@@ -4,7 +4,7 @@ Version History
 
 .. automodule:: more_itertools
 
-4.0.2
+4.1.0
 -----
 
 * New itertools:
