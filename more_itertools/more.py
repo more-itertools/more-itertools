@@ -2032,6 +2032,10 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     Note that all items in the iterable are gathered into a list before the
     summarization step, which may require significant storage.
 
+    The returned object is a :obj:`collections.defaultdict` with the
+    ``default_factory`` set to ``None``, such that if behaves as a normal
+    dictionary.
+
     """
     keyfunc = (lambda x: x) if (keyfunc is None) else keyfunc
     valuefunc = (lambda x: x) if (valuefunc is None) else valuefunc
@@ -2046,4 +2050,5 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
         for key, value_list in ret.items():
             ret[key] = reducefunc(value_list)
 
+    ret.default_factory = None
     return ret

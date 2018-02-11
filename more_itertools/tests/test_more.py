@@ -1820,3 +1820,8 @@ class MapReduceTests(TestCase):
         )
         expected = [(0, 0), (1, 6), (2, 4)]
         self.assertEqual(actual, expected)
+
+    def test_ret(self):
+        d = mi.map_reduce([1, 0, 2, 0, 1, 0], bool)
+        self.assertEqual(d, {False: [0, 0, 0], True: [1, 2, 1]})
+        self.assertRaises(KeyError, lambda: d[None].append(1))
