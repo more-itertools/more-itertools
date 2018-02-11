@@ -2037,7 +2037,6 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     dictionary.
 
     """
-    keyfunc = (lambda x: x) if (keyfunc is None) else keyfunc
     valuefunc = (lambda x: x) if (valuefunc is None) else valuefunc
 
     ret = defaultdict(list)
