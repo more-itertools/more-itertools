@@ -2033,7 +2033,7 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     summarization step, which may require significant storage.
 
     The returned object is a :obj:`collections.defaultdict` with the
-    ``default_factory`` set to ``None``, such that if behaves as a normal
+    ``default_factory`` set to ``None``, such that it behaves like a normal
     dictionary.
 
     """
