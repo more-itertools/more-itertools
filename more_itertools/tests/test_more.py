@@ -15,7 +15,7 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, itemgetter
+from operator import add, mul, itemgetter
 from unittest import TestCase
 
 from six.moves import filter, map, range, zip
@@ -1792,3 +1792,36 @@ class MakeDecoratorTests(TestCase):
 
         it.seek(0)
         self.assertEqual(list(it), ['0', '1', '2', '3', '4'])
+
+
+class MapReduceTests(TestCase):
+    def test_default(self):
+        iterable = (str(x) for x in range(5))
+        keyfunc = lambda x: int(x) // 2
+        actual = sorted(mi.map_reduce(iterable, keyfunc).items())
+        expected = [(0, ['0', '1']), (1, ['2', '3']), (2, ['4'])]
+        self.assertEqual(actual, expected)
+
+    def test_valuefunc(self):
+        iterable = (str(x) for x in range(5))
+        keyfunc = lambda x: int(x) // 2
+        valuefunc = int
+        actual = sorted(mi.map_reduce(iterable, keyfunc, valuefunc).items())
+        expected = [(0, [0, 1]), (1, [2, 3]), (2, [4])]
+        self.assertEqual(actual, expected)
+
+    def test_reducefunc(self):
+        iterable = (str(x) for x in range(5))
+        keyfunc = lambda x: int(x) // 2
+        valuefunc = int
+        reducefunc = lambda value_list: reduce(mul, value_list, 1)
+        actual = sorted(
+            mi.map_reduce(iterable, keyfunc, valuefunc, reducefunc).items()
+        )
+        expected = [(0, 0), (1, 6), (2, 4)]
+        self.assertEqual(actual, expected)
+
+    def test_ret(self):
+        d = mi.map_reduce([1, 0, 2, 0, 1, 0], bool)
+        self.assertEqual(d, {False: [0, 0, 0], True: [1, 2, 1]})
+        self.assertRaises(KeyError, lambda: d[None].append(1))
