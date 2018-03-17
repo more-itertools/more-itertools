@@ -1825,3 +1825,25 @@ class MapReduceTests(TestCase):
         d = mi.map_reduce([1, 0, 2, 0, 1, 0], bool)
         self.assertEqual(d, {False: [0, 0, 0], True: [1, 2, 1]})
         self.assertRaises(KeyError, lambda: d[None].append(1))
+
+
+class EditDistanceTests(TestCase):
+    def test_insertion(self):
+        str_a, str_b = 'abc', 'abdc'
+        self.assertEqual(1, mi.edit_distance(str_a, str_b))
+
+    def test_deletion(self):
+        str_a, str_b = 'abc', 'ac'
+        self.assertEqual(1, mi.edit_distance(str_a, str_b))
+
+    def test_substitution(self):
+        str_a, str_b = 'abc', 'acc'
+        self.assertEqual(1, mi.edit_distance(str_a, str_b))
+
+    def test_all(self):
+        str_a, str_b = 'invention', 'contention'
+        self.assertEqual(3, mi.edit_distance(str_a, str_b))
+
+    def test_non_string(self):
+        iter_a, iter_b = range(19), range(20)
+        self.assertEqual(1, mi.edit_distance(iter_a, iter_b))

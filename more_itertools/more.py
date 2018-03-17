@@ -39,6 +39,7 @@ __all__ = [
     'distinct_permutations',
     'distribute',
     'divide',
+    'edit_distance',
     'exactly_n',
     'first',
     'groupby_transform',
@@ -407,6 +408,44 @@ def ilen(iterable):
     """
     d = deque(enumerate(iterable, 1), maxlen=1)
     return d[0][0] if d else 0
+
+
+def edit_distance(iterable_a, iterable_b):
+    """Returns the minimum number of insertions, deletions, and substitutions
+    required to transform *iterable_a* into *iterable_b*.
+
+    >>> edit_distance([1, 2, 3], [1, 2, 4, 5, 3])
+    2
+
+    This caches the elements in the iterables, which may require significant
+    storage.
+
+    """
+    list_a = list(iterable_a)
+    list_b = list(iterable_b)
+    len_a = len(list_a)
+    len_b = len(list_b)
+
+    # Wagner–Fischer algorithm
+    memo = [[0] * (len_b + 1) for _ in range(len_a + 1)]
+
+    for i in range(len_a + 1):
+        memo[i][0] = i
+
+    for i in range(len_b + 1):
+        memo[0][i] = i
+
+    for num_a in range(1, len_a + 1):
+        for num_b in range(1, len_b + 1):
+            if list_a[num_a - 1] == list_b[num_b - 1]:
+                memo[num_a][num_b] = memo[num_a - 1][num_b - 1]
+                continue
+
+            memo[num_a][num_b] = min(memo[num_a][num_b - 1] + 1,
+                                     memo[num_a - 1][num_b] + 1,
+                                     memo[num_a - 1][num_b - 1] + 1)
+
+    return memo[len_a][len_b]
 
 
 def iterate(func, start):

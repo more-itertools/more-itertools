@@ -122,6 +122,7 @@ These tools return summarized or aggregated data from an iterable.
 **New itertools**
 
 .. autofunction:: ilen
+.. autofunction:: edit_distance
 .. autofunction:: first(iterable[, default])
 .. autofunction:: one
 .. autofunction:: unique_to_each
