@@ -405,8 +405,7 @@ def ilen(iterable):
     This consumes the iterable, so handle with care.
 
     """
-    d = deque(enumerate(iterable, 1), maxlen=1)
-    return d[0][0] if d else 0
+    return sum(1 for _ in iterable)
 
 
 def iterate(func, start):
