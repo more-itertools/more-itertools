@@ -723,7 +723,10 @@ class bucket(object):
             # a matching item, caching the rest.
             else:
                 while True:
-                    item = next(self._it)
+                    try:
+                        item = next(self._it)
+                    except StopIteration:
+                        return
                     item_value = self._key(item)
                     if item_value == value:
                         yield item
