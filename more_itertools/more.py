@@ -17,10 +17,10 @@ from itertools import (
 )
 from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
-if version_info < (3, 3):
-    from collections import Sequence
-else:
+try:
     from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
 
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
