@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from collections import Counter, defaultdict, deque, Sequence
+from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
@@ -17,6 +17,10 @@ from itertools import (
 )
 from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
+if version_info < (3, 3):
+    from collections import Sequence
+else:
+    from collections.abc import Sequence
 
 from six import binary_type, string_types, text_type
 from six.moves import filter, map, range, zip, zip_longest
