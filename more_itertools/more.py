@@ -1345,6 +1345,10 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
         >>> [(k, ''.join(g)) for k, g in grouper]
         [(0, 'ab'), (1, 'cde'), (2, 'fgh'), (3, 'i')]
 
+    Note that the order of items in the iterable is significant.
+    Only adjacent items are grouped together, so if you don't want any
+    duplicate groups, you should sort the iterable by the key function.
+
     """
     valuefunc = (lambda x: x) if valuefunc is None else valuefunc
     return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
