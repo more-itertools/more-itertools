@@ -409,7 +409,11 @@ def ilen(iterable):
     This consumes the iterable, so handle with care.
 
     """
+    # maxlen=1 only stores the last item in the deque
     d = deque(enumerate(iterable, 1), maxlen=1)
+    # since we started enumerate at 1,
+    # the first item of the last pair will be the length of the iterable
+    # (assuming there were items)
     return d[0][0] if d else 0
 
 
