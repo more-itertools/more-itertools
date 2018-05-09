@@ -509,48 +509,41 @@ def one(iterable, too_short=None, too_long=None):
 
 def distinct_permutations(iterable):
     """Yield successive distinct permutations of the elements in *iterable*.
-
         >>> sorted(distinct_permutations([1, 0, 1]))
         [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
-
     Equivalent to ``set(permutations(iterable))``, except duplicates are not
     generated and thrown away. For larger input sequences this is much more
     efficient.
-
     Duplicate permutations arise when there are duplicated elements in the
     input iterable. The number of items returned is
     `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
     items input, and each `x_i` is the count of a distinct item in the input
     sequence.
-
     """
-    def perm_unique_helper(item_counts, perm, i):
+    def distinct_permutations_generator(permutations_generator, e):
         """Internal helper function
+        :arg permutations_generator: The previous generator
+        :arg e: The next element from iterable
+        The output permutations are built up by adding the next element to the
+        previous permutations at every possible position. The key idea is to
+        keep identical elements ordered: if e1 == e2 and e1 is before e2 in
+        the iterable, then all permutations with e2 on the right of e1 are
+        ignored."""
+        for permutation in permutations_generator:
+            for j in range(len(permutation)):
+                yield permutation[:j] + [e] + permutation[j:]
+                if permutation[j] == e:
+                    break
+            else:
+                yield permutation + [e]
 
-        :arg item_counts: Stores the unique items in ``iterable`` and how many
-            times they are repeated
-        :arg perm: The permutation that is being built for output
-        :arg i: The index of the permutation being modified
 
-        The output permutations are built up recursively; the distinct items
-        are placed until their repetitions are exhausted.
-        """
-        if i < 0:
-            yield tuple(perm)
-        else:
-            for item in item_counts:
-                if item_counts[item] <= 0:
-                    continue
-                perm[i] = item
-                item_counts[item] -= 1
-                for x in perm_unique_helper(item_counts, perm, i - 1):
-                    yield x
-                item_counts[item] += 1
+    permutations_generator = [[]]
+    for e in iterable:
+        permutations_generator = distinct_permutations_generator(
+            permutations_generator, e)
 
-    item_counts = Counter(iterable)
-
-    return perm_unique_helper(item_counts, [None] * len(iterable),
-                              len(iterable) - 1)
+    return (tuple(t) for t in permutations_generator)
 
 
 def intersperse(e, iterable, n=1):
