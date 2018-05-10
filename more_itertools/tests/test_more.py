@@ -400,6 +400,27 @@ class DistinctPermutationsTests(TestCase):
         ref_output = sorted(set(permutations(iterable)))
         self.assertEqual(test_output, ref_output)
 
+    def test_other_iterables(self):
+        """Make sure ``distinct_permutations()`` accepts a different type of
+        iterables.
+
+        """
+        # a generator
+        iterable = (c for c in ['z', 'a', 'a', 'q', 'q', 'q', 'y'])
+        test_output = sorted(mi.distinct_permutations(iterable))
+        # "reload" it
+        iterable = (c for c in ['z', 'a', 'a', 'q', 'q', 'q', 'y'])
+        ref_output = sorted(set(permutations(iterable)))
+        self.assertEqual(test_output, ref_output)
+
+        # an iterator
+        iterable = iter(['z', 'a', 'a', 'q', 'q', 'q', 'y'])
+        test_output = sorted(mi.distinct_permutations(iterable))
+        # "reload" it
+        iterable = iter(['z', 'a', 'a', 'q', 'q', 'q', 'y'])
+        ref_output = sorted(set(permutations(iterable)))
+        self.assertEqual(test_output, ref_output)
+
 
 class IlenTests(TestCase):
     def test_ilen(self):

@@ -409,7 +409,11 @@ def ilen(iterable):
     This consumes the iterable, so handle with care.
 
     """
+    # maxlen=1 only stores the last item in the deque
     d = deque(enumerate(iterable, 1), maxlen=1)
+    # since we started enumerate at 1,
+    # the first item of the last pair will be the length of the iterable
+    # (assuming there were items)
     return d[0][0] if d else 0
 
 
@@ -544,9 +548,9 @@ def distinct_permutations(iterable):
                 item_counts[item] += 1
 
     item_counts = Counter(iterable)
+    length = sum(item_counts.values())
 
-    return perm_unique_helper(item_counts, [None] * len(iterable),
-                              len(iterable) - 1)
+    return perm_unique_helper(item_counts, [None] * length, length - 1)
 
 
 def intersperse(e, iterable, n=1):
