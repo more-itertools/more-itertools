@@ -550,8 +550,7 @@ def distinct_permutations(iterable):
     item_counts = Counter(iterable)
     length = sum(item_counts.values())
 
-    return perm_unique_helper(item_counts, [None] * length,
-                              length - 1)
+    return perm_unique_helper(item_counts, [None] * length, length - 1)
 
 
 def intersperse(e, iterable, n=1):

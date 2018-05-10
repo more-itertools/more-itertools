@@ -421,6 +421,7 @@ class DistinctPermutationsTests(TestCase):
         ref_output = sorted(set(permutations(iterable)))
         self.assertEqual(test_output, ref_output)
 
+
 class IlenTests(TestCase):
     def test_ilen(self):
         """Sanity-checks for ``ilen()``."""
