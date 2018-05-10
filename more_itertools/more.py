@@ -541,7 +541,6 @@ def distinct_permutations(iterable):
             else:
                 yield permutation + [e]
 
-
     permutations = [[]]
     for e in iterable:
         permutations = make_new_permutations(
