@@ -509,27 +509,31 @@ def one(iterable, too_short=None, too_long=None):
 
 def distinct_permutations(iterable):
     """Yield successive distinct permutations of the elements in *iterable*.
+
         >>> sorted(distinct_permutations([1, 0, 1]))
         [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+
     Equivalent to ``set(permutations(iterable))``, except duplicates are not
     generated and thrown away. For larger input sequences this is much more
     efficient.
+
     Duplicate permutations arise when there are duplicated elements in the
     input iterable. The number of items returned is
     `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
     items input, and each `x_i` is the count of a distinct item in the input
     sequence.
+
     """
-    def distinct_permutations_generator(permutations_generator, e):
+    def make_new_permutations(permutations, e):
         """Internal helper function
-        :arg permutations_generator: The previous generator
-        :arg e: The next element from iterable
-        The output permutations are built up by adding the next element to the
-        previous permutations at every possible position. The key idea is to
-        keep identical elements ordered: if e1 == e2 and e1 is before e2 in
-        the iterable, then all permutations with e2 on the right of e1 are
-        ignored."""
-        for permutation in permutations_generator:
+        :arg permutations: The current permutations
+        :arg e: The element to add
+        The output permutations are built up by adding `̀element`̀ to the
+        current `̀permutations`̀ at every possible position. The key idea
+        is to keep repeated elements (reverse) ordered: if e1 == e2 and e1
+        is before e2 in the iterable, then all permutations with e1 before
+        e2 are ignored."""
+        for permutation in permutations:
             for j in range(len(permutation)):
                 yield permutation[:j] + [e] + permutation[j:]
                 if permutation[j] == e:
@@ -538,12 +542,12 @@ def distinct_permutations(iterable):
                 yield permutation + [e]
 
 
-    permutations_generator = [[]]
+    permutations = [[]]
     for e in iterable:
-        permutations_generator = distinct_permutations_generator(
-            permutations_generator, e)
+        permutations = make_new_permutations(
+            permutations, e)
 
-    return (tuple(t) for t in permutations_generator)
+    return (tuple(t) for t in permutations)
 
 
 def intersperse(e, iterable, n=1):
