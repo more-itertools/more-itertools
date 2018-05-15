@@ -110,6 +110,7 @@ These tools combine multiple iterables.
 .. autofunction:: dotproduct
 .. autofunction:: flatten
 .. autofunction:: roundrobin
+.. autofunction:: prepend
 
 
 Summarizing

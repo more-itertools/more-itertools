@@ -589,3 +589,19 @@ class NthCombinationTests(TestCase):
         actual = mi.nth_combination(range(180), 4, 2000000)
         expected = (2, 12, 35, 126)
         self.assertEqual(actual, expected)
+
+
+class PrependTests(TestCase):
+    def test_basic(self):
+        value = 'a'
+        iterator = iter('bcdefg')
+        actual = list(mi.prepend(value, iterator))
+        expected = list('abcdefg')
+        self.assertEqual(actual, expected)
+
+    def test_multiple(self):
+        value = 'ab'
+        iterator = iter('cdefg')
+        actual = tuple(mi.prepend(value, iterator))
+        expected = ('ab',) + tuple('cdefg')
+        self.assertEqual(actual, expected)
