@@ -33,6 +33,7 @@ __all__ = [
     'pairwise',
     'partition',
     'powerset',
+    'prepend',
     'quantify',
     'random_combination_with_replacement',
     'random_combination',
@@ -548,3 +549,17 @@ def nth_combination(iterable, r, index):
         result.append(pool[-1 - n])
 
     return tuple(result)
+
+
+def prepend(value, iterator):
+    """Yield *value*, followed by the elements in *iterator*.
+
+        >>> value = '0'
+        >>> iterator = ['1', '2', '3']
+        >>> list(prepend(value, iterator))
+        ['0', '1', '2', '3']
+
+    To prepend multiple values, see :func:`itertools.chain`.
+
+    """
+    return chain([value], iterator)
