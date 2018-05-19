@@ -145,7 +145,7 @@ These tools return summarized or aggregated data from an iterable.
 Selecting
 =========
 
-These yools yield certain items from an iterable.
+These tools yield certain items from an iterable.
 
 ----
 
