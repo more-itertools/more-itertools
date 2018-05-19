@@ -4,6 +4,22 @@ Version History
 
 .. automodule:: more_itertools
 
+4.2.0
+-----
+
+* New itertools:
+    * :func:`map_reduce` (thanks to pylang)
+    * :func:`prepend` (from the `Python 3.7 docs <https://docs.python.org/3.7/library/itertools.html#itertools-recipes>`_)
+
+* Improvements to existing itertools:
+    * :func:`bucket` now complies with PEP 479 (thanks to irmen)
+
+* Other changes:
+   * Python 3.7 is now supported (thanks to irmen)
+   * Python 3.3 is no longer supported
+   * The test suite no longer requires third-party modules to run
+   * The API docs now include links to source code
+
 4.1.0
 -----
 
