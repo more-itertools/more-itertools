@@ -1846,3 +1846,34 @@ class MapReduceTests(TestCase):
         d = mi.map_reduce([1, 0, 2, 0, 1, 0], bool)
         self.assertEqual(d, {False: [0, 0, 0], True: [1, 2, 1]})
         self.assertRaises(KeyError, lambda: d[None].append(1))
+
+
+class RlocateTests(TestCase):
+    def test_default_pred(self):
+        iterable = [0, 1, 1, 0, 1, 0, 0]
+        for it in (iterable[:], iter(iterable)):
+            actual = list(mi.rlocate(it))
+            expected = [4, 2, 1]
+            self.assertEqual(actual, expected)
+
+    def test_no_matches(self):
+        iterable = [0, 0, 0]
+        for it in (iterable[:], iter(iterable)):
+            actual = list(mi.rlocate(it))
+            expected = []
+            self.assertEqual(actual, expected)
+
+    def test_custom_pred(self):
+        iterable = ['0', 1, 1, '0', 1, '0', '0']
+        pred = lambda x: x == '0'
+        for it in (iterable[:], iter(iterable)):
+            actual = list(mi.rlocate(it, pred))
+            expected = [6, 5, 3, 0]
+            self.assertEqual(actual, expected)
+
+    def test_efficient_reversal(self):
+        iterable = range(10 ** 10)  # Is efficiently reversible
+        target = 10 ** 10 - 2
+        pred = lambda x: x == target  # Find-able from the right
+        actual = next(mi.rlocate(iterable, pred))
+        self.assertEqual(actual, target)

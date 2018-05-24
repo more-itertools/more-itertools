@@ -60,6 +60,7 @@ __all__ = [
     'one',
     'padded',
     'peekable',
+    'rlocate',
     'rstrip',
     'run_length',
     'seekable',
@@ -2066,3 +2067,35 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
 
     ret.default_factory = None
     return ret
+
+
+def rlocate(iterable, pred=bool):
+    """Yield the index of each item in *iterable* for which *pred* returns
+    ``True``, starting from the right and moving left.
+
+    *pred* defaults to :func:`bool`, which will select truthy items:
+
+        >>> list(rlocate([0, 1, 1, 0, 1, 0, 0]))  # Truthy at 1, 2, and 4
+        [4, 2, 1]
+
+    Set *pred* to a custom function to, e.g., find the indexes for a particular
+    item:
+
+        >>> iterable = iter('abcb')
+        >>> pred = lambda x: x == 'b'
+        >>> list(rlocate(iterable, pred))
+        [3, 1]
+
+    Beware, this function won't return anything for infinite iterables.
+    If *iterable* is reversible, ``rlocate`` will reverse it and search from
+    the right. Otherwise, it will search from the left and return the results
+    in reverse order.
+
+    See :func:`locate` to for other example applications.
+
+    """
+    try:
+        len_iter = len(iterable)
+        return (len_iter - i - 1 for i in locate(reversed(iterable), pred))
+    except TypeError:
+        return reversed(list(locate(iterable, pred)))
