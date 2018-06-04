@@ -114,6 +114,28 @@ class FirstTests(TestCase):
         self.assertEqual(mi.first([], 'boo'), 'boo')
 
 
+class LastTests(TestCase):
+    """Tests for ``last()``"""
+
+    def test_many(self):
+        """Test that it works on many-item iterables."""
+        # Also try it on a generator expression to make sure it works on
+        # whatever those return, across Python versions.
+        self.assertEqual(mi.last(x for x in range(4)), 3)
+
+    def test_one(self):
+        """Test that it doesn't raise StopIteration prematurely."""
+        self.assertEqual(mi.last([3]), 3)
+
+    def test_empty_stop_iteration(self):
+        """It should raise StopIteration for empty iterables."""
+        self.assertRaises(ValueError, lambda: mi.last([]))
+
+    def test_default(self):
+        """It should return the provided default arg for empty iterables."""
+        self.assertEqual(mi.last([], 'boo'), 'boo')
+
+
 class PeekableTests(TestCase):
     """Tests for ``peekable()`` behavor not incidentally covered by testing
     ``collate()``

@@ -52,6 +52,7 @@ __all__ = [
     'intersperse',
     'islice_extended',
     'iterate',
+    'last',
     'locate',
     'lstrip',
     'make_decorator',
@@ -133,6 +134,29 @@ def first(iterable, default=_marker):
         # exception, and it's weird to explicitly catch StopIteration.
         if default is _marker:
             raise ValueError('first() was called on an empty iterable, and no '
+                             'default value was provided.')
+        return default
+
+
+def last(iterable, default=_marker):
+    """Return the last item of *iterable*, or *default* if *iterable* is
+    empty.
+
+        >>> last([0, 1, 2, 3])
+        3
+        >>> last([], 'some default')
+        'some default'
+
+    If *default* is not provided and there are no items in the iterable,
+    raise ``ValueError``.
+    """
+    if not isinstance(iterable, (list, deque)):
+        iterable = deque(iterable, maxlen=1)
+    try:
+        return iterable[-1]
+    except IndexError:
+        if default is _marker:
+            raise ValueError('last() was called on an empty iterable, and no '
                              'default value was provided.')
         return default
 
