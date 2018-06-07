@@ -117,22 +117,42 @@ class FirstTests(TestCase):
 class LastTests(TestCase):
     """Tests for ``last()``"""
 
-    def test_many(self):
-        """Test that it works on many-item iterables."""
+    def test_many_nonsliceable(self):
+        """Test that it works on many-item non-slice-able iterables."""
         # Also try it on a generator expression to make sure it works on
         # whatever those return, across Python versions.
         self.assertEqual(mi.last(x for x in range(4)), 3)
 
-    def test_one(self):
+    def test_one_nonsliceable(self):
+        """Test that it doesn't raise StopIteration prematurely."""
+        self.assertEqual(mi.last(x for x in range(1)), 0)
+
+    def test_empty_stop_iteration_nonsliceable(self):
+        """It should raise ValueError for empty non-slice-able iterables."""
+        self.assertRaises(ValueError, lambda: mi.last(x for x in range(0)))
+
+    def test_default_nonsliceable(self):
+        """It should return the provided default arg for empty non-slice-able
+        iterables.
+        """
+        self.assertEqual(mi.last((x for x in range(0)), 'boo'), 'boo')
+
+    def test_many_sliceable(self):
+        """Test that it works on many-item slice-able iterables."""
+        self.assertEqual(mi.last([0, 1, 2, 3]), 3)
+
+    def test_one_sliceable(self):
         """Test that it doesn't raise StopIteration prematurely."""
         self.assertEqual(mi.last([3]), 3)
 
-    def test_empty_stop_iteration(self):
-        """It should raise StopIteration for empty iterables."""
+    def test_empty_stop_iteration_sliceable(self):
+        """It should raise ValueError for empty slice-able iterables."""
         self.assertRaises(ValueError, lambda: mi.last([]))
 
-    def test_default(self):
-        """It should return the provided default arg for empty iterables."""
+    def test_default_sliceable(self):
+        """It should return the provided default arg for empty slice-able
+        iterables.
+        """
         self.assertEqual(mi.last([], 'boo'), 'boo')
 
 
