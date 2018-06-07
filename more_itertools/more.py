@@ -150,11 +150,14 @@ def last(iterable, default=_marker):
     If *default* is not provided and there are no items in the iterable,
     raise ``ValueError``.
     """
-    if not isinstance(iterable, (list, deque)):
-        iterable = deque(iterable, maxlen=1)
     try:
-        return iterable[-1]
-    except IndexError:
+        try:
+            # Try to access the last item directly
+            return iterable[-1]
+        except (TypeError, AttributeError, KeyError):
+            # If not slice-able, iterate entirely using length-1 deque
+            return deque(iterable, maxlen=1)[0]
+    except IndexError:  # If the iterable was empty
         if default is _marker:
             raise ValueError('last() was called on an empty iterable, and no '
                              'default value was provided.')
