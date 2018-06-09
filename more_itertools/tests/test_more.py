@@ -1,5 +1,6 @@
 from __future__ import division, print_function, unicode_literals
 
+from collections import OrderedDict
 from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
@@ -112,6 +113,90 @@ class FirstTests(TestCase):
     def test_default(self):
         """It should return the provided default arg for empty iterables."""
         self.assertEqual(mi.first([], 'boo'), 'boo')
+
+
+class IterOnlyRange:
+    """User-defined iterable class which only support __iter__.
+
+    It is not specified to inherit ``object``, so indexing on a instance will
+    raise an ``AttributeError`` rather than ``TypeError`` in Python 2.
+
+    >>> r = IterOnlyRange(5)
+    >>> r[0]
+    AttributeError: IterOnlyRange instance has no attribute '__getitem__'
+
+    Note: In Python 3, ``TypeError`` will be raised because ``object`` is
+    inherited implicitly by default.
+
+    >>> r[0]
+    TypeError: 'IterOnlyRange' object does not support indexing
+    """
+    def __init__(self, n):
+        """Set the length of the range."""
+        self.n = n
+
+    def __iter__(self):
+        """Works same as range()."""
+        return iter(range(self.n))
+
+
+class LastTests(TestCase):
+    """Tests for ``last()``"""
+
+    def test_many_nonsliceable(self):
+        """Test that it works on many-item non-slice-able iterables."""
+        # Also try it on a generator expression to make sure it works on
+        # whatever those return, across Python versions.
+        self.assertEqual(mi.last(x for x in range(4)), 3)
+
+    def test_one_nonsliceable(self):
+        """Test that it doesn't raise StopIteration prematurely."""
+        self.assertEqual(mi.last(x for x in range(1)), 0)
+
+    def test_empty_stop_iteration_nonsliceable(self):
+        """It should raise ValueError for empty non-slice-able iterables."""
+        self.assertRaises(ValueError, lambda: mi.last(x for x in range(0)))
+
+    def test_default_nonsliceable(self):
+        """It should return the provided default arg for empty non-slice-able
+        iterables.
+        """
+        self.assertEqual(mi.last((x for x in range(0)), 'boo'), 'boo')
+
+    def test_many_sliceable(self):
+        """Test that it works on many-item slice-able iterables."""
+        self.assertEqual(mi.last([0, 1, 2, 3]), 3)
+
+    def test_one_sliceable(self):
+        """Test that it doesn't raise StopIteration prematurely."""
+        self.assertEqual(mi.last([3]), 3)
+
+    def test_empty_stop_iteration_sliceable(self):
+        """It should raise ValueError for empty slice-able iterables."""
+        self.assertRaises(ValueError, lambda: mi.last([]))
+
+    def test_default_sliceable(self):
+        """It should return the provided default arg for empty slice-able
+        iterables.
+        """
+        self.assertEqual(mi.last([], 'boo'), 'boo')
+
+    def test_dict(self):
+        """last(dic) and last(dic.keys()) should return same result."""
+        dic = {'a': 1, 'b': 2, 'c': 3}
+        self.assertEqual(mi.last(dic), mi.last(dic.keys()))
+
+    def test_ordereddict(self):
+        """last(dic) should return the last key."""
+        od = OrderedDict()
+        od['a'] = 1
+        od['b'] = 2
+        od['c'] = 3
+        self.assertEqual(mi.last(od), 'c')
+
+    def test_customrange(self):
+        """It should work on custom class where [] raises AttributeError."""
+        self.assertEqual(mi.last(IterOnlyRange(5)), 4)
 
 
 class PeekableTests(TestCase):
