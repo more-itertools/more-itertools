@@ -594,17 +594,17 @@ def intersperse(e, iterable, n=1):
     """
     if n == 0:
         raise ValueError('n must be > 0')
-    elif n == 1:
+    if n == 1:
         # interleave(repeat(e), iterable) -> e, x_0, e, e, x_1, e, x_2...
         # islice(..., 1, None) -> x_0, e, e, x_1, e, x_2...
         return islice(interleave(repeat(e), iterable), 1, None)
-    else:
-        # interleave(filler, chunks) -> [e], [x_0, x_1], [e], [x_2, x_3]...
-        # islice(..., 1, None) -> [x_0, x_1], [e], [x_2, x_3]...
-        # flatten(...) -> x_0, x_1, e, x_2, x_3...
-        filler = repeat([e])
-        chunks = chunked(iterable, n)
-        return flatten(islice(interleave(filler, chunks), 1, None))
+
+    # interleave(filler, chunks) -> [e], [x_0, x_1], [e], [x_2, x_3]...
+    # islice(..., 1, None) -> [x_0, x_1], [e], [x_2, x_3]...
+    # flatten(...) -> x_0, x_1, e, x_2, x_3...
+    filler = repeat([e])
+    chunks = chunked(iterable, n)
+    return flatten(islice(interleave(filler, chunks), 1, None))
 
 
 def unique_to_each(*iterables):
@@ -739,9 +739,8 @@ class bucket(object):
             item = next(self[value])
         except StopIteration:
             return False
-        else:
-            self._cache[value].appendleft(item)
 
+        self._cache[value].appendleft(item)
         return True
 
     def _get_values(self, value):
@@ -767,7 +766,7 @@ class bucket(object):
                     if item_value == value:
                         yield item
                         break
-                    elif self._validator(item_value):
+                    if self._validator(item_value):
                         self._cache[item_value].append(item)
 
     def __getitem__(self, value):
@@ -888,10 +887,10 @@ def collapse(iterable, base_type=None, levels=None):
         except TypeError:
             yield node
             return
-        else:
-            for child in tree:
-                for x in walk(child, level + 1):
-                    yield x
+
+        for child in tree:
+            for x in walk(child, level + 1):
+                yield x
 
     for x in walk(iterable, 0):
         yield x
@@ -1441,10 +1440,10 @@ def numeric_range(*args):
     values = (start + (step * n) for n in count())
     if step > 0:
         return takewhile(partial(gt, stop), values)
-    elif step < 0:
+    if step < 0:
         return takewhile(partial(lt, stop), values)
-    else:
-        raise ValueError('numeric_range arg 3 must not be zero')
+
+    raise ValueError('numeric_range arg 3 must not be zero')
 
 
 def count_cycle(iterable, n=None):
