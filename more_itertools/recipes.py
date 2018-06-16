@@ -71,8 +71,8 @@ def accumulate(iterable, func=operator.add):
         total = next(it)
     except StopIteration:
         return
-    else:
-        yield total
+
+    yield total
 
     for element in it:
         total = func(total, element)
