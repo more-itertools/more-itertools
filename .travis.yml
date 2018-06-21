@@ -18,7 +18,7 @@ install:
 script:
     - "coverage run --include='more_itertools/*.py' --omit='more_itertools/tests/*' setup.py test"
     - "flake8 ."
-    - "sphinx-build -b html docs docs/_build/html"
+    - "sphinx-build -W -b html docs docs/_build/html"
 
 notifications:
   email: false
