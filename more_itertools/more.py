@@ -2126,3 +2126,28 @@ def rlocate(iterable, pred=bool):
         return (len_iter - i - 1 for i in locate(reversed(iterable), pred))
     except TypeError:
         return reversed(list(locate(iterable, pred)))
+
+
+def replace(iterable, select_func, substitute_func, count=None):
+    """Yield the items in *iterable*, replacing ones for which
+    *select_func* returns ``True`` with the value given by *substitute_func*.
+    The optional argument *count* limits the number of replacements that are
+    made.
+
+        >>> iterable = iter('aBCDeFGHi')
+        >>> select_func = lambda x: x == x.lower()
+        >>> substitute_func = lambda x: x.upper()
+        >>> list(replace(iterable, select_func, substitute_func, 2))
+        ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'i']
+
+    To select and replace multiple items, see :func:`replace_seq`.
+
+    """
+    n = 0
+    for item in iterable:
+        if select_func(item):
+            if (count is None) or (n < count):
+                n += 1
+                yield substitute_func(item)
+                continue
+        yield item
