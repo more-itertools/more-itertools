@@ -1505,6 +1505,21 @@ def locate(iterable, pred=bool):
     return compress(count(), map(pred, iterable))
 
 
+def locate_seq(iterable, seq):
+    """Yield each index in *iterable* where the sequence *seq* begins.
+
+        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+        >>> seq = [1, 2, 3]
+        >>> list(locate_seq(iterable, seq))
+        [1, 5, 9]
+
+    """
+    seq = tuple(seq)
+    it = windowed(iterable, len(seq))
+    pred = lambda w: w == seq
+    return locate(it, pred=pred)
+
+
 def lstrip(iterable, pred):
     """Yield the items from *iterable*, but strip any from the beginning
     for which *pred* returns ``True``.
@@ -2151,3 +2166,66 @@ def replace(iterable, select_func, substitute_func, count=None):
                 yield substitute_func(item)
                 continue
         yield item
+
+
+def replace_seq(iterable, old_seq, new_seq, count=None):
+    """Yield the items in *iterable*, replacing sub-sequences that match
+    *old_seq* with the items from new_seq, up to *count* times.
+
+        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+        >>> old_seq = [1, 2, 3]
+        >>> new_seq = [-1, -2, -3]
+        >>> list(replace_seq(iterable, old_seq, new_seq, 2))
+        [0, -1, -2, -3, 0, -1, -2, -3, 0, 1, 2, 3]
+
+        >>> iterable = []
+        >>> old_seq = [1, 2, 3]
+        >>> new_seq = [-1, -2, -3]
+        >>> list(replace_seq(iterable, old_seq, new_seq, 2))
+        []
+
+        >>> iterable = [1, 2]
+        >>> old_seq = [1, 2, 3]
+        >>> new_seq = [-1, -2, -3]
+        >>> list(replace_seq(iterable, old_seq, new_seq, 2))
+        [1, 2]
+
+        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+        >>> old_seq = [1, 2, 3]
+        >>> new_seq = [-1, -2, -3]
+        >>> list(replace_seq(iterable, old_seq, new_seq))
+        [0, -1, -2, -3, 0, -1, -2, -3, 0, -1, -2, -3]
+
+        >>> iterable = [0, 1, 2, 3]
+        >>> old_seq = [1, 2, 3]
+        >>> new_seq = [-1, -2, -3]
+        >>> list(replace_seq(iterable, old_seq, new_seq))
+        [0, -1, -2, -3]
+
+    """
+    old_seq = tuple(old_seq)
+    new_seq = tuple(new_seq)
+
+    windows = windowed(iterable, len(old_seq), fillvalue=_marker)
+    w = []
+
+    n = 0
+    last_replaced = False
+    for w in windows:
+        last_replaced = False
+        if w == old_seq:
+            if (count is None) or (n < count):
+                last_replaced = True
+                n += 1
+                for item in new_seq:
+                    yield item
+                consume(windows, len(old_seq) - 1)
+                continue
+
+        if w[0] is not _marker:
+            yield w[0]
+
+    if not last_replaced:
+        for item in w[1:]:
+            if item is not _marker:
+                yield item
