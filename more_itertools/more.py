@@ -2144,68 +2144,57 @@ def rlocate(iterable, pred=bool, n=None):
     return reversed(list(locate(iterable, pred, n)))
 
 
-def replace(iterable, pred, substitutes, count=None, window_size=None):
+def replace(iterable, pred, substitutes, count=None, window_size=1):
     """Yield the items from *iterable*, replacing the items for which *pred*
     returns ``True`` with the items from the iterable *substitutes*.
 
-        >>> iterable = [0, 1, 2, 5, 0, 1, 2, 5]
-        >>> pred = lambda x: x == 2
-        >>> substitutes = (2, 3, 4)
+        >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1]
+        >>> pred = lambda x: x == 0
+        >>> substitutes = (2, 3)
         >>> list(replace(iterable, pred, substitutes))
-        [0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]
+        [1, 1, 2, 3, 1, 1, 2, 3, 1, 1]
 
     If *count* is given, the number of replacements will be limited:
 
-        >>> iterable = [0, 1, 2, 5, 0, 1, 2, 5]
-        >>> pred = lambda x: x == 2
-        >>> substitutes = (2, 3, 4)
-        >>> list(replace(iterable, pred, substitutes, count=1))
-        [0, 1, 2, 3, 4, 5, 0, 1, 2, 5]
+        >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1]
+        >>> pred = lambda x: x == 0
+        >>> substitutes = [None]
+        >>> list(replace(iterable, pred, substitutes, count=2))
+        [1, 1, None, 1, 1, None, 1, 1]
 
-    If *window_size* is given, the argument passed to *pred* will be a tuple
-    of items from the iterable. This allows for locating and replacing
-    subsequences.
+    Use *window_size* to control the number of items passed as arguments to
+    *pred*. This allows for locating and replacing subsequences.
 
         >>> iterable = [0, 1, 2, 5, 0, 1, 2, 5]
         >>> window_size = 3
-        >>> pred = lambda x: x == (0, 1, 2)  # Three items passed to pred
+        >>> pred = lambda *args: args == (0, 1, 2)  # 3 items passed to pred
         >>> substitutes = [3, 4]
         >>> list(replace(iterable, pred, substitutes, window_size=window_size))
         [3, 4, 5, 3, 4, 5]
 
     """
-    if window_size is None:
-        n = 0
-        for item in iterable:
-            if pred(item):
-                if (count is None) or (n < count):
-                    n += 1
-                    for s in substitutes:
-                        yield s
-                    continue
-            yield item
-    else:
-        it = chain(iterable, [_marker] * (window_size - 1))
-        windows = windowed(it, window_size, fillvalue=_marker)
-        w = []
+    # Pad the iterable with so that the number of windows
+    it = chain(iterable, [_marker] * (window_size - 1))
+    windows = windowed(it, window_size, fillvalue=_marker)
+    w = []
 
-        n = 0
+    n = 0
+    last_replaced = False
+    for w in windows:
         last_replaced = False
-        for w in windows:
-            last_replaced = False
-            if pred(w):
-                if (count is None) or (n < count):
-                    last_replaced = True
-                    n += 1
-                    for s in substitutes:
-                        yield s
-                    consume(windows, window_size - 1)
-                    continue
+        if pred(*w):
+            if (count is None) or (n < count):
+                last_replaced = True
+                n += 1
+                for s in substitutes:
+                    yield s
+                consume(windows, window_size - 1)
+                continue
 
-            if w[0] is not _marker:
-                yield w[0]
+        if w[0] is not _marker:
+            yield w[0]
 
-        if not last_replaced:
-            for item in w[1:]:
-                if item is not _marker:
-                    yield item
+    if not last_replaced:
+        for item in w[1:]:
+            if item is not _marker:
+                yield item
