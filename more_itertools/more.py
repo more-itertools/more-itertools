@@ -2099,7 +2099,7 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     return ret
 
 
-def rlocate(iterable, pred=bool):
+def rlocate(iterable, pred=bool, n=None):
     """Yield the index of each item in *iterable* for which *pred* returns
     ``True``, starting from the right and moving left.
 
@@ -2116,6 +2116,14 @@ def rlocate(iterable, pred=bool):
         >>> list(rlocate(iterable, pred))
         [3, 1]
 
+    If *n* is given, the argument given to the *pred* function will be a tuple
+    with containing *n* items. This enables searching for sub-sequences:
+
+        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+        >>> pred = lambda sub: sub == (1, 2, 3)
+        >>> list(rlocate(iterable, pred=pred, n=3))
+        [9, 5, 1]
+
     Beware, this function won't return anything for infinite iterables.
     If *iterable* is reversible, ``rlocate`` will reverse it and search from
     the right. Otherwise, it will search from the left and return the results
@@ -2124,11 +2132,16 @@ def rlocate(iterable, pred=bool):
     See :func:`locate` to for other example applications.
 
     """
-    try:
-        len_iter = len(iterable)
-        return (len_iter - i - 1 for i in locate(reversed(iterable), pred))
-    except TypeError:
-        return reversed(list(locate(iterable, pred)))
+    if n is None:
+        try:
+            len_iter = len(iterable)
+            return (
+                len_iter - i - 1 for i in locate(reversed(iterable), pred, n)
+            )
+        except TypeError:
+            pass
+
+    return reversed(list(locate(iterable, pred, n)))
 
 
 def replace(iterable, select_func, substitute_func, count=None):
