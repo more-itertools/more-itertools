@@ -12,6 +12,7 @@ from itertools import (
     groupby,
     islice,
     repeat,
+    starmap,
     takewhile,
     tee
 )
@@ -1463,7 +1464,7 @@ def count_cycle(iterable, n=None):
     return ((i, item) for i in counter for item in iterable)
 
 
-def locate(iterable, pred=bool, n=None):
+def locate(iterable, pred=bool, window_size=None):
     """Yield the index of each item in *iterable* for which *pred* returns
     ``True``.
 
@@ -1478,12 +1479,12 @@ def locate(iterable, pred=bool, n=None):
         >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
         [1, 3]
 
-    If *n* is given, the argument given to the *pred* function will be a tuple
-    with containing *n* items. This enables searching for sub-sequences:
+    If *window_size* is given, then the *pred* function will be called with
+    that many items. This enables searching for sub-sequences:
 
         >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
-        >>> pred = lambda sub: sub == (1, 2, 3)
-        >>> list(locate(iterable, pred=pred, n=3))
+        >>> pred = lambda *args: args == (1, 2, 3)
+        >>> list(locate(iterable, pred=pred, window_size=3))
         [1, 5, 9]
 
     Use with :func:`seekable` to find indexes and then retrieve the associated
@@ -1501,11 +1502,11 @@ def locate(iterable, pred=bool, n=None):
         106
 
     """
-    if n is None:
+    if window_size is None:
         return compress(count(), map(pred, iterable))
 
-    it = windowed(iterable, n)
-    return compress(count(), map(pred, it))
+    it = windowed(iterable, window_size)
+    return compress(count(), starmap(pred, it))
 
 
 def lstrip(iterable, pred):
@@ -2099,7 +2100,7 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     return ret
 
 
-def rlocate(iterable, pred=bool, n=None):
+def rlocate(iterable, pred=bool, window_size=None):
     """Yield the index of each item in *iterable* for which *pred* returns
     ``True``, starting from the right and moving left.
 
@@ -2116,12 +2117,12 @@ def rlocate(iterable, pred=bool, n=None):
         >>> list(rlocate(iterable, pred))
         [3, 1]
 
-    If *n* is given, the argument given to the *pred* function will be a tuple
-    with containing *n* items. This enables searching for sub-sequences:
+    If *window_size* is given, then the *pred* function will be called with
+    that many items. This enables searching for sub-sequences:
 
         >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
-        >>> pred = lambda sub: sub == (1, 2, 3)
-        >>> list(rlocate(iterable, pred=pred, n=3))
+        >>> pred = lambda *args: args == (1, 2, 3)
+        >>> list(rlocate(iterable, pred=pred, window_size=3))
         [9, 5, 1]
 
     Beware, this function won't return anything for infinite iterables.
@@ -2132,16 +2133,16 @@ def rlocate(iterable, pred=bool, n=None):
     See :func:`locate` to for other example applications.
 
     """
-    if n is None:
+    if window_size is None:
         try:
             len_iter = len(iterable)
             return (
-                len_iter - i - 1 for i in locate(reversed(iterable), pred, n)
+                len_iter - i - 1 for i in locate(reversed(iterable), pred)
             )
         except TypeError:
             pass
 
-    return reversed(list(locate(iterable, pred, n)))
+    return reversed(list(locate(iterable, pred, window_size)))
 
 
 def replace(iterable, pred, substitutes, count=None, window_size=1):
