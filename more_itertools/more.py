@@ -62,6 +62,7 @@ __all__ = [
     'one',
     'padded',
     'peekable',
+    'replace',
     'rlocate',
     'rstrip',
     'run_length',
@@ -1487,6 +1488,10 @@ def locate(iterable, pred=bool, window_size=None):
         >>> list(locate(iterable, pred=pred, window_size=3))
         [1, 5, 9]
 
+    If the *window_size* is larger than *iterable*, *iterable* will be padded
+    with ``None`` such that *pred* is always called with *window_size*
+    arguments.
+
     Use with :func:`seekable` to find indexes and then retrieve the associated
     items:
 
@@ -2180,7 +2185,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
     # Add padding such that the number of windows matches the length of the
     # iterable
     it = chain(iterable, [_marker] * (window_size - 1))
-    windows = windowed(it, window_size, fillvalue=_marker)
+    windows = windowed(it, window_size)
     w = []
 
     n = 0
