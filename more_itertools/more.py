@@ -2191,11 +2191,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
     w = []
 
     n = 0
-    last_replaced = False
-
     for w in windows:
-        last_replaced = False
-
         # If the current window matches our predicate (and we haven't hit
         # out maximum number of replacements), splice in the substitutes
         # and then consume the following windows that overlap with this one.
@@ -2204,7 +2200,6 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         # If the predicate matches on (0, 1), we need to zap (0, 1) and (1, 2)
         if pred(*w):
             if (count is None) or (n < count):
-                last_replaced = True
                 n += 1
                 for s in substitutes:
                     yield s
@@ -2215,10 +2210,3 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         # yield the first item from the window.
         if w and (w[0] is not _marker):
             yield w[0]
-
-    # If the last window wasn't a match, we have leftover items. Yield them.
-    if not last_replaced:
-        for item in w[1:]:
-            if item is _marker:
-                break
-            yield item
