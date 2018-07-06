@@ -2026,10 +2026,18 @@ class ReplaceTests(TestCase):
 
     def test_window_size(self):
         iterable = range(10)
-        pred = lambda *args: (args == (0, 1, 2)) or (args == (7, 8, 9))
+        pred = lambda *args: args == (0, 1, 2)
         substitutes = []
         actual = list(mi.replace(iterable, pred, substitutes, window_size=3))
-        expected = [3, 4, 5, 6]
+        expected = [3, 4, 5, 6, 7, 8, 9]
+        self.assertEqual(actual, expected)
+
+    def test_window_size_end(self):
+        iterable = range(10)
+        pred = lambda *args: args == (7, 8, 9)
+        substitutes = []
+        actual = list(mi.replace(iterable, pred, substitutes, window_size=3))
+        expected = [0, 1, 2, 3, 4, 5, 6]
         self.assertEqual(actual, expected)
 
     def test_window_size_count(self):
