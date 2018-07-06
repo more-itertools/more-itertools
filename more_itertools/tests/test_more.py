@@ -1556,7 +1556,7 @@ class LocateTests(TestCase):
 
     def test_window_size_large(self):
         iterable = [1, 2, 3, 4]
-        pred = lambda a, b, c, d, e: e is None
+        pred = lambda a, b, c, d, e: True
         actual = list(mi.locate(iterable, pred, window_size=5))
         expected = [0]
         self.assertEqual(actual, expected)
@@ -1564,9 +1564,8 @@ class LocateTests(TestCase):
     def test_window_size_zero(self):
         iterable = [1, 2, 3, 4]
         pred = lambda: True
-        actual = list(mi.locate(iterable, pred, window_size=0))
-        expected = [0]
-        self.assertEqual(actual, expected)
+        with self.assertRaises(ValueError):
+            list(mi.locate(iterable, pred, window_size=0))
 
 
 class StripFunctionTests(TestCase):
@@ -1994,7 +1993,7 @@ class RlocateTests(TestCase):
 
     def test_window_size_large(self):
         iterable = [1, 2, 3, 4]
-        pred = lambda a, b, c, d, e: e is None
+        pred = lambda a, b, c, d, e: True
         for it in (iterable, iter(iterable)):
             actual = list(mi.rlocate(iterable, pred, window_size=5))
             expected = [0]
@@ -2004,9 +2003,8 @@ class RlocateTests(TestCase):
         iterable = [1, 2, 3, 4]
         pred = lambda: True
         for it in (iterable, iter(iterable)):
-            actual = list(mi.locate(iterable, pred, window_size=0))
-            expected = [0]
-            self.assertEqual(actual, expected)
+            with self.assertRaises(ValueError):
+                list(mi.locate(iterable, pred, window_size=0))
 
 
 class ReplaceTests(TestCase):
@@ -2045,10 +2043,24 @@ class ReplaceTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_window_size_large(self):
-        self.fail()
+        iterable = range(4)
+        pred = lambda a, b, c, d, e: True
+        substitutes = [5, 6, 7]
+        actual = list(mi.replace(iterable, pred, substitutes, window_size=5))
+        expected = [5, 6, 7]
+        self.assertEqual(actual, expected)
 
     def test_window_size_zero(self):
-        self.fail()
+        iterable = range(10)
+        pred = lambda *args: True
+        substitutes = []
+        with self.assertRaises(ValueError):
+            list(mi.replace(iterable, pred, substitutes, window_size=0))
 
     def test_iterable_substitutes(self):
-        self.fail()
+        iterable = range(5)
+        pred = lambda x: x % 2 == 0
+        substitutes = iter('__')
+        actual = list(mi.replace(iterable, pred, substitutes))
+        expected = ['_', '_', 1, '_', '_', 3, '_', '_']
+        self.assertEqual(actual, expected)

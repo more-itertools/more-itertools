@@ -1488,10 +1488,6 @@ def locate(iterable, pred=bool, window_size=None):
         >>> list(locate(iterable, pred=pred, window_size=3))
         [1, 5, 9]
 
-    If the *window_size* is larger than *iterable*, *iterable* will be padded
-    with ``None`` such that *pred* is always called with *window_size*
-    arguments.
-
     Use with :func:`seekable` to find indexes and then retrieve the associated
     items:
 
@@ -1510,7 +1506,10 @@ def locate(iterable, pred=bool, window_size=None):
     if window_size is None:
         return compress(count(), map(pred, iterable))
 
-    it = windowed(iterable, window_size)
+    if window_size < 1:
+        raise ValueError('window size must be at least 1')
+
+    it = windowed(iterable, window_size, fillvalue=_marker)
     return compress(count(), starmap(pred, it))
 
 
@@ -2179,6 +2178,9 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         [3, 4, 5, 3, 4, 5]
 
     """
+    if window_size < 1:
+        raise ValueError('window_size must be at least 1')
+
     # Save the substitutes iterable, since it's used more than once
     substitutes = tuple(substitutes)
 
@@ -2211,7 +2213,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
         # If there was no match (or we've reached the replacement limit),
         # yield the first item from the window.
-        if w[0] is not _marker:
+        if w and (w[0] is not _marker):
             yield w[0]
 
     # If the last window wasn't a match, we have leftover items. Yield them.
