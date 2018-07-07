@@ -1,5 +1,5 @@
 sudo: false
-
+dist: "xenial"
 language: "python"
 
 python:
@@ -7,7 +7,7 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
-    - "3.7-dev"
+    - "3.7"
     - "pypy-5.4.1"
     - "pypy3"
 
