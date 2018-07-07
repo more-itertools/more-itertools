@@ -7,9 +7,9 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
-    - "3.7"
-    - "pypy-5.4.1"
-    - "pypy3"
+    - "3.7-dev"
+    - "pypy2.7"
+    - "pypy3.5"
 
 install:
     - "pip install ."
