@@ -2161,11 +2161,11 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
     If *count* is given, the number of replacements will be limited:
 
-        >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1]
+        >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1, 0]
         >>> pred = lambda x: x == 0
         >>> substitutes = [None]
         >>> list(replace(iterable, pred, substitutes, count=2))
-        [1, 1, None, 1, 1, None, 1, 1]
+        [1, 1, None, 1, 1, None, 1, 1, 0]
 
     Use *window_size* to control the number of items passed as arguments to
     *pred*. This allows for locating and replacing subsequences.
