@@ -2188,12 +2188,11 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
     # iterable
     it = chain(iterable, [_marker] * (window_size - 1))
     windows = windowed(it, window_size)
-    w = []
 
     n = 0
     for w in windows:
         # If the current window matches our predicate (and we haven't hit
-        # out maximum number of replacements), splice in the substitutes
+        # our maximum number of replacements), splice in the substitutes
         # and then consume the following windows that overlap with this one.
         # For example, if the iterable is (0, 1, 2, 3, 4...)
         # and the window size is 2, we have (0, 1), (1, 2), (2, 3)...
