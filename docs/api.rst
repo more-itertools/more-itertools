@@ -218,6 +218,7 @@ Others
 
 **New itertools**
 
+.. autofunction:: replace
 .. autofunction:: numeric_range(start, stop, step)
 .. autofunction:: always_reversible
 .. autofunction:: side_effect

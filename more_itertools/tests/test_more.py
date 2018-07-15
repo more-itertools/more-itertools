@@ -1547,6 +1547,26 @@ class LocateTests(TestCase):
         expected = [0, 3, 5, 6]
         self.assertEqual(actual, expected)
 
+    def test_window_size(self):
+        iterable = ['0', 1, 1, '0', 1, '0', '0']
+        pred = lambda *args: args == ('0', 1)
+        actual = list(mi.locate(iterable, pred, window_size=2))
+        expected = [0, 3]
+        self.assertEqual(actual, expected)
+
+    def test_window_size_large(self):
+        iterable = [1, 2, 3, 4]
+        pred = lambda a, b, c, d, e: True
+        actual = list(mi.locate(iterable, pred, window_size=5))
+        expected = [0]
+        self.assertEqual(actual, expected)
+
+    def test_window_size_zero(self):
+        iterable = [1, 2, 3, 4]
+        pred = lambda: True
+        with self.assertRaises(ValueError):
+            list(mi.locate(iterable, pred, window_size=0))
+
 
 class StripFunctionTests(TestCase):
     def test_hashable(self):
@@ -1962,3 +1982,93 @@ class RlocateTests(TestCase):
         pred = lambda x: x == target  # Find-able from the right
         actual = next(mi.rlocate(iterable, pred))
         self.assertEqual(actual, target)
+
+    def test_window_size(self):
+        iterable = ['0', 1, 1, '0', 1, '0', '0']
+        pred = lambda *args: args == ('0', 1)
+        for it in (iterable, iter(iterable)):
+            actual = list(mi.rlocate(it, pred, window_size=2))
+            expected = [3, 0]
+            self.assertEqual(actual, expected)
+
+    def test_window_size_large(self):
+        iterable = [1, 2, 3, 4]
+        pred = lambda a, b, c, d, e: True
+        for it in (iterable, iter(iterable)):
+            actual = list(mi.rlocate(iterable, pred, window_size=5))
+            expected = [0]
+            self.assertEqual(actual, expected)
+
+    def test_window_size_zero(self):
+        iterable = [1, 2, 3, 4]
+        pred = lambda: True
+        for it in (iterable, iter(iterable)):
+            with self.assertRaises(ValueError):
+                list(mi.locate(iterable, pred, window_size=0))
+
+
+class ReplaceTests(TestCase):
+    def test_basic(self):
+        iterable = range(10)
+        pred = lambda x: x % 2 == 0
+        substitutes = []
+        actual = list(mi.replace(iterable, pred, substitutes))
+        expected = [1, 3, 5, 7, 9]
+        self.assertEqual(actual, expected)
+
+    def test_count(self):
+        iterable = range(10)
+        pred = lambda x: x % 2 == 0
+        substitutes = []
+        actual = list(mi.replace(iterable, pred, substitutes, count=4))
+        expected = [1, 3, 5, 7, 8, 9]
+        self.assertEqual(actual, expected)
+
+    def test_window_size(self):
+        iterable = range(10)
+        pred = lambda *args: args == (0, 1, 2)
+        substitutes = []
+        actual = list(mi.replace(iterable, pred, substitutes, window_size=3))
+        expected = [3, 4, 5, 6, 7, 8, 9]
+        self.assertEqual(actual, expected)
+
+    def test_window_size_end(self):
+        iterable = range(10)
+        pred = lambda *args: args == (7, 8, 9)
+        substitutes = []
+        actual = list(mi.replace(iterable, pred, substitutes, window_size=3))
+        expected = [0, 1, 2, 3, 4, 5, 6]
+        self.assertEqual(actual, expected)
+
+    def test_window_size_count(self):
+        iterable = range(10)
+        pred = lambda *args: (args == (0, 1, 2)) or (args == (7, 8, 9))
+        substitutes = []
+        actual = list(
+            mi.replace(iterable, pred, substitutes, count=1, window_size=3)
+        )
+        expected = [3, 4, 5, 6, 7, 8, 9]
+        self.assertEqual(actual, expected)
+
+    def test_window_size_large(self):
+        iterable = range(4)
+        pred = lambda a, b, c, d, e: True
+        substitutes = [5, 6, 7]
+        actual = list(mi.replace(iterable, pred, substitutes, window_size=5))
+        expected = [5, 6, 7]
+        self.assertEqual(actual, expected)
+
+    def test_window_size_zero(self):
+        iterable = range(10)
+        pred = lambda *args: True
+        substitutes = []
+        with self.assertRaises(ValueError):
+            list(mi.replace(iterable, pred, substitutes, window_size=0))
+
+    def test_iterable_substitutes(self):
+        iterable = range(5)
+        pred = lambda x: x % 2 == 0
+        substitutes = iter('__')
+        actual = list(mi.replace(iterable, pred, substitutes))
+        expected = ['_', '_', 1, '_', '_', 3, '_', '_']
+        self.assertEqual(actual, expected)
