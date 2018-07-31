@@ -2068,7 +2068,7 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
         [('A', 1), ('B', 2), ('C', 3)]
 
     You may want to filter the input iterable before applying the map/reduce
-    proecdure:
+    procedure:
 
         >>> all_items = range(30)
         >>> items = [x for x in all_items if 10 <= x <= 20]  # Filter
