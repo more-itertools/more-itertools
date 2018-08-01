@@ -127,8 +127,8 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: last(iterable[, default])
 .. autofunction:: one
 .. autofunction:: unique_to_each
-.. autofunction:: locate(iterable, pred=bool)
-.. autofunction:: rlocate(iterable, pred=bool)
+.. autofunction:: locate(iterable, pred=bool, window_size=None)
+.. autofunction:: rlocate(iterable, pred=bool, window_size=None)
 .. autofunction:: consecutive_groups(iterable, ordering=lambda x: x)
 .. autofunction:: exactly_n(iterable, n, predicate=bool)
 .. autoclass:: run_length
