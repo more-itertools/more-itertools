@@ -683,6 +683,45 @@ class WindowedTests(TestCase):
             list(mi.windowed(iterable, 3, step=0))
 
 
+class SubsequencesTests(TestCase):
+    def test_basic(self):
+        iterable = (x for x in range(4))
+        actual = list(mi.subsequences(iterable))
+        expected = [
+            (),
+            (0,),
+            (1,),
+            (2,),
+            (3,),
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (0, 1, 2),
+            (1, 2, 3),
+            (0, 1, 2, 3),
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_strings(self):
+        iterable = 'abc'
+        actual = list(mi.subsequences(iterable))
+        expected = [
+            (), ('a',), ('b',), ('c',), ('a', 'b'), ('b', 'c'), ('a', 'b', 'c')
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_empty(self):
+        iterable = iter([])
+        actual = list(mi.subsequences(iterable))
+        expected = [()]
+        self.assertEqual(actual, expected)
+
+    def test_order(self):
+        iterable = [2, 0, 1]
+        actual = list(mi.subsequences(iterable))
+        expected = [(), (2,), (0,), (1,), (2, 0), (0, 1), (2, 0, 1)]
+
+
 class BucketTests(TestCase):
     """Tests for ``bucket()``"""
 
