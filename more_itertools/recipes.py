@@ -346,9 +346,9 @@ def powerset(iterable):
         >>> list(powerset([1, 2, 3]))
         [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
 
-    :func:`powerset` will operate on iterables that aren't :class:`set`s,
-    so repeated elements in the input will produce repeated elements in the
-    output. Use :func:`unique_everseen` on the input to avoid generating
+    :func:`powerset` will operate on iterables that aren't :class:`set`
+    instances, so repeated elements in the input will produce repeated elements
+    in the output. Use :func:`unique_everseen` on the input to avoid generating
     duplicates:
 
         >>> seq = [1, 1, 0]
