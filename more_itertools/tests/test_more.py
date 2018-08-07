@@ -720,6 +720,7 @@ class SubsequencesTests(TestCase):
         iterable = [2, 0, 1]
         actual = list(mi.subsequences(iterable))
         expected = [(), (2,), (0,), (1,), (2, 0), (0, 1), (2, 0, 1)]
+        self.assertEqual(actual, expected)
 
 
 class BucketTests(TestCase):
