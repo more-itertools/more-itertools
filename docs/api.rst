@@ -55,7 +55,7 @@ These tools yield windows of items from an iterable.
 **New itertools**
 
 .. autofunction:: windowed
-.. autofunction:: subsequences
+.. autofunction:: substrings
 .. autofunction:: stagger
 
 ----
