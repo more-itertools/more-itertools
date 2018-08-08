@@ -77,7 +77,7 @@ __all__ = [
     'spy',
     'stagger',
     'strip',
-    'subsequences',
+    'substrings',
     'unique_to_each',
     'windowed',
     'with_iter',
@@ -695,16 +695,19 @@ def windowed(seq, n, fillvalue=None, step=1):
         yield tuple(window)
 
 
-def subsequences(iterable):
-    """Yield all of the subsequences of *iterable*.
+def substrings(iterable, join_func=None):
+    """Yield all of the substrings of *iterable*.
 
-        >>> list(subsequences([0, 1, 2]))
-        [(), (0,), (1,), (2,), (0, 1), (1, 2), (0, 1, 2)]
+        >>> [''.join(s) for s in substrings('more')]
+        ['m', 'o', 'r', 'e', 'mo', 'or', 're', 'mor', 'ore', 'more']
+
+    Note that non-string iterables can also be subdivided.
+
+        >>> list(substrings([0, 1, 2]))
+        [(0,), (1,), (2,), (0, 1), (1, 2), (0, 1, 2)]
 
     """
-    yield ()  # The empty subsequence
-
-    # The length-1 subsequences
+    # The length-1 substrings
     seq = []
     for item in iter(iterable):
         seq.append(item)
