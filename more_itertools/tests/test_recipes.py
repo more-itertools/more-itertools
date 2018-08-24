@@ -436,7 +436,7 @@ class FirstTrueTests(TestCase):
 
     def test_nothing_true(self):
         """Test default return value."""
-        self.assertEqual(mi.first_true([0, 0, 0]), False)
+        self.assertIsNone(mi.first_true([0, 0, 0]))
 
     def test_default(self):
         """Test with a default keyword"""
