@@ -436,7 +436,7 @@ def iter_except(func, exception, first=None):
         pass
 
 
-def first_true(iterable, default=False, pred=None):
+def first_true(iterable, default=None, pred=None):
     """
     Returns the first true value in the iterable.
 
