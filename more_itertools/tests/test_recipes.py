@@ -534,7 +534,7 @@ class RandomPermutationTests(TestCase):
 class RandomCombinationTests(TestCase):
     """Tests for ``random_combination()``"""
 
-    def test_psuedorandomness(self):
+    def test_pseudorandomness(self):
         """ensure different subsets of the iterable get returned over many
         samplings of random combinations"""
         items = range(15)
