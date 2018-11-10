@@ -440,10 +440,10 @@ def ilen(iterable):
     This consumes the iterable, so handle with care.
 
     """
-    len = 0
-    for len, _ in enumerate(iterable, 1):
+    length = 0
+    for length, _ in enumerate(iterable, 1):
         pass
-    return len
+    return length
 
 
 def iterate(func, start):
