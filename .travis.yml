@@ -1,5 +1,5 @@
 sudo: false
-
+dist: "xenial"
 language: "python"
 
 python:
@@ -7,9 +7,9 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
-    - "3.7-dev"
-    - "pypy-5.4.1"
-    - "pypy3"
+    - "3.7"
+    - "pypy2.7-5.10.0"
+    - "pypy3.5"
 
 install:
     - "pip install ."
@@ -21,7 +21,7 @@ script:
     - "sphinx-build -W -b html docs docs/_build/html"
 
 notifications:
-  email: false
+    - email: false
 
 after_success:
     - "coveralls"
