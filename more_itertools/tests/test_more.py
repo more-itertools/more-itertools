@@ -1179,6 +1179,47 @@ class ZipOffsetTest(TestCase):
         )
 
 
+class UnzipTests(TestCase):
+    """Tests for unzip()"""
+
+    def test_empty_iterable(self):
+        self.assertEqual(list(mi.unzip([])), [])
+        # in reality zip([], [], []) is equivalent to iter([])
+        # but it doesn't hurt to test both
+        self.assertEqual(list(mi.unzip(zip([], [], []))), [])
+
+    def test_length_one_iterable(self):
+        xs, ys, zs = mi.unzip(zip([1], [2], [3]))
+        self.assertEqual(list(xs), [1])
+        self.assertEqual(list(ys), [2])
+        self.assertEqual(list(zs), [3])
+
+    def test_normal_case(self):
+        xs, ys, zs = range(10), range(1, 11), range(2, 12)
+        zipped = zip(xs, ys, zs)
+        xs, ys, zs = mi.unzip(zipped)
+        self.assertEqual(list(xs), list(range(10)))
+        self.assertEqual(list(ys), list(range(1, 11)))
+        self.assertEqual(list(zs), list(range(2, 12)))
+
+    def test_improperly_zipped(self):
+        zipped = iter([(1, 2, 3), (4, 5), (6,)])
+        xs, ys, zs = mi.unzip(zipped)
+        self.assertEqual(list(xs), [1, 4, 6])
+        self.assertEqual(list(ys), [2, 5])
+        self.assertEqual(list(zs), [3])
+
+    def test_increasingly_zipped(self):
+        zipped = iter([(1, 2), (3, 4, 5), (6, 7, 8, 9)])
+        unzipped = mi.unzip(zipped)
+        # from the docstring:
+        # len(first tuple) is the number of iterables zipped
+        self.assertEqual(len(unzipped), 2)
+        xs, ys = unzipped
+        self.assertEqual(list(xs), [1, 3, 6])
+        self.assertEqual(list(ys), [2, 4, 7])
+
+
 class SortTogetherTest(TestCase):
     """Tests for sort_together()"""
 
