@@ -79,6 +79,7 @@ __all__ = [
     'strip',
     'substrings',
     'unique_to_each',
+    'unzip',
     'windowed',
     'with_iter',
     'zip_offset',
@@ -1237,6 +1238,57 @@ def sort_together(iterables, key_list=(0,), reverse=False):
     return list(zip(*sorted(zip(*iterables),
                             key=itemgetter(*key_list),
                             reverse=reverse)))
+
+
+def unzip(iterable):
+    """Given a zipped iterable of n iterables, return n iterables.
+    The length of the first tuple is assumed to be the number of iterables
+    that were originally zipped.
+
+        >>> iterable = zip(range(10), range(1, 11))
+        >>> range10, range1_11 = unzip(iterable)
+        >>> next(range10)
+        0
+        >>> next(range1_11)
+        1
+        >>> next(range1_11)
+        2
+        >>> list(range10)
+        [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        >>> list(range1_11)
+        [3, 4, 5, 6, 7, 8, 9, 10]
+
+    """
+    head, iterable = spy(iter(iterable))
+    if not head:
+        # empty iterable, e.g. zip([], [], [])
+        return ()
+    # spy returns a one-length iterable as head
+    head = head[0]
+    iterables = tee(iterable, len(head))
+
+    def itemgetter(i):
+        def getter(obj):
+            try:
+                return obj[i]
+            except IndexError:
+                # basically if we have an iterable like
+                # iter([(1, 2, 3), (4, 5), (6,)])
+                # the second unzipped iterable would fail at the third tuple
+                # since it would try to access tup[1]
+                # same with the third unzipped iterable and the second tuple
+                # to support these "improperly zipped" iterables,
+                # we create a custom itemgetter
+                # which just stops the unzipped iterables
+                # at first length mismatch
+                raise StopIteration
+        return getter
+
+    return tuple(
+        map(itemgetter(i), iterable)
+        for i, iterable
+        in enumerate(iterables)
+    )
 
 
 def divide(n, iterable):
