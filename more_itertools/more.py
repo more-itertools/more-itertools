@@ -1256,8 +1256,8 @@ def unzip(iterable):
         [1, 2, 3, 4]
 
     This is similar to using ``zip(*iterable)``, but it avoids reading
-    *iterable* into memory. Note, though, that this function uses
-    :func:`itertools.tee`and may require significant storage.
+    *iterable* into memory. Note, however, that this function uses
+    :func:`itertools.tee` and thus may require significant storage.
 
     """
     head, iterable = spy(iter(iterable))
