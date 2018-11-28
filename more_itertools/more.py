@@ -441,10 +441,12 @@ def ilen(iterable):
     This consumes the iterable, so handle with care.
 
     """
-    length = 0
-    for length, _ in enumerate(iterable, 1):
-        pass
-    return length
+    # This approach was selected because benchmarks showed it's likely the
+    # fastest of the known implementations at the time of writing.
+    # See GitHub tracker: #236, #230.
+    counter = count()
+    deque(zip(iterable, counter), maxlen=0)
+    return next(counter)
 
 
 def iterate(func, start):
