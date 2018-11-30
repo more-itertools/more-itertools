@@ -1243,22 +1243,23 @@ def sort_together(iterables, key_list=(0,), reverse=False):
 
 
 def unzip(iterable):
-    """Given a zipped iterable of n iterables, return n iterables.
-    The length of the first tuple is assumed to be the number of iterables
-    that were originally zipped.
+    """The inverse of :func:`zip`, this function disaggregates the elements
+    of the zipped *iterable*.
 
-        >>> iterable = zip(range(10), range(1, 11))
-        >>> range10, range1_11 = unzip(iterable)
-        >>> next(range10)
-        0
-        >>> next(range1_11)
-        1
-        >>> next(range1_11)
-        2
-        >>> list(range10)
-        [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        >>> list(range1_11)
-        [3, 4, 5, 6, 7, 8, 9, 10]
+    The ``i``-th iterable contains the ``i``-th element from each element
+    of the zipped iterable. The first element is used to to determine the
+    length of the remaining elements.
+
+        >>> iterable = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+        >>> letters, numbers = unzip(iterable)
+        >>> list(letters)
+        ['a', 'b', 'c', 'd']
+        >>> list(numbers)
+        [1, 2, 3, 4]
+
+    This is similar to using ``zip(*iterable)``, but it avoids reading
+    *iterable* into memory. Note, however, that this function uses
+    :func:`itertools.tee` and thus may require significant storage.
 
     """
     head, iterable = spy(iter(iterable))
@@ -1286,11 +1287,7 @@ def unzip(iterable):
                 raise StopIteration
         return getter
 
-    return tuple(
-        map(itemgetter(i), iterable)
-        for i, iterable
-        in enumerate(iterables)
-    )
+    return tuple(map(itemgetter(i), it) for i, it in enumerate(iterables))
 
 
 def divide(n, iterable):
