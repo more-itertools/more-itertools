@@ -530,7 +530,7 @@ class WithIterTests(TestCase):
         # Iterable's items should be faithfully represented
         self.assertEqual(initial_words, ['One', 'Two'])
         # The file object should be closed
-        self.assertEqual(s.closed, True)
+        self.assertTrue(s.closed)
 
 
 class OneTests(TestCase):
@@ -742,10 +742,10 @@ class BucketTests(TestCase):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
         D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
 
-        self.assertTrue(10 in D)
-        self.assertFalse(40 in D)
-        self.assertTrue(20 in D)
-        self.assertFalse(21 in D)
+        self.assertIn(10, D)
+        self.assertNotIn(40, D)
+        self.assertIn(20, D)
+        self.assertNotIn(21, D)
 
         # Checking in-ness shouldn't advance the iterator
         self.assertEqual(next(D[10]), 10)
