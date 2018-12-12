@@ -899,8 +899,8 @@ class SideEffectTests(TestCase):
             collector.append(f.getvalue())
 
         def it():
-            yield u'a'
-            yield u'b'
+            yield 'a'
+            yield 'b'
             raise RuntimeError('kaboom')
 
         before = lambda: print('HEADER', file=f)
@@ -912,7 +912,7 @@ class SideEffectTests(TestCase):
             pass
 
         # The iterable should have been written to the file
-        self.assertEqual(collector, [u'HEADER\na\n', u'HEADER\na\nb\n'])
+        self.assertEqual(collector, ['HEADER\na\n', 'HEADER\na\nb\n'])
 
         # The file should be closed even though something bad happened
         self.assertTrue(f.closed)
@@ -926,7 +926,7 @@ class SideEffectTests(TestCase):
 
         try:
             mi.consume(
-                mi.side_effect(func, u'abc', before=before, after=f.close)
+                mi.side_effect(func, 'abc', before=before, after=f.close)
             )
         except RuntimeError:
             pass
@@ -1344,7 +1344,7 @@ class TestAlwaysIterable(TestCase):
         self.assertEqual(list(mi.always_iterable(1)), [1])
 
     def test_strings(self):
-        for obj in ['foo', b'bar', u'baz']:
+        for obj in ['foo', b'bar', 'baz']:
             actual = list(mi.always_iterable(obj))
             expected = [obj]
             self.assertEqual(actual, expected)
