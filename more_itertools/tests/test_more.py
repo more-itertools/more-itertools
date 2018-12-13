@@ -530,7 +530,7 @@ class WithIterTests(TestCase):
         # Iterable's items should be faithfully represented
         self.assertEqual(initial_words, ['One', 'Two'])
         # The file object should be closed
-        self.assertEqual(s.closed, True)
+        self.assertTrue(s.closed)
 
 
 class OneTests(TestCase):
@@ -742,10 +742,10 @@ class BucketTests(TestCase):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
         D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
 
-        self.assertTrue(10 in D)
-        self.assertFalse(40 in D)
-        self.assertTrue(20 in D)
-        self.assertFalse(21 in D)
+        self.assertIn(10, D)
+        self.assertNotIn(40, D)
+        self.assertIn(20, D)
+        self.assertNotIn(21, D)
 
         # Checking in-ness shouldn't advance the iterator
         self.assertEqual(next(D[10]), 10)
@@ -899,8 +899,8 @@ class SideEffectTests(TestCase):
             collector.append(f.getvalue())
 
         def it():
-            yield u'a'
-            yield u'b'
+            yield 'a'
+            yield 'b'
             raise RuntimeError('kaboom')
 
         before = lambda: print('HEADER', file=f)
@@ -912,7 +912,7 @@ class SideEffectTests(TestCase):
             pass
 
         # The iterable should have been written to the file
-        self.assertEqual(collector, [u'HEADER\na\n', u'HEADER\na\nb\n'])
+        self.assertEqual(collector, ['HEADER\na\n', 'HEADER\na\nb\n'])
 
         # The file should be closed even though something bad happened
         self.assertTrue(f.closed)
@@ -926,7 +926,7 @@ class SideEffectTests(TestCase):
 
         try:
             mi.consume(
-                mi.side_effect(func, u'abc', before=before, after=f.close)
+                mi.side_effect(func, 'abc', before=before, after=f.close)
             )
         except RuntimeError:
             pass
@@ -1344,7 +1344,7 @@ class TestAlwaysIterable(TestCase):
         self.assertEqual(list(mi.always_iterable(1)), [1])
 
     def test_strings(self):
-        for obj in ['foo', b'bar', u'baz']:
+        for obj in ['foo', b'bar', 'baz']:
             actual = list(mi.always_iterable(obj))
             expected = [obj]
             self.assertEqual(actual, expected)
