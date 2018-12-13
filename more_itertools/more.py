@@ -1174,7 +1174,7 @@ def zip_offset(*iterables, **kwargs):
         [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e')]
 
     This can be used as a lightweight alternative to SciPy or pandas to analyze
-    data sets in which somes series have a lead or lag relationship.
+    data sets in which some series have a lead or lag relationship.
 
     By default, the sequence will end when the shortest iterable is exhausted.
     To continue until the longest iterable is exhausted, set *longest* to
@@ -1225,7 +1225,7 @@ def sort_together(iterables, key_list=(0,), reverse=False):
         [(1, 2, 3, 4), ('d', 'c', 'b', 'a')]
 
     Set a different key list to sort according to another iterable.
-    Specifying mutliple keys dictates how ties are broken::
+    Specifying multiple keys dictates how ties are broken::
 
         >>> iterables = [(3, 1, 2), (0, 1, 0), ('c', 'b', 'a')]
         >>> sort_together(iterables, key_list=(1, 2))
@@ -1864,7 +1864,7 @@ def difference(iterable, func=sub):
 class SequenceView(Sequence):
     """Return a read-only view of the sequence object *target*.
 
-    :class:`SequenceView` objects are analagous to Python's built-in
+    :class:`SequenceView` objects are analogous to Python's built-in
     "dictionary view" types. They provide a dynamic view of a sequence's items,
     meaning that when the sequence updates, so does the view.
 

@@ -82,7 +82,7 @@ class TailTests(TestCase):
     """Tests for ``tail()``"""
 
     def test_greater(self):
-        """Length of iterable is greather than requested tail"""
+        """Length of iterable is greater than requested tail"""
         self.assertEqual(list(mi.tail(3, 'ABCDEFG')), ['E', 'F', 'G'])
 
     def test_equal(self):
