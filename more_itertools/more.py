@@ -1109,13 +1109,11 @@ def split_into(iterable, sizes):
     it = iter(iterable)
 
     for size in sizes:
-        if isinstance(size, int):
-            yield list(islice(it, size))
-        elif size is None:
+        if size is None:
             yield list(it)
             return
         else:
-            raise TypeError("each item in 'sizes' must be an integer or None")
+            yield list(islice(it, size))
 
 
 def padded(iterable, fillvalue=None, n=None, next_multiple=False):
