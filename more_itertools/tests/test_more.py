@@ -1113,34 +1113,26 @@ class SplitIntoTests(TestCase):
         actual = list(mi.split_into(iterable, sizes))
         self.assertEqual(actual, expected)
 
-    def test_float_in_sizes(self):
-        """A float object is present in ``sizes`` and raises a TypeError
-        when reached."""
-        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        sizes = [1, 2.0]
-        with self.assertRaises(TypeError):
-            list(mi.split_into(iterable, sizes))
-
     def test_bool_in_sizes(self):
         """A bool object is present in ``sizes`` is treated as a 1 or 0 for
-        True or False due to bool being an instance of int."""
+        ``True`` or ``False`` due to bool being an instance of int."""
         iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         sizes = [3, True, 2, False]
         expected = [[1, 2, 3], [4], [5, 6], []]
         actual = list(mi.split_into(iterable, sizes))
         self.assertEqual(actual, expected)
 
-    def test_non_numeric_in_sizes(self):
-        """A non-numeric object in sizes will raise a TypeError if it is not
-        and instance of int."""
+    def test_invalid_in_sizes(self):
+        """A ValueError is raised if an object in ``sizes`` is neither ``None``
+        or an integer."""
         iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         sizes = [1, [], 3]
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             list(mi.split_into(iterable, sizes))
 
     def test_invalid_in_sizes_after_none(self):
-        """A item in sizes that is invalid will not raise a TypeError if it
-        comes after a None item."""
+        """A item in ``sizes`` that is invalid will not raise a TypeError if it
+        comes after a ``None`` item."""
         iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         sizes = [3, 4, None, []]
         expected = [[1, 2, 3], [4, 5, 6, 7], [8, 9]]
@@ -1163,7 +1155,7 @@ class SplitIntoTests(TestCase):
 
     def test_generator_sizes_integrity(self):
         """Check that if ``sizes`` is an iterator, it is consumed only until a
-        None item is reached"""
+        ``None`` item is reached"""
         iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         sizes = (i for i in [1, 2, None, 3, 4])
 
