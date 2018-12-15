@@ -74,6 +74,7 @@ __all__ = [
     'split_at',
     'split_after',
     'split_before',
+    'split_into',
     'spy',
     'stagger',
     'strip',
@@ -1068,6 +1069,51 @@ def split_after(iterable, pred):
             buf = []
     if buf:
         yield buf
+
+
+def split_into(iterable, sizes):
+    """Yield a list of sequential items from *iterable* of length 'n' for each
+    integer 'n' in *sizes*.
+
+        >>> list(split_into([1,2,3,4,5,6], [1,2,3]))
+        [[1], [2, 3], [4, 5, 6]]
+
+    If the sum of *sizes* is smaller than the length of *iterable*, then the
+    remaining items of *iterable* will not be returned.
+
+        >>> list(split_into([1,2,3,4,5,6], [2,3]))
+        [[1, 2], [3, 4, 5]]
+
+    If the sum of *sizes* is larger than the length of *iterable*, fewer items
+    will be returned in the iteration that overruns *iterable* and further
+    lists will be empty:
+
+        >>> list(split_into([1,2,3,4], [1,2,3,4]))
+        [[1], [2, 3], [4], []]
+
+    When a ``None`` object is encountered in *sizes*, the returned list will
+    contain items up to the end of *iterable* the same way that itertools.slice
+    does:
+
+        >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
+        [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
+
+    :func:`split_into` can be useful for grouping a series of items where the
+    sizes of the groups are not uniform. An example would be where in a row
+    from a table, multiple columns represent elements of the same feature
+    (e.g. a point represented by x,y,z) but, the format is not the same for
+    all columns.
+    """
+    # convert the iterable argument into an iterator so its contents can
+    # be consumed by islice in case it is a generator
+    it = iter(iterable)
+
+    for size in sizes:
+        if size is None:
+            yield list(it)
+            return
+        else:
+            yield list(islice(it, size))
 
 
 def padded(iterable, fillvalue=None, n=None, next_multiple=False):

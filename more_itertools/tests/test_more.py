@@ -1009,6 +1009,165 @@ class SplitAfterTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class SplitIntoTests(TestCase):
+    """Tests for ``split_into()``"""
+
+    def test_iterable_just_right(self):
+        """Size of ``iterable`` equals the sum of ``sizes``."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [2, 3, 4]
+        expected = [[1, 2], [3, 4, 5], [6, 7, 8, 9]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_iterable_too_small(self):
+        """Size of ``iterable`` is smaller than sum of ``sizes``. Last return
+        list is shorter as a result."""
+        iterable = [1, 2, 3, 4, 5, 6, 7]
+        sizes = [2, 3, 4]
+        expected = [[1, 2], [3, 4, 5], [6, 7]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_iterable_too_small_extra(self):
+        """Size of ``iterable`` is smaller than sum of ``sizes``. Second last
+        return list is shorter and last return list is empty as a result."""
+        iterable = [1, 2, 3, 4, 5, 6, 7]
+        sizes = [2, 3, 4, 5]
+        expected = [[1, 2], [3, 4, 5], [6, 7], []]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_iterable_too_large(self):
+        """Size of ``iterable`` is larger than sum of ``sizes``. Not all
+        items of iterable are returned."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [2, 3, 2]
+        expected = [[1, 2], [3, 4, 5], [6, 7]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_using_none_with_leftover(self):
+        """Last item of ``sizes`` is None when items still remain in
+        ``iterable``. Last list returned stretches to fit all remaining items
+        of ``iterable``."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [2, 3, None]
+        expected = [[1, 2], [3, 4, 5], [6, 7, 8, 9]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_using_none_without_leftover(self):
+        """Last item of ``sizes`` is None when no items remain in
+        ``iterable``. Last list returned is empty."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [2, 3, 4, None]
+        expected = [[1, 2], [3, 4, 5], [6, 7, 8, 9], []]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_using_none_mid_sizes(self):
+        """None is present in ``sizes`` but is not the last item. Last list
+        returned stretches to fit all remaining items of ``iterable`` but
+        all items in ``sizes`` after None are ignored."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [2, 3, None, 4]
+        expected = [[1, 2], [3, 4, 5], [6, 7, 8, 9]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_iterable_empty(self):
+        """``iterable`` argument is empty but ``sizes`` is not. An empty
+        list is returned for each item in ``sizes``."""
+        iterable = []
+        sizes = [2, 4, 2]
+        expected = [[], [], []]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_iterable_empty_using_none(self):
+        """``iterable`` argument is empty but ``sizes`` is not. An empty
+        list is returned for each item in ``sizes`` that is not after a
+        None item."""
+        iterable = []
+        sizes = [2, 4, None, 2]
+        expected = [[], [], []]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_sizes_empty(self):
+        """``sizes`` argument is empty but ``iterable`` is not. An empty
+        generator is returned."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = []
+        expected = []
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_both_empty(self):
+        """Both ``sizes`` and ``iterable`` arguments are empty. An empty
+        generator is returned."""
+        iterable = []
+        sizes = []
+        expected = []
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_bool_in_sizes(self):
+        """A bool object is present in ``sizes`` is treated as a 1 or 0 for
+        ``True`` or ``False`` due to bool being an instance of int."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [3, True, 2, False]
+        expected = [[1, 2, 3], [4], [5, 6], []]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_invalid_in_sizes(self):
+        """A ValueError is raised if an object in ``sizes`` is neither ``None``
+        or an integer."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [1, [], 3]
+        with self.assertRaises(ValueError):
+            list(mi.split_into(iterable, sizes))
+
+    def test_invalid_in_sizes_after_none(self):
+        """A item in ``sizes`` that is invalid will not raise a TypeError if it
+        comes after a ``None`` item."""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = [3, 4, None, []]
+        expected = [[1, 2, 3], [4, 5, 6, 7], [8, 9]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+    def test_generator_iterable_integrity(self):
+        """Check that if ``iterable`` is an iterator, it is consumed only by as
+        many items as the sum of ``sizes``."""
+        iterable = (i for i in range(10))
+        sizes = [2, 3]
+
+        expected = [[0, 1], [2, 3, 4]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+        iterable_expected = [5, 6, 7, 8, 9]
+        iterable_actual = list(iterable)
+        self.assertEqual(iterable_actual, iterable_expected)
+
+    def test_generator_sizes_integrity(self):
+        """Check that if ``sizes`` is an iterator, it is consumed only until a
+        ``None`` item is reached"""
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        sizes = (i for i in [1, 2, None, 3, 4])
+
+        expected = [[1], [2, 3], [4, 5, 6, 7, 8, 9]]
+        actual = list(mi.split_into(iterable, sizes))
+        self.assertEqual(actual, expected)
+
+        sizes_expected = [3, 4]
+        sizes_actual = list(sizes)
+        self.assertEqual(sizes_actual, sizes_expected)
+
+
 class PaddedTest(TestCase):
     """Tests for ``padded()``"""
 
