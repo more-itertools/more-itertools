@@ -50,7 +50,7 @@ copyright = u'2012, Erik Rose'
 # built documents.
 #
 # The short X.Y version.
-version = '4.3.0'
+version = '5.0.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 

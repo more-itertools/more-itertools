@@ -4,6 +4,35 @@ Version History
 
 .. automodule:: more_itertools
 
+5.0.0
+-----
+
+* New itertools:
+    * :func:`split_into` (thanks to rovyko)
+    * :func:`unzip` (thanks to bmintz)
+    * :func:`substrings` (thanks to pylang)
+
+* Changes to existing itertools:
+    * :func:`ilen` was optimized a bit (thanks to MSeifert04, achampion, and  bmintz)
+    * :func:`first_true` now returns ``None`` by default. This is the reason for the major version bump - see below. (thanks to sk and OJFord)
+
+* Other changes:
+   * Some code for old Python versions was removed (thanks to hugovk)
+   * Some documentation mistakes were corrected  (thanks to belm0 and hugovk)
+   * Tests now run properly on 32-bit versions of Python (thanks to Millak)
+   * Newer versions of CPython and PyPy are now tested against
+
+The major version update is due to the change in the default return value of
+:func:`first_true`. It's now ``None``.
+
+.. code-block:: python
+
+    >>> from more_itertools import first_true
+    >>> iterable = [0, '', False, [], ()]  # All these are False
+    >>> answer = first_true(iterable)
+    >>> print(answer)
+    None
+
 4.3.0
 -----
 
