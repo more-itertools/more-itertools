@@ -557,33 +557,25 @@ def distinct_permutations(iterable):
     sequence.
 
     """
-    def perm_unique_helper(item_counts, perm, i):
-        """Internal helper function
+    all_perms = [[]]
+    for item in iterable:
+        new_perms = []
+        for perm in all_perms:
+            # Add the iterable's items to the permutation at every possible
+            # position, keeping repeated elements in reverse order.
+            # If item i is the same as item j, and item i is before item j
+            # in *iterable*, then all permutations with item i before item j
+            # can be ignored.
+            for i in range(len(perm)):
+                new_perms.append(perm[:i] + [item] + perm[i:])
+                if perm[i] == item:
+                    break
+            else:  # No break
+                new_perms.append(perm + [item])
 
-        :arg item_counts: Stores the unique items in ``iterable`` and how many
-            times they are repeated
-        :arg perm: The permutation that is being built for output
-        :arg i: The index of the permutation being modified
+        all_perms = new_perms
 
-        The output permutations are built up recursively; the distinct items
-        are placed until their repetitions are exhausted.
-        """
-        if i < 0:
-            yield tuple(perm)
-        else:
-            for item in item_counts:
-                if item_counts[item] <= 0:
-                    continue
-                perm[i] = item
-                item_counts[item] -= 1
-                for x in perm_unique_helper(item_counts, perm, i - 1):
-                    yield x
-                item_counts[item] += 1
-
-    item_counts = Counter(iterable)
-    length = sum(item_counts.values())
-
-    return perm_unique_helper(item_counts, [None] * length, length - 1)
+    return (tuple(perm) for perm in all_perms)
 
 
 def intersperse(e, iterable, n=1):
