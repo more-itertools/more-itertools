@@ -7,6 +7,7 @@ Some backward-compatible usability improvements have been made.
 .. [1] http://docs.python.org/library/itertools.html#recipes
 
 """
+import warnings
 from collections import deque
 from itertools import (
     chain, combinations, count, cycle, groupby, islice, repeat, starmap, tee
@@ -285,13 +286,19 @@ def pairwise(iterable):
     return zip(a, b)
 
 
-def grouper(n, iterable, fillvalue=None):
+def grouper(iterable, n, fillvalue=None):
     """Collect data into fixed-length chunks or blocks.
 
-        >>> list(grouper(3, 'ABCDEFG', 'x'))
+        >>> list(grouper('ABCDEFG', 3, 'x'))
         [('A', 'B', 'C'), ('D', 'E', 'F'), ('G', 'x', 'x')]
 
     """
+    if isinstance(iterable, int):
+        warnings.warn(
+            "grouper expects iterable as first parameter",
+            DeprecationWarning,
+        )
+        n, iterable = iterable, n
     args = [iter(iterable)] * n
     return zip_longest(fillvalue=fillvalue, *args)
 
