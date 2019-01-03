@@ -4,6 +4,12 @@ Version History
 
 .. automodule:: more_itertools
 
+5.1.0
+-----
+
+* Changes to existing itertools:
+    * First two parameters to :func:`grouper` have been swapped, such that the iterable is expected first, matching the signature found in the stdlib documentation. If the old order is supplied, the function will infer the legacy behavior, swap the parameters, and raise a DeprecationWarning. In the future, this legacy support will be removed.
+
 5.0.0
 -----
 
