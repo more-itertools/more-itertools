@@ -312,6 +312,7 @@ class GrouperTests(TestCase):
     def test_legacy_order(self):
         """Historically, grouper expected the n as the first parameter"""
         with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
             self.assertEqual(
                 list(mi.grouper(3, 'ABCDEF')),
                 [('A', 'B', 'C'), ('D', 'E', 'F')],
