@@ -990,6 +990,47 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
             after()
 
 
+def iter_side_effect(func, iterable):
+    """Invoke *func* on the items of *iterable* as a whole. Yield the
+    original iterable's items.
+
+    Internally, *func* is invoked on an iterator produced by
+    :func:`itertools.tee`, such that the caveats applying to the consumption of
+    iterators produced by :func:`itertools.tee` apply to *func*. It's intended,
+    but not required, that *func* not exhaust the iterator.
+
+    Writing enumerated chunks of items to a file-like object:
+
+        >>> from io import StringIO
+        >>> f = StringIO()
+        >>> func = lambda it: map(lambda x: f.write(f'{x}\n'), enumerate(chunked(it, 2)))
+        >>> list(iter_side_effect(func, iter('abcde')))
+        ['a', 'b', 'c', 'd', 'e']
+        >>> f.seek(0); f.readlines()
+        ["(0, ['a', 'b'])\n", "(1, ['c', 'd'])\n", "(2, ['e'])\n"]
+        >>> f.close()
+
+    Writing enumerated items from flattened chunks to a file-like object:
+
+        >>> from io import StringIO
+        >>> f = StringIO()
+        >>> func = lambda it: map(lambda x: f.write(f'{x}\n'), enumerate(flatten(it)))
+        >>> list(iter_side_effect(func, chunked('abcde', 2)))
+        [['a', 'b'], ['c', 'd'], ['e']]
+        >>> f.seek(0); f.readlines()
+        ["(0, 'a')\n", "(1, 'b')\n", "(2, 'c')\n", "(3, 'd')\n", "(4, 'e')\n"]
+        >>> f.close()
+
+    """
+
+    filler = object()
+    i1, i2 = tee(iterable)
+    side_effecting_iter = always_iterable(func(i1))
+    zipped_iter = zip_longest(side_effecting_iter, i2, fillvalue=filler)
+    orig_items_plus_any_filler = map(itemgetter(1), zipped_iter)
+    return filter(lambda x: x is not filler, orig_items_plus_any_filler)
+
+
 def sliced(seq, n):
     """Yield slices of length *n* from the sequence *seq*.
 
