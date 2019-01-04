@@ -558,14 +558,14 @@ def distinct_permutations(iterable):
 
     """
     def make_new_permutations(permutations, e):
-        """Internal helper function
-        :arg permutations: The current permutations
-        :arg e: The element to add
-        The output permutations are built up by adding `̀element`̀ to the
-        current `̀permutations`̀ at every possible position. The key idea
-        is to keep repeated elements (reverse) ordered: if e1 == e2 and e1
-        is before e2 in the iterable, then all permutations with e1 before
-        e2 are ignored."""
+        """Internal helper function.
+        The output permutations are built up by adding element *e* to the
+        current *permutations* at every possible position.
+        The key idea is to keep repeated elements (reverse) ordered:
+        if e1 == e2 and e1 is before e2 in the iterable, then all permutations
+        with e1 before e2 are ignored.
+
+        """
         for permutation in permutations:
             for j in range(len(permutation)):
                 yield permutation[:j] + [e] + permutation[j:]
@@ -576,8 +576,7 @@ def distinct_permutations(iterable):
 
     permutations = [[]]
     for e in iterable:
-        permutations = make_new_permutations(
-            permutations, e)
+        permutations = make_new_permutations(permutations, e)
 
     return (tuple(t) for t in permutations)
 
