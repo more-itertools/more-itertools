@@ -557,33 +557,29 @@ def distinct_permutations(iterable):
     sequence.
 
     """
-    def perm_unique_helper(item_counts, perm, i):
+    def make_new_permutations(permutations, e):
         """Internal helper function
+        :arg permutations: The current permutations
+        :arg e: The element to add
+        The output permutations are built up by adding `̀element`̀ to the
+        current `̀permutations`̀ at every possible position. The key idea
+        is to keep repeated elements (reverse) ordered: if e1 == e2 and e1
+        is before e2 in the iterable, then all permutations with e1 before
+        e2 are ignored."""
+        for permutation in permutations:
+            for j in range(len(permutation)):
+                yield permutation[:j] + [e] + permutation[j:]
+                if permutation[j] == e:
+                    break
+            else:
+                yield permutation + [e]
 
-        :arg item_counts: Stores the unique items in ``iterable`` and how many
-            times they are repeated
-        :arg perm: The permutation that is being built for output
-        :arg i: The index of the permutation being modified
+    permutations = [[]]
+    for e in iterable:
+        permutations = make_new_permutations(
+            permutations, e)
 
-        The output permutations are built up recursively; the distinct items
-        are placed until their repetitions are exhausted.
-        """
-        if i < 0:
-            yield tuple(perm)
-        else:
-            for item in item_counts:
-                if item_counts[item] <= 0:
-                    continue
-                perm[i] = item
-                item_counts[item] -= 1
-                for x in perm_unique_helper(item_counts, perm, i - 1):
-                    yield x
-                item_counts[item] += 1
-
-    item_counts = Counter(iterable)
-    length = sum(item_counts.values())
-
-    return perm_unique_helper(item_counts, [None] * length, length - 1)
+    return (tuple(t) for t in permutations)
 
 
 def intersperse(e, iterable, n=1):
