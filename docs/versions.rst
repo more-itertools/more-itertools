@@ -8,7 +8,11 @@ Version History
 -----
 
 * Changes to existing itertools:
-    * First two parameters to :func:`grouper` have been swapped, such that the iterable is expected first, matching the signature found in the stdlib documentation. If the old order is supplied, the function will infer the legacy behavior, swap the parameters, and raise a DeprecationWarning. In the future, this legacy support will be removed.
+    * The order of the parameters in :func:`grouper` have changed to match
+      the latest recipe in the itertools documentation. Use of the old order
+      will be supported in this release, but emit a  ``DeprecationWarning``.
+      The legacy behavior will be dropped in a future release. (thanks to jaraco)
+    * :func:`distinct_permutations` was improved (thanks to jferard - see also `permutations with unique values <https://stackoverflow.com/questions/6284396/permutations-with-unique-values>`_ at StackOverflow.)
 
 5.0.0
 -----
