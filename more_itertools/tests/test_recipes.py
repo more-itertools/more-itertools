@@ -1,3 +1,4 @@
+import warnings
 from doctest import DocTestSuite
 from unittest import TestCase
 
@@ -289,7 +290,7 @@ class GrouperTests(TestCase):
 
         """
         self.assertEqual(
-            list(mi.grouper(3, 'ABCDEF')), [('A', 'B', 'C'), ('D', 'E', 'F')]
+            list(mi.grouper('ABCDEF', 3)), [('A', 'B', 'C'), ('D', 'E', 'F')]
         )
 
     def test_odd(self):
@@ -298,15 +299,27 @@ class GrouperTests(TestCase):
 
         """
         self.assertEqual(
-            list(mi.grouper(3, 'ABCDE')), [('A', 'B', 'C'), ('D', 'E', None)]
+            list(mi.grouper('ABCDE', 3)), [('A', 'B', 'C'), ('D', 'E', None)]
         )
 
     def test_fill_value(self):
         """Test that the fill value is used to pad the final group"""
         self.assertEqual(
-            list(mi.grouper(3, 'ABCDE', 'x')),
+            list(mi.grouper('ABCDE', 3, 'x')),
             [('A', 'B', 'C'), ('D', 'E', 'x')]
         )
+
+    def test_legacy_order(self):
+        """Historically, grouper expected the n as the first parameter"""
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            self.assertEqual(
+                list(mi.grouper(3, 'ABCDEF')),
+                [('A', 'B', 'C'), ('D', 'E', 'F')],
+            )
+
+        warning, = caught
+        assert warning.category == DeprecationWarning
 
 
 class RoundrobinTests(TestCase):
