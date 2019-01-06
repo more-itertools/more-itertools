@@ -692,7 +692,7 @@ def windowed(seq, n, fillvalue=None, step=1):
         yield tuple(window)
 
 
-def substrings(iterable, join_func=None):
+def substrings(iterable):
     """Yield all of the substrings of *iterable*.
 
         >>> [''.join(s) for s in substrings('more')]
