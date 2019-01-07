@@ -39,6 +39,9 @@ setup(
     test_suite='more_itertools.tests',
     url='https://github.com/erikrose/more-itertools',
     include_package_data=True,
+    package_data = {
+        'more-itertools':['py.typed'],
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
