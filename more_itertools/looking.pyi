@@ -1,4 +1,4 @@
-from typing import *
+from typing import Generic, Iterable, List, Tuple, TypeVar, Union, overload
 from more import SequenceView
 
 T = TypeVar("T")
