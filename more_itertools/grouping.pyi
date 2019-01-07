@@ -1,4 +1,5 @@
-from typing import TypeVar, Iterable, Iterator, Sequence, List, Callable, Union, Tuple
+from typing import (Callable, Iterable, Iterator, List, Mapping, Optional,
+                    Sequence, Tuple, TypeVar, Union)
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -18,6 +19,14 @@ def split_into(
 ) -> Iterable[T]: ...
 def unzip(iterable: Iterable[Tuple[T, S]]) -> Tuple[Iterable[T], Iterable[S]]: ...
 
-# TODO
-# class bucket(Generic[T]):
-#     def __init__(self,iterable:Iterable[T],key:Callable[[T],T],validator:Optional[])
+Key_Res = TypeVar("Key_Res")
+
+class bucket(Mapping[Key_Res, Iterable[T]]):
+    def __init__(
+        self,
+        iterable: Iterable[T],
+        key: Callable[[T], Key_Res],
+        validator: Optional[Predicate[Key_Res]],
+    ): ...
+    def __contains__(self, value: Key_Res) -> bool: ...
+    def __getitem__(self, value: Key_Res) -> Iterable[T]: ...
