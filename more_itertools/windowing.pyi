@@ -1,4 +1,4 @@
-from typing import *
+from typing import Iterable, Iterator, Sequence, Tuple, TypeVar, Union, overload
 
 T = TypeVar("T")
 U = TypeVar("U")
