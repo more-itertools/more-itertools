@@ -339,7 +339,7 @@ class peekable(object):
         return self._cache[index]
 
 
-def _collate(*iterables,key=lambda a: a, reverse = False):
+def _collate(*iterables, key=lambda a: a, reverse=False):
     """Helper for ``collate()``, called when the user is using the ``reverse``
     or ``key`` keyword arguments on Python versions below 3.5.
 
@@ -1204,7 +1204,7 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     )
 
 
-def zip_offset(*iterables,offsets,longest=False,fillvalue=None):
+def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     """``zip`` the input *iterables* together, but offset the `i`-th iterable
     by the `i`-th item in *offsets*.
 
