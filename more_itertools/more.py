@@ -339,14 +339,11 @@ class peekable(object):
         return self._cache[index]
 
 
-def _collate(*iterables, **kwargs):
+def _collate(*iterables,key=lambda a: a, reverse = False):
     """Helper for ``collate()``, called when the user is using the ``reverse``
     or ``key`` keyword arguments on Python versions below 3.5.
 
     """
-    key = kwargs.pop('key', lambda a: a)
-    reverse = kwargs.pop('reverse', False)
-
     min_or_max = partial(max if reverse else min, key=itemgetter(0))
     peekables = [peekable(it) for it in iterables]
     peekables = [p for p in peekables if p]  # Kill empties.
