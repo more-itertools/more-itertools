@@ -35,7 +35,6 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
-    install_requires=['six>=1.0.0,<2.0.0'],
     test_suite='more_itertools.tests',
     url='https://github.com/erikrose/more-itertools',
     include_package_data=True,

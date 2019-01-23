@@ -12,7 +12,8 @@ from itertools import (
     repeat,
     starmap,
     takewhile,
-    tee
+    tee,
+    zip_longest,
 )
 from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
@@ -20,9 +21,6 @@ try:
     from collections.abc import Sequence
 except ImportError:
     from collections import Sequence
-
-from six import binary_type, string_types, text_type
-from six.moves import filter, map, range, zip, zip_longest
 
 from .recipes import consume, flatten, take
 
@@ -910,7 +908,7 @@ def collapse(iterable, base_type=None, levels=None):
     def walk(node, level):
         if (
             ((levels is not None) and (level > levels)) or
-            isinstance(node, string_types) or
+            isinstance(node, str) or
             ((base_type is not None) and isinstance(node, base_type))
         ):
             yield node
@@ -1382,7 +1380,7 @@ def divide(n, iterable):
     return ret
 
 
-def always_iterable(obj, base_type=(text_type, binary_type)):
+def always_iterable(obj, base_type=(str, bytes)):
     """If *obj* is iterable, return an iterator over its items::
 
         >>> obj = (1, 2, 3)

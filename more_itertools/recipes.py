@@ -10,13 +10,20 @@ Some backward-compatible usability improvements have been made.
 import warnings
 from collections import deque
 from itertools import (
-    chain, combinations, count, cycle, groupby, islice, repeat, starmap, tee
+    chain,
+    combinations,
+    count,
+    cycle,
+    filterfalse,
+    groupby,
+    islice,
+    repeat,
+    starmap,
+    tee,
+    zip_longest,
 )
 import operator
 from random import randrange, sample, choice
-
-from six import PY2
-from six.moves import filter, filterfalse, map, range, zip, zip_longest
 
 __all__ = [
     'accumulate',
@@ -316,10 +323,7 @@ def roundrobin(*iterables):
     """
     # Recipe credited to George Sakkis
     pending = len(iterables)
-    if PY2:
-        nexts = cycle(iter(it).next for it in iterables)
-    else:
-        nexts = cycle(iter(it).__next__ for it in iterables)
+    nexts = cycle(iter(it).__next__ for it in iterables)
     while pending:
         try:
             for next in nexts:

@@ -17,8 +17,6 @@ from itertools import (
 from operator import add, mul, itemgetter
 from unittest import TestCase
 
-from six.moves import filter, map, range, zip
-
 import more_itertools as mi
 
 

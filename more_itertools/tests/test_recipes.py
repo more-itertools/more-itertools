@@ -3,7 +3,6 @@ from doctest import DocTestSuite
 from unittest import TestCase
 
 from itertools import combinations
-from six.moves import range
 
 import more_itertools as mi
 
