@@ -1,5 +1,3 @@
-from __future__ import division, print_function, unicode_literals
-
 from collections import OrderedDict
 from decimal import Decimal
 from doctest import DocTestSuite
