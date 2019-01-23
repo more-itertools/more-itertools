@@ -1863,7 +1863,7 @@ def difference(iterable, func=sub):
 
     This is the opposite of :func:`accumulate`'s default behavior:
 
-        >>> from more_itertools import accumulate
+        >>> from itertools import accumulate
         >>> iterable = [0, 1, 2, 3, 4]
         >>> list(accumulate(iterable))
         [0, 1, 3, 6, 10]

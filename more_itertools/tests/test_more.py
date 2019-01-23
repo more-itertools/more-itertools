@@ -6,6 +6,7 @@ from functools import partial, reduce
 from heapq import merge
 from io import StringIO
 from itertools import (
+    accumulate,
     chain,
     count,
     groupby,
@@ -1898,7 +1899,7 @@ class DifferenceTest(TestCase):
 
     def test_roundtrip(self):
         original = list(range(100))
-        accumulated = mi.accumulate(original)
+        accumulated = accumulate(original)
         actual = list(mi.difference(accumulated))
         self.assertEqual(actual, original)
 
