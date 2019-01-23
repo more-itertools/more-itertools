@@ -115,9 +115,6 @@ class FirstTests(TestCase):
 class IterOnlyRange:
     """User-defined iterable class which only support __iter__.
 
-    It is not specified to inherit ``object``, so indexing on a instance will
-    raise an ``AttributeError`` rather than ``TypeError`` in Python 2.
-
     >>> r = IterOnlyRange(5)
     >>> r[0]
     AttributeError: IterOnlyRange instance has no attribute '__getitem__'
