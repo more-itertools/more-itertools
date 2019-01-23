@@ -465,8 +465,7 @@ def with_iter(context_manager):
 
     """
     with context_manager as iterable:
-        for item in iterable:
-            yield item
+        yield from iterable
 
 
 def one(iterable, too_short=None, too_long=None):
@@ -918,8 +917,7 @@ def collapse(iterable, base_type=None, levels=None):
                 for x in walk(child, level + 1):
                     yield x
 
-    for x in walk(iterable, 0):
-        yield x
+    yield from walk(iterable, 0)
 
 
 def side_effect(func, iterable, chunk_size=None, before=None, after=None):
@@ -977,8 +975,7 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
         else:
             for chunk in chunked(iterable, chunk_size):
                 func(chunk)
-                for item in chunk:
-                    yield item
+                yield from chunk
     finally:
         if after is not None:
             after()
@@ -1128,8 +1125,7 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
     """
     it = iter(iterable)
     if n is None:
-        for item in chain(it, repeat(fillvalue)):
-            yield item
+        yield from chain(it, repeat(fillvalue))
     elif n < 1:
         raise ValueError('n must be at least 1')
     else:
@@ -1663,8 +1659,7 @@ def rstrip(iterable, pred):
         if pred(x):
             cache_append(x)
         else:
-            for y in cache:
-                yield y
+            yield from cache
             del cache[:]
             yield x
 
@@ -1754,8 +1749,7 @@ def islice_extended(iterable, *args):
                 cache.append(item)
         else:
             # When both start and stop are positive we have the normal case
-            for item in islice(it, start, stop, step):
-                yield item
+            yield from islice(it, start, stop, step)
     else:
         start = -1 if (start is None) else start
 
@@ -1800,8 +1794,7 @@ def islice_extended(iterable, *args):
 
             cache = list(islice(it, n))
 
-            for item in cache[i::step]:
-                yield item
+            yield from cache[i::step]
 
 
 def always_reversible(iterable):
@@ -2312,8 +2305,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         if pred(*w):
             if (count is None) or (n < count):
                 n += 1
-                for s in substitutes:
-                    yield s
+                yield from substitutes
                 consume(windows, window_size - 1)
                 continue
 
