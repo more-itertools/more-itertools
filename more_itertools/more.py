@@ -332,14 +332,11 @@ class peekable(object):
         return self._cache[index]
 
 
-def _collate(*iterables, **kwargs):
+def _collate(*iterables, key=lambda a: a, reverse=False):
     """Helper for ``collate()``, called when the user is using the ``reverse``
     or ``key`` keyword arguments on Python versions below 3.5.
 
     """
-    key = kwargs.pop('key', lambda a: a)
-    reverse = kwargs.pop('reverse', False)
-
     min_or_max = partial(max if reverse else min, key=itemgetter(0))
     peekables = [peekable(it) for it in iterables]
     peekables = [p for p in peekables if p]  # Kill empties.
@@ -1209,7 +1206,7 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     )
 
 
-def zip_offset(*iterables, **kwargs):
+def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     """``zip`` the input *iterables* together, but offset the `i`-th iterable
     by the `i`-th item in *offsets*.
 
@@ -1230,10 +1227,6 @@ def zip_offset(*iterables, **kwargs):
     sequence. Specify *fillvalue* to use some other value.
 
     """
-    offsets = kwargs['offsets']
-    longest = kwargs.get('longest', False)
-    fillvalue = kwargs.get('fillvalue', None)
-
     if len(iterables) != len(offsets):
         raise ValueError("Number of iterables and offsets didn't match")
 
