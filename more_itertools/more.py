@@ -17,10 +17,7 @@ from itertools import (
 )
 from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
-try:
-    from collections.abc import Sequence
-except ImportError:
-    from collections import Sequence
+from collections.abc import Sequence
 
 from .recipes import consume, flatten, take
 
