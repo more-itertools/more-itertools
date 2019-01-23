@@ -234,10 +234,6 @@ class peekable(object):
             return False
         return True
 
-    def __nonzero__(self):
-        # For Python 2 compatibility
-        return self.__bool__()
-
     def peek(self, default=_marker):
         """Return the item that will be next returned from ``next()``.
 
@@ -290,8 +286,6 @@ class peekable(object):
             return self._cache.popleft()
 
         return next(self._it)
-
-    next = __next__  # For Python 2 compatibility
 
     def _get_slice(self, index):
         # Normalize the slice's arguments
@@ -374,9 +368,7 @@ def collate(*iterables, **kwargs):
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
-    On Python 2.7, this function delegates to :func:`heapq.merge` if neither
-    of the keyword arguments are specified. On Python 3.5+, this function
-    is an alias for :func:`heapq.merge`.
+    On Python 3.5+, this function is an alias for :func:`heapq.merge`.
 
     """
     if not kwargs:
@@ -2008,8 +2000,6 @@ class seekable(object):
         item = next(self._source)
         self._cache.append(item)
         return item
-
-    next = __next__
 
     def elements(self):
         return SequenceView(self._cache)
