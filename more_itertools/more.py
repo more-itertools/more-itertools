@@ -1655,12 +1655,13 @@ def rstrip(iterable, pred):
     """
     cache = []
     cache_append = cache.append
+    cache_clear = cache.clear
     for x in iterable:
         if pred(x):
             cache_append(x)
         else:
             yield from cache
-            del cache[:]
+            cache_clear()
             yield x
 
 
