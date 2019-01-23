@@ -658,6 +658,15 @@ def windowed(seq, n, fillvalue=None, step=1):
         >>> list(windowed([1, 2, 3, 4, 5, 6], 3, fillvalue='!', step=2))
         [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
 
+    To slide into the iterable's items, use :func:`chain` to add filler items
+    to the left:
+
+        >>> iterable = [1, 2, 3, 4]
+        >>> n = 3
+        >>> padding = [None] * (n - 1)
+        >>> list(windowed(chain(padding, iterable), 3))
+        [(None, None, 1), (None, 1, 2), (1, 2, 3), (2, 3, 4)]
+
     """
     if n < 0:
         raise ValueError('n must be >= 0')
