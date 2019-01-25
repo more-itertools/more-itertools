@@ -162,7 +162,7 @@ def last(iterable, default=_marker):
         return default
 
 
-class peekable(object):
+class peekable:
     """Wrap an iterator to allow lookahead and prepending elements.
 
     Call :meth:`peek` on the result to get the value that will be returned
@@ -708,7 +708,7 @@ def substrings(iterable):
             yield seq[i:i + n]
 
 
-class bucket(object):
+class bucket:
     """Wrap *iterable* and return an object that buckets it iterable into
     child iterables based on a *key* function.
 
@@ -1927,7 +1927,7 @@ class SequenceView(Sequence):
         return '{}({})'.format(self.__class__.__name__, repr(self._target))
 
 
-class seekable(object):
+class seekable:
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
     re-visited.
@@ -2011,7 +2011,7 @@ class seekable(object):
             consume(self, remainder)
 
 
-class run_length(object):
+class run_length:
     """
     :func:`run_length.encode` compresses an iterable with run-length encoding.
     It yields groups of repeated items with the count of how many times they
