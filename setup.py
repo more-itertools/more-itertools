@@ -1,9 +1,3 @@
-# Hack to prevent stupid error on exit of `python setup.py test`. (See
-# http://www.eby-sarna.com/pipermail/peak/2010-May/003357.html.)
-try:
-    import multiprocessing  # noqa
-except ImportError:
-    pass
 from re import sub
 
 from setuptools import setup, find_packages
@@ -35,6 +29,7 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
+    python_requires='>=3.4',
     test_suite='more_itertools.tests',
     url='https://github.com/erikrose/more-itertools',
     include_package_data=True,
@@ -43,8 +38,6 @@ setup(
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
