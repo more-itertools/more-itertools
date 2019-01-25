@@ -4,8 +4,17 @@ Version History
 
 .. automodule:: more_itertools
 
-5.1.0
+6.0.0
 -----
+
+* Major chances:
+    * Python 2.7 is no longer supported. The 5.0.0 release will be the last
+      version targeting Python 2.7.
+    * All future releases will target the active versions of Python 3.
+      As of 2019, those are Python 3.4 and above.
+    * The ``six`` library is no longer a dependency.
+    * The :func:`accumulate` function is no longer part of this library. You
+      may import a better version from the standard ``itertools`` module.
 
 * Changes to existing itertools:
     * The order of the parameters in :func:`grouper` have changed to match
@@ -13,6 +22,10 @@ Version History
       will be supported in this release, but emit a  ``DeprecationWarning``.
       The legacy behavior will be dropped in a future release. (thanks to jaraco)
     * :func:`distinct_permutations` was improved (thanks to jferard - see also `permutations with unique values <https://stackoverflow.com/questions/6284396/permutations-with-unique-values>`_ at StackOverflow.)
+    * An unused parameter was removed from :func:`substrings`. (thanks to pylang)
+
+* Other changes:
+    *
 
 5.0.0
 -----
