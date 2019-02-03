@@ -357,7 +357,7 @@ def unique_everseen(iterable, key=None):
 
     Remember that ``list`` objects are unhashable - you may want to convert
     an iterable of ``list`` objects to an iterable of ``tuple`` objects
-    to avoid slowdown. S
+    to avoid slowdown.
 
         >>> slow_iterable = [1, 2], [2, 3], [1, 2]
         >>> list(unique_everseen(slow_iterable))
