@@ -1,5 +1,3 @@
-from __future__ import division, print_function, unicode_literals
-
 from collections import OrderedDict
 from decimal import Decimal
 from doctest import DocTestSuite
@@ -8,6 +6,7 @@ from functools import partial, reduce
 from heapq import merge
 from io import StringIO
 from itertools import (
+    accumulate,
     chain,
     count,
     groupby,
@@ -18,8 +17,6 @@ from itertools import (
 )
 from operator import add, mul, itemgetter
 from unittest import TestCase
-
-from six.moves import filter, map, range, zip
 
 import more_itertools as mi
 
@@ -117,9 +114,6 @@ class FirstTests(TestCase):
 
 class IterOnlyRange:
     """User-defined iterable class which only support __iter__.
-
-    It is not specified to inherit ``object``, so indexing on a instance will
-    raise an ``AttributeError`` rather than ``TypeError`` in Python 2.
 
     >>> r = IterOnlyRange(5)
     >>> r[0]
@@ -1902,7 +1896,7 @@ class DifferenceTest(TestCase):
 
     def test_roundtrip(self):
         original = list(range(100))
-        accumulated = mi.accumulate(original)
+        accumulated = accumulate(original)
         actual = list(mi.difference(accumulated))
         self.assertEqual(actual, original)
 

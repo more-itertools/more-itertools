@@ -3,7 +3,6 @@ from doctest import DocTestSuite
 from unittest import TestCase
 
 from itertools import combinations
-from six.moves import range
 
 import more_itertools as mi
 
@@ -12,29 +11,6 @@ def load_tests(loader, tests, ignore):
     # Add the doctests
     tests.addTests(DocTestSuite('more_itertools.recipes'))
     return tests
-
-
-class AccumulateTests(TestCase):
-    """Tests for ``accumulate()``"""
-
-    def test_empty(self):
-        """Test that an empty input returns an empty output"""
-        self.assertEqual(list(mi.accumulate([])), [])
-
-    def test_default(self):
-        """Test accumulate with the default function (addition)"""
-        self.assertEqual(list(mi.accumulate([1, 2, 3])), [1, 3, 6])
-
-    def test_bogus_function(self):
-        """Test accumulate with an invalid function"""
-        with self.assertRaises(TypeError):
-            list(mi.accumulate([1, 2, 3], func=lambda x: x))
-
-    def test_custom_function(self):
-        """Test accumulate with a custom function"""
-        self.assertEqual(
-            list(mi.accumulate((1, 2, 3, 2, 1), func=max)), [1, 2, 3, 3, 3]
-        )
 
 
 class TakeTests(TestCase):

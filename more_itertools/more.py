@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from collections import Counter, defaultdict, deque
 from functools import partial, wraps
 from heapq import merge
@@ -14,17 +12,12 @@ from itertools import (
     repeat,
     starmap,
     takewhile,
-    tee
+    tee,
+    zip_longest,
 )
 from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
-try:
-    from collections.abc import Sequence
-except ImportError:
-    from collections import Sequence
-
-from six import binary_type, string_types, text_type
-from six.moves import filter, map, range, zip, zip_longest
+from collections.abc import Sequence
 
 from .recipes import consume, flatten, take
 
@@ -169,7 +162,7 @@ def last(iterable, default=_marker):
         return default
 
 
-class peekable(object):
+class peekable:
     """Wrap an iterator to allow lookahead and prepending elements.
 
     Call :meth:`peek` on the result to get the value that will be returned
@@ -241,10 +234,6 @@ class peekable(object):
             return False
         return True
 
-    def __nonzero__(self):
-        # For Python 2 compatibility
-        return self.__bool__()
-
     def peek(self, default=_marker):
         """Return the item that will be next returned from ``next()``.
 
@@ -298,8 +287,6 @@ class peekable(object):
 
         return next(self._it)
 
-    next = __next__  # For Python 2 compatibility
-
     def _get_slice(self, index):
         # Normalize the slice's arguments
         step = 1 if (index.step is None) else index.step
@@ -339,14 +326,11 @@ class peekable(object):
         return self._cache[index]
 
 
-def _collate(*iterables, **kwargs):
+def _collate(*iterables, key=lambda a: a, reverse=False):
     """Helper for ``collate()``, called when the user is using the ``reverse``
     or ``key`` keyword arguments on Python versions below 3.5.
 
     """
-    key = kwargs.pop('key', lambda a: a)
-    reverse = kwargs.pop('reverse', False)
-
     min_or_max = partial(max if reverse else min, key=itemgetter(0))
     peekables = [peekable(it) for it in iterables]
     peekables = [p for p in peekables if p]  # Kill empties.
@@ -384,9 +368,7 @@ def collate(*iterables, **kwargs):
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
 
-    On Python 2.7, this function delegates to :func:`heapq.merge` if neither
-    of the keyword arguments are specified. On Python 3.5+, this function
-    is an alias for :func:`heapq.merge`.
+    On Python 3.5+, this function is an alias for :func:`heapq.merge`.
 
     """
     if not kwargs:
@@ -475,8 +457,7 @@ def with_iter(context_manager):
 
     """
     with context_manager as iterable:
-        for item in iterable:
-            yield item
+        yield from iterable
 
 
 def one(iterable, too_short=None, too_long=None):
@@ -727,7 +708,7 @@ def substrings(iterable):
             yield seq[i:i + n]
 
 
-class bucket(object):
+class bucket:
     """Wrap *iterable* and return an object that buckets it iterable into
     child iterables based on a *key* function.
 
@@ -912,7 +893,7 @@ def collapse(iterable, base_type=None, levels=None):
     def walk(node, level):
         if (
             ((levels is not None) and (level > levels)) or
-            isinstance(node, string_types) or
+            isinstance(node, str) or
             ((base_type is not None) and isinstance(node, base_type))
         ):
             yield node
@@ -928,8 +909,7 @@ def collapse(iterable, base_type=None, levels=None):
                 for x in walk(child, level + 1):
                     yield x
 
-    for x in walk(iterable, 0):
-        yield x
+    yield from walk(iterable, 0)
 
 
 def side_effect(func, iterable, chunk_size=None, before=None, after=None):
@@ -987,8 +967,7 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
         else:
             for chunk in chunked(iterable, chunk_size):
                 func(chunk)
-                for item in chunk:
-                    yield item
+                yield from chunk
     finally:
         if after is not None:
             after()
@@ -1138,8 +1117,7 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
     """
     it = iter(iterable)
     if n is None:
-        for item in chain(it, repeat(fillvalue)):
-            yield item
+        yield from chain(it, repeat(fillvalue))
     elif n < 1:
         raise ValueError('n must be at least 1')
     else:
@@ -1216,7 +1194,7 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     )
 
 
-def zip_offset(*iterables, **kwargs):
+def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     """``zip`` the input *iterables* together, but offset the `i`-th iterable
     by the `i`-th item in *offsets*.
 
@@ -1237,10 +1215,6 @@ def zip_offset(*iterables, **kwargs):
     sequence. Specify *fillvalue* to use some other value.
 
     """
-    offsets = kwargs['offsets']
-    longest = kwargs.get('longest', False)
-    fillvalue = kwargs.get('fillvalue', None)
-
     if len(iterables) != len(offsets):
         raise ValueError("Number of iterables and offsets didn't match")
 
@@ -1384,7 +1358,7 @@ def divide(n, iterable):
     return ret
 
 
-def always_iterable(obj, base_type=(text_type, binary_type)):
+def always_iterable(obj, base_type=(str, bytes)):
     """If *obj* is iterable, return an iterator over its items::
 
         >>> obj = (1, 2, 3)
@@ -1673,13 +1647,13 @@ def rstrip(iterable, pred):
     """
     cache = []
     cache_append = cache.append
+    cache_clear = cache.clear
     for x in iterable:
         if pred(x):
             cache_append(x)
         else:
-            for y in cache:
-                yield y
-            del cache[:]
+            yield from cache
+            cache_clear()
             yield x
 
 
@@ -1768,8 +1742,7 @@ def islice_extended(iterable, *args):
                 cache.append(item)
         else:
             # When both start and stop are positive we have the normal case
-            for item in islice(it, start, stop, step):
-                yield item
+            yield from islice(it, start, stop, step)
     else:
         start = -1 if (start is None) else start
 
@@ -1814,8 +1787,7 @@ def islice_extended(iterable, *args):
 
             cache = list(islice(it, n))
 
-            for item in cache[i::step]:
-                yield item
+            yield from cache[i::step]
 
 
 def always_reversible(iterable):
@@ -1883,7 +1855,7 @@ def difference(iterable, func=sub):
 
     This is the opposite of :func:`accumulate`'s default behavior:
 
-        >>> from more_itertools import accumulate
+        >>> from itertools import accumulate
         >>> iterable = [0, 1, 2, 3, 4]
         >>> list(accumulate(iterable))
         [0, 1, 3, 6, 10]
@@ -1955,7 +1927,7 @@ class SequenceView(Sequence):
         return '{}({})'.format(self.__class__.__name__, repr(self._target))
 
 
-class seekable(object):
+class seekable:
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
     re-visited.
@@ -2029,8 +2001,6 @@ class seekable(object):
         self._cache.append(item)
         return item
 
-    next = __next__
-
     def elements(self):
         return SequenceView(self._cache)
 
@@ -2041,7 +2011,7 @@ class seekable(object):
             consume(self, remainder)
 
 
-class run_length(object):
+class run_length:
     """
     :func:`run_length.encode` compresses an iterable with run-length encoding.
     It yields groups of repeated items with the count of how many times they
@@ -2326,8 +2296,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         if pred(*w):
             if (count is None) or (n < count):
                 n += 1
-                for s in substitutes:
-                    yield s
+                yield from substitutes
                 consume(windows, window_size - 1)
                 continue
 

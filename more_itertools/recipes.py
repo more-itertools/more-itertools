@@ -10,16 +10,22 @@ Some backward-compatible usability improvements have been made.
 import warnings
 from collections import deque
 from itertools import (
-    chain, combinations, count, cycle, groupby, islice, repeat, starmap, tee
+    chain,
+    combinations,
+    count,
+    cycle,
+    filterfalse,
+    groupby,
+    islice,
+    repeat,
+    starmap,
+    tee,
+    zip_longest,
 )
 import operator
 from random import randrange, sample, choice
 
-from six import PY2
-from six.moves import filter, filterfalse, map, range, zip, zip_longest
-
 __all__ = [
-    'accumulate',
     'all_equal',
     'consume',
     'dotproduct',
@@ -48,36 +54,6 @@ __all__ = [
     'unique_everseen',
     'unique_justseen',
 ]
-
-
-def accumulate(iterable, func=operator.add):
-    """
-    Return an iterator whose items are the accumulated results of a function
-    (specified by the optional *func* argument) that takes two arguments.
-    By default, returns accumulated sums with :func:`operator.add`.
-
-        >>> list(accumulate([1, 2, 3, 4, 5]))  # Running sum
-        [1, 3, 6, 10, 15]
-        >>> list(accumulate([1, 2, 3], func=operator.mul))  # Running product
-        [1, 2, 6]
-        >>> list(accumulate([0, 1, -1, 2, 3, 2], func=max))  # Running maximum
-        [0, 1, 1, 2, 3, 3]
-
-    This function is available in the ``itertools`` module for Python 3.2 and
-    greater.
-
-    """
-    it = iter(iterable)
-    try:
-        total = next(it)
-    except StopIteration:
-        return
-    else:
-        yield total
-
-    for element in it:
-        total = func(total, element)
-        yield total
 
 
 def take(n, iterable):
@@ -316,10 +292,7 @@ def roundrobin(*iterables):
     """
     # Recipe credited to George Sakkis
     pending = len(iterables)
-    if PY2:
-        nexts = cycle(iter(it).next for it in iterables)
-    else:
-        nexts = cycle(iter(it).__next__ for it in iterables)
+    nexts = cycle(iter(it).__next__ for it in iterables)
     while pending:
         try:
             for next in nexts:

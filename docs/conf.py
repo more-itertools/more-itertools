@@ -42,15 +42,15 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'more-itertools'
-copyright = u'2012, Erik Rose'
+project = 'more-itertools'
+copyright = '2012, Erik Rose'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '5.0.0'
+version = '6.0.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -190,8 +190,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'more-itertools.tex', u'more-itertools Documentation',
-   u'Erik Rose', 'manual'),
+  ('index', 'more-itertools.tex', 'more-itertools Documentation',
+   'Erik Rose', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -220,8 +220,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'more-itertools', u'more-itertools Documentation',
-     [u'Erik Rose'], 1)
+    ('index', 'more-itertools', 'more-itertools Documentation',
+     ['Erik Rose'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -234,8 +234,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'more-itertools', u'more-itertools Documentation',
-   u'Erik Rose', 'more-itertools', 'One line description of project.',
+  ('index', 'more-itertools', 'more-itertools Documentation',
+   'Erik Rose', 'more-itertools', 'One line description of project.',
    'Miscellaneous'),
 ]
 

@@ -235,6 +235,5 @@ Others
 **Itertools recipes**
 
 .. autofunction:: consume
-.. autofunction:: accumulate(iterable, func=operator.add)
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc
