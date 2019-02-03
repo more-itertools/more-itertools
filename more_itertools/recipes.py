@@ -372,7 +372,7 @@ def unique_everseen(iterable, key=None):
         >>> slow_iterable = {'a': 'b'}, {'c': 'd', 'e': 'f'}, {'a': 'b'}
         >>> list(unique_everseen(slow_iterable))
         [{'a': 'b'}, {'c': 'd', 'e': 'f'}]
-        >>> fast_iterable = (tuple(x.items()) for x in slow_iterable)
+        >>> fast_iterable = (tuple(sorted(x.items())) for x in slow_iterable)
         >>> list(unique_everseen(fast_iterable))
         [(('a', 'b'),), (('c', 'd'), ('e', 'f'))]
 
