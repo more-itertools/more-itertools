@@ -368,12 +368,6 @@ def unique_everseen(iterable, key=None):
     Similary, you may want to convert unhashable ``dict`` objects using
     the :func:`dict.items` method.
 
-        >>> iterable = ({'a': 'b'}, {'c': 'd', 'e': 'f'}, {'a': 'b'})
-        >>> list(unique_everseen(iterable))  # Slow
-        [{'a': 'b'}, {'c': 'd', 'e': 'f'}]
-        >>> list(unique_everseen(iterable, key=lambda x: tuple(x.items())))
-        [{'a': 'b'}, {'c': 'd', 'e': 'f'}]
-
     """
     seenset = set()
     seenset_add = seenset.add
