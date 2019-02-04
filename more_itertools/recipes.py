@@ -367,7 +367,7 @@ def unique_everseen(iterable, key=None):
 
     Similary, you may want to convert unhashable ``set`` objects with
     ``key=frozenset``. For ``dict`` objects,
-    ``key=lambda x: tuple(sorted(x.items()))`` can be used.
+    ``key=lambda x: frozenset(x.items())`` can be used.
 
     """
     seenset = set()
