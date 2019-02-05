@@ -25,7 +25,8 @@ Version History
     * An unused parameter was removed from :func:`substrings`. (thanks to pylang)
 
 * Other changes:
-    *
+    * The docs for :func:`unique_everseen` were improved. (thanks to jferard and MSeifert04)
+    * Several Python 2-isms were removed. (thanks to jaraco, MSeifert04, and hugovk)
 
 5.0.0
 -----
