@@ -893,7 +893,7 @@ def collapse(iterable, base_type=None, levels=None):
     def walk(node, level):
         if (
             ((levels is not None) and (level > levels)) or
-            isinstance(node, str) or
+            isinstance(node, (str, bytes)) or
             ((base_type is not None) and isinstance(node, base_type))
         ):
             yield node
