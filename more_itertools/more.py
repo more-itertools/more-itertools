@@ -874,7 +874,9 @@ def collapse(iterable, base_type=None, levels=None):
         >>> list(collapse(iterable))
         [1, 2, 3, 4, 5, 6]
 
-    String types are not considered iterable and will not be collapsed.
+    Binary and text strings are not considered iterable and
+    will not be collapsed.
+
     To avoid collapsing other types, specify *base_type*:
 
         >>> iterable = ['ab', ('cd', 'ef'), ['gh', 'ij']]
