@@ -840,6 +840,12 @@ class TestCollapse(TestCase):
         l = [["s1"], "s2", [["s3"], "s4"], [[["s5"]]]]
         self.assertEqual(list(mi.collapse(l)), ["s1", "s2", "s3", "s4", "s5"])
 
+    def test_collapse_to_bytes(self):
+        l = [[b"s1"], b"s2", [[b"s3"], b"s4"], [[[b"s5"]]]]
+        self.assertEqual(
+            list(mi.collapse(l)), [b"s1", b"s2", b"s3", b"s4", b"s5"]
+        )
+
     def test_collapse_flatten(self):
         l = [[1], [2], [[3], 4], [[[5]]]]
         self.assertEqual(list(mi.collapse(l, levels=1)), list(mi.flatten(l)))

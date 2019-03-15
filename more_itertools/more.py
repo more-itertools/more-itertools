@@ -874,7 +874,9 @@ def collapse(iterable, base_type=None, levels=None):
         >>> list(collapse(iterable))
         [1, 2, 3, 4, 5, 6]
 
-    String types are not considered iterable and will not be collapsed.
+    Binary and text strings are not considered iterable and
+    will not be collapsed.
+
     To avoid collapsing other types, specify *base_type*:
 
         >>> iterable = ['ab', ('cd', 'ef'), ['gh', 'ij']]
@@ -893,7 +895,7 @@ def collapse(iterable, base_type=None, levels=None):
     def walk(node, level):
         if (
             ((levels is not None) and (level > levels)) or
-            isinstance(node, str) or
+            isinstance(node, (str, bytes)) or
             ((base_type is not None) and isinstance(node, base_type))
         ):
             yield node
