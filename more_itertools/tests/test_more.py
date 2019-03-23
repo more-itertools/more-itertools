@@ -2311,3 +2311,26 @@ class ReplaceTests(TestCase):
         actual = list(mi.replace(iterable, pred, substitutes))
         expected = ['_', '_', 1, '_', '_', 3, '_', '_']
         self.assertEqual(actual, expected)
+
+
+class PartitionsTest(TestCase):
+    def test_basic(self):
+        iterable = 'abcd'
+        actual = list(mi.partitions(iterable))
+        expected = [
+            [['a', 'b', 'c', 'd']],
+            [['a'], ['b', 'c', 'd']],
+            [['a', 'b'], ['c', 'd']],
+            [['a', 'b', 'c'], ['d']],
+            [['a'], ['b'], ['c', 'd']],
+            [['a'], ['b', 'c'], ['d']],
+            [['a', 'b'], ['c'], ['d']],
+            [['a'], ['b'], ['c'], ['d']]
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_empty(self):
+        iterable = []
+        actual = list(mi.partitions(iterable))
+        expected = [[[]]]
+        self.assertEqual(actual, expected)

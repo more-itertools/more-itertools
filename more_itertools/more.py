@@ -19,7 +19,7 @@ from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
 from collections.abc import Sequence
 
-from .recipes import consume, flatten, take
+from .recipes import consume, flatten, powerset, take
 
 __all__ = [
     'adjacent',
@@ -54,6 +54,7 @@ __all__ = [
     'numeric_range',
     'one',
     'padded',
+    'partitions',
     'peekable',
     'replace',
     'rlocate',
@@ -2306,3 +2307,27 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         # yield the first item from the window.
         if w and (w[0] is not _marker):
             yield w[0]
+
+
+def partitions(iterable):
+    """Yield all possible partitions of *iterable*.
+    Partition x is defined so that:
+    1. list(x) = [x_0, ..., x_n]
+    2. x_0 + ... + x_n = list(iterable)
+    3. all(isinstance(x_i, list) for x_i in x) == True
+    4. 1 <= n <= ilen(iterable)
+    5. isinstance(x, list) == True
+
+        >>> iterable = 'abcd'
+        >>> list(partitions(iterable))
+        [[['a', 'b', 'c', 'd']], [['a'], ['b', 'c', 'd']], \
+[['a', 'b'], ['c', 'd']], [['a', 'b', 'c'], ['d']], \
+[['a'], ['b'], ['c', 'd']], [['a'], ['b', 'c'], ['d']], \
+[['a', 'b'], ['c'], ['d']], [['a'], ['b'], ['c'], ['d']]]
+
+    """
+    sequence = list(iterable)
+    n = len(sequence)
+    for partition_indexes in powerset(range(1, n)):
+        yield [sequence[i:j] for i, j in zip((0, ) + partition_indexes,
+                                             partition_indexes + (n, ))]
