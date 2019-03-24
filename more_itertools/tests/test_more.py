@@ -716,6 +716,70 @@ class SubstringsTests(TestCase):
         self.assertEqual(actual, expected)
 
 
+class SubstringsIndexesTests(TestCase):
+    def test_basic(self):
+        sequence = [x for x in range(4)]
+        actual = list(mi.substrings_indexes(sequence))
+        expected = [
+            ([0], 0, 1),
+            ([1], 1, 2),
+            ([2], 2, 3),
+            ([3], 3, 4),
+            ([0, 1], 0, 2),
+            ([1, 2], 1, 3),
+            ([2, 3], 2, 4),
+            ([0, 1, 2], 0, 3),
+            ([1, 2, 3], 1, 4),
+            ([0, 1, 2, 3], 0, 4),
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_strings(self):
+        sequence = 'abc'
+        actual = list(mi.substrings_indexes(sequence))
+        expected = [
+            ('a', 0, 1),
+            ('b', 1, 2),
+            ('c', 2, 3),
+            ('ab', 0, 2),
+            ('bc', 1, 3),
+            ('abc', 0, 3),
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_empty(self):
+        sequence = []
+        actual = list(mi.substrings_indexes(sequence))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_order(self):
+        sequence = [2, 0, 1]
+        actual = list(mi.substrings_indexes(sequence))
+        expected = [
+            ([2], 0, 1),
+            ([0], 1, 2),
+            ([1], 2, 3),
+            ([2, 0], 0, 2),
+            ([0, 1], 1, 3),
+            ([2, 0, 1], 0, 3),
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_reverse(self):
+        sequence = [2, 0, 1]
+        actual = list(mi.substrings_indexes(sequence, reverse=True))
+        expected = [
+            ([2, 0, 1], 0, 3),
+            ([2, 0], 0, 2),
+            ([0, 1], 1, 3),
+            ([2], 0, 1),
+            ([0], 1, 2),
+            ([1], 2, 3),
+        ]
+        self.assertEqual(actual, expected)
+
+
 class BucketTests(TestCase):
     """Tests for ``bucket()``"""
 
