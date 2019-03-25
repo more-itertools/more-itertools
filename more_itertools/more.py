@@ -73,6 +73,7 @@ __all__ = [
     'stagger',
     'strip',
     'substrings',
+    'substrings_indexes',
     'unique_to_each',
     'unzip',
     'windowed',
@@ -707,6 +708,41 @@ def substrings(iterable):
     for n in range(2, item_count + 1):
         for i in range(item_count - n + 1):
             yield seq[i:i + n]
+
+
+def substrings_indexes(sequence, reverse=False):
+    """Yield all of the substrings of *sequence* with their indexes in it.
+
+        >>> list(substrings_indexes('more'))
+        [('m', 0, 1), ('o', 1, 2), ('r', 2, 3), ('e', 3, 4), ('mo', 0, 2), \
+('or', 1, 3), ('re', 2, 4), ('mor', 0, 3), ('ore', 1, 4), ('more', 0, 4)]
+
+    Note the differences with *substrings* function:
+    1. This function requires the argument to be a sequence.
+    2. This function has an optional *reverse* argument which makes the
+       function return substrings from longest to shortest.
+    3. This function returns substrings along with their indexes int
+       *sequence*.
+    4. This function returns substrings of the same type as *sequence*. For
+       example, if you pass a string, the function will return normal strings,
+       not the list of strings of length 1.
+    5. This function is faster, especially if you use it for strings and
+       expect strings as a result (no need to do expensive *str.join*).
+
+        >>> list(substrings_indexes('more', reverse=True))
+        [('more', 0, 4), ('mor', 0, 3), ('ore', 1, 4), ('mo', 0, 2), \
+('or', 1, 3), ('re', 2, 4), ('m', 0, 1), ('o', 1, 2), ('r', 2, 3), ('e', 3, 4)]
+
+        >>> list(substrings_indexes([2, 0, 1]))
+        [([2], 0, 1), ([0], 1, 2), ([1], 2, 3), ([2, 0], 0, 2), \
+([0, 1], 1, 3), ([2, 0, 1], 0, 3)]
+    """
+    range_ = range(1, len(sequence) + 1)
+    if reverse:
+        range_ = reversed(range_)
+    return ((sequence[i:i + length], i, i + length)
+            for length in range_
+            for i in range(len(sequence) - length + 1))
 
 
 class bucket:
