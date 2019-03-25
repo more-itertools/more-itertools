@@ -2311,23 +2311,21 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
 def partitions(iterable):
     """Yield all possible partitions of *iterable*.
-    Partition x is defined so that:
-    1. list(x) = [x_0, ..., x_n]
-    2. x_0 + ... + x_n = list(iterable)
-    3. all(isinstance(x_i, list) for x_i in x) == True
-    4. 1 <= n <= ilen(iterable)
-    5. isinstance(x, list) == True
 
-        >>> iterable = 'abcd'
-        >>> list(partitions(iterable))
-        [[['a', 'b', 'c', 'd']], [['a'], ['b', 'c', 'd']], \
-[['a', 'b'], ['c', 'd']], [['a', 'b', 'c'], ['d']], \
-[['a'], ['b'], ['c', 'd']], [['a'], ['b', 'c'], ['d']], \
-[['a', 'b'], ['c'], ['d']], [['a'], ['b'], ['c'], ['d']]]
+    >>> iterable = ['a', 'b', 'c', 'd']
+    >>> for part in partitions(iterable):
+    ...     print(part)
+    [['a', 'b', 'c', 'd']]
+    [['a'], ['b', 'c', 'd']]
+    [['a', 'b'], ['c', 'd']]
+    [['a', 'b', 'c'], ['d']]
+    [['a'], ['b'], ['c', 'd']]
+    [['a'], ['b', 'c'], ['d']]
+    [['a', 'b'], ['c'], ['d']]
+    [['a'], ['b'], ['c'], ['d']]
 
     """
     sequence = list(iterable)
     n = len(sequence)
-    for partition_indexes in powerset(range(1, n)):
-        yield [sequence[i:j] for i, j in zip((0, ) + partition_indexes,
-                                             partition_indexes + (n, ))]
+    for i in powerset(range(1, n)):
+        yield [sequence[i:j] for i, j in zip((0,) + i, i + (n,))]

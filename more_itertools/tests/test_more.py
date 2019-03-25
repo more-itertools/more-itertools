@@ -2314,23 +2314,50 @@ class ReplaceTests(TestCase):
 
 
 class PartitionsTest(TestCase):
-    def test_basic(self):
-        iterable = 'abcd'
-        actual = list(mi.partitions(iterable))
-        expected = [
-            [['a', 'b', 'c', 'd']],
-            [['a'], ['b', 'c', 'd']],
-            [['a', 'b'], ['c', 'd']],
-            [['a', 'b', 'c'], ['d']],
-            [['a'], ['b'], ['c', 'd']],
-            [['a'], ['b', 'c'], ['d']],
-            [['a', 'b'], ['c'], ['d']],
-            [['a'], ['b'], ['c'], ['d']]
-        ]
-        self.assertEqual(actual, expected)
+    def test_types(self):
+        for iterable in [
+            'abcd',
+            ['a', 'b', 'c', 'd'],
+            ('a', 'b', 'c', 'd'),
+        ]:
+            with self.subTest(iterable=iterable):
+                actual = list(mi.partitions(iterable))
+                expected = [
+                    [['a', 'b', 'c', 'd']],
+                    [['a'], ['b', 'c', 'd']],
+                    [['a', 'b'], ['c', 'd']],
+                    [['a', 'b', 'c'], ['d']],
+                    [['a'], ['b'], ['c', 'd']],
+                    [['a'], ['b', 'c'], ['d']],
+                    [['a', 'b'], ['c'], ['d']],
+                    [['a'], ['b'], ['c'], ['d']]
+                ]
+                self.assertEqual(actual, expected)
 
     def test_empty(self):
         iterable = []
         actual = list(mi.partitions(iterable))
         expected = [[[]]]
+        self.assertEqual(actual, expected)
+
+    def test_order(self):
+        iterable = iter([3, 2, 1])
+        actual = list(mi.partitions(iterable))
+        expected = [
+            [[3, 2, 1]],
+            [[3], [2, 1]],
+            [[3, 2], [1]],
+            [[3], [2], [1]],
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_duplicates(self):
+        iterable = [1, 1, 1]
+        actual = list(mi.partitions(iterable))
+        expected = [
+            [[1, 1, 1]],
+            [[1], [1, 1]],
+            [[1, 1], [1]],
+            [[1], [1], [1]],
+        ]
         self.assertEqual(actual, expected)
