@@ -710,39 +710,38 @@ def substrings(iterable):
             yield seq[i:i + n]
 
 
-def substrings_indexes(sequence, reverse=False):
-    """Yield all of the substrings of *sequence* with their indexes in it.
+def substrings_indexes(seq, reverse=False):
+    """Yield all substrings and their positions in *seq*
 
-        >>> list(substrings_indexes('more'))
-        [('m', 0, 1), ('o', 1, 2), ('r', 2, 3), ('e', 3, 4), ('mo', 0, 2), \
-('or', 1, 3), ('re', 2, 4), ('mor', 0, 3), ('ore', 1, 4), ('more', 0, 4)]
+    The items yielded will be a tuple of the form ``(substr, i, j)``, where
+    ``substr == seq[i:j]``.
 
-    Note the differences with *substrings* function:
-    1. This function requires the argument to be a sequence.
-    2. This function has an optional *reverse* argument which makes the
-       function return substrings from longest to shortest.
-    3. This function returns substrings along with their indexes int
-       *sequence*.
-    4. This function returns substrings of the same type as *sequence*. For
-       example, if you pass a string, the function will return normal strings,
-       not the list of strings of length 1.
-    5. This function is faster, especially if you use it for strings and
-       expect strings as a result (no need to do expensive *str.join*).
+    This function only works for iterables that support slicing, such as
+    ``str`` objects.
 
-        >>> list(substrings_indexes('more', reverse=True))
-        [('more', 0, 4), ('mor', 0, 3), ('ore', 1, 4), ('mo', 0, 2), \
-('or', 1, 3), ('re', 2, 4), ('m', 0, 1), ('o', 1, 2), ('r', 2, 3), ('e', 3, 4)]
+    >>> for item in substrings_indexes('more'):
+    ...    print(item)
+    ('m', 0, 1)
+    ('o', 1, 2)
+    ('r', 2, 3)
+    ('e', 3, 4)
+    ('mo', 0, 2)
+    ('or', 1, 3)
+    ('re', 2, 4)
+    ('mor', 0, 3)
+    ('ore', 1, 4)
+    ('more', 0, 4)
 
-        >>> list(substrings_indexes([2, 0, 1]))
-        [([2], 0, 1), ([0], 1, 2), ([1], 2, 3), ([2, 0], 0, 2), \
-([0, 1], 1, 3), ([2, 0, 1], 0, 3)]
+    Set *reverse* to ``True`` to yield the same items in the opposite order.
+
+
     """
-    range_ = range(1, len(sequence) + 1)
+    r = range(1, len(seq) + 1)
     if reverse:
-        range_ = reversed(range_)
-    return ((sequence[i:i + length], i, i + length)
-            for length in range_
-            for i in range(len(sequence) - length + 1))
+        r = reversed(r)
+    return (
+        (seq[i:i + L], i, i + L) for L in r for i in range(len(seq) - L + 1)
+    )
 
 
 class bucket:
