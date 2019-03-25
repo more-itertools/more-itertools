@@ -231,6 +231,7 @@ Others
 .. autofunction:: difference(iterable, func=operator.sub)
 .. autofunction:: make_decorator
 .. autoclass:: SequenceView
+.. autofunction:: time_limited
 
 ----
 

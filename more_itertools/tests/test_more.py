@@ -16,6 +16,7 @@ from itertools import (
     repeat,
 )
 from operator import add, mul, itemgetter
+from time import sleep
 from unittest import TestCase
 
 import more_itertools as mi
@@ -2425,3 +2426,27 @@ class PartitionsTest(TestCase):
             [[1], [1], [1]],
         ]
         self.assertEqual(actual, expected)
+
+
+class TimeLimitedTests(TestCase):
+    def test_basic(self):
+        def generator():
+            yield 1
+            yield 2
+            sleep(0.2)
+            yield 3
+
+        iterable = generator()
+        actual = list(mi.time_limited(0.1, iterable))
+        expected = [1, 2]
+        self.assertEqual(actual, expected)
+
+    def test_zero_limit(self):
+        iterable = count()
+        actual = list(mi.time_limited(0, iterable))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_invalid_limit(self):
+        with self.assertRaises(ValueError):
+            list(mi.time_limited(-0.1, count()))

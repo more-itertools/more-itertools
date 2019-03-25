@@ -1,4 +1,5 @@
 from collections import Counter, defaultdict, deque
+from collections.abc import Sequence
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
@@ -17,7 +18,7 @@ from itertools import (
 )
 from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
-from collections.abc import Sequence
+from time import monotonic
 
 from .recipes import consume, flatten, powerset, take
 
@@ -74,6 +75,7 @@ __all__ = [
     'strip',
     'substrings',
     'substrings_indexes',
+    'time_limited',
     'unique_to_each',
     'unzip',
     'windowed',
@@ -2369,3 +2371,28 @@ def partitions(iterable):
     n = len(sequence)
     for i in powerset(range(1, n)):
         yield [sequence[i:j] for i, j in zip((0,) + i, i + (n,))]
+
+
+def time_limited(limit_seconds, iterable):
+    """
+    Yield items from *iterable* until *limit_seconds* have passed.
+
+    >>> from time import sleep
+    >>> def generator():
+    ...     yield 1
+    ...     yield 2
+    ...     sleep(0.2)
+    ...     yield 3
+    >>> iterable = generator()
+    >>> list(time_limited(0.1, iterable))
+    [1, 2]
+
+    """
+    if limit_seconds < 0:
+        raise ValueError('limit_seconds must be positive')
+
+    start_time = monotonic()
+    for item in iterable:
+        if monotonic() - start_time > limit_seconds:
+            break
+        yield item
