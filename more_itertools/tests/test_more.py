@@ -840,6 +840,12 @@ class TestCollapse(TestCase):
         l = [["s1"], "s2", [["s3"], "s4"], [[["s5"]]]]
         self.assertEqual(list(mi.collapse(l)), ["s1", "s2", "s3", "s4", "s5"])
 
+    def test_collapse_to_bytes(self):
+        l = [[b"s1"], b"s2", [[b"s3"], b"s4"], [[[b"s5"]]]]
+        self.assertEqual(
+            list(mi.collapse(l)), [b"s1", b"s2", b"s3", b"s4", b"s5"]
+        )
+
     def test_collapse_flatten(self):
         l = [[1], [2], [[3], 4], [[[5]]]]
         self.assertEqual(list(mi.collapse(l, levels=1)), list(mi.flatten(l)))
@@ -2304,4 +2310,54 @@ class ReplaceTests(TestCase):
         substitutes = iter('__')
         actual = list(mi.replace(iterable, pred, substitutes))
         expected = ['_', '_', 1, '_', '_', 3, '_', '_']
+        self.assertEqual(actual, expected)
+
+
+class PartitionsTest(TestCase):
+    def test_types(self):
+        for iterable in [
+            'abcd',
+            ['a', 'b', 'c', 'd'],
+            ('a', 'b', 'c', 'd'),
+        ]:
+            with self.subTest(iterable=iterable):
+                actual = list(mi.partitions(iterable))
+                expected = [
+                    [['a', 'b', 'c', 'd']],
+                    [['a'], ['b', 'c', 'd']],
+                    [['a', 'b'], ['c', 'd']],
+                    [['a', 'b', 'c'], ['d']],
+                    [['a'], ['b'], ['c', 'd']],
+                    [['a'], ['b', 'c'], ['d']],
+                    [['a', 'b'], ['c'], ['d']],
+                    [['a'], ['b'], ['c'], ['d']]
+                ]
+                self.assertEqual(actual, expected)
+
+    def test_empty(self):
+        iterable = []
+        actual = list(mi.partitions(iterable))
+        expected = [[[]]]
+        self.assertEqual(actual, expected)
+
+    def test_order(self):
+        iterable = iter([3, 2, 1])
+        actual = list(mi.partitions(iterable))
+        expected = [
+            [[3, 2, 1]],
+            [[3], [2, 1]],
+            [[3, 2], [1]],
+            [[3], [2], [1]],
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_duplicates(self):
+        iterable = [1, 1, 1]
+        actual = list(mi.partitions(iterable))
+        expected = [
+            [[1, 1, 1]],
+            [[1], [1, 1]],
+            [[1, 1], [1]],
+            [[1], [1], [1]],
+        ]
         self.assertEqual(actual, expected)

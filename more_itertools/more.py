@@ -19,7 +19,7 @@ from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
 from collections.abc import Sequence
 
-from .recipes import consume, flatten, take
+from .recipes import consume, flatten, powerset, take
 
 __all__ = [
     'adjacent',
@@ -54,6 +54,7 @@ __all__ = [
     'numeric_range',
     'one',
     'padded',
+    'partitions',
     'peekable',
     'replace',
     'rlocate',
@@ -874,7 +875,9 @@ def collapse(iterable, base_type=None, levels=None):
         >>> list(collapse(iterable))
         [1, 2, 3, 4, 5, 6]
 
-    String types are not considered iterable and will not be collapsed.
+    Binary and text strings are not considered iterable and
+    will not be collapsed.
+
     To avoid collapsing other types, specify *base_type*:
 
         >>> iterable = ['ab', ('cd', 'ef'), ['gh', 'ij']]
@@ -893,7 +896,7 @@ def collapse(iterable, base_type=None, levels=None):
     def walk(node, level):
         if (
             ((levels is not None) and (level > levels)) or
-            isinstance(node, str) or
+            isinstance(node, (str, bytes)) or
             ((base_type is not None) and isinstance(node, base_type))
         ):
             yield node
@@ -2304,3 +2307,25 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         # yield the first item from the window.
         if w and (w[0] is not _marker):
             yield w[0]
+
+
+def partitions(iterable):
+    """Yield all possible partitions of *iterable*.
+
+    >>> iterable = ['a', 'b', 'c', 'd']
+    >>> for part in partitions(iterable):
+    ...     print(part)
+    [['a', 'b', 'c', 'd']]
+    [['a'], ['b', 'c', 'd']]
+    [['a', 'b'], ['c', 'd']]
+    [['a', 'b', 'c'], ['d']]
+    [['a'], ['b'], ['c', 'd']]
+    [['a'], ['b', 'c'], ['d']]
+    [['a', 'b'], ['c'], ['d']]
+    [['a'], ['b'], ['c'], ['d']]
+
+    """
+    sequence = list(iterable)
+    n = len(sequence)
+    for i in powerset(range(1, n)):
+        yield [sequence[i:j] for i, j in zip((0,) + i, i + (n,))]
