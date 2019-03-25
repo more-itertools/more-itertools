@@ -2388,7 +2388,7 @@ def time_limited(limit_seconds, iterable):
     [1, 2]
 
     Note that the time is checked before each item is yielded, and iteration
-    stops if  the time elapsed is greater than *limit_seconds*. If, your time
+    stops if  the time elapsed is greater than *limit_seconds*. If your time
     limit is 1 second, but it takes 2 seconds to generate the first item from
     the iterable, the function will run for 2 seconds and not yield anything.
 
