@@ -58,6 +58,7 @@ These tools yield windows of items from an iterable.
 
 .. autofunction:: windowed
 .. autofunction:: substrings
+.. autofunction:: substrings_indexes
 .. autofunction:: stagger
 
 ----
