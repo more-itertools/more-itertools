@@ -2345,7 +2345,10 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
 
 def partitions(iterable):
-    """Yield all possible partitions of *iterable*.
+    """Yield all possible partitions of *iterable*. This yields all the ways
+    to split the iterable, starting with the full iterable, all splits into
+    two pieces, all the splits into three pieces, and so on. Order is preserved
+    and repeated elements are treated as distinct.
 
     >>> iterable = ['a', 'b', 'c', 'd']
     >>> for part in partitions(iterable):
@@ -2358,6 +2361,8 @@ def partitions(iterable):
     [['a'], ['b', 'c'], ['d']]
     [['a', 'b'], ['c'], ['d']]
     [['a'], ['b'], ['c'], ['d']]
+
+    This is unrelated to :func:`partition`.
 
     """
     sequence = list(iterable)
