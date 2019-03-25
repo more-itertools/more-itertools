@@ -2387,6 +2387,11 @@ def time_limited(limit_seconds, iterable):
     >>> list(time_limited(0.1, iterable))
     [1, 2]
 
+    Note that the time is checked before each item is yielded, and iteration
+    stops if  the time elapsed is greater than *limit_seconds*. If, your time
+    limit is 1 second, but it takes 2 seconds to generate the first item from
+    the iterable, the function will run for 2 seconds and not yield anything.
+
     """
     if limit_seconds < 0:
         raise ValueError('limit_seconds must be positive')
