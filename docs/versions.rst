@@ -4,6 +4,17 @@ Version History
 
 .. automodule:: more_itertools
 
+6.1.0
+-----
+
+* New itertools:
+    * :func:`time_limited`
+    * :func:`partitions` (thanks to rominf and Saluev)
+    * :func:`substrings_indexes` (thanks to rominf)
+
+* Changes to existing itertools:
+    * :func:`collapse` now treats `bytes` objects the same as `str` objects. (thanks to Sweenpet)
+
 6.0.0
 -----
 
