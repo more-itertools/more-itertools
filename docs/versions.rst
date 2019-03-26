@@ -4,7 +4,7 @@ Version History
 
 .. automodule:: more_itertools
 
-6.1.0
+7.0.0
 -----
 
 * New itertools:
@@ -14,6 +14,17 @@ Version History
 
 * Changes to existing itertools:
     * :func:`collapse` now treats `bytes` objects the same as `str` objects. (thanks to Sweenpet)
+
+The major version update is due to the change in the default behavior of
+:func:`collapse`. It now treats ``bytes`` objects the same as ``str`` objects.
+This aligns its behavior with :func:`always_iterable`.
+
+.. code-block:: python
+
+    >>> from more_itertools import collapse
+    >>> iterable = [[1, 2], b'345', [6]]
+    >>> print(list(collapse(iterable)))
+    [1, 2, b'345', 6]
 
 6.0.0
 -----
