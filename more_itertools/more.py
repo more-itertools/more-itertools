@@ -464,7 +464,7 @@ def with_iter(context_manager):
         yield from iterable
 
 
-def one(iterable, too_short=None, too_long=None):
+def one(iterable, too_short=_marker, too_long=_marker):
     """Return the first item from *iterable*, which is expected to contain only
     that item. Raise an exception if *iterable* is empty or has more than one
     item.
@@ -513,14 +513,24 @@ def one(iterable, too_short=None, too_long=None):
     try:
         value = next(it)
     except StopIteration:
-        raise too_short or ValueError('too few items in iterable (expected 1)')
+        if too_short is _marker:
+            raise ValueError('too few items in iterable (expected 1)')
+        try:
+            raise too_short
+        except TypeError:
+            return too_short
 
     try:
         next(it)
     except StopIteration:
         pass
     else:
-        raise too_long or ValueError('too many items in iterable (expected 1)')
+        if too_long is _marker:
+            raise ValueError('too many items in iterable (expected 1)')
+        try:
+            raise too_long
+        except TypeError:
+            return too_long
 
     return value
 
