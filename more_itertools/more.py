@@ -1565,6 +1565,19 @@ def numeric_range(*args):
     Be aware of the limitations of floating point numbers; the representation
     of the yielded numbers may be surprising.
 
+    ``datetime.datetime`` objects can be used for *start* and *stop*, if *step*
+    is a ``datetime.timedelta`` object:
+
+        >>> import datetime
+        >>> start = datetime.datetime(2019, 1, 1)
+        >>> stop = datetime.datetime(2019, 1, 3)
+        >>> step = datetime.timedelta(days=1)
+        >>> items = numeric_range(start, stop, step)
+        >>> next(items)
+        datetime.datetime(2019, 1, 1, 0, 0)
+        >>> next(items)
+        datetime.datetime(2019, 1, 2, 0, 0)
+
     """
     argc = len(args)
     if argc == 1:
