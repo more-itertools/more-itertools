@@ -1581,9 +1581,10 @@ def numeric_range(*args):
         raise TypeError(err_msg.format(argc))
 
     values = (start + (step * n) for n in count())
-    if step > 0:
+    zero = type(step)(0)
+    if step > zero:
         return takewhile(partial(gt, stop), values)
-    elif step < 0:
+    elif step < zero:
         return takewhile(partial(lt, stop), values)
     else:
         raise ValueError('numeric_range arg 3 must not be zero')
