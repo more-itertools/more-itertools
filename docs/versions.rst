@@ -29,7 +29,7 @@ This aligns its behavior with :func:`always_iterable`.
 6.0.0
 -----
 
-* Major chances:
+* Major changes:
     * Python 2.7 is no longer supported. The 5.0.0 release will be the last
       version targeting Python 2.7.
     * All future releases will target the active versions of Python 3.
