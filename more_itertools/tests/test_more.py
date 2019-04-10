@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import datetime, timedelta
 from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
@@ -1791,6 +1792,18 @@ class NumericRangeTests(TestCase):
             ((1.0, 0.0), []),
             ((Fraction(2, 1),), [Fraction(0, 1), Fraction(1, 1)]),
             ((Decimal('2.0'),), [Decimal('0.0'), Decimal('1.0')]),
+            (
+                (
+                    datetime(2019, 3, 29, 12, 34, 56),
+                    datetime(2019, 3, 29, 12, 37, 55),
+                    timedelta(minutes=1)
+                ),
+                [
+                    datetime(2019, 3, 29, 12, 34, 56),
+                    datetime(2019, 3, 29, 12, 35, 56),
+                    datetime(2019, 3, 29, 12, 36, 56),
+                ]
+            ),
         ]:
             actual = list(mi.numeric_range(*args))
             self.assertEqual(actual, expected)
@@ -1805,9 +1818,16 @@ class NumericRangeTests(TestCase):
         )
 
     def test_zero_step(self):
-        self.assertRaises(
-            ValueError, lambda: list(mi.numeric_range(1, 2, 0))
-        )
+        with self.assertRaises(ValueError):
+            for args in [
+                (1, 2, 0),
+                (
+                    datetime(2019, 3, 29, 12, 34, 56),
+                    datetime(2019, 3, 29, 12, 37, 55),
+                    timedelta(minutes=0)
+                ),
+            ]:
+                list(mi.numeric_range(*args))
 
 
 class CountCycleTests(TestCase):
