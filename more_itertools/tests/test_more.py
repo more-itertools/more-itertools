@@ -1818,15 +1818,15 @@ class NumericRangeTests(TestCase):
         )
 
     def test_zero_step(self):
-        with self.assertRaises(ValueError):
-            for args in [
-                (1, 2, 0),
-                (
-                    datetime(2019, 3, 29, 12, 34, 56),
-                    datetime(2019, 3, 29, 12, 37, 55),
-                    timedelta(minutes=0)
-                ),
-            ]:
+        for args in [
+            (1, 2, 0),
+            (
+                datetime(2019, 3, 29, 12, 34, 56),
+                datetime(2019, 3, 29, 12, 37, 55),
+                timedelta(minutes=0)
+            ),
+        ]:
+            with self.assertRaises(ValueError):
                 list(mi.numeric_range(*args))
 
 
