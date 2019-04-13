@@ -2470,3 +2470,22 @@ class TimeLimitedTests(TestCase):
     def test_invalid_limit(self):
         with self.assertRaises(ValueError):
             list(mi.time_limited(-0.1, count()))
+
+
+class OnlyTests(TestCase):
+    def test_defaults(self):
+        self.assertEqual(mi.only([]), None)
+        self.assertEqual(mi.only([1]), 1)
+        self.assertRaises(ValueError, lambda: mi.only([1, 2]))
+
+    def test_custom_value(self):
+        self.assertEqual(mi.only([], default='!'), '!')
+        self.assertEqual(mi.only([1], default='!'), 1)
+        self.assertRaises(ValueError, lambda: mi.only([1, 2], default='!'))
+
+    def test_custom_exception(self):
+        self.assertEqual(mi.only([], too_long=RuntimeError), None)
+        self.assertEqual(mi.only([1], too_long=RuntimeError), 1)
+        self.assertRaises(
+            RuntimeError, lambda: mi.only([1, 2], too_long=RuntimeError)
+        )

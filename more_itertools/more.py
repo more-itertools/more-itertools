@@ -54,6 +54,7 @@ __all__ = [
     'map_reduce',
     'numeric_range',
     'one',
+    'only',
     'padded',
     'partitions',
     'peekable',
@@ -503,9 +504,8 @@ def one(iterable, too_short=None, too_long=None):
         RuntimeError
 
     Note that :func:`one` attempts to advance *iterable* twice to ensure there
-    is only one item. If there is more than one, both items will be discarded.
-    See :func:`spy` or :func:`peekable` to check iterable contents less
-    destructively.
+    is only one item. See :func:`spy` or :func:`peekable` to check iterable
+    contents less destructively.
 
     """
     it = iter(iterable)
@@ -2415,3 +2415,35 @@ def time_limited(limit_seconds, iterable):
         if monotonic() - start_time > limit_seconds:
             break
         yield item
+
+
+def only(iterable, default=None, too_long=None):
+    """If *iterable* has only one item, return it.
+    If it has zero items, return *default*.
+    If it has more than item, raise the exception given by *too_long*,
+    which is ``ValueError`` by default.
+
+    >>> only([], default='missing')
+    'missing'
+    >>> only([1])
+    1
+    >>> only([1, 2])  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    ValueError: too many items in iterable (expected 1)'
+
+    Note that :func:`only` attempts to advance *iterable* twice to ensure there
+    is only one item.  See :func:`spy` or :func:`peekable` to check
+    iterable contents less destructively.
+    """
+    it = iter(iterable)
+    value = next(it, default)
+
+    try:
+        next(it)
+    except StopIteration:
+        pass
+    else:
+        raise too_long or ValueError('too many items in iterable (expected 1)')
+
+    return value

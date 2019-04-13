@@ -129,7 +129,8 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: ilen
 .. autofunction:: first(iterable[, default])
 .. autofunction:: last(iterable[, default])
-.. autofunction:: one
+.. autofunction:: one(iterable, too_short=ValueError, too_long=ValueError)
+.. autofunction:: only(iterable, default=None, too_long=ValueError)
 .. autofunction:: unique_to_each
 .. autofunction:: locate(iterable, pred=bool, window_size=None)
 .. autofunction:: rlocate(iterable, pred=bool, window_size=None)
