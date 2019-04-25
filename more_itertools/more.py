@@ -2420,7 +2420,7 @@ def time_limited(limit_seconds, iterable):
 def only(iterable, default=None, too_long=None):
     """If *iterable* has only one item, return it.
     If it has zero items, return *default*.
-    If it has more than item, raise the exception given by *too_long*,
+    If it has more than one item, raise the exception given by *too_long*,
     which is ``ValueError`` by default.
 
     >>> only([], default='missing')
@@ -2431,6 +2431,10 @@ def only(iterable, default=None, too_long=None):
     Traceback (most recent call last):
     ...
     ValueError: too many items in iterable (expected 1)'
+    >>> only([1, 2], too_long=TypeError)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    TypeError
 
     Note that :func:`only` attempts to advance *iterable* twice to ensure there
     is only one item.  See :func:`spy` or :func:`peekable` to check
