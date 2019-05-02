@@ -51,6 +51,7 @@ __all__ = [
     'locate',
     'lstrip',
     'make_decorator',
+    'map_accumulate',
     'map_reduce',
     'numeric_range',
     'one',
@@ -2251,6 +2252,70 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
             ret[key] = reducefunc(value_list)
 
     ret.default_factory = None
+    return ret
+
+
+def map_accumulate(iterable, keyfunc, initfunc, updatefunc):
+    """Return a dictionary that maps the items in *iterable* to categories
+    defined by *keyfunc*. The first time an item with a given key is is seen,
+    *initfunc* will be called with no arguments to provide an initial value
+    for the category. Then *updatefunc* will be called with the category's
+    current value and the item.
+
+    Keeping a running total:
+
+        >>> iterable = ['ash', 'ape', 'bat', 'cat', 'cow']
+        >>> keyfunc = lambda item: item[0]  # Organize by first letter
+        >>> initfunc = lambda: 0
+        >>> updatefunc = lambda value, item: value + 1
+        >>> result = map_accumulate(iterable, keyfunc, initfunc, updatefunc)
+        >>> result == {'a': 2, 'b': 1, 'c': 2}
+        True
+
+    Using a custom data structure to track multiple things:
+
+        >>> from datetime import datetime
+        >>> class Tracker:
+        ...     def __init__(self):
+        ...         self.first_time = datetime.max
+        ...         self.last_time = datetime.min
+        ...         self.hits = 0
+        ...
+        >>> def updatefunc(value, item):
+        ...    value.first_time = min(value.first_time, item['time'])
+        ...    value.last_time = max(value.first_time, item['time'])
+        ...    value.hits += 1
+        ...    return value
+        ...
+        >>> iterable = [
+        ...     {'key': 1, 'time': datetime(2019, 5, 1)},
+        ...     {'key': 1, 'time': datetime(2019, 12, 31)},
+        ...     {'key': 2, 'time': datetime(2019, 1, 1)},
+        ... ]
+        >>> keyfunc = lambda item: item['key']  # Extract the key field
+        >>> initfunc = Tracker  # Instantiate a Tracker object
+        >>> result = map_accumulate(iterable, keyfunc, initfunc, updatefunc)
+        >>> result[1].first_time
+        datetime.datetime(2019, 5, 1, 0, 0)
+        >>> result[1].last_time
+        datetime.datetime(2019, 12, 31, 0, 0)
+        >>> result[1].hits
+        2
+        >>> result[2].first_time
+        datetime.datetime(2019, 1, 1, 0, 0)
+        >>> result[2].last_time
+        datetime.datetime(2019, 1, 1, 0, 0)
+        >>> result[2].hits
+        1
+
+    """
+    ret = {}
+    for item in iterable:
+        key = keyfunc(item)
+        if key not in ret:
+            ret[key] = initfunc()
+        ret[key] = updatefunc(ret[key], item)
+
     return ret
 
 

@@ -2277,6 +2277,30 @@ class MapReduceTests(TestCase):
         self.assertRaises(KeyError, lambda: d[None].append(1))
 
 
+class MapAccumulateTests(TestCase):
+    def test_basic(self):
+        iterable = (str(x) for x in range(5))
+        keyfunc = lambda item: int(item) // 2
+        initfunc = lambda: 0
+        updatefunc = lambda value, item: max(value, int(item))
+        actual = mi.map_accumulate(iterable, keyfunc, initfunc, updatefunc)
+        expected = {0: 1, 1: 3, 2: 4}
+        self.assertEqual(actual, expected)
+
+    def test_side_effects(self):
+        iterable = 'abbccc'
+        keyfunc = lambda item: item.upper()
+        initfunc = lambda: []
+
+        def updatefunc(value, item):
+            value.append(item)
+            return value
+
+        actual = mi.map_accumulate(iterable, keyfunc, initfunc, updatefunc)
+        expected = {'A': ['a'], 'B': ['b', 'b'], 'C': ['c', 'c', 'c']}
+        self.assertEqual(actual, expected)
+
+
 class RlocateTests(TestCase):
     def test_default_pred(self):
         iterable = [0, 1, 1, 0, 1, 0, 0]
