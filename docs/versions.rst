@@ -3,6 +3,7 @@ Version History
 ===============
 
 .. automodule:: more_itertools
+   :noindex:
 
 7.0.0
 -----
