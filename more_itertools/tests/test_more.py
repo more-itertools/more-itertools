@@ -17,8 +17,9 @@ from itertools import (
     repeat,
 )
 from operator import add, mul, itemgetter
+from sys import version_info
 from time import sleep
-from unittest import TestCase
+from unittest import skipIf, TestCase
 
 import more_itertools as mi
 
@@ -1996,6 +1997,13 @@ class DifferenceTest(TestCase):
 
     def test_empty(self):
         self.assertEqual(list(mi.difference([])), [])
+
+    @skipIf(version_info[:2] < (3, 8), 'accumulate with initial needs 3.8+')
+    def test_initial(self):
+        original = list(range(100))
+        accumulated = accumulate(original, initial=100)
+        actual = list(mi.difference(accumulated, initial=100))
+        self.assertEqual(actual, original)
 
 
 class SeekableTest(TestCase):

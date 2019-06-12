@@ -1899,7 +1899,7 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         yield map(itemgetter(1), g)
 
 
-def difference(iterable, func=sub):
+def difference(iterable, func=sub, *, initial=None):
     """By default, compute the first difference of *iterable* using
     :func:`operator.sub`.
 
@@ -1907,7 +1907,7 @@ def difference(iterable, func=sub):
         >>> list(difference(iterable))
         [0, 1, 2, 3, 4]
 
-    This is the opposite of :func:`accumulate`'s default behavior:
+    This is the opposite of :func:`itertools.accumulate`'s default behavior:
 
         >>> from itertools import accumulate
         >>> iterable = [0, 1, 2, 3, 4]
@@ -1928,13 +1928,26 @@ def difference(iterable, func=sub):
         >>> list(difference(iterable, func))
         [1, 2, 3, 4, 5]
 
+    Since Python 3.8, :func:`itertools.accumulate` can be supplied with an
+    *initial* keyword argument. If :func:`difference` is called with *initial*
+    set to something other than ``None``, it will skip the first element when
+    computing successive differences.
+
+        >>> iterable = [100, 101, 103, 106]  # accumate([1, 2, 3], initial=100)
+        >>> list(difference(iterable, initial=100))
+        [1, 2, 3]
+
     """
     a, b = tee(iterable)
     try:
-        item = next(b)
+        first = [next(b)]
     except StopIteration:
         return iter([])
-    return chain([item], map(lambda x: func(x[1], x[0]), zip(a, b)))
+
+    if initial is not None:
+        first = []
+
+    return chain(first, map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
 class SequenceView(Sequence):
