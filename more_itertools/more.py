@@ -47,6 +47,7 @@ __all__ = [
     'intersperse',
     'islice_extended',
     'iterate',
+    'iterchunked',
     'last',
     'locate',
     'lstrip',
@@ -88,16 +89,15 @@ _marker = object()
 
 
 def chunked(iterable, n):
-    # type: (typing.Iterable, int) -> typing.Iterable[typing.Iterable]
-    """Break *iterable* into iterators of (at most) length *n*:
+    """Break *iterable* into lists of length *n*:
 
-        >>> list(list(chunk) for chunk in chunked([1, 2, 3, 4, 5, 6], 3))
+        >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
         [[1, 2, 3], [4, 5, 6]]
 
     If the length of *iterable* is not evenly divisible by *n*, the last
-    returned iterable will be shorter:
+    returned list will be shorter:
 
-        >>> list(list(chunk) for chunk in chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
+        >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
     To use a fill-in value instead, see the :func:`grouper` recipe.
@@ -107,6 +107,27 @@ def chunked(iterable, n):
     example is operations on rows in MySQL, which does not implement
     server-side cursors properly and would otherwise load the entire dataset
     into RAM on the client.
+
+    """
+    return iter(partial(take, n, iter(iterable)), [])
+
+
+def iterchunked(iterable, n):
+    # type: (typing.Iterable, int) -> typing.Iterable[typing.Iterable]
+    """Break *iterable* into iterators of (at most) length *n*:
+
+        >>> list(list(chunk) for chunk in iterchunked([1, 2, 3, 4, 5, 6], 3))
+        [[1, 2, 3], [4, 5, 6]]
+
+    If the length of *iterable* is not evenly divisible by *n*, the last
+    returned iterable will be shorter:
+
+        >>> list(list(chunk) for chunk in iterchunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
+        [[1, 2, 3], [4, 5, 6], [7, 8]]
+
+    To use a fill-in value instead, see the :func:`grouper` recipe.
+
+    To iterate over lists instead of sub-iterators, see the :func:`chunked` recipe.
 
     """
 
@@ -640,7 +661,7 @@ def intersperse(e, iterable, n=1):
         # islice(..., 1, None) -> [x_0, x_1], [e], [x_2, x_3]...
         # flatten(...) -> x_0, x_1, e, x_2, x_3...
         filler = repeat([e])
-        chunks = iter(list(chunk) for chunk in chunked(iterable, n))
+        chunks = chunked(iterable, n)
         return flatten(islice(interleave(filler, chunks), 1, None))
 
 
@@ -1058,7 +1079,6 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
                 yield item
         else:
             for chunk in chunked(iterable, chunk_size):
-                chunk = list(chunk)
                 func(chunk)
                 yield from chunk
     finally:
@@ -2205,7 +2225,7 @@ def make_decorator(wrapping_func, result_index=0):
         ... def iter_range(n):
         ...     return iter(range(n))
         ...
-        >>> list(list(chunk) for chunk in iter_range(9))
+        >>> list(iter_range(9))
         [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 
     To only allow truthy items to be returned:
