@@ -1058,7 +1058,8 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
                 yield item
         else:
             for chunk in chunked(iterable, chunk_size):
-                func(list(chunk))
+                chunk = list(chunk)
+                func(chunk)
                 yield from chunk
     finally:
         if after is not None:
