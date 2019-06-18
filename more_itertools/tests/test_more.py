@@ -80,7 +80,7 @@ class ChunkedTests(TestCase):
     def test_even(self):
         """Test when ``n`` divides evenly into the length of the iterable."""
         self.assertEqual(
-            list(mi.chunked('ABCDEF', 3)), [['A', 'B', 'C'], ['D', 'E', 'F']]
+            list(list(chunk) for chunk in mi.chunked('ABCDEF', 3)), [['A', 'B', 'C'], ['D', 'E', 'F']]
         )
 
     def test_odd(self):
@@ -89,7 +89,7 @@ class ChunkedTests(TestCase):
 
         """
         self.assertEqual(
-            list(mi.chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']]
+            list(list(chunk) for chunk in mi.chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']]
         )
 
 

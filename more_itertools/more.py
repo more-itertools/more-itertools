@@ -88,15 +88,16 @@ _marker = object()
 
 
 def chunked(iterable, n):
-    """Break *iterable* into lists of length *n*:
+    # type: (typing.Iterable, int) -> typing.Iterable[typing.Iterable]
+    """Break *iterable* into iterators of (at most) length *n*:
 
-        >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
+        >>> list(list(chunk) for chunk in chunked([1, 2, 3, 4, 5, 6], 3))
         [[1, 2, 3], [4, 5, 6]]
 
     If the length of *iterable* is not evenly divisible by *n*, the last
-    returned list will be shorter:
+    returned iterable will be shorter:
 
-        >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
+        >>> list(list(chunk) for chunk in chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
     To use a fill-in value instead, see the :func:`grouper` recipe.
@@ -108,7 +109,58 @@ def chunked(iterable, n):
     into RAM on the client.
 
     """
-    return iter(partial(take, n, iter(iterable)), [])
+
+    # Make sure we are working with an iterator
+    if not (
+        hasattr(iterable, '__next__') and
+        callable(iterable.__next__)
+    ):
+        iterable = iter(iterable)
+
+    # Define functions for yielding sub-iterators
+
+    def yield_and_dequeue(queue, limit):
+        # type: (Iterable, int) -> Iterable
+        """
+        De-queues and yields at most `limit` number of items from an iterator
+        """
+        for i in range(limit):
+            try:
+                yield next(queue)
+            except StopIteration:
+                break
+
+    def dequeue_and_yield(queue, limit):
+        # type: (Iterable, int) -> Iterable
+        """
+        This function first checks the next value in the queue to make sure we haven't already reached the end of the
+        iterator, *then* de-queues and yields at most `limit` number of items from the iterator--but only if there is at
+        least one upcoming value. This is to prevent the parent function from yielding empty iterators.
+        """
+        if not limit:
+            return None
+
+        try:
+            first = next(queue)
+        except StopIteration:
+            return None
+
+        chunk = (first,)
+
+        if limit > 1:
+            chunk = chain(chunk, yield_and_dequeue(queue, limit-1))
+        else:
+            chunk = iter(chunk)
+
+        return chunk
+
+    # Retrieve the first chunk of values (or `None`)
+    value = dequeue_and_yield(iterable, n)
+
+    # Only yield `value` so long as it is an iterator, as `None` indicates we've exhausted `iterable`
+    while value is not None:
+        yield value
+        value = dequeue_and_yield(iterable, n)
 
 
 def first(iterable, default=_marker):
@@ -588,7 +640,7 @@ def intersperse(e, iterable, n=1):
         # islice(..., 1, None) -> [x_0, x_1], [e], [x_2, x_3]...
         # flatten(...) -> x_0, x_1, e, x_2, x_3...
         filler = repeat([e])
-        chunks = chunked(iterable, n)
+        chunks = iter(list(chunk) for chunk in chunked(iterable, n))
         return flatten(islice(interleave(filler, chunks), 1, None))
 
 
@@ -1006,7 +1058,7 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
                 yield item
         else:
             for chunk in chunked(iterable, chunk_size):
-                func(chunk)
+                func(list(chunk))
                 yield from chunk
     finally:
         if after is not None:
@@ -2152,7 +2204,7 @@ def make_decorator(wrapping_func, result_index=0):
         ... def iter_range(n):
         ...     return iter(range(n))
         ...
-        >>> list(iter_range(9))
+        >>> list(list(chunk) for chunk in iter_range(9))
         [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 
     To only allow truthy items to be returned:

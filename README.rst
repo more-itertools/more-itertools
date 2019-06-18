@@ -135,7 +135,7 @@ Several new recipes are available as well:
 
     >>> from more_itertools import chunked
     >>> iterable = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    >>> list(chunked(iterable, 3))
+    >>> list(list(chunk) for chunk in chunked(iterable, 3))
     [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 
     >>> from more_itertools import spy
