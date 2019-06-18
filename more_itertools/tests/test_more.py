@@ -93,7 +93,7 @@ class ChunkedTests(TestCase):
         )
 
 
-class ChunkedIterTests(TestCase):
+class IterchunkedTests(TestCase):
     """Tests for ``iterchunked()``"""
 
     def test_even(self):
