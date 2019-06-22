@@ -47,7 +47,7 @@ __all__ = [
     'intersperse',
     'islice_extended',
     'iterate',
-    'iterchunked',
+    'ichunked',
     'last',
     'locate',
     'lstrip',
@@ -2467,9 +2467,9 @@ def only(iterable, default=None, too_long=None):
     return value
 
 
-def iterchunked(iterable, n):
+def ichunked(iterable, n):
     """Break *iterable* into sub-iterables with *n* elements each.
-    :func:`iterchunked` is like :func:`chunked`, but it yields iterables
+    :func:`ichunked` is like :func:`chunked`, but it yields iterables
     instead of lists.
 
     If the sub-iterables are read in order, the elements of *iterable*
@@ -2478,7 +2478,7 @@ def iterchunked(iterable, n):
     elements as necessary.
 
     >>> from itertools import count
-    >>> all_chunks = iterchunked(count(), 4)
+    >>> all_chunks = ichunked(count(), 4)
     >>> c_1, c_2, c_3 = next(all_chunks), next(all_chunks), next(all_chunks)
     >>> list(c_2)  # c_1's elements have been cached; c_3's haven't been
     [4, 5, 6, 7]
