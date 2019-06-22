@@ -2489,14 +2489,8 @@ def ichunked(iterable, n):
 
     """
     source = iter(iterable)
-    i = 0
 
     while True:
-        # Don't advance the iterator on the first loop, but skip past
-        # n elements on subsequent loops.
-        consume(source, i)
-        i = n
-
         # Check to see whether we're at the end of the source iterable
         item = next(source, _marker)
         if item is _marker:
@@ -2505,3 +2499,6 @@ def ichunked(iterable, n):
         # Clone the source and yield an n-length slice
         source, it = tee(chain([item], source))
         yield islice(it, n)
+
+        # Advance the source iterable
+        consume(source, n)
