@@ -14,7 +14,7 @@ Version History
 
 * Changes to existing itertools:
     * :func:`numeric_range` now supports ranges specified by
-    ``datetime.datetime`` and ``datetime.timedelta`` objects (thanks to MSeifert04 for tests).
+      ``datetime.datetime`` and ``datetime.timedelta`` objects (thanks to MSeifert04 for tests).
     * :func:`difference` now supports an *initial* keyword argument.
 
 
