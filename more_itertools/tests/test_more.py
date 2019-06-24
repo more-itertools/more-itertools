@@ -2497,3 +2497,47 @@ class OnlyTests(TestCase):
         self.assertRaises(
             RuntimeError, lambda: mi.only([1, 2], too_long=RuntimeError)
         )
+
+
+class IchunkedTests(TestCase):
+    def test_even(self):
+        iterable = (str(x) for x in range(10))
+        actual = [''.join(c) for c in mi.ichunked(iterable, 5)]
+        expected = ['01234', '56789']
+        self.assertEqual(actual, expected)
+
+    def test_odd(self):
+        iterable = (str(x) for x in range(10))
+        actual = [''.join(c) for c in mi.ichunked(iterable, 4)]
+        expected = ['0123', '4567', '89']
+        self.assertEqual(actual, expected)
+
+    def test_zero(self):
+        iterable = []
+        actual = [list(c) for c in mi.ichunked(iterable, 0)]
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_negative(self):
+        iterable = count()
+        with self.assertRaises(ValueError):
+            [list(c) for c in mi.ichunked(iterable, -1)]
+
+    def test_out_of_order(self):
+        iterable = map(str, count())
+        it = mi.ichunked(iterable, 4)
+        chunk_1 = next(it)
+        chunk_2 = next(it)
+        self.assertEqual(''.join(chunk_2), '4567')
+        self.assertEqual(''.join(chunk_1), '0123')
+
+    def test_laziness(self):
+        def gen():
+            yield 0
+            raise RuntimeError
+            yield from count(1)
+
+        it = mi.ichunked(gen(), 4)
+        chunk = next(it)
+        self.assertEqual(next(chunk), 0)
+        self.assertRaises(RuntimeError, next, it)
