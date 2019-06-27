@@ -544,7 +544,7 @@ def distinct_permutations(iterable):
     sequence.
 
     """
-    def make_new_permutations(permutations, e):
+    def make_new_permutations(pool, e):
         """Internal helper function.
         The output permutations are built up by adding element *e* to the
         current *permutations* at every possible position.
@@ -553,15 +553,15 @@ def distinct_permutations(iterable):
         with e1 before e2 are ignored.
 
         """
-        for permutation in permutations:
-            for j in range(len(permutation)):
-                yield permutation[:j] + [e] + permutation[j:]
-                if permutation[j] == e:
+        for perm in pool:
+            for j in range(len(perm)):
+                yield perm[:j] + (e,) + perm[j:]
+                if perm[j] == e:
                     break
             else:
-                yield permutation + [e]
+                yield perm + (e,)
 
-    permutations = [[]]
+    permutations = [()]
     for e in iterable:
         permutations = make_new_permutations(permutations, e)
 
