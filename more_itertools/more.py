@@ -2522,7 +2522,6 @@ def distinct_combinations(iterable, r):
         yield ()
     else:
         pool = tuple(iterable)
-        enumerated = enumerate(pool)
-        for i, prefix in unique_everseen(enumerated, key=itemgetter(1)):
+        for i, prefix in unique_everseen(enumerate(pool), key=itemgetter(1)):
             for suffix in distinct_combinations(pool[i + 1:], r - 1):
                 yield (prefix,) + suffix
