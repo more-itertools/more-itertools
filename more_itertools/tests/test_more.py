@@ -9,6 +9,7 @@ from io import StringIO
 from itertools import (
     accumulate,
     chain,
+    combinations,
     count,
     groupby,
     islice,
@@ -2541,3 +2542,28 @@ class IchunkedTests(TestCase):
         chunk = next(it)
         self.assertEqual(next(chunk), 0)
         self.assertRaises(RuntimeError, next, it)
+
+
+class DistinctCombinationsTests(TestCase):
+    def test_basic(self):
+        iterable = (1, 2, 2, 3, 3, 3)
+        for r in range(len(iterable)):
+            with self.subTest(r=r):
+                actual = sorted(mi.distinct_combinations(iterable, r))
+                expected = sorted(set(combinations(iterable, r)))
+                self.assertEqual(actual, expected)
+
+    def test_distinct(self):
+        iterable = list(range(6))
+        for r in range(len(iterable)):
+            with self.subTest(r=r):
+                actual = list(mi.distinct_combinations(iterable, r))
+                expected = list(combinations(iterable, r))
+                self.assertEqual(actual, expected)
+
+    def test_negative(self):
+        with self.assertRaises(ValueError):
+            list(mi.distinct_combinations([], -1))
+
+    def test_empty(self):
+        self.assertEqual(list(mi.distinct_combinations([], 2)), [])
