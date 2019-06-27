@@ -5,6 +5,22 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+7.1.0
+-----
+
+* New itertools
+    * :func:`ichunked` (thanks davebelais and youtux)
+    * :func:`only` (thanks jaraco)
+
+* Changes to existing itertools:
+    * :func:`numeric_range` now supports ranges specified by
+      ``datetime.datetime`` and ``datetime.timedelta`` objects (thanks to MSeifert04 for tests).
+    * :func:`difference` now supports an *initial* keyword argument.
+
+
+* Other changes
+    * Various documentation fixes (thanks raimon49, pylang)
+
 7.0.0
 -----
 
@@ -14,7 +30,7 @@ Version History
     * :func:`substrings_indexes` (thanks to rominf)
 
 * Changes to existing itertools:
-    * :func:`collapse` now treats `bytes` objects the same as `str` objects. (thanks to Sweenpet)
+    * :func:`collapse` now treats ``bytes`` objects the same as ``str`` objects. (thanks to Sweenpet)
 
 The major version update is due to the change in the default behavior of
 :func:`collapse`. It now treats ``bytes`` objects the same as ``str`` objects.
