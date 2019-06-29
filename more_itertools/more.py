@@ -20,7 +20,7 @@ from operator import itemgetter, lt, gt, sub
 from sys import maxsize, version_info
 from time import monotonic
 
-from .recipes import consume, flatten, powerset, take
+from .recipes import consume, flatten, powerset, take, unique_everseen
 
 __all__ = [
     'adjacent',
@@ -35,6 +35,7 @@ __all__ = [
     'consumer',
     'count_cycle',
     'difference',
+    'distinct_combinations',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -543,7 +544,7 @@ def distinct_permutations(iterable):
     sequence.
 
     """
-    def make_new_permutations(permutations, e):
+    def make_new_permutations(pool, e):
         """Internal helper function.
         The output permutations are built up by adding element *e* to the
         current *permutations* at every possible position.
@@ -552,15 +553,15 @@ def distinct_permutations(iterable):
         with e1 before e2 are ignored.
 
         """
-        for permutation in permutations:
-            for j in range(len(permutation)):
-                yield permutation[:j] + [e] + permutation[j:]
-                if permutation[j] == e:
+        for perm in pool:
+            for j in range(len(perm)):
+                yield perm[:j] + (e,) + perm[j:]
+                if perm[j] == e:
                     break
             else:
-                yield permutation + [e]
+                yield perm + (e,)
 
-    permutations = [[]]
+    permutations = [()]
     for e in iterable:
         permutations = make_new_permutations(permutations, e)
 
@@ -2502,3 +2503,25 @@ def ichunked(iterable, n):
 
         # Advance the source iterable
         consume(source, n)
+
+
+def distinct_combinations(iterable, r):
+    """Yield the distinct combinations of *r* items taken from *iterable*.
+
+        >>> list(distinct_combinations([0, 0, 1], 2))
+        [(0, 0), (0, 1)]
+
+    Equivalent to ``set(combinations(iterable))``, except duplicates are not
+    generated and thrown away. For larger input sequences this is much more
+    efficient.
+
+    """
+    if r < 0:
+        raise ValueError('r must be non-negative')
+    elif r == 0:
+        yield ()
+    else:
+        pool = tuple(iterable)
+        for i, prefix in unique_everseen(enumerate(pool), key=itemgetter(1)):
+            for suffix in distinct_combinations(pool[i + 1:], r - 1):
+                yield (prefix,) + suffix
