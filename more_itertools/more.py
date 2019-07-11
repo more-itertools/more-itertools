@@ -2431,14 +2431,14 @@ def integer_partitions(N, k=None):
         if k <= 1:
             yield (N,)
         else:
-            for curr in range(1, (N//2)+1):
+            for curr in range(1, (N // 2) + 1):
                 if prev <= curr:
-                    nxt = N-curr
-                    for parts in helper(nxt, k-1, curr):
-                        yield (curr, *parts)
+                    nxt = N - curr
+                    for parts in helper(nxt, k - 1, curr):
+                        yield (curr,) + parts
 
     if k is None:
-        for k in range(1, N+1):
+        for k in range(1, N + 1):
             yield from helper(N, k, 1)
     else:
         yield from helper(N, k, 1)
@@ -2446,7 +2446,7 @@ def integer_partitions(N, k=None):
 
 def set_partitions(iterable, k=None):
     """
-    Generates k set partitions of iterable, or all partitions if k is not given.
+    Generates k set partitions of iterable, or all partitions if k is not given
     A set partition is a wasy to split a set into unique subsets that when
     summed result in the origin set.
 
@@ -2470,25 +2470,25 @@ def set_partitions(iterable, k=None):
         else:
             return len(a) < len(b)
 
-    def partition_indexes(indexes, k, prev_part):
+    def part_inds(inds, k, prev):
         """Generates set partitions by index"""
         if k <= 1:
-            yield (indexes,)
+            yield (inds,)
         else:
-            for this_part_size, rem_part_size in integer_partitions(len(indexes), 2):
-                for curr_part in combinations(indexes, this_part_size):
-                    nxt_part = tuple(i for i in indexes if i not in curr_part)
-                    if less(prev_part, curr_part) and less(curr_part, nxt_part):
-                        for nxt_parts in partition_indexes(nxt_part, k-1, curr_part):
-                            yield (curr_part, *nxt_parts)
+            for curr_part_size, _ in integer_partitions(len(inds), 2):
+                for curr_part in combinations(inds, curr_part_size):
+                    nxt_part = tuple(i for i in inds if i not in curr_part)
+                    if less(prev, curr_part) and less(curr_part, nxt_part):
+                        for nxt_parts in part_inds(nxt_part, k - 1, curr_part):
+                            yield (curr_part,) + nxt_parts
 
     def apply_selection(k):
         """Creates partitions of iterable using index partitions"""
-        for index_partitions in partition_indexes(range(len(iterable)), k, ()):
-            yield tuple(tuple(iterable[i] for i in indexes) for indexes in index_partitions)
+        for ind_parts in part_inds(range(len(iterable)), k, ()):
+            yield tuple(tuple(iterable[i] for i in inds) for inds in ind_parts)
 
     if k is None:
-        for k in range(1, len(iterable)+1):
+        for k in range(1, len(iterable) + 1):
             yield from apply_selection(k)
     else:
         yield from apply_selection(k)
