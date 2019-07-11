@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
+    combinations,
     chain,
     compress,
     count,
@@ -59,6 +60,8 @@ __all__ = [
     'only',
     'padded',
     'partitions',
+    'set_partitions',
+    'integer_partitions',
     'peekable',
     'replace',
     'rlocate',
@@ -2400,6 +2403,95 @@ def partitions(iterable):
     n = len(sequence)
     for i in powerset(range(1, n)):
         yield [sequence[i:j] for i, j in zip((0,) + i, i + (n,))]
+
+
+def integer_partitions(N, k=None):
+    """
+    Generates k integer partitions of N, or all partitions if k is not given.
+    An integer partition is a way to split a positive integer into multiple
+    integers that sum to N.
+
+    >>> N = 10
+    >>> for p in integer_partitions(N, 3):
+    ...     print(p)
+    (1, 1, 8)
+    (1, 2, 7)
+    (1, 3, 6)
+    (1, 4, 5)
+    (2, 2, 6)
+    (2, 3, 5)
+    (2, 4, 4)
+    (3, 3, 4)
+    """
+    N = int(N)
+    if N < 1:
+        raise ValueError("Cannot partition non-positive integers")
+
+    def helper(N, k, prev):
+        if k <= 1:
+            yield (N,)
+        else:
+            for curr in range(1, (N//2)+1):
+                if prev <= curr:
+                    nxt = N-curr
+                    for parts in helper(nxt, k-1, curr):
+                        yield (curr, *parts)
+
+    if k is None:
+        for k in range(1, N+1):
+            yield from helper(N, k, 1)
+    else:
+        yield from helper(N, k, 1)
+
+
+def set_partitions(iterable, k=None):
+    """
+    Generates k set partitions of iterable, or all partitions if k is not given.
+    A set partition is a wasy to split a set into unique subsets that when
+    summed result in the origin set.
+
+    >>> s = set(range(4))
+    >>> for p in set_partitions(s, 2):
+    ...     print(p)
+    ((0,), (1, 2, 3))
+    ((1,), (0, 2, 3))
+    ((2,), (0, 1, 3))
+    ((3,), (0, 1, 2))
+    ((0, 1), (2, 3))
+    ((0, 2), (1, 3))
+    ((0, 3), (1, 2))
+    """
+    iterable = tuple(iterable)
+
+    def less(a, b):
+        """Orders tuples lexically"""
+        if len(a) == len(b):
+            return a < b
+        else:
+            return len(a) < len(b)
+
+    def partition_indexes(indexes, k, prev_part):
+        """Generates set partitions by index"""
+        if k <= 1:
+            yield (indexes,)
+        else:
+            for this_part_size, rem_part_size in integer_partitions(len(indexes), 2):
+                for curr_part in combinations(indexes, this_part_size):
+                    nxt_part = tuple(i for i in indexes if i not in curr_part)
+                    if less(prev_part, curr_part) and less(curr_part, nxt_part):
+                        for nxt_parts in partition_indexes(nxt_part, k-1, curr_part):
+                            yield (curr_part, *nxt_parts)
+
+    def apply_selection(k):
+        """Creates partitions of iterable using index partitions"""
+        for index_partitions in partition_indexes(range(len(iterable)), k, ()):
+            yield tuple(tuple(iterable[i] for i in indexes) for indexes in index_partitions)
+
+    if k is None:
+        for k in range(1, len(iterable)+1):
+            yield from apply_selection(k)
+    else:
+        yield from apply_selection(k)
 
 
 def time_limited(limit_seconds, iterable):
