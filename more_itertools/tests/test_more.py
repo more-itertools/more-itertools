@@ -2458,6 +2458,14 @@ class PartitionsTest(TestCase):
 
 
 class SetPartitionsTests(TestCase):
+    def test_repeated(self):
+        it = 'aaa'
+        actual = []
+        for part in mi.set_partitions(it, 2):
+            actual.append([''.join(p) for p in part])
+        expected = [['a', 'aa'], ['a', 'aa'], ['a', 'aa']]
+        self.assertEqual(actual, expected)
+
     def test_each_correct(self):
         a = frozenset(range(6))
         for soln in mi.set_partitions(a):

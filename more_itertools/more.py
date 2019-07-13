@@ -2378,22 +2378,15 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
 
 def partitions(iterable):
-    """Yield all possible partitions of *iterable*. This yields all the ways
-    to split the iterable, starting with the full iterable, all splits into
-    two pieces, all the splits into three pieces, and so on. Order is preserved
-    and repeated elements are treated as distinct.
+    """Yield all possible order-perserving partitions of *iterable*.
 
-    >>> iterable = ['a', 'b', 'c', 'd']
+    >>> iterable = 'abc'
     >>> for part in partitions(iterable):
-    ...     print(part)
-    [['a', 'b', 'c', 'd']]
-    [['a'], ['b', 'c', 'd']]
-    [['a', 'b'], ['c', 'd']]
-    [['a', 'b', 'c'], ['d']]
-    [['a'], ['b'], ['c', 'd']]
-    [['a'], ['b', 'c'], ['d']]
-    [['a', 'b'], ['c'], ['d']]
-    [['a'], ['b'], ['c'], ['d']]
+    ...     print([''.join(p) for p in part])
+    ['abc']
+    ['a', 'bc']
+    ['ab', 'c']
+    ['a', 'b', 'c']
 
     This is unrelated to :func:`partition`.
 
@@ -2406,37 +2399,40 @@ def partitions(iterable):
 
 def set_partitions(iterable, k=None):
     """
-    Generates k set partitions of iterable, or all partitions if k is not given
-    A set partition is a way to split a set into unique subsets that when
-    summed result in the original set.
+    Yield the set partitions of *iterable* into *k* parts. Set partitions are
+    not order-preserving.
 
-    >>> s = set(range(4))
-    >>> for p in set_partitions(s, 2):
-    ...     print(p)
-    ((0,), (1, 2, 3))
-    ((1,), (0, 2, 3))
-    ((2,), (0, 1, 3))
-    ((3,), (0, 1, 2))
-    ((0, 1), (2, 3))
-    ((0, 2), (1, 3))
-    ((0, 3), (1, 2))
+    >>> iterable = 'abc'
+    >>> for part in set_partitions(iterable, 2):
+    ...     print([''.join(p) for p in part])
+    ['a', 'bc']
+    ['b', 'ac']
+    ['c', 'ab']
+
+
+    If *k* is not given, every set partition is generated.
+
+    >>> iterable = 'abc'
+    >>> for part in set_partitions(iterable):
+    ...     print([''.join(p) for p in part])
+    ['abc']
+    ['a', 'bc']
+    ['b', 'ac']
+    ['c', 'ab']
+    ['a', 'b', 'c']
+
     """
     iterable = tuple(iterable)
+    n = len(iterable)
 
     def less(a, b):
         """Orders index tuples lexically"""
-        if len(a) == len(b):
-            return a < b
-        else:
-            return len(a) < len(b)
+        return (a < b) if (len(a) == len(b)) else (len(a) < len(b))
 
     def part_inds(inds, k, prev):
         """Generates set partitions by index"""
-        if k <= 1:
-            if less(prev, inds):
-                yield (inds,)
-            else:
-                return
+        if (k <= 1) and (less(prev, inds)):
+            yield (inds,)
         else:
             for curr_part_size in range(1, len(inds)):
                 for curr_part in combinations(inds, curr_part_size):
@@ -2447,11 +2443,14 @@ def set_partitions(iterable, k=None):
 
     def apply_selection(k):
         """Creates partitions of iterable using index partitions"""
-        for ind_parts in part_inds(range(len(iterable)), k, ()):
+        nonlocal iterable
+        nonlocal n
+
+        for ind_parts in part_inds(range(n), k, ()):
             yield tuple(tuple(iterable[i] for i in inds) for inds in ind_parts)
 
     if k is None:
-        for k in range(1, len(iterable) + 1):
+        for k in range(1, n + 1):
             yield from apply_selection(k)
     else:
         yield from apply_selection(k)

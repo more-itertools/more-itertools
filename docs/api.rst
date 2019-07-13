@@ -187,6 +187,7 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: distinct_combinations
 .. autofunction:: circular_shifts
 .. autofunction:: partitions
+.. autofunction:: set_partitions
 
 ----
 
