@@ -2469,9 +2469,9 @@ class SetPartitionsTests(TestCase):
         a = list(range(6))  # unique values so set comparision will work
         solns = list(mi.set_partitions(a))
         unique_solns = frozenset(
-                frozenset(
-                    frozenset(part) for part in soln)
-                for soln in solns)
+            frozenset(
+                frozenset(part) for part in soln)
+            for soln in solns)
         self.assertEqual(len(solns), len(unique_solns))
 
     def test_lexical_order(self):
@@ -2521,6 +2521,7 @@ class SetPartitionsTests(TestCase):
         actual = list(mi.set_partitions(range(5), 3))
         for e, a in zip(expected, actual):
             self.assertEqual(e, a)
+
 
 class TimeLimitedTests(TestCase):
     def test_basic(self):
