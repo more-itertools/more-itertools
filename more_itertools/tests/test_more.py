@@ -9,6 +9,7 @@ from io import StringIO
 from itertools import (
     accumulate,
     chain,
+    combinations,
     count,
     groupby,
     islice,
@@ -16,7 +17,7 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter
+from operator import add, mul, itemgetter, or_
 from sys import version_info
 from time import sleep
 from unittest import skipIf, TestCase
@@ -2456,6 +2457,80 @@ class PartitionsTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class SetPartitionsTests(TestCase):
+    def test_repeated(self):
+        it = 'aaa'
+        actual = []
+        for part in mi.set_partitions(it, 2):
+            actual.append([''.join(p) for p in part])
+        expected = [['a', 'aa'], ['a', 'aa'], ['a', 'aa']]
+        self.assertEqual(actual, expected)
+
+    def test_each_correct(self):
+        a = frozenset(range(6))
+        for soln in mi.set_partitions(a):
+            soln = frozenset(frozenset(part) for part in soln)
+            total = reduce(or_, soln)
+            self.assertEqual(a, total)
+
+    def test_duplicates(self):
+        a = list(range(6))  # unique values so set comparision will work
+        solns = list(mi.set_partitions(a))
+        unique_solns = frozenset(
+            frozenset(
+                frozenset(part) for part in soln)
+            for soln in solns)
+        self.assertEqual(len(solns), len(unique_solns))
+
+    def test_lexical_order(self):
+        def less(solnA, solnB):
+            """lexically orders solutions"""
+            if len(solnA) == len(solnB):
+                for partA, partB in zip(solnA, solnB):
+                    if len(partA) == len(partB):
+                        if partA == partB:
+                            continue
+                        else:
+                            return partA < partB
+                    else:
+                        return len(partA) < len(partB)
+            else:
+                return len(solnA) < len(solnB)
+        for curr, nxt in mi.windowed(mi.set_partitions(range(6)), 2):
+            self.assertTrue(less(curr, nxt))
+
+    def test_found_all(self):
+        """small example, hand-checked"""
+        expected = [((0,), (1,), (2, 3, 4)),
+                    ((0,), (2,), (1, 3, 4)),
+                    ((0,), (3,), (1, 2, 4)),
+                    ((0,), (4,), (1, 2, 3)),
+                    ((0,), (1, 2), (3, 4)),
+                    ((0,), (1, 3), (2, 4)),
+                    ((0,), (1, 4), (2, 3)),
+                    ((1,), (2,), (0, 3, 4)),
+                    ((1,), (3,), (0, 2, 4)),
+                    ((1,), (4,), (0, 2, 3)),
+                    ((1,), (0, 2), (3, 4)),
+                    ((1,), (0, 3), (2, 4)),
+                    ((1,), (0, 4), (2, 3)),
+                    ((2,), (3,), (0, 1, 4)),
+                    ((2,), (4,), (0, 1, 3)),
+                    ((2,), (0, 1), (3, 4)),
+                    ((2,), (0, 3), (1, 4)),
+                    ((2,), (0, 4), (1, 3)),
+                    ((3,), (4,), (0, 1, 2)),
+                    ((3,), (0, 1), (2, 4)),
+                    ((3,), (0, 2), (1, 4)),
+                    ((3,), (0, 4), (1, 2)),
+                    ((4,), (0, 1), (2, 3)),
+                    ((4,), (0, 2), (1, 3)),
+                    ((4,), (0, 3), (1, 2))]
+        actual = list(mi.set_partitions(range(5), 3))
+        for e, a in zip(expected, actual):
+            self.assertEqual(e, a)
+
+
 class TimeLimitedTests(TestCase):
     def test_basic(self):
         def generator():
@@ -2541,3 +2616,28 @@ class IchunkedTests(TestCase):
         chunk = next(it)
         self.assertEqual(next(chunk), 0)
         self.assertRaises(RuntimeError, next, it)
+
+
+class DistinctCombinationsTests(TestCase):
+    def test_basic(self):
+        iterable = (1, 2, 2, 3, 3, 3)
+        for r in range(len(iterable)):
+            with self.subTest(r=r):
+                actual = sorted(mi.distinct_combinations(iterable, r))
+                expected = sorted(set(combinations(iterable, r)))
+                self.assertEqual(actual, expected)
+
+    def test_distinct(self):
+        iterable = list(range(6))
+        for r in range(len(iterable)):
+            with self.subTest(r=r):
+                actual = list(mi.distinct_combinations(iterable, r))
+                expected = list(combinations(iterable, r))
+                self.assertEqual(actual, expected)
+
+    def test_negative(self):
+        with self.assertRaises(ValueError):
+            list(mi.distinct_combinations([], -1))
+
+    def test_empty(self):
+        self.assertEqual(list(mi.distinct_combinations([], 2)), [])
