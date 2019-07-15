@@ -55,6 +55,7 @@ __all__ = [
     'locate',
     'lstrip',
     'make_decorator',
+    'map_except',
     'map_reduce',
     'numeric_range',
     'one',
@@ -2605,3 +2606,25 @@ def filter_except(validator, iterable, *exceptions):
             pass
         else:
             yield item
+
+
+def map_except(function, iterable, *exceptions):
+    """Transform each item from *iterable* with *function* and yield the
+    result, unless *function* raises one of the specified *exceptions*.
+
+    *function* is called to transform each item in *iterable*.
+    It should be a accept one argument.
+
+    >>> iterable = ['1', '2', 'three', '4', None]
+    >>> list(map_except(int, iterable, ValueError, TypeError))
+    [1, 2, 4]
+
+    If an exception other than one given by *exceptions* is raised by
+    *function*, it is raised like normal.
+    """
+    exceptions = tuple(exceptions)
+    for item in iterable:
+        try:
+            yield function(item)
+        except exceptions:
+            pass

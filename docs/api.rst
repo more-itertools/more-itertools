@@ -215,6 +215,7 @@ consume iterables.
 .. autofunction:: consumer
 .. autofunction:: with_iter
 .. autofunction:: filter_except
+.. autofunction:: map_except
 
 ----
 
