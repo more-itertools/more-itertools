@@ -163,6 +163,8 @@ These tools yield certain items from an iterable.
 .. autofunction:: strip
 .. autofunction:: lstrip
 .. autofunction:: rstrip
+.. autofunction:: filter_except
+.. autofunction:: map_except
 
 ----
 
@@ -214,8 +216,6 @@ consume iterables.
 .. autofunction:: always_iterable
 .. autofunction:: consumer
 .. autofunction:: with_iter
-.. autofunction:: filter_except
-.. autofunction:: map_except
 
 ----
 
