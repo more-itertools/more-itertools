@@ -2641,3 +2641,59 @@ class DistinctCombinationsTests(TestCase):
 
     def test_empty(self):
         self.assertEqual(list(mi.distinct_combinations([], 2)), [])
+
+
+class FilterExceptTests(TestCase):
+    def test_no_exceptions_pass(self):
+        iterable = '0123'
+        actual = list(mi.filter_except(int, iterable))
+        expected = ['0', '1', '2', '3']
+        self.assertEqual(actual, expected)
+
+    def test_no_exceptions_raise(self):
+        iterable = ['0', '1', 'two', '3']
+        with self.assertRaises(ValueError):
+            list(mi.filter_except(int, iterable))
+
+    def test_raise(self):
+        iterable = ['0', '1' '2', 'three', None]
+        with self.assertRaises(TypeError):
+            list(mi.filter_except(int, iterable, ValueError))
+
+    def test_false(self):
+        # Even if the validator returns false, we pass through
+        validator = lambda x: False
+        iterable = ['0', '1', '2', 'three', None]
+        actual = list(mi.filter_except(validator, iterable, Exception))
+        expected = ['0', '1', '2', 'three', None]
+        self.assertEqual(actual, expected)
+
+    def test_multiple(self):
+        iterable = ['0', '1', '2', 'three', None, '4']
+        actual = list(mi.filter_except(int, iterable, ValueError, TypeError))
+        expected = ['0', '1', '2', '4']
+        self.assertEqual(actual, expected)
+
+
+class MapExceptTests(TestCase):
+    def test_no_exceptions_pass(self):
+        iterable = '0123'
+        actual = list(mi.map_except(int, iterable))
+        expected = [0, 1, 2, 3]
+        self.assertEqual(actual, expected)
+
+    def test_no_exceptions_raise(self):
+        iterable = ['0', '1', 'two', '3']
+        with self.assertRaises(ValueError):
+            list(mi.map_except(int, iterable))
+
+    def test_raise(self):
+        iterable = ['0', '1' '2', 'three', None]
+        with self.assertRaises(TypeError):
+            list(mi.map_except(int, iterable, ValueError))
+
+    def test_multiple(self):
+        iterable = ['0', '1', '2', 'three', None, '4']
+        actual = list(mi.map_except(int, iterable, ValueError, TypeError))
+        expected = [0, 1, 2, 4]
+        self.assertEqual(actual, expected)
