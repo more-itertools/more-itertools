@@ -5,6 +5,15 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+7.2.0
+-----
+
+* New itertools
+    * :func:`distinct_combinations`
+    * :func:`set_partitions` (thanks to kbarrett)
+    * :func:`filter_except`
+    * :func:`map_except`
+
 7.1.0
 -----
 
