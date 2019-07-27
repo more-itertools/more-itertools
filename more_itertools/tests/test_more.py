@@ -2457,11 +2457,12 @@ class PartitionsTest(TestCase):
         ]
         self.assertEqual(actual, expected)
 
+
 class _FrozenMultiset(Set):
     """
     A helper class, useful to compare two lists without reference to the order
     of elements.
-    
+
     FrozenMultiset represents a hashable set that allows duplicate elements.
     """
     def __init__(self, iterable):
