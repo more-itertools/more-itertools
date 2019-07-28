@@ -18,7 +18,7 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter, or_
+from operator import add, mul, itemgetter
 from sys import version_info
 from time import sleep
 from unittest import skipIf, TestCase
@@ -2500,23 +2500,27 @@ class _FrozenMultiset(Set):
         return hash(self._collection)
 
     def __repr__(self):
-        return "FrozenSet(["+", ".join(repr(x) for x in iter(self))+"])"
+        return "FrozenSet([{}]".format(
+               ", ".join(repr(x) for x in iter(self)))
 
 
 class SetPartitionsTests(TestCase):
     @staticmethod
     def _normalize_partition(p):
         """
-        Return a normalized, hashable, version of a partition using _FrozenMultiset
+        Return a normalized, hashable, version of a partition using
+        _FrozenMultiset
         """
         return _FrozenMultiset(_FrozenMultiset(g) for g in p)
 
     @staticmethod
     def _normalize_partitions(ps):
         """
-        Return a normalized set of all normalized partitions using _FrozenMultiset
+        Return a normalized set of all normalized partitions using
+        _FrozenMultiset
         """
-        return _FrozenMultiset(SetPartitionsTests._normalize_partition(p) for p in ps)
+        return _FrozenMultiset(
+            SetPartitionsTests._normalize_partition(p) for p in ps)
 
     def test_repeated(self):
         it = 'aaa'
@@ -2570,7 +2574,8 @@ class SetPartitionsTests(TestCase):
                          self._normalize_partitions(actual))
 
     def test_stirling_numbers(self):
-        """Check against https://en.wikipedia.org/wiki/Stirling_numbers_of_the_second_kind#Table_of_values"""
+        """Check against https://en.wikipedia.org/wiki/
+        Stirling_numbers_of_the_second_kind#Table_of_values"""
         cardinality_by_k_by_n = [
             [1],
             [1, 1],
@@ -2581,7 +2586,8 @@ class SetPartitionsTests(TestCase):
         ]
         for n, cardinality_by_k in enumerate(cardinality_by_k_by_n, 1):
             for k, cardinality in enumerate(cardinality_by_k, 1):
-                self.assertEqual(cardinality, len(list(mi.set_partitions(range(n), k))))
+                self.assertEqual(cardinality,
+                                 len(list(mi.set_partitions(range(n), k))))
 
 
 class TimeLimitedTests(TestCase):

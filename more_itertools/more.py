@@ -3,7 +3,6 @@ from collections.abc import Sequence
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
-    combinations,
     chain,
     compress,
     count,
@@ -2428,7 +2427,8 @@ def set_partitions(iterable, k=None):
     n = len(L)
     if k is not None:
         if k < 1:
-            raise ValueError("Can't partition in a negative or zero number of groups")
+            raise ValueError(
+                "Can't partition in a negative or zero number of groups")
         elif k > n:
             return []
 
