@@ -29,7 +29,7 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     test_suite='more_itertools.tests',
     url='https://github.com/erikrose/more-itertools',
     include_package_data=True,
