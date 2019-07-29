@@ -2589,6 +2589,15 @@ class SetPartitionsTests(TestCase):
                 self.assertEqual(cardinality,
                                  len(list(mi.set_partitions(range(n), k))))
 
+    def test_no_group(self):
+        def helper():
+            list(mi.set_partitions(range(4), -1))
+
+        self.assertRaises(ValueError, helper)
+
+    def test_to_many_groups(self):
+        self.assertEquals([], list(mi.set_partitions(range(4), 5)))
+
 
 class TimeLimitedTests(TestCase):
     def test_basic(self):

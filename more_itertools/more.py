@@ -2430,7 +2430,7 @@ def set_partitions(iterable, k=None):
             raise ValueError(
                 "Can't partition in a negative or zero number of groups")
         elif k > n:
-            return []
+            return
 
     def set_partitions_helper(L, k):
         n = len(L)
