@@ -105,7 +105,6 @@ These tools combine multiple iterables.
 .. autofunction:: sort_together
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
-.. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
 
 ----

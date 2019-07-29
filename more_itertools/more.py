@@ -1,3 +1,5 @@
+import warnings
+
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from functools import partial, wraps
@@ -18,7 +20,7 @@ from itertools import (
     zip_longest,
 )
 from operator import itemgetter, lt, gt, sub
-from sys import maxsize, version_info
+from sys import maxsize
 from time import monotonic
 
 from .recipes import consume, flatten, powerset, take, unique_everseen
@@ -337,20 +339,6 @@ class peekable:
         return self._cache[index]
 
 
-def _collate(*iterables, key=lambda a: a, reverse=False):
-    """Helper for ``collate()``, called when the user is using the ``reverse``
-    or ``key`` keyword arguments on Python versions below 3.5.
-
-    """
-    min_or_max = partial(max if reverse else min, key=itemgetter(0))
-    peekables = [peekable(it) for it in iterables]
-    peekables = [p for p in peekables if p]  # Kill empties.
-    while peekables:
-        _, p = min_or_max((key(p.peek()), p) for p in peekables)
-        yield next(p)
-        peekables = [x for x in peekables if x]
-
-
 def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
     *iterables*.
@@ -382,18 +370,11 @@ def collate(*iterables, **kwargs):
     On Python 3.5+, this function is an alias for :func:`heapq.merge`.
 
     """
-    if not kwargs:
-        return merge(*iterables)
-
-    return _collate(*iterables, **kwargs)
-
-
-# If using Python version 3.5 or greater, heapq.merge() will be faster than
-# collate - use that instead.
-if version_info >= (3, 5, 0):
-    _collate_docstring = collate.__doc__
-    collate = partial(merge)
-    collate.__doc__ = _collate_docstring
+    warnings.warn(
+        "collate is no longer part of more_itertools, use heapq.merge",
+        DeprecationWarning,
+    )
+    return merge(*iterables, **kwargs)
 
 
 def consumer(func):
