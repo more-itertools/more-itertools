@@ -374,7 +374,7 @@ def collate(*iterables, **kwargs):
         "collate is no longer part of more_itertools, use heapq.merge",
         DeprecationWarning,
     )
-    return merge(*iterables)
+    return merge(*iterables, **kwargs)
 
 
 def consumer(func):
