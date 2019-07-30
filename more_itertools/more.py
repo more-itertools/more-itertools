@@ -78,6 +78,7 @@ __all__ = [
     'split_at',
     'split_after',
     'split_before',
+    'split_when',
     'split_into',
     'spy',
     'stagger',
@@ -1079,6 +1080,40 @@ def split_after(iterable, pred):
             buf = []
     if buf:
         yield buf
+
+
+def split_when(iterable, pred):
+    """Yield lists of items from *iterable*, where callable *pred* returns
+    ``True`` for the last item of a list and the first item of the next one.
+
+        >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2], lambda x, y: x > y))
+        [[1, 2, 3, 3], [2, 5], [2, 4], [2]]
+
+    The function :func:`split_when` is more generic than :func:`split_before`
+    and :func:`split_after`:
+    ``split_when(iterable, lambda _, b: f(b))`` is equivalent to
+    ``split_before(iterable, f)`` and
+    ``split_when(iterable, lambda a, _: g(a))`` is equivalent to
+    ``split_after(iterable, g)``.
+    """
+    it = iter(iterable)
+    # PEP 479: StopIteration is replaced with RuntimeError
+    # in generators and must be catched.
+    try:
+        cur_item = next(it)
+    except StopIteration:
+        return     # raises the StopIteration
+
+    buf = [cur_item]
+    for next_item in it:
+        if pred(cur_item, next_item):
+            yield buf
+            buf = []
+
+        buf.append(next_item)
+        cur_item = next_item
+
+    yield buf
 
 
 def split_into(iterable, sizes):

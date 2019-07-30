@@ -1077,6 +1077,70 @@ class SplitAfterTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class SplitWhenTests(TestCase):
+    """Tests for ``split_when()``"""
+    @staticmethod
+    def _split_when_before(iterable, pred):
+        return mi.split_when(iterable, lambda _, c: pred(c))
+
+    @staticmethod
+    def _split_when_after(iterable, pred):
+        return mi.split_when(iterable, lambda c, _: pred(c))
+
+    # split_before emulation
+    def test_before_emulation_starts_with_sep(self):
+        actual = list(self._split_when_before('xooxoo', lambda c: c == 'x'))
+        expected = [['x', 'o', 'o'], ['x', 'o', 'o']]
+        self.assertEqual(actual, expected)
+
+    def test_before_emulation_ends_with_sep(self):
+        actual = list(self._split_when_before('ooxoox', lambda c: c == 'x'))
+        expected = [['o', 'o'], ['x', 'o', 'o'], ['x']]
+        self.assertEqual(actual, expected)
+
+    def test_before_emulation_no_sep(self):
+        actual = list(self._split_when_before('ooo', lambda c: c == 'x'))
+        expected = [['o', 'o', 'o']]
+        self.assertEqual(actual, expected)
+
+    # split_after emulation
+    def test_after_emulation_starts_with_sep(self):
+        actual = list(self._split_when_after('xooxoo', lambda c: c == 'x'))
+        expected = [['x'], ['o', 'o', 'x'], ['o', 'o']]
+        self.assertEqual(actual, expected)
+
+    def test_after_emulation_ends_with_sep(self):
+        actual = list(self._split_when_after('ooxoox', lambda c: c == 'x'))
+        expected = [['o', 'o', 'x'], ['o', 'o', 'x']]
+        self.assertEqual(actual, expected)
+
+    def test_after_emulation_no_sep(self):
+        actual = list(self._split_when_after('ooo', lambda c: c == 'x'))
+        expected = [['o', 'o', 'o']]
+        self.assertEqual(actual, expected)
+
+    # edge cases
+    def test_empty_iterable(self):
+        actual = list(mi.split_when('', lambda a, b: a != b))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_one_element(self):
+        actual = list(mi.split_when('o', lambda a, b: a == b))
+        expected = [['o']]
+        self.assertEqual(actual, expected)
+
+    def test_one_element_is_second_item(self):
+        actual = list(self._split_when_before('x', lambda c: c == 'x'))
+        expected = [['x']]
+        self.assertEqual(actual, expected)
+
+    def test_one_element_is_first_item(self):
+        actual = list(self._split_when_after('x', lambda c: c == 'x'))
+        expected = [['x']]
+        self.assertEqual(actual, expected)
+
+
 class SplitIntoTests(TestCase):
     """Tests for ``split_into()``"""
 
