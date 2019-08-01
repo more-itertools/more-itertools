@@ -1083,26 +1083,21 @@ def split_after(iterable, pred):
 
 
 def split_when(iterable, pred):
-    """Yield lists of items from *iterable*, where callable *pred* returns
-    ``True`` for the last item of a list and the first item of the next one.
+    """Split *iterable* into pieces based on the output of *pred*.
+    *pred* should be a function that takes successive pairs of items and
+    returns ``True`` if the iterable should be split in between them.
+
+    For example, to find runs of increasing numbers, split the iterable when
+    element ``i`` is larger than element ``i + 1``:
 
         >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2], lambda x, y: x > y))
         [[1, 2, 3, 3], [2, 5], [2, 4], [2]]
-
-    The function :func:`split_when` is more generic than :func:`split_before`
-    and :func:`split_after`:
-    ``split_when(iterable, lambda _, b: f(b))`` is equivalent to
-    ``split_before(iterable, f)`` and
-    ``split_when(iterable, lambda a, _: g(a))`` is equivalent to
-    ``split_after(iterable, g)``.
     """
     it = iter(iterable)
-    # PEP 479: StopIteration is replaced with RuntimeError
-    # in generators and must be catched.
     try:
         cur_item = next(it)
     except StopIteration:
-        return     # raises the StopIteration
+        return
 
     buf = [cur_item]
     for next_item in it:

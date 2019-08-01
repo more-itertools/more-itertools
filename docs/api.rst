@@ -22,6 +22,7 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: split_before
 .. autofunction:: split_after
 .. autofunction:: split_into
+.. autofunction:: split_when
 .. autofunction:: bucket
 .. autofunction:: unzip
 
