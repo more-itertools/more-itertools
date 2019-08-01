@@ -22,6 +22,7 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: split_before
 .. autofunction:: split_after
 .. autofunction:: split_into
+.. autofunction:: split_when
 .. autofunction:: bucket
 .. autofunction:: unzip
 
@@ -105,7 +106,6 @@ These tools combine multiple iterables.
 .. autofunction:: sort_together
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
-.. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
 
 ----

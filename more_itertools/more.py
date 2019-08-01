@@ -1,3 +1,5 @@
+import warnings
+
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from functools import partial, wraps
@@ -18,7 +20,7 @@ from itertools import (
     zip_longest,
 )
 from operator import itemgetter, lt, gt, sub
-from sys import maxsize, version_info
+from sys import maxsize
 from time import monotonic
 
 from .recipes import consume, flatten, powerset, take, unique_everseen
@@ -76,6 +78,7 @@ __all__ = [
     'split_at',
     'split_after',
     'split_before',
+    'split_when',
     'split_into',
     'spy',
     'stagger',
@@ -337,20 +340,6 @@ class peekable:
         return self._cache[index]
 
 
-def _collate(*iterables, key=lambda a: a, reverse=False):
-    """Helper for ``collate()``, called when the user is using the ``reverse``
-    or ``key`` keyword arguments on Python versions below 3.5.
-
-    """
-    min_or_max = partial(max if reverse else min, key=itemgetter(0))
-    peekables = [peekable(it) for it in iterables]
-    peekables = [p for p in peekables if p]  # Kill empties.
-    while peekables:
-        _, p = min_or_max((key(p.peek()), p) for p in peekables)
-        yield next(p)
-        peekables = [x for x in peekables if x]
-
-
 def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
     *iterables*.
@@ -382,18 +371,11 @@ def collate(*iterables, **kwargs):
     On Python 3.5+, this function is an alias for :func:`heapq.merge`.
 
     """
-    if not kwargs:
-        return merge(*iterables)
-
-    return _collate(*iterables, **kwargs)
-
-
-# If using Python version 3.5 or greater, heapq.merge() will be faster than
-# collate - use that instead.
-if version_info >= (3, 5, 0):
-    _collate_docstring = collate.__doc__
-    collate = partial(merge)
-    collate.__doc__ = _collate_docstring
+    warnings.warn(
+        "collate is no longer part of more_itertools, use heapq.merge",
+        DeprecationWarning,
+    )
+    return merge(*iterables, **kwargs)
 
 
 def consumer(func):
@@ -1098,6 +1080,35 @@ def split_after(iterable, pred):
             buf = []
     if buf:
         yield buf
+
+
+def split_when(iterable, pred):
+    """Split *iterable* into pieces based on the output of *pred*.
+    *pred* should be a function that takes successive pairs of items and
+    returns ``True`` if the iterable should be split in between them.
+
+    For example, to find runs of increasing numbers, split the iterable when
+    element ``i`` is larger than element ``i + 1``:
+
+        >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2], lambda x, y: x > y))
+        [[1, 2, 3, 3], [2, 5], [2, 4], [2]]
+    """
+    it = iter(iterable)
+    try:
+        cur_item = next(it)
+    except StopIteration:
+        return
+
+    buf = [cur_item]
+    for next_item in it:
+        if pred(cur_item, next_item):
+            yield buf
+            buf = []
+
+        buf.append(next_item)
+        cur_item = next_item
+
+    yield buf
 
 
 def split_into(iterable, sizes):
