@@ -271,8 +271,7 @@ def grouper(iterable, n, fillvalue=None):
     """
     if isinstance(iterable, int):
         warnings.warn(
-            "grouper expects iterable as first parameter",
-            DeprecationWarning,
+            "grouper expects iterable as first parameter", DeprecationWarning
         )
         n, iterable = iterable, n
     args = [iter(iterable)] * n
