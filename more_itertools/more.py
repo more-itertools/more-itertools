@@ -1041,8 +1041,8 @@ def split_at(iterable, pred):
 
 
 def split_before(iterable, pred):
-    """Yield lists of items from *iterable*, where each list starts with an
-    item where callable *pred* returns ``True``:
+    """Yield lists of items from *iterable*, where each list ends just before
+    an item for which callable *pred* returns ``True``:
 
         >>> list(split_before('OneTwo', lambda s: s.isupper()))
         [['O', 'n', 'e'], ['T', 'w', 'o']]
