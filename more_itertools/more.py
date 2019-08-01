@@ -5,7 +5,6 @@ from collections.abc import Sequence
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
-    combinations,
     chain,
     compress,
     count,
@@ -2419,8 +2418,8 @@ def set_partitions(iterable, k=None):
     >>> for part in set_partitions(iterable, 2):
     ...     print([''.join(p) for p in part])
     ['a', 'bc']
+    ['ab', 'c']
     ['b', 'ac']
-    ['c', 'ab']
 
 
     If *k* is not given, every set partition is generated.
@@ -2430,43 +2429,39 @@ def set_partitions(iterable, k=None):
     ...     print([''.join(p) for p in part])
     ['abc']
     ['a', 'bc']
+    ['ab', 'c']
     ['b', 'ac']
-    ['c', 'ab']
     ['a', 'b', 'c']
 
     """
-    iterable = tuple(iterable)
-    n = len(iterable)
+    L = list(iterable)
+    n = len(L)
+    if k is not None:
+        if k < 1:
+            raise ValueError(
+                "Can't partition in a negative or zero number of groups")
+        elif k > n:
+            return
 
-    def less(a, b):
-        """Orders index tuples lexically"""
-        return (a < b) if (len(a) == len(b)) else (len(a) < len(b))
-
-    def part_inds(inds, k, prev):
-        """Generates set partitions by index"""
-        if (k <= 1) and (less(prev, inds)):
-            yield (inds,)
+    def set_partitions_helper(L, k):
+        n = len(L)
+        if k == 1:
+            yield [L]
+        elif n == k:
+            yield [[s] for s in L]
         else:
-            for curr_part_size in range(1, len(inds)):
-                for curr_part in combinations(inds, curr_part_size):
-                    nxt_part = tuple(i for i in inds if i not in curr_part)
-                    if less(prev, curr_part):
-                        for nxt_parts in part_inds(nxt_part, k - 1, curr_part):
-                            yield (curr_part,) + nxt_parts
-
-    def apply_selection(k):
-        """Creates partitions of iterable using index partitions"""
-        nonlocal iterable
-        nonlocal n
-
-        for ind_parts in part_inds(range(n), k, ()):
-            yield tuple(tuple(iterable[i] for i in inds) for inds in ind_parts)
+            e, *M = L
+            for p in set_partitions_helper(M, k - 1):
+                yield [[e], *p]
+            for p in set_partitions_helper(M, k):
+                for i in range(len(p)):
+                    yield p[:i] + [[e] + p[i]] + p[i + 1:]
 
     if k is None:
         for k in range(1, n + 1):
-            yield from apply_selection(k)
+            yield from set_partitions_helper(L, k)
     else:
-        yield from apply_selection(k)
+        yield from set_partitions_helper(L, k)
 
 
 def time_limited(limit_seconds, iterable):

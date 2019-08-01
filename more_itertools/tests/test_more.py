@@ -1,4 +1,5 @@
-from collections import OrderedDict
+from collections import OrderedDict, Counter
+from collections.abc import Set
 from datetime import datetime, timedelta
 from decimal import Decimal
 from doctest import DocTestSuite
@@ -17,7 +18,7 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter, or_
+from operator import add, mul, itemgetter
 from sys import version_info
 from time import sleep
 from unittest import skipIf, TestCase
@@ -2521,78 +2522,145 @@ class PartitionsTest(TestCase):
         self.assertEqual(actual, expected)
 
 
+class _FrozenMultiset(Set):
+    """
+    A helper class, useful to compare two lists without reference to the order
+    of elements.
+
+    FrozenMultiset represents a hashable set that allows duplicate elements.
+    """
+    def __init__(self, iterable):
+        self._collection = frozenset(Counter(iterable).items())
+
+    def __contains__(self, y):
+        """
+        >>> (0, 1) in _FrozenMultiset([(0, 1), (2,), (0, 1)])
+        True
+        """
+        return any(y == x for x, _ in self._collection)
+
+    def __iter__(self):
+        """
+        >>> sorted(_FrozenMultiset([(0, 1), (2,), (0, 1)]))
+        [(0, 1), (0, 1), (2,)]
+        """
+        return (x for x, c in self._collection for _ in range(c))
+
+    def __len__(self):
+        """
+        >>> len(_FrozenMultiset([(0, 1), (2,), (0, 1)]))
+        3
+        """
+        return sum(c for x, c in self._collection)
+
+    def has_duplicates(self):
+        """
+        >>> _FrozenMultiset([(0, 1), (2,), (0, 1)]).has_duplicates()
+        True
+        """
+        return any(c != 1 for _, c in self._collection)
+
+    def __hash__(self):
+        return hash(self._collection)
+
+    def __repr__(self):
+        return "FrozenSet([{}]".format(
+               ", ".join(repr(x) for x in iter(self)))
+
+
 class SetPartitionsTests(TestCase):
+    @staticmethod
+    def _normalize_partition(p):
+        """
+        Return a normalized, hashable, version of a partition using
+        _FrozenMultiset
+        """
+        return _FrozenMultiset(_FrozenMultiset(g) for g in p)
+
+    @staticmethod
+    def _normalize_partitions(ps):
+        """
+        Return a normalized set of all normalized partitions using
+        _FrozenMultiset
+        """
+        return _FrozenMultiset(
+            SetPartitionsTests._normalize_partition(p) for p in ps)
+
     def test_repeated(self):
         it = 'aaa'
-        actual = []
-        for part in mi.set_partitions(it, 2):
-            actual.append([''.join(p) for p in part])
+        actual = mi.set_partitions(it, 2)
         expected = [['a', 'aa'], ['a', 'aa'], ['a', 'aa']]
-        self.assertEqual(actual, expected)
+        self.assertEqual(
+            self._normalize_partitions(expected),
+            self._normalize_partitions(actual)
+        )
 
     def test_each_correct(self):
-        a = frozenset(range(6))
-        for soln in mi.set_partitions(a):
-            soln = frozenset(frozenset(part) for part in soln)
-            total = reduce(or_, soln)
+        a = set(range(6))
+        for p in mi.set_partitions(a):
+            total = set(e for g in p for e in g)
             self.assertEqual(a, total)
 
     def test_duplicates(self):
-        a = list(range(6))  # unique values so set comparision will work
-        solns = list(mi.set_partitions(a))
-        unique_solns = frozenset(
-            frozenset(
-                frozenset(part) for part in soln)
-            for soln in solns)
-        self.assertEqual(len(solns), len(unique_solns))
-
-    def test_lexical_order(self):
-        def less(solnA, solnB):
-            """lexically orders solutions"""
-            if len(solnA) == len(solnB):
-                for partA, partB in zip(solnA, solnB):
-                    if len(partA) == len(partB):
-                        if partA == partB:
-                            continue
-                        else:
-                            return partA < partB
-                    else:
-                        return len(partA) < len(partB)
-            else:
-                return len(solnA) < len(solnB)
-        for curr, nxt in mi.windowed(mi.set_partitions(range(6)), 2):
-            self.assertTrue(less(curr, nxt))
+        a = set(range(6))
+        for p in mi.set_partitions(a):
+            self.assertFalse(self._normalize_partition(p).has_duplicates())
 
     def test_found_all(self):
         """small example, hand-checked"""
-        expected = [((0,), (1,), (2, 3, 4)),
-                    ((0,), (2,), (1, 3, 4)),
-                    ((0,), (3,), (1, 2, 4)),
-                    ((0,), (4,), (1, 2, 3)),
-                    ((0,), (1, 2), (3, 4)),
-                    ((0,), (1, 3), (2, 4)),
-                    ((0,), (1, 4), (2, 3)),
-                    ((1,), (2,), (0, 3, 4)),
-                    ((1,), (3,), (0, 2, 4)),
-                    ((1,), (4,), (0, 2, 3)),
-                    ((1,), (0, 2), (3, 4)),
-                    ((1,), (0, 3), (2, 4)),
-                    ((1,), (0, 4), (2, 3)),
-                    ((2,), (3,), (0, 1, 4)),
-                    ((2,), (4,), (0, 1, 3)),
-                    ((2,), (0, 1), (3, 4)),
-                    ((2,), (0, 3), (1, 4)),
-                    ((2,), (0, 4), (1, 3)),
-                    ((3,), (4,), (0, 1, 2)),
-                    ((3,), (0, 1), (2, 4)),
-                    ((3,), (0, 2), (1, 4)),
-                    ((3,), (0, 4), (1, 2)),
-                    ((4,), (0, 1), (2, 3)),
-                    ((4,), (0, 2), (1, 3)),
-                    ((4,), (0, 3), (1, 2))]
-        actual = list(mi.set_partitions(range(5), 3))
-        for e, a in zip(expected, actual):
-            self.assertEqual(e, a)
+        expected = [[[0], [1], [2, 3, 4]],
+                    [[0], [1, 2], [3, 4]],
+                    [[0], [2], [1, 3, 4]],
+                    [[0], [3], [1, 2, 4]],
+                    [[0], [4], [1, 2, 3]],
+                    [[0], [1, 3], [2, 4]],
+                    [[0], [1, 4], [2, 3]],
+                    [[1], [2], [0, 3, 4]],
+                    [[1], [3], [0, 2, 4]],
+                    [[1], [4], [0, 2, 3]],
+                    [[1], [0, 2], [3, 4]],
+                    [[1], [0, 3], [2, 4]],
+                    [[1], [0, 4], [2, 3]],
+                    [[2], [3], [0, 1, 4]],
+                    [[2], [4], [0, 1, 3]],
+                    [[2], [0, 1], [3, 4]],
+                    [[2], [0, 3], [1, 4]],
+                    [[2], [0, 4], [1, 3]],
+                    [[3], [4], [0, 1, 2]],
+                    [[3], [0, 1], [2, 4]],
+                    [[3], [0, 2], [1, 4]],
+                    [[3], [0, 4], [1, 2]],
+                    [[4], [0, 1], [2, 3]],
+                    [[4], [0, 2], [1, 3]],
+                    [[4], [0, 3], [1, 2]]]
+        actual = mi.set_partitions(range(5), 3)
+        self.assertEqual(self._normalize_partitions(expected),
+                         self._normalize_partitions(actual))
+
+    def test_stirling_numbers(self):
+        """Check against https://en.wikipedia.org/wiki/
+        Stirling_numbers_of_the_second_kind#Table_of_values"""
+        cardinality_by_k_by_n = [
+            [1],
+            [1, 1],
+            [1, 3, 1],
+            [1, 7, 6, 1],
+            [1, 15, 25, 10, 1],
+            [1, 31, 90, 65, 15, 1]
+        ]
+        for n, cardinality_by_k in enumerate(cardinality_by_k_by_n, 1):
+            for k, cardinality in enumerate(cardinality_by_k, 1):
+                self.assertEqual(cardinality,
+                                 len(list(mi.set_partitions(range(n), k))))
+
+    def test_no_group(self):
+        def helper():
+            list(mi.set_partitions(range(4), -1))
+
+        self.assertRaises(ValueError, helper)
+
+    def test_to_many_groups(self):
+        self.assertEquals([], list(mi.set_partitions(range(4), 5)))
 
 
 class TimeLimitedTests(TestCase):
