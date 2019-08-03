@@ -9,11 +9,10 @@ python:
 
 install:
     - "pip install ."
-    - "pip install -U black coveralls flake8 sphinx sphinx_rtd_theme"
+    - "pip install -U coveralls flake8 sphinx sphinx_rtd_theme"
 
 script:
     - "coverage run --include='more_itertools/*.py' --omit='more_itertools/tests/*' setup.py test"
-    - "black --check -t py35 -S -l 79 more_itertools/"
     - "flake8 ."
     - "sphinx-build -W -b html docs docs/_build/html"
 
