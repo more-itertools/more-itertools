@@ -2725,7 +2725,7 @@ class SetPartitionsTests(TestCase):
         self.assertRaises(ValueError, helper)
 
     def test_to_many_groups(self):
-        self.assertEquals([], list(mi.set_partitions(range(4), 5)))
+        self.assertEqual([], list(mi.set_partitions(range(4), 5)))
 
 
 class TimeLimitedTests(TestCase):
