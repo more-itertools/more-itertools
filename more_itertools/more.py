@@ -144,8 +144,10 @@ def first(iterable, default=_marker):
         # want to do something different with flow control when I raise the
         # exception, and it's weird to explicitly catch StopIteration.
         if default is _marker:
-            raise ValueError('first() was called on an empty iterable, and no '
-                             'default value was provided.')
+            raise ValueError(
+                'first() was called on an empty iterable, and no '
+                'default value was provided.'
+            )
         return default
 
 
@@ -170,8 +172,10 @@ def last(iterable, default=_marker):
             return deque(iterable, maxlen=1)[0]
     except IndexError:  # If the iterable was empty
         if default is _marker:
-            raise ValueError('last() was called on an empty iterable, and no '
-                             'default value was provided.')
+            raise ValueError(
+                'last() was called on an empty iterable, and no '
+                'default value was provided.'
+            )
         return default
 
 
@@ -233,6 +237,7 @@ class peekable:
         []
 
     """
+
     def __init__(self, iterable):
         self._it = iter(iterable)
         self._cache = deque()
@@ -399,11 +404,13 @@ def consumer(func):
     ``t.send()`` could be used.
 
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         gen = func(*args, **kwargs)
         next(gen)
         return gen
+
     return wrapper
 
 
@@ -529,6 +536,7 @@ def distinct_permutations(iterable):
     sequence.
 
     """
+
     def make_new_permutations(pool, e):
         """Internal helper function.
         The output permutations are built up by adding element *e* to the
@@ -696,7 +704,7 @@ def substrings(iterable):
     # And the rest
     for n in range(2, item_count + 1):
         for i in range(item_count - n + 1):
-            yield seq[i:i + n]
+            yield seq[i : i + n]
 
 
 def substrings_indexes(seq, reverse=False):
@@ -729,7 +737,7 @@ def substrings_indexes(seq, reverse=False):
     if reverse:
         r = reversed(r)
     return (
-        (seq[i:i + L], i, i + L) for L in r for i in range(len(seq) - L + 1)
+        (seq[i : i + L], i, i + L) for L in r for i in range(len(seq) - L + 1)
     )
 
 
@@ -766,6 +774,7 @@ class bucket:
         []
 
     """
+
     def __init__(self, iterable, key, validator=None):
         self._it = iter(iterable)
         self._key = key
@@ -917,11 +926,12 @@ def collapse(iterable, base_type=None, levels=None):
     ['a', ['b'], 'c', ['d']]
 
     """
+
     def walk(node, level):
         if (
-            ((levels is not None) and (level > levels)) or
-            isinstance(node, (str, bytes)) or
-            ((base_type is not None) and isinstance(node, base_type))
+            ((levels is not None) and (level > levels))
+            or isinstance(node, (str, bytes))
+            or ((base_type is not None) and isinstance(node, base_type))
         ):
             yield node
             return
@@ -1016,7 +1026,7 @@ def sliced(seq, n):
     For non-sliceable iterables, see :func:`chunked`.
 
     """
-    return takewhile(bool, (seq[i: i + n] for i in count(0, n)))
+    return takewhile(bool, (seq[i : i + n] for i in count(0, n)))
 
 
 def split_at(iterable, pred):
@@ -1041,8 +1051,8 @@ def split_at(iterable, pred):
 
 
 def split_before(iterable, pred):
-    """Yield lists of items from *iterable*, where each list starts with an
-    item where callable *pred* returns ``True``:
+    """Yield lists of items from *iterable*, where each list ends just before
+    an item for which callable *pred* returns ``True``:
 
         >>> list(split_before('OneTwo', lambda s: s.isupper()))
         [['O', 'n', 'e'], ['T', 'w', 'o']]
@@ -1317,9 +1327,13 @@ def sort_together(iterables, key_list=(0,), reverse=False):
         [(3, 2, 1), ('a', 'b', 'c')]
 
     """
-    return list(zip(*sorted(zip(*iterables),
-                            key=itemgetter(*key_list),
-                            reverse=reverse)))
+    return list(
+        zip(
+            *sorted(
+                zip(*iterables), key=itemgetter(*key_list), reverse=reverse
+            )
+        )
+    )
 
 
 def unzip(iterable):
@@ -1365,6 +1379,7 @@ def unzip(iterable):
                 # which just stops the unzipped iterables
                 # at first length mismatch
                 raise StopIteration
+
         return getter
 
     return tuple(map(itemgetter(i), it) for i, it in enumerate(iterables))
@@ -1774,7 +1789,7 @@ def islice_extended(iterable, *args):
     if step > 0:
         start = 0 if (start is None) else start
 
-        if (start < 0):
+        if start < 0:
             # Consume all but the last -start items
             cache = deque(enumerate(it, 1), maxlen=-start)
             len_iter = cache[-1][0] if cache else 0
@@ -1995,6 +2010,7 @@ class SequenceView(Sequence):
     require (much) extra storage.
 
     """
+
     def __init__(self, target):
         if not isinstance(target, Sequence):
             raise TypeError
@@ -2319,9 +2335,7 @@ def rlocate(iterable, pred=bool, window_size=None):
     if window_size is None:
         try:
             len_iter = len(iterable)
-            return (
-                len_iter - i - 1 for i in locate(reversed(iterable), pred)
-            )
+            return (len_iter - i - 1 for i in locate(reversed(iterable), pred))
         except TypeError:
             pass
 
@@ -2439,7 +2453,8 @@ def set_partitions(iterable, k=None):
     if k is not None:
         if k < 1:
             raise ValueError(
-                "Can't partition in a negative or zero number of groups")
+                "Can't partition in a negative or zero number of groups"
+            )
         elif k > n:
             return
 
@@ -2455,7 +2470,7 @@ def set_partitions(iterable, k=None):
                 yield [[e], *p]
             for p in set_partitions_helper(M, k):
                 for i in range(len(p)):
-                    yield p[:i] + [[e] + p[i]] + p[i + 1:]
+                    yield p[:i] + [[e] + p[i]] + p[i + 1 :]
 
     if k is None:
         for k in range(1, n + 1):
@@ -2585,7 +2600,7 @@ def distinct_combinations(iterable, r):
     else:
         pool = tuple(iterable)
         for i, prefix in unique_everseen(enumerate(pool), key=itemgetter(1)):
-            for suffix in distinct_combinations(pool[i + 1:], r - 1):
+            for suffix in distinct_combinations(pool[i + 1 :], r - 1):
                 yield (prefix,) + suffix
 
 

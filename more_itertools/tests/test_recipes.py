@@ -182,8 +182,7 @@ class NcyclesTests(TestCase):
         r = ["a", "b", "c"]
         n = mi.ncycles(r, 3)
         self.assertEqual(
-            ["a", "b", "c", "a", "b", "c", "a", "b", "c"],
-            list(n)
+            ["a", "b", "c", "a", "b", "c", "a", "b", "c"], list(n)
         )
 
     def test_null_case(self):
@@ -282,7 +281,7 @@ class GrouperTests(TestCase):
         """Test that the fill value is used to pad the final group"""
         self.assertEqual(
             list(mi.grouper('ABCDE', 3, 'x')),
-            [('A', 'B', 'C'), ('D', 'E', 'x')]
+            [('A', 'B', 'C'), ('D', 'E', 'x')],
         )
 
     def test_legacy_order(self):
@@ -305,14 +304,14 @@ class RoundrobinTests(TestCase):
         """Ensure ordered output from evenly populated iterables"""
         self.assertEqual(
             list(mi.roundrobin('ABC', [1, 2, 3], range(3))),
-            ['A', 1, 0, 'B', 2, 1, 'C', 3, 2]
+            ['A', 1, 0, 'B', 2, 1, 'C', 3, 2],
         )
 
     def test_uneven_groups(self):
         """Ensure ordered output from unevenly populated iterables"""
         self.assertEqual(
             list(mi.roundrobin('ABCD', [1, 2], range(0))),
-            ['A', 1, 'B', 2, 'C', 'D']
+            ['A', 1, 'B', 2, 'C', 'D'],
         )
 
 
@@ -339,8 +338,7 @@ class PowersetTests(TestCase):
         """Ensure a proper enumeration"""
         p = mi.powerset([1, 2, 3])
         self.assertEqual(
-            list(p),
-            [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
+            list(p), [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
         )
 
 
@@ -350,10 +348,7 @@ class UniqueEverseenTests(TestCase):
     def test_everseen(self):
         """ensure duplicate elements are ignored"""
         u = mi.unique_everseen('AAAABBBBCCDAABBB')
-        self.assertEqual(
-            ['A', 'B', 'C', 'D'],
-            list(u)
-        )
+        self.assertEqual(['A', 'B', 'C', 'D'], list(u))
 
     def test_custom_key(self):
         """ensure the custom key comparison works"""
