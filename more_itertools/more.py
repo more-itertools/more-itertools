@@ -1923,6 +1923,17 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         ['i']
         ['l', 'm', 'n', 'o', 'p']
 
+    Each group of consecutive items is an iterator that shares it source with
+    *iterable*. When an an output group is advanced, the previous group is
+    no longer available unless its elements are copied (e.g., into a ``list``).
+
+        >>> iterable = [1, 2, 11, 12, 21, 22]
+        >>> saved_groups = []
+        >>> for group in consecutive_groups(iterable):
+        ...     saved_groups.append(list(group))  # Copy group elements
+        >>> saved_groups
+        [[1, 2], [11, 12], [21, 22]]
+
     """
     for k, g in groupby(
         enumerate(iterable), key=lambda x: x[0] - ordering(x[1])
