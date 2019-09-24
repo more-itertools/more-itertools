@@ -30,10 +30,12 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Set,
     Tuple,
     Type,
     TypeVar,
     Union,
+    cast,
     overload,
 )
 
@@ -195,7 +197,8 @@ def all_equal(iterable: Iterable[object]) -> bool:
 
     """
     g = groupby(iterable)
-    return next(g, True) and not next(g, False)
+    first_group = next(g, True)
+    return first_group and not next(g, False)
 
 
 def quantify(iterable: Iterable[_T], pred: Callable[[_T], bool] = bool) -> int:
@@ -337,7 +340,7 @@ def grouper(
             "grouper expects iterable as first parameter", DeprecationWarning
         )
         n, iterable = iterable, n
-    args = [iter(iterable)] * n
+    args = [iter(cast(Iterable[_T], iterable))] * cast(int, n)
     return zip_longest(fillvalue=fillvalue, *args)
 
 
@@ -439,9 +442,9 @@ def unique_everseen(
     ``key=lambda x: frozenset(x.items())`` can be used.
 
     """
-    seenset = set()
+    seenset = set()  # type: Set[Union[_T, _U]]
     seenset_add = seenset.add
-    seenlist = []
+    seenlist = []  # type: List[Union[_T, _U]]
     seenlist_add = seenlist.append
     if key is None:
         for element in iterable:

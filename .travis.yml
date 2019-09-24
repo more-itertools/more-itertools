@@ -10,12 +10,13 @@ python:
 
 install:
     - "pip install ."
-    - "pip install -U coveralls flake8 sphinx sphinx_rtd_theme"
+    - "pip install -U coveralls flake8 sphinx sphinx_rtd_theme mypy"
 
 script:
     - "coverage run --include='more_itertools/*.py' --omit='more_itertools/tests/*' setup.py test"
     - "flake8 ."
     - "sphinx-build -W -b html docs docs/_build/html"
+    - "mypy more_itertools"
 
 notifications:
     - email: false

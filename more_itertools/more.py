@@ -27,6 +27,8 @@ from typing import (
     Callable,
     Container,
     ContextManager,
+    DefaultDict,
+    Deque,
     Dict,
     Generic,
     Iterable,
@@ -40,6 +42,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
     overload,
 )
 
@@ -251,7 +254,7 @@ def last(
     try:
         try:
             # Try to access the last item directly
-            return iterable[-1]
+            return iterable[-1]  # type: ignore
         except (TypeError, AttributeError, KeyError):
             # If not slice-able, iterate entirely using length-1 deque
             return deque(iterable, maxlen=1)[0]
@@ -325,7 +328,7 @@ class peekable(Generic[_T], Iterable[_T]):
 
     def __init__(self, iterable: Iterable[_T]) -> None:
         self._it = iter(iterable)
-        self._cache = deque()
+        self._cache = deque()  # type: Deque[_T]
 
     def __iter__(self) -> 'peekable[_T]':
         return self
@@ -507,12 +510,12 @@ def consumer(func: _GenFn) -> _GenFn:
     """
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Iterator[object]:
         gen = func(*args, **kwargs)
         next(gen)
         return gen
 
-    return wrapper
+    return cast(_GenFn, wrapper)
 
 
 def ilen(iterable: Iterable[object]) -> int:
@@ -613,7 +616,11 @@ def one(
     try:
         first_value = next(it)
     except StopIteration:
-        raise too_short or ValueError('too few items in iterable (expected 1)')
+        # We use type: ignore because of the following issue:
+        # https://git.io/JeG3f
+        raise too_short or ValueError(  # type: ignore
+            'too few items in iterable (expected 1)'
+        )
 
     try:
         second_value = next(it)
@@ -623,6 +630,9 @@ def one(
         msg = 'Expected exactly one item in iterable, but got {!r}, {!r}, ' \
               'and perhaps more.'.format(first_value, second_value)
         raise too_long or ValueError(msg)
+        raise too_long or ValueError(  # type: ignore
+            'too many items in iterable (expected 1)'
+        )
 
     return first_value
 
@@ -645,7 +655,9 @@ def distinct_permutations(iterable: Iterable[_T]) -> Iterator[Tuple[_T, ...]]:
 
     """
 
-    def make_new_permutations(pool, e):
+    def make_new_permutations(
+        pool: Iterable[Tuple[_T, ...]], e: _T
+    ) -> Iterator[Tuple[_T, ...]]:
         """Internal helper function.
         The output permutations are built up by adding element *e* to the
         current *permutations* at every possible position.
@@ -662,7 +674,7 @@ def distinct_permutations(iterable: Iterable[_T]) -> Iterator[Tuple[_T, ...]]:
             else:
                 yield perm + (e,)
 
-    permutations = [()]
+    permutations = [()]  # type: Iterable[Tuple[_T, ...]]
     for e in iterable:
         permutations = make_new_permutations(permutations, e)
 
@@ -725,7 +737,8 @@ def unique_to_each(*iterables: Iterable[_T]) -> List[List[_T]]:
 
     """
     pool = [list(it) for it in iterables]
-    counts = Counter(chain.from_iterable(map(set, pool)))
+    # We use type: ignore because of the following issue: https://git.io/JeG3T
+    counts = Counter(chain.from_iterable(map(set, pool)))  # type: ignore
     uniques = {element for element in counts if counts[element] == 1}
     return [list(filter(uniques.__contains__, it)) for it in pool]
 
@@ -783,7 +796,7 @@ def windowed(
         raise ValueError('step must be >= 1')
 
     it = iter(seq)
-    window = deque([], n)
+    window = deque([], n)  # type: Deque[Union[_T, _U, None]]
     append = window.append
 
     # Initial deque fill
@@ -824,13 +837,13 @@ def substrings(iterable: Iterable[_T]) -> Iterator[Tuple[_T, ...]]:
     for item in iter(iterable):
         seq.append(item)
         yield (item,)
-    seq = tuple(seq)
-    item_count = len(seq)
+    tup = tuple(seq)
+    item_count = len(tup)
 
     # And the rest
     for n in range(2, item_count + 1):
         for i in range(item_count - n + 1):
-            yield seq[i : i + n]
+            yield tup[i : i + n]
 
 
 def substrings_indexes(
@@ -861,9 +874,10 @@ def substrings_indexes(
 
 
     """
-    r = range(1, len(seq) + 1)
-    if reverse:
-        r = reversed(r)
+    if not reverse:
+        r = range(1, len(seq) + 1)
+    else:
+        r = range(len(seq), 0, -1)
     return (
         (seq[i : i + L], i, i + L) for L in r for i in range(len(seq) - L + 1)
     )
@@ -911,7 +925,7 @@ class bucket(Generic[_T, _U], Container[_U]):
     ):
         self._it = iter(iterable)
         self._key = key
-        self._cache = defaultdict(deque)
+        self._cache = defaultdict(deque)  # type: DefaultDict[_U, Deque[_T]]
         self._validator = validator or (lambda x: True)
 
     def __contains__(self, value: object) -> bool:
@@ -919,11 +933,11 @@ class bucket(Generic[_T, _U], Container[_U]):
             return False
 
         try:
-            item = next(self[value])
+            item = next(self[cast(_U, value)])
         except StopIteration:
             return False
         else:
-            self._cache[value].appendleft(item)
+            self._cache[cast(_U, value)].appendleft(item)
 
         return True
 
@@ -1064,7 +1078,7 @@ def collapse(
 
     """
 
-    def walk(node, level):
+    def walk(node: Iterable[Any], level: int) -> Iterator[Any]:
         if (
             ((levels is not None) and (level > levels))
             or isinstance(node, (str, bytes))
@@ -1164,11 +1178,11 @@ def side_effect(
 
         if chunk_size is None:
             for item in iterable:
-                func(item)
+                func(item)  # type: ignore
                 yield item
         else:
             for chunk in chunked(iterable, chunk_size):
-                func(chunk)
+                func(chunk)  # type: ignore
                 yield from chunk
     finally:
         if after is not None:
@@ -1205,7 +1219,7 @@ def split_at(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
         >>> list(split_at(range(10), lambda n: n % 2 == 1))
         [[0], [2], [4], [6], [8], []]
     """
-    buf = []
+    buf = []  # type: List[_T]
     for item in iterable:
         if pred(item):
             yield buf
@@ -1228,7 +1242,7 @@ def split_before(
         [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
 
     """
-    buf = []
+    buf = []  # type: List[_T]
     for item in iterable:
         if pred(item) and buf:
             yield buf
@@ -1248,7 +1262,7 @@ def split_after(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
         [[0], [1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
     """
-    buf = []
+    buf = []  # type: List[_T]
     for item in iterable:
         buf.append(item)
         if pred(item) and buf:
@@ -1528,7 +1542,7 @@ def zip_offset(
     if len(iterables) != len(offsets):
         raise ValueError("Number of iterables and offsets didn't match")
 
-    staggered = []
+    staggered = []  # type: List[Iterable[Union[_T, _U, None]]]
     for it, n in zip(iterables, offsets):
         if n < 0:
             staggered.append(chain(repeat(fillvalue, -n), it))
@@ -1609,11 +1623,11 @@ def unzip(iterable: Iterable[Sequence[_T]]) -> Tuple[Iterator[_T], ...]:
         # empty iterable, e.g. zip([], [], [])
         return ()
     # spy returns a one-length iterable as head
-    head = head[0]
-    iterables = tee(iterable, len(head))
+    first, = head
+    iterables = tee(iterable, len(first))
 
-    def itemgetter(i):
-        def getter(obj):
+    def itemgetter(i: int) -> Callable[[Sequence[_T]], _T]:
+        def getter(obj: Sequence[_T]) -> _T:
             try:
                 return obj[i]
             except IndexError:
@@ -1848,8 +1862,12 @@ def groupby_transform(
     duplicate groups, you should sort the iterable by the key function.
 
     """
-    valuefunc = (lambda x: x) if valuefunc is None else valuefunc
-    return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
+    if valuefunc is None:
+        return groupby(iterable, keyfunc)
+
+    return (  # type: ignore
+        (k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc)
+    )
 
 
 def numeric_range(*args: Any) -> Iterator[Any]:
@@ -2029,7 +2047,7 @@ def rstrip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
     This function is analogous to :func:`str.rstrip`.
 
     """
-    cache = []
+    cache = []  # type: List[_T]
     cache_append = cache.append
     cache_clear = cache.clear
     for x in iterable:
@@ -2092,8 +2110,10 @@ def islice_extended(
 
         if start < 0:
             # Consume all but the last -start items
-            cache = deque(enumerate(it, 1), maxlen=-start)
-            len_iter = cache[-1][0] if cache else 0
+            enum_cache = deque(
+                enumerate(it, 1), maxlen=-start
+            )  # type: Deque[Tuple[int, _T]]
+            len_iter = enum_cache[-1][0] if enum_cache else 0
 
             # Adjust start to be positive
             i = max(len_iter + start, 0)
@@ -2111,7 +2131,7 @@ def islice_extended(
             if n <= 0:
                 return
 
-            for index, item in islice(cache, 0, n, step):
+            for index, item in islice(enum_cache, 0, n, step):
                 yield item
         elif (stop is not None) and (stop < 0):
             # Advance to the start position
@@ -2119,7 +2139,7 @@ def islice_extended(
 
             # When stop is negative, we have to carry -stop items while
             # iterating
-            cache = deque(islice(it, -stop), maxlen=-stop)
+            cache = deque(islice(it, -stop), maxlen=-stop)  # type: Deque[_T]
 
             for index, item in enumerate(it):
                 cached_item = cache.popleft()
@@ -2135,18 +2155,16 @@ def islice_extended(
         if (stop is not None) and (stop < 0):
             # Consume all but the last items
             n = -stop - 1
-            cache = deque(enumerate(it, 1), maxlen=n)
-            len_iter = cache[-1][0] if cache else 0
+            enum_cache = deque(enumerate(it, 1), maxlen=n)
+            len_iter = enum_cache[-1][0] if enum_cache else 0
 
             # If start and stop are both negative they are comparable and
             # we can just slice. Otherwise we can adjust start to be negative
             # and then slice.
-            if start < 0:
-                i, j = start, stop
-            else:
-                i, j = min(start - len_iter, -1), None
+            if start >= 0:
+                start, stop = min(start - len_iter, -1), None
 
-            for index, item in list(cache)[i:j:step]:
+            for index, item in list(enum_cache)[start:stop:step]:
                 yield item
         else:
             # Advance to the stop position
@@ -2157,23 +2175,23 @@ def islice_extended(
             # stop is positive, so if start is negative they are not comparable
             # and we need the rest of the items.
             if start < 0:
-                i = start
-                n = None
+                u = start  # type: Optional[int]
+                stop = None
             # stop is None and start is positive, so we just need items up to
             # the start index.
             elif stop is None:
-                i = None
-                n = start + 1
+                u = None
+                stop = start + 1
             # Both stop and start are positive, so they are comparable.
             else:
-                i = None
-                n = start - stop
-                if n <= 0:
+                u = None
+                stop = start - stop
+                if stop <= 0:
                     return
 
-            cache = list(islice(it, n))
+            cache_list = list(islice(it, stop))
 
-            yield from cache[i::step]
+            yield from cache_list[u::step]
 
 
 def always_reversible(iterable: Iterable[_T]) -> Iterator[_T]:
@@ -2189,7 +2207,7 @@ def always_reversible(iterable: Iterable[_T]) -> Iterator[_T]:
     yield them in reverse order, which may require significant storage.
     """
     try:
-        return reversed(iterable)
+        return reversed(iterable)  # type: ignore
     except TypeError:
         return reversed(list(iterable))
 
@@ -2371,7 +2389,7 @@ class SequenceView(Generic[_T], Sequence[_T]):
         return '{}({})'.format(self.__class__.__name__, repr(self._target))
 
 
-class seekable(Generic[_T]):
+class seekable(Generic[_T], Iterator[_T]):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
     re-visited.
@@ -2425,8 +2443,8 @@ class seekable(Generic[_T]):
 
     def __init__(self, iterable: Iterable[_T]) -> None:
         self._source = iter(iterable)
-        self._cache = []
-        self._index = None
+        self._cache = []  # type: List[_T]
+        self._index = None  # type: Optional[int]
 
     def __iter__(self) -> 'seekable[_T]':
         return self
@@ -2511,7 +2529,10 @@ def circular_shifts(iterable: Iterable[_T]) -> List[Tuple[_T, ...]]:
         [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
     """
     lst = list(iterable)
-    return take(len(lst), windowed(cycle(lst), len(lst)))
+    windowed_cycle = cast(
+        Iterator[Tuple[_T, ...]], windowed(cycle(lst), len(lst))
+    )
+    return take(len(lst), windowed_cycle)
 
 
 def make_decorator(
@@ -2566,9 +2587,11 @@ def make_decorator(
     """
     # See https://sites.google.com/site/bbayles/index/decorator_factory for
     # notes on how this works.
-    def decorator(*wrapping_args, **wrapping_kwargs):
-        def outer_wrapper(f):
-            def inner_wrapper(*args, **kwargs):
+    def decorator(
+        *wrapping_args: Any, **wrapping_kwargs: Any
+    ) -> Callable[[Callable[..., Any]], Callable[..., _U]]:
+        def outer_wrapper(f: Callable[..., Any]) -> Callable[..., _U]:
+            def inner_wrapper(*args: Any, **kwargs: Any) -> _U:
                 result = f(*args, **kwargs)
                 wrapping_args_ = list(wrapping_args)
                 wrapping_args_.insert(result_index, result)
@@ -2679,19 +2702,23 @@ def map_reduce(
     dictionary.
 
     """
-    valuefunc = (lambda x: x) if (valuefunc is None) else valuefunc
+    value_function = (lambda x: x) if (valuefunc is None) else valuefunc
 
-    ret = defaultdict(list)
+    ret = defaultdict(list)  # type: Dict[_U, List[Any]]
     for item in iterable:
         key = keyfunc(item)
-        value = valuefunc(item)
+        value = value_function(item)
         ret[key].append(value)
 
     if reducefunc is not None:
         for key, value_list in ret.items():
-            ret[key] = reducefunc(value_list)
+            ret[key] = reducefunc(  # type: ignore
+                value_list
+            )
 
-    ret.default_factory = None
+    ret.default_factory = (  # type: ignore  # this changes the dictionary type
+        None
+    )
     return ret
 
 
@@ -2734,8 +2761,11 @@ def rlocate(
     """
     if window_size is None:
         try:
-            len_iter = len(iterable)
-            return (len_iter - i - 1 for i in locate(reversed(iterable), pred))
+            reversible = cast('_SizedReversible[_T]', iterable)
+            len_iter = len(reversible)
+            return (
+                len_iter - i - 1 for i in locate(reversed(reversible), pred)
+            )
         except TypeError:
             pass
 
@@ -2786,7 +2816,9 @@ def replace(
     # Add padding such that the number of windows matches the length of the
     # iterable
     it = chain(iterable, [_marker] * (window_size - 1))
-    windows = windowed(it, window_size)
+    windows = cast(
+        Iterator[Tuple[Union[_T, _Marker], ...]], windowed(it, window_size)
+    )
 
     n = 0
     for w in windows:
@@ -2866,7 +2898,7 @@ def set_partitions(
         elif k > n:
             return
 
-    def set_partitions_helper(L, k):
+    def set_partitions_helper(L: List[_T], k: int) -> Iterator[List[List[_T]]]:
         n = len(L)
         if k == 1:
             yield [L]
@@ -2970,6 +3002,9 @@ def only(
         msg = 'Expected exactly one item in iterable, but got {!r}, {!r}, ' \
               'and perhaps more.'.format(first_value, second_value)
         raise too_long or ValueError(msg)
+        raise too_long or ValueError(  # type: ignore
+            'too many items in iterable (expected 1)'
+        )
 
     return first_value
 
