@@ -1,7 +1,7 @@
 import warnings
 
 from collections import Counter, defaultdict, deque
-from collections.abc import Sequence
+from enum import Enum
 from functools import partial, wraps
 from heapq import merge
 from itertools import (
@@ -21,8 +21,33 @@ from itertools import (
 from operator import itemgetter, lt, gt, sub
 from sys import maxsize
 from time import monotonic
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Container,
+    ContextManager,
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Reversible,
+    Sequence,
+    Sized,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from .recipes import consume, flatten, powerset, take, unique_everseen
+
+if TYPE_CHECKING:
+    # Final is needed for now because of this issue https://git.io/JesdW
+    from typing_extensions import Final, Protocol
 
 __all__ = [
     'adjacent',
@@ -92,10 +117,46 @@ __all__ = [
     'zip_offset',
 ]
 
-_marker = object()
+
+# Type and type variable definitions
+_T = TypeVar('_T')
+_U = TypeVar('_U')
+_V = TypeVar('_V')
+_W = TypeVar('_W')
+_GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[object]])
+_T_co = TypeVar('_T_co', covariant=True)
+_Raisable = Union[BaseException, Type[BaseException]]
+_Pred = Callable[[_T], object]
 
 
-def chunked(iterable, n):
+if TYPE_CHECKING:
+
+    class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]):
+        """An abstract base class for sized and iterable.
+
+        SizedIterable is the same to Collection (new in Python 3.6), except
+        that subclasses don't have to implement __contains__.
+
+        """
+
+    class _SizedReversible(Protocol[_T_co], Sized, Reversible[_T_co]):
+        """An abstract base class for sized and reversible."""
+
+
+class _Marker(Enum):
+    """Singleton type, as described in:
+
+    https://python.org/dev/peps/pep-0484/#support-for-singleton-types-in-unions
+
+    """
+
+    MARKER = object()
+
+
+_marker = _Marker.MARKER  # type: Final
+
+
+def chunked(iterable: Iterable[_T], n: int) -> Iterator[List[_T]]:
     """Break *iterable* into lists of length *n*:
 
         >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
@@ -119,7 +180,19 @@ def chunked(iterable, n):
     return iter(partial(take, n, iter(iterable)), [])
 
 
-def first(iterable, default=_marker):
+@overload
+def first(iterable: Iterable[_T], default: _Marker = ...) -> _T:
+    ...
+
+
+@overload
+def first(iterable: Iterable[_T], default: _U) -> Union[_T, _U]:
+    ...
+
+
+def first(
+    iterable: Iterable[_T], default: Union[_Marker, _U] = _marker
+) -> Union[_T, _U]:
     """Return the first item of *iterable*, or *default* if *iterable* is
     empty.
 
@@ -151,7 +224,19 @@ def first(iterable, default=_marker):
         return default
 
 
-def last(iterable, default=_marker):
+@overload
+def last(iterable: Iterable[_T], default: _Marker = ...) -> _T:
+    ...
+
+
+@overload
+def last(iterable: Iterable[_T], default: _U) -> Union[_T, _U]:
+    ...
+
+
+def last(
+    iterable: Iterable[_T], default: Union[_Marker, _U] = _marker
+) -> Union[_T, _U]:
     """Return the last item of *iterable*, or *default* if *iterable* is
     empty.
 
@@ -179,7 +264,7 @@ def last(iterable, default=_marker):
         return default
 
 
-class peekable:
+class peekable(Generic[_T], Iterable[_T]):
     """Wrap an iterator to allow lookahead and prepending elements.
 
     Call :meth:`peek` on the result to get the value that will be returned
@@ -238,21 +323,29 @@ class peekable:
 
     """
 
-    def __init__(self, iterable):
+    def __init__(self, iterable: Iterable[_T]) -> None:
         self._it = iter(iterable)
         self._cache = deque()
 
-    def __iter__(self):
+    def __iter__(self) -> 'peekable[_T]':
         return self
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         try:
             self.peek()
         except StopIteration:
             return False
         return True
 
-    def peek(self, default=_marker):
+    @overload
+    def peek(self, default: _Marker = ...) -> _T:
+        ...
+
+    @overload
+    def peek(self, default: _U) -> Union[_T, _U]:
+        ...
+
+    def peek(self, default: Union[_U, _Marker] = _marker) -> Union[_T, _U]:
         """Return the item that will be next returned from ``next()``.
 
         Return ``default`` if there are no items left. If ``default`` is not
@@ -268,7 +361,7 @@ class peekable:
                 return default
         return self._cache[0]
 
-    def prepend(self, *items):
+    def prepend(self, *items: _T) -> None:
         """Stack up items to be the next ones returned from ``next()`` or
         ``self.peek()``. The items will be returned in
         first in, first out order::
@@ -299,13 +392,13 @@ class peekable:
         """
         self._cache.extendleft(reversed(items))
 
-    def __next__(self):
+    def __next__(self) -> _T:
         if self._cache:
             return self._cache.popleft()
 
         return next(self._it)
 
-    def _get_slice(self, index):
+    def _get_slice(self, index: slice) -> List[_T]:
         # Normalize the slice's arguments
         step = 1 if (index.step is None) else index.step
         if step > 0:
@@ -331,7 +424,15 @@ class peekable:
 
         return list(self._cache)[index]
 
-    def __getitem__(self, index):
+    @overload
+    def __getitem__(self, index: int) -> _T:
+        ...
+
+    @overload
+    def __getitem__(self, index: slice) -> List[_T]:
+        ...
+
+    def __getitem__(self, index: Union[int, slice]) -> Union[_T, List[_T]]:
         if isinstance(index, slice):
             return self._get_slice(index)
 
@@ -344,7 +445,7 @@ class peekable:
         return self._cache[index]
 
 
-def collate(*iterables, **kwargs):
+def collate(*iterables: Iterable[_T], **kwargs: Any) -> Iterable[_T]:
     """Return a sorted merge of the items from each of several already-sorted
     *iterables*.
 
@@ -382,7 +483,7 @@ def collate(*iterables, **kwargs):
     return merge(*iterables, **kwargs)
 
 
-def consumer(func):
+def consumer(func: _GenFn) -> _GenFn:
     """Decorator that automatically advances a PEP-342-style "reverse iterator"
     to its first yield point so you don't have to call ``next()`` on it
     manually.
@@ -414,7 +515,7 @@ def consumer(func):
     return wrapper
 
 
-def ilen(iterable):
+def ilen(iterable: Iterable[object]) -> int:
     """Return the number of items in *iterable*.
 
         >>> ilen(x for x in range(1000000) if x % 3 == 0)
@@ -431,7 +532,7 @@ def ilen(iterable):
     return next(counter)
 
 
-def iterate(func, start):
+def iterate(func: Callable[[_T], _T], start: _T) -> Iterator[_T]:
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
 
         >>> from itertools import islice
@@ -444,7 +545,7 @@ def iterate(func, start):
         start = func(start)
 
 
-def with_iter(context_manager):
+def with_iter(context_manager: ContextManager[Iterable[_T]]) -> Iterator[_T]:
     """Wrap an iterable in a ``with`` statement, so it closes once exhausted.
 
     For example, this will close the file when the iterator is exhausted::
@@ -459,7 +560,11 @@ def with_iter(context_manager):
         yield from iterable
 
 
-def one(iterable, too_short=None, too_long=None):
+def one(
+    iterable: Iterable[_T],
+    too_short: Optional[_Raisable] = None,
+    too_long: Optional[_Raisable] = None,
+) -> _T:
     """Return the first item from *iterable*, which is expected to contain only
     that item. Raise an exception if *iterable* is empty or has more than one
     item.
@@ -522,7 +627,7 @@ def one(iterable, too_short=None, too_long=None):
     return first_value
 
 
-def distinct_permutations(iterable):
+def distinct_permutations(iterable: Iterable[_T]) -> Iterator[Tuple[_T, ...]]:
     """Yield successive distinct permutations of the elements in *iterable*.
 
         >>> sorted(distinct_permutations([1, 0, 1]))
@@ -564,7 +669,9 @@ def distinct_permutations(iterable):
     return (tuple(t) for t in permutations)
 
 
-def intersperse(e, iterable, n=1):
+def intersperse(
+    e: _U, iterable: Iterable[_T], n: int = 1
+) -> Iterator[Union[_T, _U]]:
     """Intersperse filler element *e* among the items in *iterable*, leaving
     *n* items between each filler element.
 
@@ -590,7 +697,7 @@ def intersperse(e, iterable, n=1):
         return flatten(islice(interleave(filler, chunks), 1, None))
 
 
-def unique_to_each(*iterables):
+def unique_to_each(*iterables: Iterable[_T]) -> List[List[_T]]:
     """Return the elements from each of the input iterables that aren't in the
     other input iterables.
 
@@ -623,7 +730,23 @@ def unique_to_each(*iterables):
     return [list(filter(uniques.__contains__, it)) for it in pool]
 
 
-def windowed(seq, n, fillvalue=None, step=1):
+@overload
+def windowed(
+    seq: Iterable[_T], n: int, *, step: int = ...
+) -> Iterator[Tuple[Optional[_T], ...]]:
+    ...
+
+
+@overload
+def windowed(
+    seq: Iterable[_T], n: int, fillvalue: _U, step: int = ...
+) -> Iterator[Tuple[Union[_T, _U], ...]]:
+    ...
+
+
+def windowed(
+    seq: Iterable[_T], n: int, fillvalue: Optional[_U] = None, step: int = 1
+) -> Iterator[Tuple[Union[_T, _U, None], ...]]:
     """Return a sliding window of width *n* over the given iterable.
 
         >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
@@ -684,7 +807,7 @@ def windowed(seq, n, fillvalue=None, step=1):
         yield tuple(window)
 
 
-def substrings(iterable):
+def substrings(iterable: Iterable[_T]) -> Iterator[Tuple[_T, ...]]:
     """Yield all of the substrings of *iterable*.
 
         >>> [''.join(s) for s in substrings('more')]
@@ -710,7 +833,9 @@ def substrings(iterable):
             yield seq[i : i + n]
 
 
-def substrings_indexes(seq, reverse=False):
+def substrings_indexes(
+    seq: Sequence[_T], reverse: bool = False
+) -> Iterator[Tuple[Sequence[_T], int, int]]:
     """Yield all substrings and their positions in *seq*
 
     The items yielded will be a tuple of the form ``(substr, i, j)``, where
@@ -744,7 +869,7 @@ def substrings_indexes(seq, reverse=False):
     )
 
 
-class bucket:
+class bucket(Generic[_T, _U], Container[_U]):
     """Wrap *iterable* and return an object that buckets it iterable into
     child iterables based on a *key* function.
 
@@ -778,13 +903,18 @@ class bucket:
 
     """
 
-    def __init__(self, iterable, key, validator=None):
+    def __init__(
+        self,
+        iterable: Iterable[_T],
+        key: Callable[[_T], _U],
+        validator: Optional[_Pred[object]] = None,
+    ):
         self._it = iter(iterable)
         self._key = key
         self._cache = defaultdict(deque)
         self._validator = validator or (lambda x: True)
 
-    def __contains__(self, value):
+    def __contains__(self, value: object) -> bool:
         if not self._validator(value):
             return False
 
@@ -797,7 +927,7 @@ class bucket:
 
         return True
 
-    def _get_values(self, value):
+    def _get_values(self, value: _U) -> Iterator[_T]:
         """
         Helper to yield items from the parent iterator that match *value*.
         Items that don't match are stored in the local cache as they
@@ -823,14 +953,14 @@ class bucket:
                     elif self._validator(item_value):
                         self._cache[item_value].append(item)
 
-    def __getitem__(self, value):
+    def __getitem__(self, value: _U) -> Iterator[_T]:
         if not self._validator(value):
             return iter(())
 
         return self._get_values(value)
 
 
-def spy(iterable, n=1):
+def spy(iterable: Iterable[_T], n: int = 1) -> Tuple[List[_T], Iterator[_T]]:
     """Return a 2-tuple with a list containing the first *n* elements of
     *iterable*, and an iterator with the same items as *iterable*.
     This allows you to "look ahead" at the items in the iterable without
@@ -873,7 +1003,7 @@ def spy(iterable, n=1):
     return head, chain(head, it)
 
 
-def interleave(*iterables):
+def interleave(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Return a new iterable yielding from each iterable in turn,
     until the shortest is exhausted.
 
@@ -887,7 +1017,7 @@ def interleave(*iterables):
     return chain.from_iterable(zip(*iterables))
 
 
-def interleave_longest(*iterables):
+def interleave_longest(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Return a new iterable yielding from each iterable in turn,
     skipping any that are exhausted.
 
@@ -903,7 +1033,11 @@ def interleave_longest(*iterables):
     return (x for x in i if x is not _marker)
 
 
-def collapse(iterable, base_type=None, levels=None):
+def collapse(
+    iterable: Iterable[Any],
+    base_type: Optional[type] = None,
+    levels: Optional[int] = None,
+) -> Iterator[Any]:
     """Flatten an iterable with multiple levels of nesting (e.g., a list of
     lists of tuples) into non-iterable types.
 
@@ -952,7 +1086,35 @@ def collapse(iterable, base_type=None, levels=None):
     yield from walk(iterable, 0)
 
 
-def side_effect(func, iterable, chunk_size=None, before=None, after=None):
+@overload
+def side_effect(
+    func: _Pred[_T],
+    iterable: Iterable[_T],
+    chunk_size: None = ...,
+    before: Optional[Callable[[], object]] = ...,
+    after: Optional[Callable[[], object]] = ...,
+) -> Iterator[_T]:
+    ...
+
+
+@overload
+def side_effect(
+    func: _Pred[List[_T]],
+    iterable: Iterable[_T],
+    chunk_size: int,
+    before: Optional[Callable[[], object]] = ...,
+    after: Optional[Callable[[], object]] = ...,
+) -> Iterator[_T]:
+    ...
+
+
+def side_effect(
+    func: Union[_Pred[_T], _Pred[List[_T]]],
+    iterable: Iterable[_T],
+    chunk_size: Optional[int] = None,
+    before: Optional[Callable[[], object]] = None,
+    after: Optional[Callable[[], object]] = None,
+) -> Iterator[_T]:
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
     of items) before yielding the item.
 
@@ -1013,7 +1175,7 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
             after()
 
 
-def sliced(seq, n):
+def sliced(seq: Sequence[_T], n: int) -> Iterator[Sequence[_T]]:
     """Yield slices of length *n* from the sequence *seq*.
 
         >>> list(sliced((1, 2, 3, 4, 5, 6), 3))
@@ -1032,7 +1194,7 @@ def sliced(seq, n):
     return takewhile(bool, (seq[i : i + n] for i in count(0, n)))
 
 
-def split_at(iterable, pred):
+def split_at(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
     """Yield lists of items from *iterable*, where each list is delimited by
     an item where callable *pred* returns ``True``. The lists do not include
     the delimiting items.
@@ -1053,7 +1215,9 @@ def split_at(iterable, pred):
     yield buf
 
 
-def split_before(iterable, pred):
+def split_before(
+    iterable: Iterable[_T], pred: _Pred[_T]
+) -> Iterator[List[_T]]:
     """Yield lists of items from *iterable*, where each list ends just before
     an item for which callable *pred* returns ``True``:
 
@@ -1073,7 +1237,7 @@ def split_before(iterable, pred):
     yield buf
 
 
-def split_after(iterable, pred):
+def split_after(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
     """Yield lists of items from *iterable*, where each list ends with an
     item where callable *pred* returns ``True``:
 
@@ -1094,7 +1258,9 @@ def split_after(iterable, pred):
         yield buf
 
 
-def split_when(iterable, pred):
+def split_when(
+    iterable: Iterable[_T], pred: Callable[[_T, _T], Any]
+) -> Iterator[List[_T]]:
     """Split *iterable* into pieces based on the output of *pred*.
     *pred* should be a function that takes successive pairs of items and
     returns ``True`` if the iterable should be split in between them.
@@ -1123,7 +1289,9 @@ def split_when(iterable, pred):
     yield buf
 
 
-def split_into(iterable, sizes):
+def split_into(
+    iterable: Iterable[_T], sizes: Iterable[Optional[int]]
+) -> Iterator[List[_T]]:
     """Yield a list of sequential items from *iterable* of length 'n' for each
     integer 'n' in *sizes*.
 
@@ -1168,7 +1336,32 @@ def split_into(iterable, sizes):
             yield list(islice(it, size))
 
 
-def padded(iterable, fillvalue=None, n=None, next_multiple=False):
+@overload
+def padded(
+    iterable: Iterable[_T],
+    *,
+    n: Optional[int] = ...,
+    next_multiple: bool = ...
+) -> Iterator[Optional[_T]]:
+    ...
+
+
+@overload
+def padded(
+    iterable: Iterable[_T],
+    fillvalue: _U,
+    n: Optional[int] = ...,
+    next_multiple: bool = ...,
+) -> Iterator[Union[_T, _U]]:
+    ...
+
+
+def padded(
+    iterable: Iterable[_T],
+    fillvalue: Optional[_U] = None,
+    n: Optional[int] = None,
+    next_multiple: bool = False,
+) -> Iterator[Union[_T, _U, None]]:
     """Yield the elements from *iterable*, followed by *fillvalue*, such that
     at least *n* items are emitted.
 
@@ -1200,7 +1393,7 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
             yield fillvalue
 
 
-def distribute(n, iterable):
+def distribute(n: int, iterable: Iterable[_T]) -> List[Iterator[_T]]:
     """Distribute the items from *iterable* among *n* smaller iterables.
 
         >>> group_1, group_2 = distribute(2, [1, 2, 3, 4, 5, 6])
@@ -1235,7 +1428,31 @@ def distribute(n, iterable):
     return [islice(it, index, None, n) for index, it in enumerate(children)]
 
 
-def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
+@overload
+def stagger(
+    iterable: Iterable[_T],
+    offsets: '_SizedIterable[int]' = (-1, 0, 1),
+    longest: bool = ...,
+) -> Iterator[Tuple[Optional[_T], ...]]:
+    ...
+
+
+@overload
+def stagger(
+    iterable: Iterable[_T],
+    offsets: '_SizedIterable[int]' = (-1, 0, 1),
+    longest: bool = ...,
+    fillvalue: _U = ...,
+) -> Iterator[Tuple[Union[_T, _U], ...]]:
+    ...
+
+
+def stagger(
+    iterable: Iterable[_T],
+    offsets: '_SizedIterable[int]' = (-1, 0, 1),
+    longest: bool = False,
+    fillvalue: Optional[_U] = None,
+) -> Iterator[Tuple[Union[_T, _U, None], ...]]:
     """Yield tuples whose elements are offset from *iterable*.
     The amount by which the `i`-th item in each tuple is offset is given by
     the `i`-th item in *offsets*.
@@ -1263,7 +1480,31 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     )
 
 
-def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
+@overload
+def zip_offset(
+    *iterables: Iterable[_T],
+    offsets: '_SizedIterable[int]',
+    longest: bool = ...
+) -> Iterator[Tuple[Optional[_T], ...]]:
+    ...
+
+
+@overload
+def zip_offset(
+    *iterables: Iterable[_T],
+    offsets: '_SizedIterable[int]',
+    longest: bool = ...,
+    fillvalue: _U
+) -> Iterator[Tuple[Union[_T, _U], ...]]:
+    ...
+
+
+def zip_offset(
+    *iterables: Iterable[_T],
+    offsets: '_SizedIterable[int]',
+    longest: bool = False,
+    fillvalue: Optional[_U] = None
+) -> Iterator[Tuple[Union[_T, _U, None], ...]]:
     """``zip`` the input *iterables* together, but offset the `i`-th iterable
     by the `i`-th item in *offsets*.
 
@@ -1302,7 +1543,11 @@ def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     return zip(*staggered)
 
 
-def sort_together(iterables, key_list=(0,), reverse=False):
+def sort_together(
+    iterables: Iterable[Iterable[_T]],
+    key_list: Iterable[int] = (0,),
+    reverse: bool = False,
+) -> List[Tuple[_T, ...]]:
     """Return the input iterables sorted together, with *key_list* as the
     priority for sorting. All iterables are trimmed to the length of the
     shortest one.
@@ -1339,7 +1584,7 @@ def sort_together(iterables, key_list=(0,), reverse=False):
     )
 
 
-def unzip(iterable):
+def unzip(iterable: Iterable[Sequence[_T]]) -> Tuple[Iterator[_T], ...]:
     """The inverse of :func:`zip`, this function disaggregates the elements
     of the zipped *iterable*.
 
@@ -1388,7 +1633,7 @@ def unzip(iterable):
     return tuple(map(itemgetter(i), it) for i, it in enumerate(iterables))
 
 
-def divide(n, iterable):
+def divide(n: int, iterable: Iterable[_T]) -> List[Iterator[_T]]:
     """Divide the elements from *iterable* into *n* parts, maintaining
     order.
 
@@ -1432,7 +1677,9 @@ def divide(n, iterable):
     return ret
 
 
-def always_iterable(obj, base_type=(str, bytes)):
+def always_iterable(
+    obj: object, base_type: Union[type, Tuple[type, ...], None] = (str, bytes)
+) -> Iterator[Any]:
     """If *obj* is iterable, return an iterator over its items::
 
         >>> obj = (1, 2, 3)
@@ -1480,12 +1727,14 @@ def always_iterable(obj, base_type=(str, bytes)):
         return iter((obj,))
 
     try:
-        return iter(obj)
+        return iter(obj)  # type: ignore
     except TypeError:
         return iter((obj,))
 
 
-def adjacent(predicate, iterable, distance=1):
+def adjacent(
+    predicate: Callable[[_T], bool], iterable: Iterable[_T], distance: int = 1
+) -> Iterator[Tuple[bool, _T]]:
     """Return an iterable over `(bool, item)` tuples where the `item` is
     drawn from *iterable* and the `bool` indicates whether
     that item satisfies the *predicate* or is adjacent to an item that does.
@@ -1524,7 +1773,48 @@ def adjacent(predicate, iterable, distance=1):
     return zip(adjacent_to_selected, i2)
 
 
-def groupby_transform(iterable, keyfunc=None, valuefunc=None):
+@overload
+def groupby_transform(
+    iterable: Iterable[_T], keyfunc: None = ..., valuefunc: None = ...
+) -> Iterator[Tuple[_T, Iterator[_T]]]:
+    ...
+
+
+@overload
+def groupby_transform(
+    iterable: Iterable[_T], keyfunc: Callable[[_T], _U], valuefunc: None = ...
+) -> Iterator[Tuple[_U, Iterator[_T]]]:
+    ...
+
+
+@overload
+def groupby_transform(
+    iterable: Iterable[_T],
+    keyfunc: None = ...,
+    valuefunc: Callable[[_T], _V] = ...,
+) -> Iterator[Tuple[_T, Iterator[_V]]]:
+    ...
+
+
+@overload
+def groupby_transform(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    valuefunc: Callable[[_T], _V],
+) -> Iterator[Tuple[_U, Iterator[_V]]]:
+    ...
+
+
+def groupby_transform(
+    iterable: Iterable[_T],
+    keyfunc: Optional[Callable[[_T], _U]] = None,
+    valuefunc: Optional[Callable[[_T], _V]] = None,
+) -> Union[
+    Iterator[Tuple[_T, Iterator[_T]]],
+    Iterator[Tuple[_U, Iterator[_T]]],
+    Iterator[Tuple[_T, Iterator[_V]]],
+    Iterator[Tuple[_U, Iterator[_V]]],
+]:
     """An extension of :func:`itertools.groupby` that transforms the values of
     *iterable* after grouping them.
     *keyfunc* is a function used to compute a grouping key for each item.
@@ -1562,7 +1852,7 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
 
 
-def numeric_range(*args):
+def numeric_range(*args: Any) -> Iterator[Any]:
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
 
@@ -1637,7 +1927,9 @@ def numeric_range(*args):
         raise ValueError('numeric_range arg 3 must not be zero')
 
 
-def count_cycle(iterable, n=None):
+def count_cycle(
+    iterable: Iterable[_T], n: Optional[int] = None
+) -> Iterable[Tuple[int, _T]]:
     """Cycle through the items from *iterable* up to *n* times, yielding
     the number of completed cycles along with each item. If *n* is omitted the
     process repeats indefinitely.
@@ -1653,7 +1945,11 @@ def count_cycle(iterable, n=None):
     return ((i, item) for i in counter for item in iterable)
 
 
-def locate(iterable, pred=bool, window_size=None):
+def locate(
+    iterable: Iterable[object],
+    pred: Callable[..., Any] = bool,
+    window_size: Optional[int] = None,
+) -> Iterator[int]:
     """Yield the index of each item in *iterable* for which *pred* returns
     ``True``.
 
@@ -1701,7 +1997,7 @@ def locate(iterable, pred=bool, window_size=None):
     return compress(count(), starmap(pred, it))
 
 
-def lstrip(iterable, pred):
+def lstrip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
     """Yield the items from *iterable*, but strip any from the beginning
     for which *pred* returns ``True``.
 
@@ -1719,7 +2015,7 @@ def lstrip(iterable, pred):
     return dropwhile(pred, iterable)
 
 
-def rstrip(iterable, pred):
+def rstrip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
     """Yield the items from *iterable*, but strip any from the end
     for which *pred* returns ``True``.
 
@@ -1745,7 +2041,7 @@ def rstrip(iterable, pred):
             yield x
 
 
-def strip(iterable, pred):
+def strip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
     """Yield the items from *iterable*, but strip any from the
     beginning and end for which *pred* returns ``True``.
 
@@ -1762,7 +2058,9 @@ def strip(iterable, pred):
     return rstrip(lstrip(iterable, pred), pred)
 
 
-def islice_extended(iterable, *args):
+def islice_extended(
+    iterable: Iterable[_T], *args: Optional[int]
+) -> Iterator[_T]:
     """An extension of :func:`itertools.islice` that supports negative values
     for *stop*, *start*, and *step*.
 
@@ -1878,7 +2176,7 @@ def islice_extended(iterable, *args):
             yield from cache[i::step]
 
 
-def always_reversible(iterable):
+def always_reversible(iterable: Iterable[_T]) -> Iterator[_T]:
     """An extension of :func:`reversed` that supports all iterables, not
     just those which implement the ``Reversible`` or ``Sequence`` protocols.
 
@@ -1896,7 +2194,10 @@ def always_reversible(iterable):
         return reversed(list(iterable))
 
 
-def consecutive_groups(iterable, ordering=lambda x: x):
+def consecutive_groups(  # type: ignore
+    iterable: Iterable[_T],
+    ordering: Callable[[_T], int] = lambda x: x,  # type: ignore
+) -> Iterator[Iterator[_T]]:
     """Yield groups of consecutive items using :func:`itertools.groupby`.
     The *ordering* function determines whether two items are adjacent by
     returning their position.
@@ -1944,7 +2245,29 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         yield map(itemgetter(1), g)
 
 
-def difference(iterable, func=sub, *, initial=None):
+@overload
+def difference(
+    iterable: Iterable[_T],
+    func: Callable[[_T, _T], _U] = ...,
+    *,
+    initial: None = ...
+) -> Iterator[Union[_T, _U]]:
+    ...
+
+
+@overload
+def difference(
+    iterable: Iterable[_T], func: Callable[[_T, _T], _U] = ..., *, initial: _U
+) -> Iterator[_U]:
+    ...
+
+
+def difference(
+    iterable: Iterable[_T],
+    func: Callable[[_T, _T], _U] = sub,
+    *,
+    initial: Optional[_U] = None
+) -> Iterator[Union[_T, _U]]:
     """By default, compute the first difference of *iterable* using
     :func:`operator.sub`.
 
@@ -1995,7 +2318,7 @@ def difference(iterable, func=sub, *, initial=None):
     return chain(first, map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
-class SequenceView(Sequence):
+class SequenceView(Generic[_T], Sequence[_T]):
     """Return a read-only view of the sequence object *target*.
 
     :class:`SequenceView` objects are analogous to Python's built-in
@@ -2025,22 +2348,30 @@ class SequenceView(Sequence):
 
     """
 
-    def __init__(self, target):
+    def __init__(self, target: Sequence[_T]) -> None:
         if not isinstance(target, Sequence):
             raise TypeError
         self._target = target
 
-    def __getitem__(self, index):
+    @overload
+    def __getitem__(self, index: int) -> _T:
+        ...
+
+    @overload
+    def __getitem__(self, index: slice) -> Sequence[_T]:
+        ...
+
+    def __getitem__(self, index: Union[int, slice]) -> Union[_T, Sequence[_T]]:
         return self._target[index]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._target)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({})'.format(self.__class__.__name__, repr(self._target))
 
 
-class seekable:
+class seekable(Generic[_T]):
     """Wrap an iterator to allow for seeking backward and forward. This
     progressively caches the items in the source iterable so they can be
     re-visited.
@@ -2092,15 +2423,15 @@ class seekable:
 
     """
 
-    def __init__(self, iterable):
+    def __init__(self, iterable: Iterable[_T]) -> None:
         self._source = iter(iterable)
         self._cache = []
         self._index = None
 
-    def __iter__(self):
+    def __iter__(self) -> 'seekable[_T]':
         return self
 
-    def __next__(self):
+    def __next__(self) -> _T:
         if self._index is not None:
             try:
                 item = self._cache[self._index]
@@ -2114,10 +2445,10 @@ class seekable:
         self._cache.append(item)
         return item
 
-    def elements(self):
+    def elements(self) -> SequenceView[_T]:
         return SequenceView(self._cache)
 
-    def seek(self, index):
+    def seek(self, index: int) -> None:
         self._index = index
         remainder = index - len(self._cache)
         if remainder > 0:
@@ -2145,15 +2476,17 @@ class run_length:
     """
 
     @staticmethod
-    def encode(iterable):
+    def encode(iterable: Iterable[_T]) -> Iterator[Tuple[_T, int]]:
         return ((k, ilen(g)) for k, g in groupby(iterable))
 
     @staticmethod
-    def decode(iterable):
+    def decode(iterable: Iterable[Tuple[_T, int]]) -> Iterator[_T]:
         return chain.from_iterable(repeat(k, n) for k, n in iterable)
 
 
-def exactly_n(iterable, n, predicate=bool):
+def exactly_n(
+    iterable: Iterable[_T], n: int, predicate: _Pred[_T] = bool
+) -> bool:
     """Return ``True`` if exactly ``n`` items in the iterable are ``True``
     according to the *predicate* function.
 
@@ -2171,7 +2504,7 @@ def exactly_n(iterable, n, predicate=bool):
     return len(take(n + 1, filter(predicate, iterable))) == n
 
 
-def circular_shifts(iterable):
+def circular_shifts(iterable: Iterable[_T]) -> List[Tuple[_T, ...]]:
     """Return a list of circular shifts of *iterable*.
 
         >>> circular_shifts(range(4))
@@ -2181,7 +2514,9 @@ def circular_shifts(iterable):
     return take(len(lst), windowed(cycle(lst), len(lst)))
 
 
-def make_decorator(wrapping_func, result_index=0):
+def make_decorator(
+    wrapping_func: Callable[..., _U], result_index: int = 0
+) -> Callable[..., Callable[[Callable[..., Any]], Callable[..., _U]]]:
     """Return a decorator version of *wrapping_func*, which is a function that
     modifies an iterable. *result_index* is the position in that function's
     signature where the iterable goes.
@@ -2246,7 +2581,54 @@ def make_decorator(wrapping_func, result_index=0):
     return decorator
 
 
-def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
+@overload
+def map_reduce(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    valuefunc: None = ...,
+    reducefunc: None = ...,
+) -> Dict[_U, List[_T]]:
+    ...
+
+
+@overload
+def map_reduce(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    valuefunc: Callable[[_T], _V],
+    reducefunc: None = ...,
+) -> Dict[_U, List[_V]]:
+    ...
+
+
+@overload
+def map_reduce(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    valuefunc: None = ...,
+    reducefunc: Callable[[List[_T]], _W] = ...,
+) -> Dict[_U, _W]:
+    ...
+
+
+@overload
+def map_reduce(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    valuefunc: Callable[[_T], _V],
+    reducefunc: Callable[[List[_V]], _W],
+) -> Dict[_U, _W]:
+    ...
+
+
+def map_reduce(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    valuefunc: Optional[Callable[[_T], _V]] = None,
+    reducefunc: Union[
+        Callable[[List[_T]], _W], Callable[[List[_V]], _W], None
+    ] = None,
+) -> Union[Dict[_U, List[_T]], Dict[_U, List[_V]], Dict[_U, _W]]:
     """Return a dictionary that maps the items in *iterable* to categories
     defined by *keyfunc*, transforms them with *valuefunc*, and
     then summarizes them by category with *reducefunc*.
@@ -2313,7 +2695,11 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     return ret
 
 
-def rlocate(iterable, pred=bool, window_size=None):
+def rlocate(
+    iterable: Iterable[_T],
+    pred: Callable[..., object] = bool,
+    window_size: Optional[int] = None,
+) -> Iterator[int]:
     """Yield the index of each item in *iterable* for which *pred* returns
     ``True``, starting from the right and moving left.
 
@@ -2356,7 +2742,13 @@ def rlocate(iterable, pred=bool, window_size=None):
     return reversed(list(locate(iterable, pred, window_size)))
 
 
-def replace(iterable, pred, substitutes, count=None, window_size=1):
+def replace(
+    iterable: Iterable[_T],
+    pred: Callable[..., object],
+    substitutes: Iterable[_U],
+    count: Optional[int] = None,
+    window_size: int = 1,
+) -> Iterator[Union[_T, _U]]:
     """Yield the items from *iterable*, replacing the items for which *pred*
     returns ``True`` with the items from the iterable *substitutes*.
 
@@ -2417,7 +2809,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
             yield w[0]
 
 
-def partitions(iterable):
+def partitions(iterable: Iterable[_T]) -> Iterator[List[List[_T]]]:
     """Yield all possible order-perserving partitions of *iterable*.
 
     >>> iterable = 'abc'
@@ -2437,7 +2829,9 @@ def partitions(iterable):
         yield [sequence[i:j] for i, j in zip((0,) + i, i + (n,))]
 
 
-def set_partitions(iterable, k=None):
+def set_partitions(
+    iterable: Iterable[_T], k: Optional[int] = None
+) -> Iterator[List[List[_T]]]:
     """
     Yield the set partitions of *iterable* into *k* parts. Set partitions are
     not order-preserving.
@@ -2493,7 +2887,7 @@ def set_partitions(iterable, k=None):
         yield from set_partitions_helper(L, k)
 
 
-def time_limited(limit_seconds, iterable):
+def time_limited(limit_seconds: float, iterable: Iterable[_T]) -> Iterator[_T]:
     """
     Yield items from *iterable* until *limit_seconds* have passed.
 
@@ -2523,7 +2917,25 @@ def time_limited(limit_seconds, iterable):
         yield item
 
 
-def only(iterable, default=None, too_long=None):
+@overload
+def only(
+    iterable: Iterable[_T], *, too_long: Optional[_Raisable] = ...
+) -> Optional[_T]:
+    ...
+
+
+@overload
+def only(
+    iterable: Iterable[_T], default: _U, too_long: Optional[_Raisable] = None
+) -> Union[_T, _U]:
+    ...
+
+
+def only(
+    iterable: Iterable[_T],
+    default: Optional[_U] = None,
+    too_long: Optional[_Raisable] = None,
+) -> Union[_T, _U, None]:
     """If *iterable* has only one item, return it.
     If it has zero items, return *default*.
     If it has more than one item, raise the exception given by *too_long*,
@@ -2562,7 +2974,7 @@ def only(iterable, default=None, too_long=None):
     return first_value
 
 
-def ichunked(iterable, n):
+def ichunked(iterable: Iterable[_T], n: int) -> Iterator[Iterator[_T]]:
     """Break *iterable* into sub-iterables with *n* elements each.
     :func:`ichunked` is like :func:`chunked`, but it yields iterables
     instead of lists.
@@ -2599,7 +3011,9 @@ def ichunked(iterable, n):
         consume(source, n)
 
 
-def distinct_combinations(iterable, r):
+def distinct_combinations(
+    iterable: Iterable[_T], r: int
+) -> Iterator[Tuple[_T, ...]]:
     """Yield the distinct combinations of *r* items taken from *iterable*.
 
         >>> list(distinct_combinations([0, 0, 1], 2))
@@ -2621,7 +3035,11 @@ def distinct_combinations(iterable, r):
                 yield (prefix,) + suffix
 
 
-def filter_except(validator, iterable, *exceptions):
+def filter_except(
+    validator: _Pred[Any],
+    iterable: Iterable[_T],
+    *exceptions: Type[BaseException]
+) -> Iterator[_T]:
     """Yield the items from *iterable* for which the *validator* function does
     not raise one of the specified *exceptions*.
 
@@ -2646,7 +3064,11 @@ def filter_except(validator, iterable, *exceptions):
             yield item
 
 
-def map_except(function, iterable, *exceptions):
+def map_except(
+    function: Callable[[Any], _U],
+    iterable: Iterable[_T],
+    *exceptions: Type[BaseException]
+) -> Iterator[_U]:
     """Transform each item from *iterable* with *function* and yield the
     result, unless *function* raises one of the specified *exceptions*.
 

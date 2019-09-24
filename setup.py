@@ -3,7 +3,7 @@ from re import sub
 from setuptools import setup, find_packages
 
 
-def get_long_description():
+def get_long_description() -> str:
     # Fix display issues on PyPI caused by RST markup
     readme = open('README.rst').read()
 

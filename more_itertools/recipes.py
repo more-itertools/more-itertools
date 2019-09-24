@@ -23,6 +23,19 @@ from itertools import (
 )
 import operator
 from random import randrange, sample, choice
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 __all__ = [
     'all_equal',
@@ -55,7 +68,13 @@ __all__ = [
 ]
 
 
-def take(n, iterable):
+# Type and type variable definitions
+_T = TypeVar('_T')
+_U = TypeVar('_U')
+_Pred = Callable[[_T], object]
+
+
+def take(n: int, iterable: Iterable[_T]) -> List[_T]:
     """Return first *n* items of the iterable as a list.
 
         >>> take(3, range(10))
@@ -71,7 +90,7 @@ def take(n, iterable):
     return list(islice(iterable, n))
 
 
-def tabulate(function, start=0):
+def tabulate(function: Callable[[int], _T], start: int = 0) -> Iterator[_T]:
     """Return an iterator over the results of ``func(start)``,
     ``func(start + 1)``, ``func(start + 2)``...
 
@@ -89,7 +108,7 @@ def tabulate(function, start=0):
     return map(function, count(start))
 
 
-def tail(n, iterable):
+def tail(n: int, iterable: Iterable[_T]) -> Iterator[_T]:
     """Return an iterator over the last *n* items of *iterable*.
 
         >>> t = tail(3, 'ABCDEFG')
@@ -100,7 +119,7 @@ def tail(n, iterable):
     return iter(deque(iterable, maxlen=n))
 
 
-def consume(iterator, n=None):
+def consume(iterator: Iterable[object], n: Optional[int] = None) -> None:
     """Advance *iterable* by *n* steps. If *n* is ``None``, consume it
     entirely.
 
@@ -140,7 +159,19 @@ def consume(iterator, n=None):
         next(islice(iterator, n, n), None)
 
 
-def nth(iterable, n, default=None):
+@overload
+def nth(iterable: Iterable[_T], n: int) -> Optional[_T]:
+    ...
+
+
+@overload
+def nth(iterable: Iterable[_T], n: int, default: _U) -> Union[_T, _U]:
+    ...
+
+
+def nth(
+    iterable: Iterable[_T], n: int, default: Optional[_U] = None
+) -> Union[_T, _U, None]:
     """Returns the nth item or a default value.
 
         >>> l = range(10)
@@ -153,7 +184,7 @@ def nth(iterable, n, default=None):
     return next(islice(iterable, n, None), default)
 
 
-def all_equal(iterable):
+def all_equal(iterable: Iterable[object]) -> bool:
     """
     Returns ``True`` if all the elements are equal to each other.
 
@@ -167,7 +198,7 @@ def all_equal(iterable):
     return next(g, True) and not next(g, False)
 
 
-def quantify(iterable, pred=bool):
+def quantify(iterable: Iterable[_T], pred: Callable[[_T], bool] = bool) -> int:
     """Return the how many times the predicate is true.
 
         >>> quantify([True, False, True])
@@ -177,7 +208,7 @@ def quantify(iterable, pred=bool):
     return sum(map(pred, iterable))
 
 
-def padnone(iterable):
+def padnone(iterable: Iterable[_T]) -> Iterator[Optional[_T]]:
     """Returns the sequence of elements and then returns ``None`` indefinitely.
 
         >>> take(5, padnone(range(3)))
@@ -191,7 +222,7 @@ def padnone(iterable):
     return chain(iterable, repeat(None))
 
 
-def ncycles(iterable, n):
+def ncycles(iterable: Iterable[_T], n: int) -> Iterator[_T]:
     """Returns the sequence elements *n* times
 
         >>> list(ncycles(["a", "b"], 3))
@@ -201,7 +232,7 @@ def ncycles(iterable, n):
     return chain.from_iterable(repeat(tuple(iterable), n))
 
 
-def dotproduct(vec1, vec2):
+def dotproduct(vec1: Iterable[object], vec2: Iterable[object]) -> object:
     """Returns the dot product of the two iterables.
 
         >>> dotproduct([10, 10], [20, 20])
@@ -211,7 +242,7 @@ def dotproduct(vec1, vec2):
     return sum(map(operator.mul, vec1, vec2))
 
 
-def flatten(listOfLists):
+def flatten(listOfLists: Iterable[Iterable[_T]]) -> Iterator[_T]:
     """Return an iterator flattening one level of nesting in a list of lists.
 
         >>> list(flatten([[0, 1], [2, 3]]))
@@ -223,7 +254,9 @@ def flatten(listOfLists):
     return chain.from_iterable(listOfLists)
 
 
-def repeatfunc(func, times=None, *args):
+def repeatfunc(
+    func: Callable[..., _U], times: Optional[int] = None, *args: Any
+) -> Iterator[_U]:
     """Call *func* with *args* repeatedly, returning an iterable over the
     results.
 
@@ -250,7 +283,7 @@ def repeatfunc(func, times=None, *args):
     return starmap(func, repeat(args, times))
 
 
-def pairwise(iterable):
+def pairwise(iterable: Iterable[_T]) -> Iterator[Tuple[_T, _T]]:
     """Returns an iterator of paired items, overlapping, from the original
 
         >>> take(4, pairwise(count()))
@@ -262,7 +295,37 @@ def pairwise(iterable):
     return zip(a, b)
 
 
-def grouper(iterable, n, fillvalue=None):
+@overload
+def grouper(iterable: Iterable[_T], n: int) -> Iterator[Optional[_T]]:
+    ...
+
+
+@overload
+def grouper(
+    iterable: Iterable[_T], n: int, fillvalue: _U
+) -> Iterator[Union[_T, _U]]:
+    ...
+
+
+@overload
+def grouper(iterable: int, n: Iterable[_T]) -> Iterator[Optional[_T]]:
+    """Deprecated signature for grouper."""
+    ...
+
+
+@overload
+def grouper(
+    iterable: int, n: Iterable[_T], fillvalue: _U
+) -> Iterator[Union[_T, _U]]:
+    """Deprecated signature for grouper."""
+    ...
+
+
+def grouper(
+    iterable: Union[Iterable[_T], int],
+    n: Union[Iterable[_T], int],
+    fillvalue: Optional[_U] = None,
+) -> Iterator[Union[_T, _U, None]]:
     """Collect data into fixed-length chunks or blocks.
 
         >>> list(grouper('ABCDEFG', 3, 'x'))
@@ -278,7 +341,7 @@ def grouper(iterable, n, fillvalue=None):
     return zip_longest(fillvalue=fillvalue, *args)
 
 
-def roundrobin(*iterables):
+def roundrobin(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Yields an item from each iterable, alternating between them.
 
         >>> list(roundrobin('ABC', 'D', 'EF'))
@@ -301,7 +364,9 @@ def roundrobin(*iterables):
             nexts = cycle(islice(nexts, pending))
 
 
-def partition(pred, iterable):
+def partition(
+    pred: _Pred[_T], iterable: Iterable[_T]
+) -> Tuple[Iterator[_T], Iterator[_T]]:
     """
     Returns a 2-tuple of iterables derived from the input iterable.
     The first yields the items that have ``pred(item) == False``.
@@ -322,7 +387,7 @@ def partition(pred, iterable):
         (x for (cond, x) in t2 if cond))
 
 
-def powerset(iterable):
+def powerset(iterable: Iterable[_T]) -> Iterator[Tuple[_T, ...]]:
     """Yields all possible subsets of the iterable.
 
         >>> list(powerset([1, 2, 3]))
@@ -345,7 +410,9 @@ def powerset(iterable):
     return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
 
-def unique_everseen(iterable, key=None):
+def unique_everseen(
+    iterable: Iterable[_T], key: Optional[Callable[[_T], _U]] = None
+) -> Iterator[_T]:
     """
     Yield unique elements, preserving order.
 
@@ -399,7 +466,9 @@ def unique_everseen(iterable, key=None):
                     yield element
 
 
-def unique_justseen(iterable, key=None):
+def unique_justseen(
+    iterable: Iterable[_T], key: Optional[Callable[[_T], object]] = None
+) -> Iterator[_T]:
     """Yields elements in order, ignoring serial duplicates
 
         >>> list(unique_justseen('AAAABBBCCDAABBB'))
@@ -411,7 +480,27 @@ def unique_justseen(iterable, key=None):
     return map(next, map(operator.itemgetter(1), groupby(iterable, key)))
 
 
-def iter_except(func, exception, first=None):
+@overload
+def iter_except(
+    func: Callable[[], _T], exception: Type[BaseException], first: None = ...
+) -> Iterator[_T]:
+    ...
+
+
+@overload
+def iter_except(
+    func: Callable[[], _T],
+    exception: Type[BaseException],
+    first: Callable[[], _U],
+) -> Iterator[Union[_T, _U]]:
+    ...
+
+
+def iter_except(
+    func: Callable[[], _T],
+    exception: Type[BaseException],
+    first: Optional[Callable[[], _U]] = None,
+) -> Iterator[Union[_T, _U, None]]:
     """Yields results from a function repeatedly until an exception is raised.
 
     Converts a call-until-exception interface to an iterator interface.
@@ -432,7 +521,25 @@ def iter_except(func, exception, first=None):
         pass
 
 
-def first_true(iterable, default=None, pred=None):
+@overload
+def first_true(
+    iterable: Iterable[_T], *, pred: Optional[_Pred[_T]] = ...
+) -> Optional[_T]:
+    ...
+
+
+@overload
+def first_true(
+    iterable: Iterable[_T], default: _U, pred: Optional[_Pred[_T]] = ...
+) -> Union[_T, _U]:
+    ...
+
+
+def first_true(
+    iterable: Iterable[_T],
+    default: Optional[_U] = None,
+    pred: Optional[_Pred[_T]] = None,
+) -> Union[_T, _U, None]:
     """
     Returns the first true value in the iterable.
 
@@ -452,7 +559,7 @@ def first_true(iterable, default=None, pred=None):
     return next(filter(pred, iterable), default)
 
 
-def random_product(*args, **kwds):
+def random_product(*args: Iterable[_T], repeat: int = 1) -> Tuple[_T, ...]:
     """Draw an item at random from each of the input iterables.
 
         >>> random_product('abc', range(4), 'XYZ')  # doctest:+SKIP
@@ -468,11 +575,13 @@ def random_product(*args, **kwds):
     ``itertools.product(*args, **kwarg)``.
 
     """
-    pools = [tuple(pool) for pool in args] * kwds.get('repeat', 1)
+    pools = [tuple(pool) for pool in args] * repeat
     return tuple(choice(pool) for pool in pools)
 
 
-def random_permutation(iterable, r=None):
+def random_permutation(
+    iterable: Iterable[_T], r: Optional[int] = None
+) -> Tuple[_T, ...]:
     """Return a random *r* length permutation of the elements in *iterable*.
 
     If *r* is not specified or is ``None``, then *r* defaults to the length of
@@ -490,7 +599,7 @@ def random_permutation(iterable, r=None):
     return tuple(sample(pool, r))
 
 
-def random_combination(iterable, r):
+def random_combination(iterable: Iterable[_T], r: int) -> Tuple[_T, ...]:
     """Return a random *r* length subsequence of the elements in *iterable*.
 
         >>> random_combination(range(5), 3)  # doctest:+SKIP
@@ -506,7 +615,9 @@ def random_combination(iterable, r):
     return tuple(pool[i] for i in indices)
 
 
-def random_combination_with_replacement(iterable, r):
+def random_combination_with_replacement(
+    iterable: Iterable[_T], r: int
+) -> Tuple[_T, ...]:
     """Return a random *r* length subsequence of elements in *iterable*,
     allowing individual elements to be repeated.
 
@@ -523,7 +634,9 @@ def random_combination_with_replacement(iterable, r):
     return tuple(pool[i] for i in indices)
 
 
-def nth_combination(iterable, r, index):
+def nth_combination(
+    iterable: Iterable[_T], r: int, index: int
+) -> Tuple[_T, ...]:
     """Equivalent to ``list(combinations(iterable, r))[index]``.
 
     The subsequences of *iterable* that are of length *r* can be ordered
@@ -559,7 +672,7 @@ def nth_combination(iterable, r, index):
     return tuple(result)
 
 
-def prepend(value, iterator):
+def prepend(value: _T, iterator: Iterable[_U]) -> Iterator[Union[_T, _U]]:
     """Yield *value*, followed by the elements in *iterator*.
 
         >>> value = '0'
