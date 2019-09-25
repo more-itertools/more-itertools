@@ -32,11 +32,9 @@ from typing import (
     Optional,
     Set,
     Tuple,
-    Type,
     TypeVar,
     Union,
     cast,
-    overload,
 )
 
 __all__ = [
@@ -69,11 +67,20 @@ __all__ = [
     'unique_justseen',
 ]
 
+TYPE_CHECKING = False
+
+if TYPE_CHECKING:
+    from typing_extensions import overload, Type
+else:
+    # Older versions of Python supported by more-itertools, such as Python
+    # 3.5.0, disallow overloads outside stub files. Therefore, we disable
+    # overload at runtime
+    overload = lambda _: None
+
 
 # Type and type variable definitions
 _T = TypeVar('_T')
 _U = TypeVar('_U')
-_Pred = Callable[[_T], object]
 
 
 def take(n: int, iterable: Iterable[_T]) -> List[_T]:
@@ -368,7 +375,7 @@ def roundrobin(*iterables: Iterable[_T]) -> Iterator[_T]:
 
 
 def partition(
-    pred: _Pred[_T], iterable: Iterable[_T]
+    pred: Callable[[_T], object], iterable: Iterable[_T]
 ) -> Tuple[Iterator[_T], Iterator[_T]]:
     """
     Returns a 2-tuple of iterables derived from the input iterable.
@@ -485,7 +492,7 @@ def unique_justseen(
 
 @overload
 def iter_except(
-    func: Callable[[], _T], exception: Type[BaseException], first: None = ...
+    func: Callable[[], _T], exception: 'Type[BaseException]', first: None = ...
 ) -> Iterator[_T]:
     ...
 
@@ -493,7 +500,7 @@ def iter_except(
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException],
+    exception: 'Type[BaseException]',
     first: Callable[[], _U],
 ) -> Iterator[Union[_T, _U]]:
     ...
@@ -501,7 +508,7 @@ def iter_except(
 
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException],
+    exception: 'Type[BaseException]',
     first: Optional[Callable[[], _U]] = None,
 ) -> Iterator[Union[_T, _U, None]]:
     """Yields results from a function repeatedly until an exception is raised.
@@ -526,14 +533,16 @@ def iter_except(
 
 @overload
 def first_true(
-    iterable: Iterable[_T], *, pred: Optional[_Pred[_T]] = ...
+    iterable: Iterable[_T], *, pred: Optional[Callable[[_T], object]] = ...
 ) -> Optional[_T]:
     ...
 
 
 @overload
 def first_true(
-    iterable: Iterable[_T], default: _U, pred: Optional[_Pred[_T]] = ...
+    iterable: Iterable[_T],
+    default: _U,
+    pred: Optional[Callable[[_T], object]] = ...,
 ) -> Union[_T, _U]:
     ...
 
@@ -541,7 +550,7 @@ def first_true(
 def first_true(
     iterable: Iterable[_T],
     default: Optional[_U] = None,
-    pred: Optional[_Pred[_T]] = None,
+    pred: Optional[Callable[[_T], object]] = None,
 ) -> Union[_T, _U, None]:
     """
     Returns the first true value in the iterable.

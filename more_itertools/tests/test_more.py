@@ -29,7 +29,6 @@ from typing import (
     Iterable,
     Iterator,
     List,
-    NoReturn,
     Optional,
     Sequence,
     Set,
@@ -41,10 +40,14 @@ from unittest import TestCase, TestLoader, TestSuite, skipIf
 
 import more_itertools as mi
 
+TYPE_CHECKING = False
+
+if TYPE_CHECKING:
+    from typing_extensions import NoReturn
+
 _T = TypeVar('_T')
 _U = TypeVar('_U')
 _T_co = TypeVar('_T_co', covariant=True)
-_Pred = Callable[[_T], object]
 
 
 def load_tests(loader: TestLoader, tests: TestSuite, ignore: str) -> TestSuite:
@@ -1034,7 +1037,7 @@ class SideEffectTests(TestCase):
         f = StringIO()
         func = lambda x: print(x, file=f)
 
-        def before() -> NoReturn:
+        def before() -> 'NoReturn':
             raise RuntimeError('ouch')
 
         try:
@@ -1127,13 +1130,13 @@ class SplitWhenTests(TestCase):
 
     @staticmethod
     def _split_when_before(
-        iterable: Iterable[_T], pred: _Pred[_T]
+        iterable: Iterable[_T], pred: Callable[[_T], object]
     ) -> Iterator[List[_T]]:
         return mi.split_when(iterable, lambda _, c: pred(c))
 
     @staticmethod
     def _split_when_after(
-        iterable: Iterable[_T], pred: _Pred[_T]
+        iterable: Iterable[_T], pred: Callable[[_T], object]
     ) -> Iterator[List[_T]]:
         return mi.split_when(iterable, lambda c, _: pred(c))
 
@@ -2648,7 +2651,7 @@ class PartitionsTest(TestCase):
         self.assertEqual(actual, expected)
 
 
-class _FrozenMultiset(Generic[_T_co], Set[_T_co]):
+class _FrozenMultiset(Set[_T_co], Generic[_T_co]):
     """
     A helper class, useful to compare two lists without reference to the order
     of elements.

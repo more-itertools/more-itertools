@@ -1,6 +1,6 @@
 import warnings
 
-from collections import Counter, defaultdict, deque
+from collections import Counter, abc, defaultdict, deque
 from enum import Enum
 from functools import partial, wraps
 from heapq import merge
@@ -22,13 +22,9 @@ from operator import itemgetter, lt, gt, sub
 from sys import maxsize
 from time import monotonic
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Container,
-    ContextManager,
-    DefaultDict,
-    Deque,
     Dict,
     Generic,
     Iterable,
@@ -39,18 +35,12 @@ from typing import (
     Sequence,
     Sized,
     Tuple,
-    Type,
     TypeVar,
     Union,
     cast,
-    overload,
 )
 
 from .recipes import consume, flatten, powerset, take, unique_everseen
-
-if TYPE_CHECKING:
-    # Final is needed for now because of this issue https://git.io/JesdW
-    from typing_extensions import Final, Protocol
 
 __all__ = [
     'adjacent',
@@ -121,18 +111,21 @@ __all__ = [
 ]
 
 
-# Type and type variable definitions
-_T = TypeVar('_T')
-_U = TypeVar('_U')
-_V = TypeVar('_V')
-_W = TypeVar('_W')
-_GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[object]])
-_T_co = TypeVar('_T_co', covariant=True)
-_Raisable = Union[BaseException, Type[BaseException]]
-_Pred = Callable[[_T], object]
-
+TYPE_CHECKING = False
 
 if TYPE_CHECKING:
+    from typing_extensions import (
+        ContextManager,
+        DefaultDict,
+        Deque,
+        # Final is needed for now because of this issue: https://git.io/JesdW
+        Final,
+        Protocol,
+        Type,
+        overload,
+    )
+
+    _T_co = TypeVar('_T_co', covariant=True)
 
     class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]):
         """An abstract base class for sized and iterable.
@@ -144,6 +137,22 @@ if TYPE_CHECKING:
 
     class _SizedReversible(Protocol[_T_co], Sized, Reversible[_T_co]):
         """An abstract base class for sized and reversible."""
+
+
+else:
+    # Older versions of Python supported by more-itertools, such as Python
+    # 3.5.0, disallow overloads outside stub files. Therefore, we disable
+    # overload at runtime
+    overload = lambda _: None
+
+
+# Type and type variable definitions
+_T = TypeVar('_T')
+_U = TypeVar('_U')
+_V = TypeVar('_V')
+_W = TypeVar('_W')
+_GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[object]])
+_Raisable = Union[BaseException, 'Type[BaseException]']
 
 
 class _Marker(Enum):
@@ -510,7 +519,7 @@ def consumer(func: _GenFn) -> _GenFn:
     """
 
     @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Iterator[object]:
+    def wrapper(*args: Any, **kwargs: Any) -> Iterator[Any]:
         gen = func(*args, **kwargs)
         next(gen)
         return gen
@@ -548,7 +557,7 @@ def iterate(func: Callable[[_T], _T], start: _T) -> Iterator[_T]:
         start = func(start)
 
 
-def with_iter(context_manager: ContextManager[Iterable[_T]]) -> Iterator[_T]:
+def with_iter(context_manager: 'ContextManager[Iterable[_T]]') -> Iterator[_T]:
     """Wrap an iterable in a ``with`` statement, so it closes once exhausted.
 
     For example, this will close the file when the iterator is exhausted::
@@ -921,7 +930,7 @@ class bucket(Generic[_T, _U], Container[_U]):
         self,
         iterable: Iterable[_T],
         key: Callable[[_T], _U],
-        validator: Optional[_Pred[object]] = None,
+        validator: Optional[Callable[[object], object]] = None,
     ):
         self._it = iter(iterable)
         self._key = key
@@ -1102,7 +1111,7 @@ def collapse(
 
 @overload
 def side_effect(
-    func: _Pred[_T],
+    func: Callable[[_T], object],
     iterable: Iterable[_T],
     chunk_size: None = ...,
     before: Optional[Callable[[], object]] = ...,
@@ -1113,7 +1122,7 @@ def side_effect(
 
 @overload
 def side_effect(
-    func: _Pred[List[_T]],
+    func: Callable[[List[_T]], object],
     iterable: Iterable[_T],
     chunk_size: int,
     before: Optional[Callable[[], object]] = ...,
@@ -1123,7 +1132,7 @@ def side_effect(
 
 
 def side_effect(
-    func: Union[_Pred[_T], _Pred[List[_T]]],
+    func: Union[Callable[[_T], object], Callable[[List[_T]], object]],
     iterable: Iterable[_T],
     chunk_size: Optional[int] = None,
     before: Optional[Callable[[], object]] = None,
@@ -1208,7 +1217,9 @@ def sliced(seq: Sequence[_T], n: int) -> Iterator[Sequence[_T]]:
     return takewhile(bool, (seq[i : i + n] for i in count(0, n)))
 
 
-def split_at(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
+def split_at(
+    iterable: Iterable[_T], pred: Callable[[_T], object]
+) -> Iterator[List[_T]]:
     """Yield lists of items from *iterable*, where each list is delimited by
     an item where callable *pred* returns ``True``. The lists do not include
     the delimiting items.
@@ -1230,7 +1241,7 @@ def split_at(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
 
 
 def split_before(
-    iterable: Iterable[_T], pred: _Pred[_T]
+    iterable: Iterable[_T], pred: Callable[[_T], object]
 ) -> Iterator[List[_T]]:
     """Yield lists of items from *iterable*, where each list ends just before
     an item for which callable *pred* returns ``True``:
@@ -1251,7 +1262,9 @@ def split_before(
     yield buf
 
 
-def split_after(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
+def split_after(
+    iterable: Iterable[_T], pred: Callable[[_T], object]
+) -> Iterator[List[_T]]:
     """Yield lists of items from *iterable*, where each list ends with an
     item where callable *pred* returns ``True``:
 
@@ -1273,7 +1286,7 @@ def split_after(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[List[_T]]:
 
 
 def split_when(
-    iterable: Iterable[_T], pred: Callable[[_T, _T], Any]
+    iterable: Iterable[_T], pred: Callable[[_T, _T], object]
 ) -> Iterator[List[_T]]:
     """Split *iterable* into pieces based on the output of *pred*.
     *pred* should be a function that takes successive pairs of items and
@@ -2015,7 +2028,9 @@ def locate(
     return compress(count(), starmap(pred, it))
 
 
-def lstrip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
+def lstrip(
+    iterable: Iterable[_T], pred: Callable[[_T], object]
+) -> Iterator[_T]:
     """Yield the items from *iterable*, but strip any from the beginning
     for which *pred* returns ``True``.
 
@@ -2033,7 +2048,9 @@ def lstrip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
     return dropwhile(pred, iterable)
 
 
-def rstrip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
+def rstrip(
+    iterable: Iterable[_T], pred: Callable[[_T], object]
+) -> Iterator[_T]:
     """Yield the items from *iterable*, but strip any from the end
     for which *pred* returns ``True``.
 
@@ -2059,7 +2076,9 @@ def rstrip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
             yield x
 
 
-def strip(iterable: Iterable[_T], pred: _Pred[_T]) -> Iterator[_T]:
+def strip(
+    iterable: Iterable[_T], pred: Callable[[_T], object]
+) -> Iterator[_T]:
     """Yield the items from *iterable*, but strip any from the
     beginning and end for which *pred* returns ``True``.
 
@@ -2336,7 +2355,11 @@ def difference(
     return chain(first, map(lambda x: func(x[1], x[0]), zip(a, b)))
 
 
-class SequenceView(Generic[_T], Sequence[_T]):
+# _FrozenMultiset should inherit from Sequence[_T]. However, this results in an
+# exception with early versions of Python 3.5 during tests:
+# > AttributeError: 'SequenceView' object has no attribute 'index'
+# Inheriting from Sequence[_T] is fine for Python 3.5.4+
+class SequenceView(Generic[_T], abc.Sequence):  # type: ignore
     """Return a read-only view of the sequence object *target*.
 
     :class:`SequenceView` objects are analogous to Python's built-in
@@ -2503,7 +2526,7 @@ class run_length:
 
 
 def exactly_n(
-    iterable: Iterable[_T], n: int, predicate: _Pred[_T] = bool
+    iterable: Iterable[_T], n: int, predicate: Callable[[_T], object] = bool
 ) -> bool:
     """Return ``True`` if exactly ``n`` items in the iterable are ``True``
     according to the *predicate* function.
@@ -2716,9 +2739,7 @@ def map_reduce(
                 value_list
             )
 
-    ret.default_factory = (  # type: ignore  # this changes the dictionary type
-        None
-    )
+    ret.default_factory = None  # type: ignore
     return ret
 
 
@@ -3071,9 +3092,9 @@ def distinct_combinations(
 
 
 def filter_except(
-    validator: _Pred[Any],
+    validator: Callable[[Any], object],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException]
+    *exceptions: 'Type[BaseException]'
 ) -> Iterator[_T]:
     """Yield the items from *iterable* for which the *validator* function does
     not raise one of the specified *exceptions*.
@@ -3102,7 +3123,7 @@ def filter_except(
 def map_except(
     function: Callable[[Any], _U],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException]
+    *exceptions: 'Type[BaseException]'
 ) -> Iterator[_U]:
     """Transform each item from *iterable* with *function* and yield the
     result, unless *function* raises one of the specified *exceptions*.
