@@ -10,13 +10,14 @@ python:
 
 install:
     - "pip install ."
-    - "pip install -U coveralls flake8 sphinx sphinx_rtd_theme mypy"
+    - "pip install -U coveralls flake8 sphinx sphinx_rtd_theme"
+    - "if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then pip install -U mypy; fi"
 
 script:
     - "coverage run --include='more_itertools/*.py' --omit='more_itertools/tests/*' setup.py test"
     - "flake8 ."
     - "sphinx-build -W -b html docs docs/_build/html"
-    - "mypy more_itertools"
+    - "if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then mypy more_itertools; fi"
 
 notifications:
     - email: false
