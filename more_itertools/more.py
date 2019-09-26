@@ -2614,7 +2614,9 @@ def make_decorator(
         *wrapping_args: Any, **wrapping_kwargs: Any
     ) -> Callable[[Callable[..., Any]], Callable[..., _U]]:
         def outer_wrapper(f: Callable[..., Any]) -> Callable[..., _U]:
-            def inner_wrapper(*args: Any, **kwargs: Any) -> _U:
+            # Typing the args and kwargs as Any without quotes causes a
+            # segmentation fault with PyPy 3.5
+            def inner_wrapper(*args: 'Any', **kwargs: 'Any') -> _U:
                 result = f(*args, **kwargs)
                 wrapping_args_ = list(wrapping_args)
                 wrapping_args_.insert(result_index, result)
