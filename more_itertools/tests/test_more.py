@@ -24,6 +24,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    FrozenSet,
     Generator,
     Generic,
     Iterable,
@@ -2651,7 +2652,7 @@ class PartitionsTest(TestCase):
         self.assertEqual(actual, expected)
 
 
-class _FrozenMultiset(Set[_T_co], Generic[_T_co]):
+class _FrozenMultiset(FrozenSet[_T_co], Generic[_T_co]):
     """
     A helper class, useful to compare two lists without reference to the order
     of elements.
