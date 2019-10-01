@@ -14,7 +14,6 @@ from itertools import (
     combinations,
     count,
     cycle,
-    filterfalse,
     groupby,
     islice,
     repeat,
@@ -315,8 +314,11 @@ def partition(pred, iterable):
 
     """
     # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
-    t1, t2 = tee(iterable)
-    return filterfalse(pred, t1), filter(pred, t2)
+    evaluations = ((pred(x), x) for x in iterable)
+    t1, t2 = tee(evaluations)
+    return (
+        (x for (cond, x) in t1 if not cond),
+        (x for (cond, x) in t2 if cond))
 
 
 def powerset(iterable):
