@@ -490,7 +490,8 @@ def one(iterable, too_short=None, too_long=None):
         >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: Expected exactly one item in iterable, but got 'too', 'many', and perhaps more.
+        ValueError: Expected exactly one item in iterable, but got 'too',
+        'many', and perhaps more.
         >>> too_long = RuntimeError
         >>> one(it, too_long=too_long)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -2535,7 +2536,8 @@ def only(iterable, default=None, too_long=None):
     >>> only([1, 2])  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    ValueError: Expected exactly one item in iterable, but got 1, 2, and perhaps more.'
+    ValueError: Expected exactly one item in iterable, but got 1, 2,
+     and perhaps more.'
     >>> only([1, 2], too_long=TypeError)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
