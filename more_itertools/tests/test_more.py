@@ -556,7 +556,7 @@ class OneTests(TestCase):
     def test_too_long_default_message(self):
         it = count()
         self.assertRaisesRegex(ValueError, "Expected exactly one item in "
-                                           "iterable, but got 0, 1 and "
+                                           "iterable, but got 0, 1, and "
                                            "perhaps more.",
                                lambda: mi.one(it))
 
