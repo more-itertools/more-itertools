@@ -2525,9 +2525,9 @@ def time_limited(limit_seconds, iterable):
 
 def only(iterable, default=None, too_long=None):
     """If *iterable* has only one item, return it.
-    If it has zero items, return *default*, which is *None* if not specified.
-    If it has more than one item, raise the exception given by *too_long*.
-    If *too_long* is not specified, raises a ``ValueError``.
+    If it has zero items, return *default*.
+    If it has more than one item, raise the exception given by *too_long*,
+    which is ``ValueError`` by default.
 
     >>> only([], default='missing')
     'missing'
