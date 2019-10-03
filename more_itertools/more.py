@@ -490,7 +490,7 @@ def one(iterable, too_short=None, too_long=None):
         >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: too many items in iterable (expected 1)'
+        ValueError: Expected exactly one item in iterable, but got 'too', 'many', and perhaps more.
         >>> too_long = RuntimeError
         >>> one(it, too_long=too_long)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
@@ -505,18 +505,20 @@ def one(iterable, too_short=None, too_long=None):
     it = iter(iterable)
 
     try:
-        value = next(it)
+        first_value = next(it)
     except StopIteration:
         raise too_short or ValueError('too few items in iterable (expected 1)')
 
     try:
-        next(it)
+        second_value = next(it)
     except StopIteration:
         pass
     else:
-        raise too_long or ValueError('too many items in iterable (expected 1)')
+        msg = 'Expected exactly one item in iterable, but got {!r}, {!r}, ' \
+              'and perhaps more.'.format(first_value, second_value)
+        raise too_long or ValueError(msg)
 
-    return value
+    return first_value
 
 
 def distinct_permutations(iterable):
@@ -2522,9 +2524,9 @@ def time_limited(limit_seconds, iterable):
 
 def only(iterable, default=None, too_long=None):
     """If *iterable* has only one item, return it.
-    If it has zero items, return *default*.
-    If it has more than one item, raise the exception given by *too_long*,
-    which is ``ValueError`` by default.
+    If it has zero items, return *default*, which is *None* if not specified.
+    If it has more than one item, raise the exception given by *too_long*.
+    If *too_long* is not specified, raises a ``ValueError``.
 
     >>> only([], default='missing')
     'missing'
@@ -2533,7 +2535,7 @@ def only(iterable, default=None, too_long=None):
     >>> only([1, 2])  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    ValueError: too many items in iterable (expected 1)'
+    ValueError: Expected exactly one item in iterable, but got 1, 2, and perhaps more.'
     >>> only([1, 2], too_long=TypeError)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
@@ -2544,16 +2546,18 @@ def only(iterable, default=None, too_long=None):
     iterable contents less destructively.
     """
     it = iter(iterable)
-    value = next(it, default)
+    first_value = next(it, default)
 
     try:
-        next(it)
+        second_value = next(it)
     except StopIteration:
         pass
     else:
-        raise too_long or ValueError('too many items in iterable (expected 1)')
+        msg = 'Expected exactly one item in iterable, but got {!r}, {!r}, ' \
+              'and perhaps more.'.format(first_value, second_value)
+        raise too_long or ValueError(msg)
 
-    return value
+    return first_value
 
 
 def ichunked(iterable, n):

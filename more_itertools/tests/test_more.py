@@ -553,6 +553,11 @@ class OneTests(TestCase):
             OverflowError, lambda: mi.one(it, too_long=OverflowError)
         )
 
+    def test_too_long_default_message(self):
+        it = count()
+        self.assertRaisesRegex(ValueError, "Expected exactly one item in iterable, but got 0, "
+                                           "1 and perhaps more", lambda: mi.one(it))
+
 
 class IntersperseTest(TestCase):
     """ Tests for intersperse() """
@@ -2769,6 +2774,11 @@ class OnlyTests(TestCase):
         self.assertRaises(
             RuntimeError, lambda: mi.only([1, 2], too_long=RuntimeError)
         )
+
+    def test_default_exception_message(self):
+        self.assertRaisesRegex(
+            ValueError, "Expected exactly one item in iterable, but got 'foo', 'bar', "
+                       "and perhaps more", lambda: mi.only(['foo', 'bar', 'baz']))
 
 
 class IchunkedTests(TestCase):
