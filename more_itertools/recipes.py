@@ -60,11 +60,12 @@ def take(n, iterable):
 
         >>> take(3, range(10))
         [0, 1, 2]
-        >>> take(5, range(3))
-        [0, 1, 2]
 
-    Effectively a short replacement for ``next`` based iterator consumption
-    when you want more than one item, but less than the whole iterator.
+    If there are fewer than *n* items in the iterable, all of them are
+    returned.
+
+        >>> take(10, range(3))
+        [0, 1, 2]
 
     """
     return list(islice(iterable, n))
