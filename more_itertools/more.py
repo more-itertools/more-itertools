@@ -934,7 +934,9 @@ class bucket(Generic[_T, _U], Container[_U]):
     ):
         self._it = iter(iterable)
         self._key = key
-        self._cache = defaultdict(deque)  # type: DefaultDict[_U, Deque[_T]]
+        self._cache = defaultdict(
+            deque
+        )  # type: DefaultDict[object, Deque[_T]]
         self._validator = validator or (lambda x: True)
 
     def __contains__(self, value: object) -> bool:
@@ -942,15 +944,15 @@ class bucket(Generic[_T, _U], Container[_U]):
             return False
 
         try:
-            item = next(self[cast(_U, value)])
+            item = next(self[value])
         except StopIteration:
             return False
         else:
-            self._cache[cast(_U, value)].appendleft(item)
+            self._cache[value].appendleft(item)
 
         return True
 
-    def _get_values(self, value: _U) -> Iterator[_T]:
+    def _get_values(self, value: object) -> Iterator[_T]:
         """
         Helper to yield items from the parent iterator that match *value*.
         Items that don't match are stored in the local cache as they
@@ -976,7 +978,7 @@ class bucket(Generic[_T, _U], Container[_U]):
                     elif self._validator(item_value):
                         self._cache[item_value].append(item)
 
-    def __getitem__(self, value: _U) -> Iterator[_T]:
+    def __getitem__(self, value: object) -> Iterator[_T]:
         if not self._validator(value):
             return iter(())
 
