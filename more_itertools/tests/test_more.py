@@ -555,10 +555,13 @@ class OneTests(TestCase):
 
     def test_too_long_default_message(self):
         it = count()
-        self.assertRaisesRegex(ValueError, "Expected exactly one item in "
-                                           "iterable, but got 0, 1, and "
-                                           "perhaps more.",
-                               lambda: mi.one(it))
+        self.assertRaisesRegex(
+            ValueError,
+            "Expected exactly one item in "
+            "iterable, but got 0, 1, and "
+            "perhaps more.",
+            lambda: mi.one(it),
+        )
 
 
 class IntersperseTest(TestCase):
@@ -2779,9 +2782,11 @@ class OnlyTests(TestCase):
 
     def test_default_exception_message(self):
         self.assertRaisesRegex(
-            ValueError, "Expected exactly one item in iterable, "
-                        "but got 'foo', 'bar', and perhaps more",
-            lambda: mi.only(['foo', 'bar', 'baz']))
+            ValueError,
+            "Expected exactly one item in iterable, "
+            "but got 'foo', 'bar', and perhaps more",
+            lambda: mi.only(['foo', 'bar', 'baz']),
+        )
 
 
 class IchunkedTests(TestCase):
