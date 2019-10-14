@@ -319,7 +319,8 @@ def partition(pred, iterable):
     t1, t2 = tee(evaluations)
     return (
         (x for (cond, x) in t1 if not cond),
-        (x for (cond, x) in t2 if cond))
+        (x for (cond, x) in t2 if cond),
+    )
 
 
 def powerset(iterable):
@@ -452,7 +453,7 @@ def first_true(iterable, default=None, pred=None):
     return next(filter(pred, iterable), default)
 
 
-def random_product(*args, **kwds):
+def random_product(*args, repeat=1):
     """Draw an item at random from each of the input iterables.
 
         >>> random_product('abc', range(4), 'XYZ')  # doctest:+SKIP
@@ -468,7 +469,7 @@ def random_product(*args, **kwds):
     ``itertools.product(*args, **kwarg)``.
 
     """
-    pools = [tuple(pool) for pool in args] * kwds.get('repeat', 1)
+    pools = [tuple(pool) for pool in args] * repeat
     return tuple(choice(pool) for pool in pools)
 
 

@@ -515,8 +515,10 @@ def one(iterable, too_short=None, too_long=None):
     except StopIteration:
         pass
     else:
-        msg = 'Expected exactly one item in iterable, but got {!r}, {!r}, ' \
-              'and perhaps more.'.format(first_value, second_value)
+        msg = (
+            'Expected exactly one item in iterable, but got {!r}, {!r}, '
+            'and perhaps more.'.format(first_value, second_value)
+        )
         raise too_long or ValueError(msg)
 
     return first_value
@@ -2555,8 +2557,10 @@ def only(iterable, default=None, too_long=None):
     except StopIteration:
         pass
     else:
-        msg = 'Expected exactly one item in iterable, but got {!r}, {!r}, ' \
-              'and perhaps more.'.format(first_value, second_value)
+        msg = (
+            'Expected exactly one item in iterable, but got {!r}, {!r}, '
+            'and perhaps more.'.format(first_value, second_value)
+        )
         raise too_long or ValueError(msg)
 
     return first_value
