@@ -65,6 +65,7 @@ __all__ = [
     'partitions',
     'set_partitions',
     'peekable',
+    'repeat_last',
     'replace',
     'rlocate',
     'rstrip',
@@ -1200,6 +1201,26 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
         remaining = (n - item_count) % n if next_multiple else n - item_count
         for _ in range(remaining):
             yield fillvalue
+
+
+def repeat_last(iterable):
+    """After the *iterable* is exhausted, keep yielding its last element.
+
+        >>> list(islice(repeat_last(range(3)), 5))
+        [0, 1, 2, 2, 2]
+    """
+    it = iter(iterable)
+    # check that iterable is not empty
+    try:
+        element = next(it)
+    except StopIteration:
+        return
+
+    yield element
+    for element in it:
+        yield element
+    while True:
+        yield element
 
 
 def distribute(n, iterable):
