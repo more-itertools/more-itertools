@@ -1387,6 +1387,25 @@ class PaddedTest(TestCase):
         )
 
 
+class RepeatLastTests(TestCase):
+    """Tests for repeat_last()"""
+
+    def test_empty_iterable(self):
+        self.assertEqual(tuple(), tuple(mi.repeat_last(range(0))))
+
+    def test_last_element_repeated(self):
+        range_length = 3
+        last_element = range_length - 1
+        extended_length = 7
+
+        self.assertEqual(
+            tuple(
+                islice(mi.repeat_last(range(range_length)), extended_length)
+            )[range_length:],
+            (last_element,) * (extended_length - range_length)
+        )
+
+
 class DistributeTest(TestCase):
     """Tests for distribute()"""
 
