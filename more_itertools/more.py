@@ -1203,24 +1203,18 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
             yield fillvalue
 
 
-def repeat_last(iterable):
-    """After the *iterable* is exhausted, keep yielding its last element.
+def repeat_last(iterable, default=None):
+    """After the *iterable* is exhausted, keep yielding its last element,
+    if the iterable was not empty. Otherwise yield *default* value forever.
 
         >>> list(islice(repeat_last(range(3)), 5))
         [0, 1, 2, 2, 2]
     """
-    it = iter(iterable)
-    # check that iterable is not empty
-    try:
-        element = next(it)
-    except StopIteration:
-        return
-
-    yield element
-    for element in it:
-        yield element
-    while True:
-        yield element
+    item = _marker
+    for item in iterable:
+        yield item
+    final = default if item is _marker else item
+    yield from repeat(final)
 
 
 def distribute(n, iterable):

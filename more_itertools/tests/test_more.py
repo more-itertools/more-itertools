@@ -1391,7 +1391,21 @@ class RepeatLastTests(TestCase):
     """Tests for repeat_last()"""
 
     def test_empty_iterable(self):
-        self.assertEqual(tuple(), tuple(mi.repeat_last(range(0))))
+        slice_length = 3
+
+        # default value not provided
+        self.assertEqual(
+            (None,) * slice_length,
+            tuple(islice(mi.repeat_last(range(0)), slice_length))
+        )
+
+        default = object()
+        self.assertEqual(
+            (default,) * slice_length,
+            tuple(
+                islice(mi.repeat_last(range(0), default=default), slice_length)
+            )
+        )
 
     def test_last_element_repeated(self):
         range_length = 3
