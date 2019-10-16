@@ -1205,10 +1205,15 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
 
 def repeat_last(iterable, default=None):
     """After the *iterable* is exhausted, keep yielding its last element,
-    if the iterable was not empty. Otherwise yield *default* value forever.
+    if the iterable was not empty.
 
         >>> list(islice(repeat_last(range(3)), 5))
         [0, 1, 2, 2, 2]
+
+     If the iterable is empty, yield *default* forever.
+
+        >>> list(islice(repeat_last(range(0), 42), 5))
+        [42, 42, 42, 42, 42]
     """
     item = _marker
     for item in iterable:
