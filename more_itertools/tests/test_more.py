@@ -1388,36 +1388,27 @@ class PaddedTest(TestCase):
 
 
 class RepeatLastTests(TestCase):
-    """Tests for repeat_last()"""
-
     def test_empty_iterable(self):
         slice_length = 3
+        iterable = iter([])
+        actual = mi.take(slice_length, mi.repeat_last(iterable))
+        expected = [None] * slice_length
+        self.assertEqual(actual, expected)
 
-        # default value not provided
-        self.assertEqual(
-            (None,) * slice_length,
-            tuple(islice(mi.repeat_last(range(0)), slice_length))
-        )
+    def test_default_value(self):
+        slice_length = 3
+        iterable = iter([])
+        default = '3'
+        actual = mi.take(slice_length, mi.repeat_last(iterable, default))
+        expected = ['3'] * slice_length
+        self.assertEqual(actual, expected)
 
-        default = object()
-        self.assertEqual(
-            (default,) * slice_length,
-            tuple(
-                islice(mi.repeat_last(range(0), default=default), slice_length)
-            )
-        )
-
-    def test_last_element_repeated(self):
-        range_length = 3
-        last_element = range_length - 1
-        extended_length = 7
-
-        self.assertEqual(
-            tuple(
-                islice(mi.repeat_last(range(range_length)), extended_length)
-            )[range_length:],
-            (last_element,) * (extended_length - range_length)
-        )
+    def test_basic(self):
+        slice_length = 10
+        iterable = (str(x) for x in range(5))
+        actual = mi.take(slice_length, mi.repeat_last(iterable))
+        expected = ['0', '1', '2', '3', '4', '4', '4', '4', '4', '4']
+        self.assertEqual(actual, expected)
 
 
 class DistributeTest(TestCase):
