@@ -1387,6 +1387,30 @@ class PaddedTest(TestCase):
         )
 
 
+class RepeatLastTests(TestCase):
+    def test_empty_iterable(self):
+        slice_length = 3
+        iterable = iter([])
+        actual = mi.take(slice_length, mi.repeat_last(iterable))
+        expected = [None] * slice_length
+        self.assertEqual(actual, expected)
+
+    def test_default_value(self):
+        slice_length = 3
+        iterable = iter([])
+        default = '3'
+        actual = mi.take(slice_length, mi.repeat_last(iterable, default))
+        expected = ['3'] * slice_length
+        self.assertEqual(actual, expected)
+
+    def test_basic(self):
+        slice_length = 10
+        iterable = (str(x) for x in range(5))
+        actual = mi.take(slice_length, mi.repeat_last(iterable))
+        expected = ['0', '1', '2', '3', '4', '4', '4', '4', '4', '4']
+        self.assertEqual(actual, expected)
+
+
 class DistributeTest(TestCase):
     """Tests for distribute()"""
 

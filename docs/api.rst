@@ -82,6 +82,7 @@ These tools yield items from an iterable, plus additional data.
 .. autofunction:: count_cycle
 .. autofunction:: intersperse
 .. autofunction:: padded
+.. autofunction:: repeat_last
 .. autofunction:: adjacent
 .. autofunction:: groupby_transform
 
