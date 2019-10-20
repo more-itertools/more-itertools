@@ -1,6 +1,6 @@
 from re import sub
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 def get_long_description():
@@ -28,9 +28,9 @@ setup(
     author='Erik Rose',
     author_email='erikrose@grinchcentral.com',
     license='MIT',
-    packages=find_packages(exclude=['ez_setup']),
+    packages=['more_itertools'],
     python_requires='>=3.5',
-    test_suite='more_itertools.tests',
+    test_suite='tests',
     url='https://github.com/erikrose/more-itertools',
     include_package_data=True,
     classifiers=[

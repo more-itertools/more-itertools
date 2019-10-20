@@ -8,3 +8,4 @@ include docs/_static/*
 include fabfile.py
 include tox.ini
 include more_itertools/py.typed
+include tests/*.py
