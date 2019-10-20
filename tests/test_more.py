@@ -518,7 +518,7 @@ class IlenTests(TestCase):
         )
 
         # Empty
-        self.assertEqual(mi.ilen((x for x in range(0))), 0)
+        self.assertEqual(mi.ilen(x for x in range(0)), 0)
 
         # Iterable with __len__
         self.assertEqual(mi.ilen(list(range(6))), 6)
@@ -2692,7 +2692,7 @@ class SetPartitionsTests(TestCase):
     def test_each_correct(self):
         a = set(range(6))
         for p in mi.set_partitions(a):
-            total = set(e for g in p for e in g)
+            total = {e for g in p for e in g}
             self.assertEqual(a, total)
 
     def test_duplicates(self):

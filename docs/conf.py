@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # more-itertools documentation build configuration file, created by
 # sphinx-quickstart on Mon Jun 25 20:42:39 2012.
