@@ -949,8 +949,7 @@ def collapse(iterable, base_type=None, levels=None):
             return
         else:
             for child in tree:
-                for x in walk(child, level + 1):
-                    yield x
+                yield from walk(child, level + 1)
 
     yield from walk(iterable, 0)
 
