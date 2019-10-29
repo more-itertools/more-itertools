@@ -1,7 +1,7 @@
 from re import sub
 
 from setuptools import setup
-
+import os
 
 def get_long_description():
     # Fix display issues on PyPI caused by RST markup
@@ -20,6 +20,17 @@ def get_long_description():
     return ret
 
 
+def find_incl_stub_files():
+    result = []
+    for root, dirs, files in os.walk('more_itertools'):
+        for file in files:
+            if file.endswith('.pyi') or file.endswith('.py'):
+                if os.path.sep in root:
+                    sub_root = root.split(os.path.sep, 1)[-1]
+                    file = os.path.join(sub_root, file)
+                result.append(file)
+    return result
+
 setup(
     name='more-itertools',
     version='7.2.0',
@@ -33,6 +44,7 @@ setup(
     test_suite='tests',
     url='https://github.com/erikrose/more-itertools',
     include_package_data=True,
+    package_data={'more_itertools': find_incl_stub_files()},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
