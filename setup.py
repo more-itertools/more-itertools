@@ -29,6 +29,7 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=['more_itertools'],
+    package_data={'more_itertools': ['py.typed', 'recipes.pyi', 'more.pyi']},
     python_requires='>=3.5',
     test_suite='tests',
     url='https://github.com/erikrose/more-itertools',
