@@ -289,16 +289,16 @@ def roundrobin(*iterables):
     iterables is small).
 
     """
-    # Recipe credited to George Sakkis
-    pending = len(iterables)
-    nexts = cycle(iter(it).__next__ for it in iterables)
-    while pending:
+    q = deque(iter(it).__next__ for it in iterables)
+    push, popleft = q.append, q.popleft
+    while q:
         try:
-            for next in nexts:
+            while True:
+                next = popleft()
                 yield next()
+                push(next)
         except StopIteration:
-            pending -= 1
-            nexts = cycle(islice(nexts, pending))
+            pass
 
 
 def partition(pred, iterable):
