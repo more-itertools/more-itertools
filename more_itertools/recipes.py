@@ -377,27 +377,16 @@ def unique_everseen(iterable, key=None):
     seenset_add = seenset.add
     seenlist = []
     seenlist_add = seenlist.append
-    if key is None:
-        for element in iterable:
-            try:
-                if element not in seenset:
-                    seenset_add(element)
-                    yield element
-            except TypeError:
-                if element not in seenlist:
-                    seenlist_add(element)
-                    yield element
-    else:
-        for element in iterable:
-            k = key(element)
-            try:
-                if k not in seenset:
-                    seenset_add(k)
-                    yield element
-            except TypeError:
-                if k not in seenlist:
-                    seenlist_add(k)
-                    yield element
+    iterable, keys = tee(iterable)
+    for element, k in zip(iterable, map(key, keys) if key else keys):
+        try:
+            if k not in seenset:
+                seenset_add(k)
+                yield element
+        except TypeError:
+            if k not in seenlist:
+                seenlist_add(k)
+                yield element
 
 
 def unique_justseen(iterable, key=None):
