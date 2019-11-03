@@ -12,6 +12,7 @@ from collections import deque
 from itertools import (
     chain,
     combinations,
+    compress,
     count,
     cycle,
     groupby,
@@ -314,13 +315,9 @@ def partition(pred, iterable):
         ([0, 2, 4, 6, 8], [1, 3, 5, 7, 9])
 
     """
-    # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
-    evaluations = ((pred(x), x) for x in iterable)
-    t1, t2 = tee(evaluations)
-    return (
-        (x for (cond, x) in t1 if not cond),
-        (x for (cond, x) in t2 if cond),
-    )
+    t1, t2, t3 = tee(iterable, 3)
+    s1, s2 = tee(map(pred, t3))
+    return compress(t2, map(operator.not_, s2)), compress(t1, s1)
 
 
 def powerset(iterable):
