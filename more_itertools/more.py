@@ -662,29 +662,14 @@ def windowed(seq, n, fillvalue=None, step=1):
     if step < 1:
         raise ValueError('step must be >= 1')
 
-    it = iter(seq)
-    window = deque([], n)
-    append = window.append
-
-    # Initial deque fill
-    for _ in range(n):
-        append(next(it, fillvalue))
-    yield tuple(window)
-
-    # Appending new items to the right causes old items to fall off the left
-    i = 0
-    for item in it:
-        append(item)
-        i = (i + 1) % step
-        if i % step == 0:
+    window, i = deque((), n), n
+    for _ in map(window.append, seq):
+        i -= 1
+        if not i:
+            i = step
             yield tuple(window)
-
-    # If there are items from the iterable in the window, pad with the given
-    # value and emit them.
-    if (i % step) and (step - i < n):
-        for _ in range(step - i):
-            append(fillvalue)
-        yield tuple(window)
+    window.extend((fillvalue,) * i)
+    yield tuple(window)
 
 
 def substrings(iterable):
