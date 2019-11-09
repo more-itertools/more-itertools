@@ -654,14 +654,8 @@ def windowed(seq, n, fillvalue=None, step=1):
         [(None, None, 1), (None, 1, 2), (1, 2, 3), (2, 3, 4)]
 
     """
-    if n < 0:
-        raise ValueError('n must be >= 0')
-    if n == 0:
-        yield tuple()
-        return
-    if step < 1:
-        raise ValueError('step must be >= 1')
-
+    if not n > 0 < step:
+        raise ValueError('n and step both must be > 0')
     it = iter(seq)
     window = deque([], n)
     append = window.append
