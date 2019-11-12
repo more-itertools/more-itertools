@@ -1580,8 +1580,8 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     duplicate groups, you should sort the iterable by the key function.
 
     """
-    valuefunc = (lambda x: x) if valuefunc is None else valuefunc
-    return ((k, map(valuefunc, g)) for k, g in groupby(iterable, keyfunc))
+    res = groupby(iterable, keyfunc)
+    return ((k, map(valuefunc, g)) for k, g in res) if valuefunc else res
 
 
 def numeric_range(*args):
