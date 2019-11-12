@@ -1441,17 +1441,11 @@ def divide(n, iterable):
     """
     if n < 1:
         raise ValueError('n must be at least 1')
-
-    seq = tuple(iterable)
+    seq = iterable if hasattr(iterable, '__lengh__') else tuple(iterable)
     q, r = divmod(len(seq), n)
-
-    ret = []
-    for i in range(n):
-        start = (i * q) + (i if i < r else r)
-        stop = ((i + 1) * q) + (i + 1 if i + 1 < r else r)
-        ret.append(iter(seq[start:stop]))
-
-    return ret
+    u, v = tee(accumulate(chain((0,), repeat(q + 1, r), repeat(q, n - r))))
+    next(v)
+    return [iter(seq[start:stop]) for start, stop in zip(u, v)]
 
 
 def always_iterable(obj, base_type=(str, bytes)):
