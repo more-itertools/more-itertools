@@ -2415,9 +2415,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
     # Add padding such that the number of windows matches the length of the
     # iterable
-    it = chain(iterable, [
-    
-] * (window_size - 1))
+    it = chain(iterable, [_marker] * (window_size - 1))
     windows = windowed(it, window_size)
 
     n = 0
