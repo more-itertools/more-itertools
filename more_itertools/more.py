@@ -1966,7 +1966,7 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         yield map(itemgetter(1), g)
 
 
-def difference(iterable, func=sub, *, initial=None):
+def difference(iterable, func=sub, *, initial=_marker):
     """By default, compute the first difference of *iterable* using
     :func:`operator.sub`.
 
@@ -2011,10 +2011,10 @@ def difference(iterable, func=sub, *, initial=None):
     except StopIteration:
         return iter([])
 
-    if initial is not None:
+    if initial is not _marker:
         first = []
 
-    return chain(first, map(lambda x: func(x[1], x[0]), zip(a, b)))
+    return chain(first, starmap(func, zip(b,a)))
 
 
 class SequenceView(Sequence):
@@ -2415,7 +2415,9 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
     # Add padding such that the number of windows matches the length of the
     # iterable
-    it = chain(iterable, [_marker] * (window_size - 1))
+    it = chain(iterable, [
+    
+] * (window_size - 1))
     windows = windowed(it, window_size)
 
     n = 0
