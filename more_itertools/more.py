@@ -1966,7 +1966,7 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         yield map(itemgetter(1), g)
 
 
-def difference(iterable, func=sub, *, initial=_marker):
+def difference(iterable, func=sub, *, initial=None):
     """By default, compute the first difference of *iterable* using
     :func:`operator.sub`.
 
@@ -2011,7 +2011,7 @@ def difference(iterable, func=sub, *, initial=_marker):
     except StopIteration:
         return iter([])
 
-    if initial is not _marker:
+    if initial is not None:
         first = []
 
     return chain(first, starmap(func, zip(b,a)))
