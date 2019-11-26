@@ -344,6 +344,50 @@ class PowersetTests(TestCase):
         )
 
 
+class UniquePowersetTests(TestCase):
+    """ Tests for ``unique_powerset``"""
+
+    def test_unique_powerset(self):
+        elements = [1, 1, 1, 2, 2, 3]
+        pss = set(mi.powerset(elements))
+
+        self.assertEqual(len(pss), 24)
+
+        ups = list(mi.unique_powerset(elements))
+
+        self.assertEqual(len(ups), 24)
+        self.assertEqual(set(pss), set(ups))
+
+        expected_results = [
+            (),
+            (1,),
+            (1, 1),
+            (1, 1, 1),
+            (2,),
+            (2, 2),
+            (3,),
+            (1, 2),
+            (1, 1, 2),
+            (1, 1, 1, 2),
+            (1, 2, 2),
+            (1, 1, 2, 2),
+            (1, 1, 1, 2, 2),
+            (1, 3),
+            (1, 1, 3),
+            (1, 1, 1, 3),
+            (2, 3),
+            (2, 2, 3),
+            (1, 2, 3),
+            (1, 1, 2, 3),
+            (1, 1, 1, 2, 3),
+            (1, 2, 2, 3),
+            (1, 1, 2, 2, 3),
+            (1, 1, 1, 2, 2, 3)
+        ]
+
+        self.assertEqual(ups, expected_results)
+
+
 class UniqueEverseenTests(TestCase):
     """Tests for ``unique_everseen()``"""
 
