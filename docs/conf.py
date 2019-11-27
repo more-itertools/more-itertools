@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # more-itertools documentation build configuration file, created by
 # sphinx-quickstart on Mon Jun 25 20:42:39 2012.
@@ -50,7 +49,7 @@ copyright = '2012, Erik Rose'
 # built documents.
 #
 # The short X.Y version.
-version = '7.0.0'
+version = '7.2.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 

@@ -35,3 +35,7 @@ venv/
 .idea
 .vscode
 .DS_Store
+
+# Mypy
+.mypy_cache
+.dmypy.json

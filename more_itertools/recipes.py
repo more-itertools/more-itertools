@@ -14,7 +14,6 @@ from itertools import (
     combinations,
     count,
     cycle,
-    filterfalse,
     groupby,
     islice,
     repeat,
@@ -62,11 +61,12 @@ def take(n, iterable):
 
         >>> take(3, range(10))
         [0, 1, 2]
-        >>> take(5, range(3))
-        [0, 1, 2]
 
-    Effectively a short replacement for ``next`` based iterator consumption
-    when you want more than one item, but less than the whole iterator.
+    If there are fewer than *n* items in the iterable, all of them are
+    returned.
+
+        >>> take(10, range(3))
+        [0, 1, 2]
 
     """
     return list(islice(iterable, n))
@@ -272,8 +272,7 @@ def grouper(iterable, n, fillvalue=None):
     """
     if isinstance(iterable, int):
         warnings.warn(
-            "grouper expects iterable as first parameter",
-            DeprecationWarning,
+            "grouper expects iterable as first parameter", DeprecationWarning
         )
         n, iterable = iterable, n
     args = [iter(iterable)] * n
@@ -317,8 +316,12 @@ def partition(pred, iterable):
 
     """
     # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
-    t1, t2 = tee(iterable)
-    return filterfalse(pred, t1), filter(pred, t2)
+    evaluations = ((pred(x), x) for x in iterable)
+    t1, t2 = tee(evaluations)
+    return (
+        (x for (cond, x) in t1 if not cond),
+        (x for (cond, x) in t2 if cond),
+    )
 
 
 def powerset(iterable):
@@ -485,27 +488,16 @@ def unique_everseen(iterable, key=None):
     seenset_add = seenset.add
     seenlist = []
     seenlist_add = seenlist.append
-    if key is None:
-        for element in iterable:
-            try:
-                if element not in seenset:
-                    seenset_add(element)
-                    yield element
-            except TypeError:
-                if element not in seenlist:
-                    seenlist_add(element)
-                    yield element
-    else:
-        for element in iterable:
-            k = key(element)
-            try:
-                if k not in seenset:
-                    seenset_add(k)
-                    yield element
-            except TypeError:
-                if k not in seenlist:
-                    seenlist_add(k)
-                    yield element
+    iterable, keys = tee(iterable)
+    for element, k in zip(iterable, map(key, keys) if key else keys):
+        try:
+            if k not in seenset:
+                seenset_add(k)
+                yield element
+        except TypeError:
+            if k not in seenlist:
+                seenlist_add(k)
+                yield element
 
 
 def unique_justseen(iterable, key=None):
@@ -561,7 +553,7 @@ def first_true(iterable, default=None, pred=None):
     return next(filter(pred, iterable), default)
 
 
-def random_product(*args, **kwds):
+def random_product(*args, repeat=1):
     """Draw an item at random from each of the input iterables.
 
         >>> random_product('abc', range(4), 'XYZ')  # doctest:+SKIP
@@ -577,7 +569,7 @@ def random_product(*args, **kwds):
     ``itertools.product(*args, **kwarg)``.
 
     """
-    pools = [tuple(pool) for pool in args] * kwds.get('repeat', 1)
+    pools = [tuple(pool) for pool in args] * repeat
     return tuple(choice(pool) for pool in pools)
 
 

@@ -14,6 +14,7 @@ These tools yield groups of items from a source iterable.
 **New itertools**
 
 .. autofunction:: chunked
+.. autofunction:: ichunked
 .. autofunction:: sliced
 .. autofunction:: distribute
 .. autofunction:: divide
@@ -21,6 +22,7 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: split_before
 .. autofunction:: split_after
 .. autofunction:: split_into
+.. autofunction:: split_when
 .. autofunction:: bucket
 .. autofunction:: unzip
 
@@ -80,6 +82,7 @@ These tools yield items from an iterable, plus additional data.
 .. autofunction:: count_cycle
 .. autofunction:: intersperse
 .. autofunction:: padded
+.. autofunction:: repeat_last
 .. autofunction:: adjacent
 .. autofunction:: groupby_transform
 
@@ -104,7 +107,6 @@ These tools combine multiple iterables.
 .. autofunction:: sort_together
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
-.. autofunction:: collate(*iterables, key=lambda a: a, reverse=False)
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
 
 ----
@@ -129,7 +131,8 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: ilen
 .. autofunction:: first(iterable[, default])
 .. autofunction:: last(iterable[, default])
-.. autofunction:: one
+.. autofunction:: one(iterable, too_short=ValueError, too_long=ValueError)
+.. autofunction:: only(iterable, default=None, too_long=ValueError)
 .. autofunction:: unique_to_each
 .. autofunction:: locate(iterable, pred=bool, window_size=None)
 .. autofunction:: rlocate(iterable, pred=bool, window_size=None)
@@ -161,6 +164,8 @@ These tools yield certain items from an iterable.
 .. autofunction:: strip
 .. autofunction:: lstrip
 .. autofunction:: rstrip
+.. autofunction:: filter_except
+.. autofunction:: map_except
 
 ----
 
@@ -182,8 +187,10 @@ These tools yield combinatorial arrangements of items from iterables.
 **New itertools**
 
 .. autofunction:: distinct_permutations
+.. autofunction:: distinct_combinations
 .. autofunction:: circular_shifts
 .. autofunction:: partitions
+.. autofunction:: set_partitions
 
 ----
 
