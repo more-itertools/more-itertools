@@ -384,7 +384,7 @@ def unique_powerset(iterable):
 
     As the number of duplicate values grow, the number of redundant options
     grows exponentially if using powerset.
-    In the example above the powerset generates 63 vs the 23 unique options
+    In the example above the powerset generates 63 vs the 24 unique options
     generated in the unique_powerset.
 
     The assertion set(powerset(iterable)) == unique_powerset(iterable) must

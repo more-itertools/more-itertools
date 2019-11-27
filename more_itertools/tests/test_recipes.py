@@ -343,20 +343,21 @@ class PowersetTests(TestCase):
             [(), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3)]
         )
 
+    def test_empty(self):
+        p = list(mi.powerset([]))
+        self.assertEqual(p, [()])
+
 
 class UniquePowersetTests(TestCase):
     """ Tests for ``unique_powerset``"""
 
+    def test_empty_source(self):
+        ups = list(mi.unique_powerset([]))
+        self.assertEqual(ups, [()])
+
     def test_unique_powerset(self):
-        elements = [1, 1, 1, 2, 2, 3]
-        pss = set(mi.powerset(elements))
-
-        self.assertEqual(len(pss), 24)
-
-        ups = list(mi.unique_powerset(elements))
-
+        ups = list(mi.unique_powerset([1, 1, 1, 2, 2, 3]))
         self.assertEqual(len(ups), 24)
-        self.assertEqual(set(pss), set(ups))
 
         expected_results = [
             (),
