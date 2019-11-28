@@ -5,6 +5,32 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.0.0
+-----
+
+* New itertools and other additions
+    * This library now ships type hints for use with mypy.
+      (thanks to ilai-deutel for the implementation, and to gabbard and fmagin for assistance)
+    * :func:`split_when` (thanks to jferard)
+    * :func:`repeat_last` (thanks to d-ryzhikov)
+
+* Changes to existing itertools:
+    * The implementation for :func:`set_partitions` was improved. (thanks to jferard)
+    * :func:`partition` was optimized for expensive predicates. (thanks to stevecj)
+    * :func:`unique_everseen` and :func:`groupby_transform` were re-factored. (thanks to SergBobrovsky)
+    * The implementation for :func:`difference` was improved. (thanks to Jabbey92)
+
+
+* Other changes
+    * Python 3.4 has reached its end of life and is no longer supported.
+    * Python 3.8 is officially supported. (thanks to jdufresne)
+    * The ``collate`` function has been deprecated.
+      It raises a ``DeprecationWarning`` if used, and will be removed in a future release.
+    * :func:`one` and :func:`only` now provide more informative error messages. (thanks to gabbard)
+    * Unit tests were moved outside of the main package (thanks to jdufresne)
+    * Various documentation fixes (thanks to kriomant, gabbard, jdufresne)
+
+
 7.2.0
 -----
 
