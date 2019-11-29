@@ -22,7 +22,7 @@ def get_long_description():
 
 setup(
     name='more-itertools',
-    version='7.2.0',
+    version='8.0.0',
     description='More routines for operating on iterables, beyond itertools',
     long_description=get_long_description(),
     author='Erik Rose',

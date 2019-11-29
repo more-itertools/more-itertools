@@ -1203,8 +1203,7 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
 
 
 def repeat_last(iterable, default=None):
-    """After the *iterable* is exhausted, keep yielding its last element,
-    if the iterable was not empty.
+    """After the *iterable* is exhausted, keep yielding its last element.
 
         >>> list(islice(repeat_last(range(3)), 5))
         [0, 1, 2, 2, 2]
