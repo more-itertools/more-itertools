@@ -235,7 +235,7 @@ Others
 .. autofunction:: always_reversible
 .. autofunction:: side_effect
 .. autofunction:: iterate
-.. autofunction:: difference(iterable, func=operator.sub)
+.. autofunction:: difference(iterable, func=operator.sub, *, initial=None)
 .. autofunction:: make_decorator
 .. autoclass:: SequenceView
 .. autofunction:: time_limited
