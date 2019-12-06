@@ -5,6 +5,12 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.0.2
+-----
+
+* Bug fixes
+    * The type stub files are now part of the wheel distribution (thanks to keisheiled)
+
 8.0.1
 -----
 
