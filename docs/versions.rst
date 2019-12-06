@@ -5,6 +5,13 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.0.1
+-----
+
+* Bug fixes
+    * The type stub files now work for functions imported from the
+      root package (thanks to keisheiled)
+
 8.0.0
 -----
 
