@@ -424,7 +424,7 @@ def unique_powerset(iterable):
             # the clusters values:
             c_index = [0 for _ in clusters]
             # this allows us to increment each index in values of each block.
-            # Hereby c_index = [0,1,0] on the cluster (1,2,3) becomes [1,2,2,3].
+            # Hereby c_index = [0,1,0] on the cluster (1,2,3) becomes [1,2,2,3]
 
             # next we set the upper limit to control the incremental iteration
             c_limit = [len(blocks[i]) for i in clusters]
