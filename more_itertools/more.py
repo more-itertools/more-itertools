@@ -1,5 +1,5 @@
 import warnings
-
+from bisect import bisect_left
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from functools import partial, wraps
@@ -18,7 +18,9 @@ from itertools import (
     tee,
     zip_longest,
 )
-from operator import itemgetter, lt, gt, sub
+from math import exp, floor, log
+from operator import gt, itemgetter, lt, sub
+from random import random, randrange
 from sys import maxsize
 from time import monotonic
 
@@ -70,6 +72,7 @@ __all__ = [
     'rlocate',
     'rstrip',
     'run_length',
+    'sample',
     'seekable',
     'SequenceView',
     'side_effect',
@@ -2689,3 +2692,95 @@ def map_except(function, iterable, *exceptions):
             yield function(item)
         except exceptions:
             pass
+
+
+def _sample_unweighted(iterable, k):
+    # Implementation of "Algorithm L" from the 1994 paper by Kim-Hung Li:
+    # "Reservoir-Sampling Algorithms of Time Complexity O(n(1+log(N/n)))".
+
+    # Fill up the reservoir (collection of samples) with the first k samples
+    reservoir = []
+    for element in iterable:
+        if len(reservoir) >= k:
+            break
+        reservoir.append(element)
+        yield reservoir
+
+    # Generate random number that's the largest in a sample of k U(0,1) numbers
+    # Largest order statistic: https://en.wikipedia.org/wiki/Order_statistic
+    W = exp(log(random()) / k)
+    # The number of elements we skip before changing the reservoir
+    # is a random number with a geometric distribution.
+    # Generate a geometric sample using random() and logs
+    next_index = k + floor(log(random()) / log(1 - W)) + 1
+
+    for index, element in enumerate(iterable, k + 1):
+
+        if index == next_index:
+            reservoir[randrange(k)] = element
+            # The new W is the largest in a sample of k U(0, `old_W`) numbers
+            W *= exp(log(random()) / k)
+            next_index += floor(log(random()) / log(1 - W)) + 1
+
+        yield reservoir
+
+
+def _sample_weighted(iterable, k, weights):
+    # Implementation of  "A-Res" from the 2006 paper by Efraimidis et al. :
+    # "Weighted random sampling with a reservoir".
+    # TODO: The 'A-ExpJ' algorithm from the paper will be a bit faster
+
+    # Log-transform for numerical stability for weights that are small
+    # Switching signs to keep the k smallest values instead of k largest
+    # Benefical since `bisect_left` assumes a sorted list and pop() is O(1)
+    weight_keys = (-log(random()) / weight for weight in weights)
+
+    # Fill up the reservoir (collection of samples) with the first k samples
+    reservoir, reservoir_weights = [], []
+    for element, weight_key in zip(iterable, weight_keys):
+
+        if len(reservoir) >= k:
+            break
+
+        # The original algorithm consumes the iterable before returning
+        # Using heapq would give O(log(k)) insert and O(k) yield of reservoir
+        # Using a sorted list provides O(k) insertion and O(1) yield instead
+        # We yield in every iteration, but insertion is more rare.
+        index = bisect_left(reservoir_weights, weight_key)
+        reservoir.insert(index, element)
+        reservoir_weights.insert(index, weight_key)
+
+        yield reservoir
+
+    for element, weight_key in zip(iterable, weight_keys):
+
+        # If this key is smaller than the largest of the k smallest keys seen
+        if weight_key < reservoir_weights[-1]:
+
+            # Remove item with the largest `weight_key` from the reservoir
+            reservoir.pop()
+            reservoir_weights.pop()
+
+            # Insert the new element and key, maintaining a sorted list
+            index = bisect_left(reservoir_weights, weight_key)
+            reservoir.insert(index, element)
+            reservoir_weights.insert(index, weight_key)
+
+        yield reservoir
+
+
+def sample(iterable, k=1, weights=None):
+    """
+    Yields *k*-length lists of elements chosen (without replacement) from
+    the elements consumed so far in the *iterable*. The sample can be
+    weighted by providing an iterable of non-negative *weights*.
+
+    Like :func:`random.sample`, but works on  iterables with unknown
+    length and with weights.
+    """
+    iterable = iter(iterable)
+    if weights is None:
+        yield from _sample_unweighted(iterable, k)
+    else:
+        weights = iter(weights)
+        yield from _sample_weighted(iterable, k, weights)
