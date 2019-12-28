@@ -19,7 +19,7 @@ from itertools import (
 )
 from math import exp, floor, log
 from operator import gt, itemgetter, lt, sub
-from random import random, randrange
+from random import random, randrange, uniform
 from sys import maxsize
 from time import monotonic
 
@@ -2743,7 +2743,7 @@ def _sample_weighted(iterable, k, weights):
             # the weight-keys in log-space for better numerical stability.
             smallest_weight_key, _ = reservoir[0]
             t_w = exp(weight * smallest_weight_key)
-            r_2 = t_w + (1 - t_w) * random()  # generate U(t_w, 1)
+            r_2 = uniform(t_w, 1)  # generate U(t_w, 1)
             weight_key = log(r_2) / weight
             heapreplace(reservoir, (weight_key, element))
             weights_to_skip = log(random()) / smallest_weight_key
@@ -2754,7 +2754,7 @@ def _sample_weighted(iterable, k, weights):
     return [heappop(reservoir)[1] for _ in range(k)]
 
 
-def sample(iterable, k=1, weights=None):
+def sample(iterable, k, weights=None):
     """Return a *k*-length list of elements chosen (without replacement)
     from the *iterable*. Like :func:`random.sample`, but works on iterables
     of unknown length. An iterable with *weights* may also be given.
