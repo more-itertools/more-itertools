@@ -19,6 +19,7 @@ from itertools import (
     repeat,
 )
 from operator import add, mul, itemgetter
+from statistics import mean
 from sys import version_info
 from time import sleep
 from unittest import skipIf, TestCase
@@ -2945,4 +2946,30 @@ class SampleTests(TestCase):
         data = [1, 2, 3, 4, 5]
         for k in [0, 3, 5, 7]:
             sampled = mi.sample(data, k=k)
-            self.assertEqual(len(sampled), min(k, len(data)))
+            actual = len(sampled)
+            expected = min(k, len(data))
+            self.assertEqual(actual, expected)
+
+    def test_samling_entire_iterable(self):
+        """If k=len(iterable), the sample contains the original elements."""
+        data = ["a", 2, "a", 4, (1, 2, 3)]
+        k = len(data)
+        actual = set(mi.sample(data, k=k))
+        expected = set(data)
+        self.assertEqual(actual, expected)
+
+    def test_invariance_under_permutations(self):
+        """The order of the data should not matter. This is a stochastic test,
+        but it will fail in less than 1 / 10_000 cases."""
+
+        # Create a data set and a reversed data set
+        data = list(range(100))
+        data_rev = list(reversed(data))
+
+        # Sample each data set 10 times
+        data_means = [mean(mi.sample(data, k=50)) for _ in range(10)]
+        data_rev_means = [mean(mi.sample(data_rev, k=50)) for _ in range(10)]
+
+        # The difference in the means should be low, i.e. little bias
+        difference_in_means = abs(mean(data_means) - mean(data_rev_means))
+        self.assertTrue(difference_in_means < 5)
