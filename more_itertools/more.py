@@ -2746,6 +2746,7 @@ def _sample_weighted(iterable, k, weights):
             r_2 = uniform(t_w, 1)  # generate U(t_w, 1)
             weight_key = log(r_2) / weight
             heapreplace(reservoir, (weight_key, element))
+            smallest_weight_key, _ = reservoir[0]
             weights_to_skip = log(random()) / smallest_weight_key
         else:
             weights_to_skip -= weight

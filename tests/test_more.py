@@ -2958,7 +2958,7 @@ class SampleTests(TestCase):
         expected = set(data)
         self.assertEqual(actual, expected)
 
-    def test_invariance_under_permutations(self):
+    def test_invariance_under_permutations_unweighted(self):
         """The order of the data should not matter. This is a stochastic test,
         but it will fail in less than 1 / 10_000 cases."""
 
@@ -2973,3 +2973,21 @@ class SampleTests(TestCase):
         # The difference in the means should be low, i.e. little bias
         difference_in_means = abs(mean(data_means) - mean(data_rev_means))
         self.assertTrue(difference_in_means < 5)
+
+    def test_invariance_under_permutations_weighted(self):
+        """The order of the data should not matter. This is a stochastic test,
+        but it will fail in less than 1 / 10_000 cases."""
+
+        # Create a data set and a reversed data set
+        data = list(range(1, 101))
+        data_rev = list(reversed(data))
+
+        # Sample each data set 10 times
+        data_means = [mean(mi.sample(data, k=50, weights=data))
+                      for _ in range(10)]
+        data_rev_means = [mean(mi.sample(data_rev, k=50, weights=data_rev))
+                          for _ in range(10)]
+
+        # The difference in the means should be low, i.e. little bias
+        difference_in_means = abs(mean(data_means) - mean(data_rev_means))
+        self.assertTrue(difference_in_means < 4)
