@@ -2771,6 +2771,9 @@ def sample(iterable, k, weights=None):
     >>> weights = range(1, len(data) + 1)
     >>> random_permutation = sample(data, k=len(data), weights=weights)
     """
+    if k == 0:
+        return []
+
     iterable = iter(iterable)
     if weights is None:
         return _sample_unweighted(iterable, k)
