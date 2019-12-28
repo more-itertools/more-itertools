@@ -1,9 +1,8 @@
 import warnings
-from bisect import bisect_left
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from functools import partial, wraps
-from heapq import merge
+from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
     chain,
     compress,
@@ -2698,20 +2697,15 @@ def _sample_unweighted(iterable, k):
     # Implementation of "Algorithm L" from the 1994 paper by Kim-Hung Li:
     # "Reservoir-Sampling Algorithms of Time Complexity O(n(1+log(N/n)))".
 
-    # Fill up the reservoir (collection of samples) with the first k samples
-    reservoir = []
-    for element in iterable:
-        if len(reservoir) >= k:
-            break
-        reservoir.append(element)
-        yield reservoir
+    # Fill up the reservoir (collection of samples) with the first `k` samples
+    reservoir = list(islice(iterable, k))
 
     # Generate random number that's the largest in a sample of k U(0,1) numbers
     # Largest order statistic: https://en.wikipedia.org/wiki/Order_statistic
     W = exp(log(random()) / k)
-    # The number of elements we skip before changing the reservoir
-    # is a random number with a geometric distribution.
-    # Generate a geometric sample using random() and logs
+
+    # The number of elements to skip before changing the reservoir is a random
+    # number with a geometric distribution. Sample it using random() and logs.
     next_index = k + floor(log(random()) / log(1 - W)) + 1
 
     for index, element in enumerate(iterable, k + 1):
@@ -2722,65 +2716,65 @@ def _sample_unweighted(iterable, k):
             W *= exp(log(random()) / k)
             next_index += floor(log(random()) / log(1 - W)) + 1
 
-        yield reservoir
+    return reservoir
 
 
 def _sample_weighted(iterable, k, weights):
-    # Implementation of  "A-Res" from the 2006 paper by Efraimidis et al. :
+    # Implementation of "A-ExpJ" from the 2006 paper by Efraimidis et al. :
     # "Weighted random sampling with a reservoir".
-    # TODO: The 'A-ExpJ' algorithm from the paper will be a bit faster
 
-    # Log-transform for numerical stability for weights that are small
-    # Switching signs to keep the k smallest values instead of k largest
-    # Benefical since `bisect_left` assumes a sorted list and pop() is O(1)
-    weight_keys = (-log(random()) / weight for weight in weights)
+    # Log-transform for numerical stability for weights that are small/large
+    weight_keys = (log(random()) / weight for weight in weights)
 
-    # Fill up the reservoir (collection of samples) with the first k samples
-    reservoir, reservoir_weights = [], []
-    for element, weight_key in zip(iterable, weight_keys):
+    # Fill up the reservoir (collection of samples) with the first `k`
+    # weight-keys and elements, then heapify the list.
+    reservoir = list(islice(zip(weight_keys, iterable), k))
+    heapify(reservoir)
 
-        if len(reservoir) >= k:
-            break
+    # The number of jumps before changing the reservoir is a random variable
+    # with an exponential distribution. Sample it using random() and logs.
+    smallest_weight_key, _ = reservoir[0]
+    weights_to_skip = log(random()) / smallest_weight_key
 
-        # The original algorithm consumes the iterable before returning
-        # Using heapq would give O(log(k)) insert and O(k) yield of reservoir
-        # Using a sorted list provides O(k) insertion and O(1) yield instead
-        # We yield in every iteration, but insertion is more rare.
-        index = bisect_left(reservoir_weights, weight_key)
-        reservoir.insert(index, element)
-        reservoir_weights.insert(index, weight_key)
+    for weight, element in zip(weights, iterable):
 
-        yield reservoir
+        if weight >= weights_to_skip:
+            # The notation here is consistent with the paper, but we store
+            # the weight-keys in log-space for better numerical stability.
+            smallest_weight_key, _ = reservoir[0]
+            t_w = exp(weight * smallest_weight_key)
+            r_2 = t_w + (1 - t_w) * random()  # generate U(t_w, 1)
+            weight_key = log(r_2) / weight
+            heapreplace(reservoir, (weight_key, element))
+            weights_to_skip = log(random()) / smallest_weight_key
+        else:
+            weights_to_skip -= weight
 
-    for element, weight_key in zip(iterable, weight_keys):
-
-        # If this key is smaller than the largest of the k smallest keys seen
-        if weight_key < reservoir_weights[-1]:
-
-            # Remove item with the largest `weight_key` from the reservoir
-            reservoir.pop()
-            reservoir_weights.pop()
-
-            # Insert the new element and key, maintaining a sorted list
-            index = bisect_left(reservoir_weights, weight_key)
-            reservoir.insert(index, element)
-            reservoir_weights.insert(index, weight_key)
-
-        yield reservoir
+    # Equivalent to [element for weight_key, element in sorted(reservoir)]
+    return [heappop(reservoir)[1] for _ in range(k)]
 
 
 def sample(iterable, k=1, weights=None):
-    """
-    Yields *k*-length lists of elements chosen (without replacement) from
-    the elements consumed so far in the *iterable*. The sample can be
-    weighted by providing an iterable of non-negative *weights*.
-
-    Like :func:`random.sample`, but works on  iterables with unknown
-    length and with weights.
+    """Return a *k*-length list of elements chosen (without replacement)
+    from the *iterable*. Like :func:`random.sample`, but works on iterables
+    of unknown length. An iterable with *weights* may also be given.
+    
+    >>> data = range(100)
+    >>> weights = (i * i + 1 for i in range(100))
+    >>> sampled = sample(data, k=10, weights=weights)
+    
+    The algorithm can also be used to generate weighted random permutations.
+    The relative weight of each item determines the probability that it
+    appears late in the permutation.
+    
+    >>> data = "abcdefgh"
+    >>> weights = range(1, len(data) + 1)
+    >>> random_permutation = sample(data, k=len(data), weights=weights)
     """
     iterable = iter(iterable)
     if weights is None:
-        yield from _sample_unweighted(iterable, k)
+        return _sample_unweighted(iterable, k)
     else:
         weights = iter(weights)
-        yield from _sample_weighted(iterable, k, weights)
+        return _sample_weighted(iterable, k, weights)
+
