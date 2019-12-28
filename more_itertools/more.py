@@ -2758,15 +2758,15 @@ def sample(iterable, k=1, weights=None):
     """Return a *k*-length list of elements chosen (without replacement)
     from the *iterable*. Like :func:`random.sample`, but works on iterables
     of unknown length. An iterable with *weights* may also be given.
-    
+
     >>> data = range(100)
     >>> weights = (i * i + 1 for i in range(100))
     >>> sampled = sample(data, k=10, weights=weights)
-    
+
     The algorithm can also be used to generate weighted random permutations.
     The relative weight of each item determines the probability that it
     appears late in the permutation.
-    
+
     >>> data = "abcdefgh"
     >>> weights = range(1, len(data) + 1)
     >>> random_permutation = sample(data, k=len(data), weights=weights)
@@ -2777,4 +2777,3 @@ def sample(iterable, k=1, weights=None):
     else:
         weights = iter(weights)
         return _sample_weighted(iterable, k, weights)
-
