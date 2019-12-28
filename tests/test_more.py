@@ -2936,3 +2936,13 @@ class MapExceptTests(TestCase):
         actual = list(mi.map_except(int, iterable, ValueError, TypeError))
         expected = [0, 1, 2, 4]
         self.assertEqual(actual, expected)
+
+
+class SampleTests(TestCase):
+
+    def test_length(self):
+        """Check that *k* elements are sampled."""
+        data = [1, 2, 3, 4, 5]
+        for k in [0, 3, 5, 7]:
+            sampled = mi.sample(data, k=k)
+            self.assertEqual(len(sampled), min(k, len(data)))
