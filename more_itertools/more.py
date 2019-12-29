@@ -1441,14 +1441,20 @@ def divide(n, iterable):
     if n < 1:
         raise ValueError('n must be at least 1')
 
-    seq = tuple(iterable)
+    try:
+        iterable[:0]
+    except TypeError:
+        seq = tuple(iterable)
+    else:
+        seq = iterable
+
     q, r = divmod(len(seq), n)
 
     ret = []
     stop = 0
     for i in range(1, n + 1):
         start = stop
-        stop = (i * q) + (i if i < r else r)
+        stop += q + 1 if i <= r else q
         ret.append(iter(seq[start:stop]))
 
     return ret
