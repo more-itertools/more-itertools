@@ -2942,6 +2942,19 @@ class MapExceptTests(TestCase):
 
 class SampleTests(TestCase):
 
+    def test_unit_case(self):
+        """Test against a fixed case by seeding the random module."""
+        # Beware that this test really just verifies random.random() behavior.
+        # If the algorithm is changed (e.g. to a more naive implementation)
+        # this test will fail, but the algorithm might be correct.
+        # Also, this test can pass and the algorithm can be completely wrong.
+        data = "abcdef"
+        weights = list(range(1, len(data) + 1))
+        seed(123)
+        actual = mi.sample(data, k=2, weights=weights)
+        expected = ['f', 'e']
+        self.assertEqual(actual, expected)
+
     def test_length(self):
         """Check that *k* elements are sampled."""
         data = [1, 2, 3, 4, 5]
