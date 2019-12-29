@@ -1445,9 +1445,10 @@ def divide(n, iterable):
     q, r = divmod(len(seq), n)
 
     ret = []
-    for i in range(n):
-        start = (i * q) + (i if i < r else r)
-        stop = ((i + 1) * q) + (i + 1 if i + 1 < r else r)
+    stop = 0
+    for i in range(1, n + 1):
+        start = stop
+        stop = (i * q) + (i if i < r else r)
         ret.append(iter(seq[start:stop]))
 
     return ret
