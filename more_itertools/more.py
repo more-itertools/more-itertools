@@ -2706,9 +2706,9 @@ def _sample_unweighted(iterable, k):
 
     # The number of elements to skip before changing the reservoir is a random
     # number with a geometric distribution. Sample it using random() and logs.
-    next_index = k + floor(log(random()) / log(1 - W)) + 1
+    next_index = k + floor(log(random()) / log(1 - W))
 
-    for index, element in enumerate(iterable, k + 1):
+    for index, element in enumerate(iterable, k):
 
         if index == next_index:
             reservoir[randrange(k)] = element
