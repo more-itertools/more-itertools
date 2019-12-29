@@ -2728,7 +2728,7 @@ def _sample_weighted(iterable, k, weights):
 
     # Fill up the reservoir (collection of samples) with the first `k`
     # weight-keys and elements, then heapify the list.
-    reservoir = list(islice(zip(weight_keys, iterable), k))
+    reservoir = take(k, zip(weight_keys, iterable))
     heapify(reservoir)
 
     # The number of jumps before changing the reservoir is a random variable
