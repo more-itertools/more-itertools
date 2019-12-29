@@ -2698,7 +2698,7 @@ def _sample_unweighted(iterable, k):
     # "Reservoir-Sampling Algorithms of Time Complexity O(n(1+log(N/n)))".
 
     # Fill up the reservoir (collection of samples) with the first `k` samples
-    reservoir = list(islice(iterable, k))
+    reservoir = take(k, iterable)
 
     # Generate random number that's the largest in a sample of k U(0,1) numbers
     # Largest order statistic: https://en.wikipedia.org/wiki/Order_statistic
