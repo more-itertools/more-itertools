@@ -19,6 +19,7 @@ from itertools import (
     repeat,
 )
 from operator import add, mul, itemgetter
+from random import seed
 from statistics import mean
 from sys import version_info
 from time import sleep
@@ -2953,10 +2954,25 @@ class SampleTests(TestCase):
     def test_samling_entire_iterable(self):
         """If k=len(iterable), the sample contains the original elements."""
         data = ["a", 2, "a", 4, (1, 2, 3)]
-        k = len(data)
-        actual = set(mi.sample(data, k=k))
+        actual = set(mi.sample(data, k=len(data)))
         expected = set(data)
         self.assertEqual(actual, expected)
+
+    def test_scale_invariance_of_weights(self):
+        """The probabilit of chosing element a_i is w_i / sum(weights).
+        Scaling weights should not change the probability or outcome."""
+        data = "abcdef"
+
+        weights = list(range(1, len(data) + 1))
+        seed(123)
+        first_sample = mi.sample(data, k=2, weights=weights)
+
+        # Scale the weights and sample again
+        weights_scaled = [w / 1e10 for w in weights]
+        seed(123)
+        second_sample = mi.sample(data, k=2, weights=weights_scaled)
+
+        self.assertEqual(first_sample, second_sample)
 
     def test_invariance_under_permutations_unweighted(self):
         """The order of the data should not matter. This is a stochastic test,
@@ -2972,7 +2988,9 @@ class SampleTests(TestCase):
 
         # The difference in the means should be low, i.e. little bias
         difference_in_means = abs(mean(data_means) - mean(data_rev_means))
-        self.assertTrue(difference_in_means < 5)
+
+        # The observed largest difference in 10,000 simulations was 5.09599
+        self.assertTrue(difference_in_means < 5.1)
 
     def test_invariance_under_permutations_weighted(self):
         """The order of the data should not matter. This is a stochastic test,
@@ -2990,4 +3008,6 @@ class SampleTests(TestCase):
 
         # The difference in the means should be low, i.e. little bias
         difference_in_means = abs(mean(data_means) - mean(data_rev_means))
-        self.assertTrue(difference_in_means < 4)
+
+        # The observed largest difference in 10,000 simulations was 4.337999
+        self.assertTrue(difference_in_means < 4.4)
