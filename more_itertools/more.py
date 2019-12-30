@@ -20,6 +20,7 @@ from itertools import (
 from math import exp, floor, log
 from operator import gt, itemgetter, lt, sub
 from random import random, randrange, uniform
+from operator import itemgetter, sub
 from sys import maxsize
 from time import monotonic
 
@@ -1610,7 +1611,7 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     return ((k, map(valuefunc, g)) for k, g in res) if valuefunc else res
 
 
-def numeric_range(*args):
+class numeric_range:
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
 
@@ -1661,28 +1662,130 @@ def numeric_range(*args):
         datetime.datetime(2019, 1, 2, 0, 0)
 
     """
-    argc = len(args)
-    if argc == 1:
-        stop, = args
-        start = type(stop)(0)
-        step = 1
-    elif argc == 2:
-        start, stop = args
-        step = 1
-    elif argc == 3:
-        start, stop, step = args
-    else:
-        err_msg = 'numeric_range takes at most 3 arguments, got {}'
-        raise TypeError(err_msg.format(argc))
+    def __init__(self, *args):
+        argc = len(args)
+        if argc == 1:
+            self._stop, = args
+            self._start = type(self._stop)(0)
+            self._step = 1
+        elif argc == 2:
+            self._start, self._stop = args
+            self._step = 1
+        elif argc == 3:
+            self._start, self._stop, self._step = args
+        else:
+            if argc == 0:
+                err_msg = 'numeric_range expected 1 argument, got {}'
+            else:
+                err_msg = 'numeric_range expected at most 3 arguments, got {}'
+            raise TypeError(err_msg.format(argc))
 
-    values = (start + (step * n) for n in count())
-    zero = type(step)(0)
-    if step > zero:
-        return takewhile(partial(gt, stop), values)
-    elif step < zero:
-        return takewhile(partial(lt, stop), values)
-    else:
-        raise ValueError('numeric_range arg 3 must not be zero')
+        self._zero = type(self._step)(0)
+        if self._step == self._zero:
+            raise ValueError('numeric_range() arg 3 must not be zero')
+        self._growing = self._step > self._zero
+
+    def __contains__(self, elem):
+        if self._growing:
+            if self._start <= elem < self._stop:
+                return (elem - self._start) % self._step == self._zero
+        else:
+            if self._start >= elem > self._stop:
+                return (self._start - elem) % (-self._step) == self._zero
+
+        return False
+
+    def __eq__(self, other):
+        return (self._start == other._start
+                and self._step == other._step
+                and self._get_by_index(-1) == other._get_by_index(-1))
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self._get_by_index(key)
+        elif isinstance(key, slice):
+            start = self._start if key.start is None \
+                else self._get_by_index(key.start)
+            stop = self._stop if key.stop is None \
+                else self._get_by_index(key.stop)
+            step = self._step if key.step is None else key.step * self._step
+            return numeric_range(start, stop, step)
+        else:
+            raise TypeError(
+                "numeric range indices must be integers or slices, not str")
+
+    def __hash__(self):
+        return hash((self._start, self._stop, self._step))
+
+    def __iter__(self):
+        elem = self._start + self._zero
+        if self._growing:
+            while elem < self._stop:
+                yield elem
+                elem += self._step
+        else:
+            while elem > self._stop:
+                yield elem
+                elem += self._step
+
+    def __len__(self):
+        if self._growing:
+            start = self._start
+            stop = self._stop
+            step = self._step
+        else:
+            start = self._stop
+            stop = self._start
+            step = -self._step
+
+        distance = stop - start
+        if distance <= 0:
+            return 0
+
+        r = distance % step
+        q = int(distance / step)
+        return q + int(r != self._zero)
+
+    def __reduce__(self):
+        return numeric_range, (self._start, self._stop, self._step)
+
+    def __repr__(self):
+        if self._step == 1:
+            return "numeric_range({}, {})".format(repr(self._start),
+                                                  repr(self._stop))
+        else:
+            return "numeric_range({}, {}, {})".format(repr(self._start),
+                                                      repr(self._stop),
+                                                      repr(self._step))
+
+    def __reversed__(self):
+        return iter(numeric_range(self._get_by_index(-1),
+                                  self._start - self._step, -self._step))
+
+    def count(self, value):
+        return int(self.__contains__(value))
+
+    def index(self, value):
+        if self._growing:
+            if self._start <= value < self._stop:
+                q, r = divmod(value - self._start, self._step)
+                if r == self._zero:
+                    return int(q)
+        else:
+            if self._start >= value > self._stop:
+                q, r = divmod(self._start - value, -self._step)
+                if r == self._zero:
+                    return int(q)
+
+        raise ValueError("{} is not in numeric range".format(value))
+
+    def _get_by_index(self, i):
+        L = self.__len__()
+        if i < 0:
+            i += L
+        if i < 0 or i >= L:
+            raise IndexError("numeric range object index out of range")
+        return self._start + i * self._step
 
 
 def count_cycle(iterable, n=None):

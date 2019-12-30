@@ -2001,6 +2001,118 @@ class NumericRangeTests(TestCase):
             with self.assertRaises(ValueError):
                 list(mi.numeric_range(*args))
 
+    def test_contains(self):
+        r1 = mi.numeric_range(1.0, 9.9, 1.5)
+        r2 = mi.numeric_range(8.5, 0.0, -1.5)
+
+        for r in (r1, r2):
+            for v in (1.0, 2.5, 4.0, 5.5, 7.0, 8.5):
+                self.assertTrue(v in r)
+
+            for v in (0.9,):
+                self.assertFalse(0.9 in r)
+
+    def test_eq(self):
+        self.assertEqual(mi.numeric_range(1.0, 9.9, 1.5),
+                         mi.numeric_range(1.0, 8.6, 1.5))
+        self.assertEqual(mi.numeric_range(8.5, 0.0, -1.5),
+                         mi.numeric_range(8.5, 0.7, -1.5))
+
+        self.assertNotEqual(mi.numeric_range(1.0, 9.9, 1.5),
+                            mi.numeric_range(1.2, 9.9, 1.5))
+        self.assertNotEqual(mi.numeric_range(1.0, 9.9, 1.5),
+                            mi.numeric_range(1.0, 10.3, 1.5))
+        self.assertNotEqual(mi.numeric_range(1.0, 9.9, 1.5),
+                            mi.numeric_range(1.0, 9.9, 1.4))
+        self.assertNotEqual(mi.numeric_range(8.5, 0.0, -1.5),
+                            mi.numeric_range(8.4, 0.0, -1.5))
+        self.assertNotEqual(mi.numeric_range(8.5, 0.0, -1.5),
+                            mi.numeric_range(8.5, -0.7, -1.5))
+        self.assertNotEqual(mi.numeric_range(8.5, 0.0, -1.5),
+                            mi.numeric_range(8.5, 0.0, -1.4))
+
+    def test_get_item_by_index(self):
+        for args, index, expected in [
+            ((1.0, 6.0, 1.5), 0, 1.0),
+            ((1.0, 6.0, 1.5), 1, 2.5),
+            ((1.0, 6.0, 1.5), 2, 4.0),
+            ((1.0, 6.0, 1.5), 3, 5.5),
+            ((1.0, 6.0, 1.5), -1, 5.5),
+            ((1.0, 6.0, 1.5), -2, 4.0),
+        ]:
+            self.assertEqual(expected, mi.numeric_range(*args)[index])
+
+        for args, index in [
+            ((1.0, 6.0, 1.5), 4),
+            ((1.0, 6.0, 1.5), -5),
+        ]:
+            with self.assertRaises(IndexError):
+                mi.numeric_range(*args)[index]
+
+    def test_get_item_by_slice(self):
+        r = mi.numeric_range(1.0, 9.9, 1.5)
+        self.assertEqual(mi.numeric_range(1.0, 2.5, 1.5), r[:1])
+        self.assertEqual(mi.numeric_range(1.0, 4.0, 1.5), r[:2])
+        self.assertEqual(mi.numeric_range(2.5, 4.0, 1.5), r[1:2])
+        self.assertEqual(mi.numeric_range(2.5, 8.5, 1.5), r[1:-1])
+
+    def test_hash(self):
+        for args, expected in [
+            ((1.0, 6.0, 1.5), -7847785522693970979),
+        ]:
+            self.assertEqual(expected, hash(mi.numeric_range(*args)))
+
+    def test_iter_twice(self):
+        r1 = mi.numeric_range(1.0, 9.9, 1.5)
+        r2 = mi.numeric_range(8.5, 0.0, -1.5)
+        self.assertEqual([1.0, 2.5, 4.0, 5.5, 7.0, 8.5], list(r1))
+        self.assertEqual([1.0, 2.5, 4.0, 5.5, 7.0, 8.5], list(r1))
+        self.assertEqual([8.5, 7.0, 5.5, 4.0, 2.5, 1.0], list(r2))
+        self.assertEqual([8.5, 7.0, 5.5, 4.0, 2.5, 1.0], list(r2))
+
+    def test_len(self):
+        for args, expected in [
+            ((1.0, 7.0, 1.5), 4),
+            ((1.0, 7.01, 1.5), 5),
+            ((7.0, 1.0, -1.5), 4),
+            ((7.01, 1.0, -1.5), 5),
+        ]:
+            self.assertEqual(expected, len(mi.numeric_range(*args)))
+
+    def test_repr(self):
+        for args, expected in [
+            ((7.0,), "numeric_range(0.0, 7.0)"),
+            ((1.0, 7.0), "numeric_range(1.0, 7.0)"),
+            ((7.0, 1.0, -1.5), "numeric_range(7.0, 1.0, -1.5)"),
+        ]:
+            self.assertEqual(expected, repr(mi.numeric_range(*args)))
+
+    def test_reversed(self):
+        for args, expected in [
+            ((7.0,), [6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0]),
+            ((1.0, 7.0), [6.0, 5.0, 4.0, 3.0, 2.0, 1.0]),
+            ((7.0, 1.0, -1.5), [2.5, 4.0, 5.5, 7.0]),
+            ((7.0, 0.9, -1.5), [1.0, 2.5, 4.0, 5.5, 7.0]),
+        ]:
+            self.assertEqual(expected, list(reversed(mi.numeric_range(*args))))
+
+    def test_count(self):
+        r = mi.numeric_range(7.0)
+        self.assertEqual(1, r.count(0.0))
+        self.assertEqual(0, r.count(0.5))
+        self.assertEqual(1, r.count(6.0))
+        self.assertEqual(0, r.count(7.0))
+        self.assertEqual(0, r.count(10.0))
+
+    def test_index(self):
+        r = mi.numeric_range(7.0)
+        self.assertEqual(0, r.index(0.0))
+        self.assertEqual(6, r.index(6.0))
+
+        for v in (0.5, 7.0, 10.0):
+            with self.assertRaises(ValueError):
+                r.index(v)
+
 
 class CountCycleTests(TestCase):
     def test_basic(self):
