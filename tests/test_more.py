@@ -2058,7 +2058,12 @@ class NumericRangeTests(TestCase):
 
     def test_hash(self):
         for args, expected in [
-            ((1.0, 6.0, 1.5), -7847785522693970979),
+            ((1.0, 6.0, 1.5), hash((1.0, 5.5, 1.5))),
+            ((1.0, 7.0, 1.5), hash((1.0, 5.5, 1.5))),
+            ((1.0, 7.5, 1.5), hash((1.0, 7.0, 1.5))),
+            ((1.0, 1.5, 1.5), hash((1.0, 1.0, 1.5))),
+            ((1.5, 1.0, 1.5), hash(range(0, 0))),
+            ((1.5, 1.5, 1.5), hash(range(0, 0))),
         ]:
             self.assertEqual(expected, hash(mi.numeric_range(*args)))
 

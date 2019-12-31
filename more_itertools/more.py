@@ -1662,6 +1662,8 @@ class numeric_range:
         datetime.datetime(2019, 1, 2, 0, 0)
 
     """
+    _EMPTY_HASH = hash(range(0, 0))
+
     def __init__(self, *args):
         argc = len(args)
         if argc == 1:
@@ -1715,7 +1717,16 @@ class numeric_range:
                 "numeric range indices must be integers or slices, not str")
 
     def __hash__(self):
-        return hash((self._start, self._stop, self._step))
+        if self._growing:
+            if self._start >= self._stop:
+                return self._EMPTY_HASH
+            else:
+                return hash((self._start, self._get_by_index(-1), self._step))
+        else:
+            if self._start <= self._stop:
+                return self._EMPTY_HASH
+            else:
+                return hash((self._start, self._get_by_index(-1), self._step))
 
     def __iter__(self):
         elem = self._start + self._zero
