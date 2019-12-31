@@ -1655,7 +1655,7 @@ class numeric_range:
         >>> start = datetime.datetime(2019, 1, 1)
         >>> stop = datetime.datetime(2019, 1, 3)
         >>> step = datetime.timedelta(days=1)
-        >>> items = numeric_range(start, stop, step)
+        >>> items = iter(numeric_range(start, stop, step))
         >>> next(items)
         datetime.datetime(2019, 1, 1, 0, 0)
         >>> next(items)
