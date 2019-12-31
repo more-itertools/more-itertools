@@ -1687,6 +1687,12 @@ class numeric_range:
             raise ValueError('numeric_range() arg 3 must not be zero')
         self._growing = self._step > self._zero
 
+    def __bool__(self):
+        if self._growing:
+            return self._start < self._stop
+        else:
+            return self._start > self._stop
+
     def __contains__(self, elem):
         if self._growing:
             if self._start <= elem < self._stop:
@@ -1717,16 +1723,10 @@ class numeric_range:
                 "numeric range indices must be integers or slices, not str")
 
     def __hash__(self):
-        if self._growing:
-            if self._start >= self._stop:
-                return self._EMPTY_HASH
-            else:
-                return hash((self._start, self._get_by_index(-1), self._step))
+        if self:
+            return hash((self._start, self._get_by_index(-1), self._step))
         else:
-            if self._start <= self._stop:
-                return self._EMPTY_HASH
-            else:
-                return hash((self._start, self._get_by_index(-1), self._step))
+            return self._EMPTY_HASH
 
     def __iter__(self):
         elem = self._start + self._zero
@@ -1774,7 +1774,7 @@ class numeric_range:
                                   self._start - self._step, -self._step))
 
     def count(self, value):
-        return int(self.__contains__(value))
+        return int(value in self)
 
     def index(self, value):
         if self._growing:

@@ -2001,6 +2001,19 @@ class NumericRangeTests(TestCase):
             with self.assertRaises(ValueError):
                 list(mi.numeric_range(*args))
 
+    def test_bool(self):
+        for args, expected in [
+            ((1.0, 3.0, 1.5), True),
+            ((1.0, 2.0, 1.5), True),
+            ((1.0, 1.0, 1.5), False),
+            ((1.0, 0.0, 1.5), False),
+            ((3.0, 1.0, -1.5), True),
+            ((2.0, 1.0, -1.5), True),
+            ((1.0, 1.0, -1.5), False),
+            ((0.0, 1.0, -1.5), False),
+        ]:
+            self.assertEqual(expected, bool(mi.numeric_range(*args)))
+
     def test_contains(self):
         r1 = mi.numeric_range(1.0, 9.9, 1.5)
         r2 = mi.numeric_range(8.5, 0.0, -1.5)
