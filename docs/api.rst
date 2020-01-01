@@ -148,6 +148,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: all_equal
 .. autofunction:: first_true
 .. autofunction:: nth
+.. autofunction:: nth_or_last
 .. autofunction:: quantify(iterable, pred=bool)
 
 
