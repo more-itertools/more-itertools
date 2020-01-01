@@ -202,6 +202,21 @@ class LastTests(TestCase):
         self.assertEqual(mi.last(IterOnlyRange(5)), 4)
 
 
+class NthOrLastTests(TestCase):
+    """Tests for ``nth_or_last()``"""
+
+    def test_basic(self):
+        self.assertEqual(mi.nth_or_last(range(3), 1), 1)
+        self.assertEqual(mi.nth_or_last(range(3), 3), 2)
+
+    def test_default_value(self):
+        default = 42
+        self.assertEqual(mi.nth_or_last(range(0), 3, default), default)
+
+    def test_empty_iterable_no_default(self):
+        self.assertRaises(ValueError, lambda: mi.nth_or_last(range(0), 0))
+
+
 class PeekableTests(TestCase):
     """Tests for ``peekable()`` behavor not incidentally covered by testing
     ``collate()``
