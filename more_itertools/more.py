@@ -1,9 +1,8 @@
 import warnings
-
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from functools import partial, wraps
-from heapq import merge
+from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
     chain,
     compress,
@@ -18,7 +17,9 @@ from itertools import (
     tee,
     zip_longest,
 )
-from operator import itemgetter, lt, gt, sub
+from math import exp, floor, log
+from operator import gt, itemgetter, lt, sub
+from random import random, randrange, uniform
 from sys import maxsize
 from time import monotonic
 
@@ -70,6 +71,7 @@ __all__ = [
     'rlocate',
     'rstrip',
     'run_length',
+    'sample',
     'seekable',
     'SequenceView',
     'side_effect',
@@ -2696,3 +2698,93 @@ def map_except(function, iterable, *exceptions):
             yield function(item)
         except exceptions:
             pass
+
+
+def _sample_unweighted(iterable, k):
+    # Implementation of "Algorithm L" from the 1994 paper by Kim-Hung Li:
+    # "Reservoir-Sampling Algorithms of Time Complexity O(n(1+log(N/n)))".
+
+    # Fill up the reservoir (collection of samples) with the first `k` samples
+    reservoir = take(k, iterable)
+
+    # Generate random number that's the largest in a sample of k U(0,1) numbers
+    # Largest order statistic: https://en.wikipedia.org/wiki/Order_statistic
+    W = exp(log(random()) / k)
+
+    # The number of elements to skip before changing the reservoir is a random
+    # number with a geometric distribution. Sample it using random() and logs.
+    next_index = k + floor(log(random()) / log(1 - W))
+
+    for index, element in enumerate(iterable, k):
+
+        if index == next_index:
+            reservoir[randrange(k)] = element
+            # The new W is the largest in a sample of k U(0, `old_W`) numbers
+            W *= exp(log(random()) / k)
+            next_index += floor(log(random()) / log(1 - W)) + 1
+
+    return reservoir
+
+
+def _sample_weighted(iterable, k, weights):
+    # Implementation of "A-ExpJ" from the 2006 paper by Efraimidis et al. :
+    # "Weighted random sampling with a reservoir".
+
+    # Log-transform for numerical stability for weights that are small/large
+    weight_keys = (log(random()) / weight for weight in weights)
+
+    # Fill up the reservoir (collection of samples) with the first `k`
+    # weight-keys and elements, then heapify the list.
+    reservoir = take(k, zip(weight_keys, iterable))
+    heapify(reservoir)
+
+    # The number of jumps before changing the reservoir is a random variable
+    # with an exponential distribution. Sample it using random() and logs.
+    smallest_weight_key, _ = reservoir[0]
+    weights_to_skip = log(random()) / smallest_weight_key
+
+    for weight, element in zip(weights, iterable):
+
+        if weight >= weights_to_skip:
+            # The notation here is consistent with the paper, but we store
+            # the weight-keys in log-space for better numerical stability.
+            smallest_weight_key, _ = reservoir[0]
+            t_w = exp(weight * smallest_weight_key)
+            r_2 = uniform(t_w, 1)  # generate U(t_w, 1)
+            weight_key = log(r_2) / weight
+            heapreplace(reservoir, (weight_key, element))
+            smallest_weight_key, _ = reservoir[0]
+            weights_to_skip = log(random()) / smallest_weight_key
+        else:
+            weights_to_skip -= weight
+
+    # Equivalent to [element for weight_key, element in sorted(reservoir)]
+    return [heappop(reservoir)[1] for _ in range(k)]
+
+
+def sample(iterable, k, weights=None):
+    """Return a *k*-length list of elements chosen (without replacement)
+    from the *iterable*. Like :func:`random.sample`, but works on iterables
+    of unknown length. An iterable with *weights* may also be given.
+
+    >>> data = range(100)
+    >>> weights = (i * i + 1 for i in range(100))
+    >>> sampled = sample(data, k=10, weights=weights)
+
+    The algorithm can also be used to generate weighted random permutations.
+    The relative weight of each item determines the probability that it
+    appears late in the permutation.
+
+    >>> data = "abcdefgh"
+    >>> weights = range(1, len(data) + 1)
+    >>> random_permutation = sample(data, k=len(data), weights=weights)
+    """
+    if k == 0:
+        return []
+
+    iterable = iter(iterable)
+    if weights is None:
+        return _sample_unweighted(iterable, k)
+    else:
+        weights = iter(weights)
+        return _sample_weighted(iterable, k, weights)

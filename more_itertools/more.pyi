@@ -355,3 +355,8 @@ def map_except(
     iterable: Iterable[_T],
     *exceptions: Type[BaseException]
 ) -> Iterator[_U]: ...
+def sample(
+    iterable: Iterable[_T],
+    k: int,
+    weights: Iterable[_T],
+) -> List[_T]: ...

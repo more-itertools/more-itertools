@@ -19,6 +19,8 @@ from itertools import (
     repeat,
 )
 from operator import add, mul, itemgetter
+from random import seed
+from statistics import mean
 from sys import version_info
 from time import sleep
 from unittest import skipIf, TestCase
@@ -2936,3 +2938,89 @@ class MapExceptTests(TestCase):
         actual = list(mi.map_except(int, iterable, ValueError, TypeError))
         expected = [0, 1, 2, 4]
         self.assertEqual(actual, expected)
+
+
+class SampleTests(TestCase):
+
+    def test_unit_case(self):
+        """Test against a fixed case by seeding the random module."""
+        # Beware that this test really just verifies random.random() behavior.
+        # If the algorithm is changed (e.g. to a more naive implementation)
+        # this test will fail, but the algorithm might be correct.
+        # Also, this test can pass and the algorithm can be completely wrong.
+        data = "abcdef"
+        weights = list(range(1, len(data) + 1))
+        seed(123)
+        actual = mi.sample(data, k=2, weights=weights)
+        expected = ['f', 'e']
+        self.assertEqual(actual, expected)
+
+    def test_length(self):
+        """Check that *k* elements are sampled."""
+        data = [1, 2, 3, 4, 5]
+        for k in [0, 3, 5, 7]:
+            sampled = mi.sample(data, k=k)
+            actual = len(sampled)
+            expected = min(k, len(data))
+            self.assertEqual(actual, expected)
+
+    def test_samling_entire_iterable(self):
+        """If k=len(iterable), the sample contains the original elements."""
+        data = ["a", 2, "a", 4, (1, 2, 3)]
+        actual = set(mi.sample(data, k=len(data)))
+        expected = set(data)
+        self.assertEqual(actual, expected)
+
+    def test_scale_invariance_of_weights(self):
+        """The probabilit of chosing element a_i is w_i / sum(weights).
+        Scaling weights should not change the probability or outcome."""
+        data = "abcdef"
+
+        weights = list(range(1, len(data) + 1))
+        seed(123)
+        first_sample = mi.sample(data, k=2, weights=weights)
+
+        # Scale the weights and sample again
+        weights_scaled = [w / 1e10 for w in weights]
+        seed(123)
+        second_sample = mi.sample(data, k=2, weights=weights_scaled)
+
+        self.assertEqual(first_sample, second_sample)
+
+    def test_invariance_under_permutations_unweighted(self):
+        """The order of the data should not matter. This is a stochastic test,
+        but it will fail in less than 1 / 10_000 cases."""
+
+        # Create a data set and a reversed data set
+        data = list(range(100))
+        data_rev = list(reversed(data))
+
+        # Sample each data set 10 times
+        data_means = [mean(mi.sample(data, k=50)) for _ in range(10)]
+        data_rev_means = [mean(mi.sample(data_rev, k=50)) for _ in range(10)]
+
+        # The difference in the means should be low, i.e. little bias
+        difference_in_means = abs(mean(data_means) - mean(data_rev_means))
+
+        # The observed largest difference in 10,000 simulations was 5.09599
+        self.assertTrue(difference_in_means < 5.1)
+
+    def test_invariance_under_permutations_weighted(self):
+        """The order of the data should not matter. This is a stochastic test,
+        but it will fail in less than 1 / 10_000 cases."""
+
+        # Create a data set and a reversed data set
+        data = list(range(1, 101))
+        data_rev = list(reversed(data))
+
+        # Sample each data set 10 times
+        data_means = [mean(mi.sample(data, k=50, weights=data))
+                      for _ in range(10)]
+        data_rev_means = [mean(mi.sample(data_rev, k=50, weights=data_rev))
+                          for _ in range(10)]
+
+        # The difference in the means should be low, i.e. little bias
+        difference_in_means = abs(mean(data_means) - mean(data_rev_means))
+
+        # The observed largest difference in 10,000 simulations was 4.337999
+        self.assertTrue(difference_in_means < 4.4)
