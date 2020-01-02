@@ -2140,9 +2140,12 @@ class seekable:
 
     """
 
-    def __init__(self, iterable):
+    def __init__(self, iterable, maxlen=None):
         self._source = iter(iterable)
-        self._cache = []
+        if maxlen is None:
+            self._cache = []
+        else:
+            self._cache = deque([], maxlen)
         self._index = None
 
     def __iter__(self):
