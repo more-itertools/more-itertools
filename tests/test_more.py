@@ -1,4 +1,4 @@
-from collections import OrderedDict, Counter
+from collections import OrderedDict, Counter, abc
 from collections.abc import Set
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -1984,10 +1984,12 @@ class NumericRangeTests(TestCase):
             )
 
     def test_arg_count(self):
-        self.assertRaises(TypeError, lambda: list(mi.numeric_range()))
-        self.assertRaises(
-            TypeError, lambda: list(mi.numeric_range(0, 1, 2, 3))
-        )
+        for args, message in [
+            ((), 'numeric_range expected at least 1 argument, got 0'),
+            ((0, 1, 2, 3), 'numeric_range expected at most 3 arguments, got 4')
+        ]:
+            with self.assertRaisesRegex(TypeError, message):
+                mi.numeric_range(*args)
 
     def test_zero_step(self):
         for args in [
@@ -2130,6 +2132,23 @@ class NumericRangeTests(TestCase):
         for v in (0.5, 7.0, 10.0):
             with self.assertRaises(ValueError):
                 r.index(v)
+
+    def test_parent_classes(self):
+        r = mi.numeric_range(7.0)
+        self.assertTrue(isinstance(r, abc.Iterable))
+        self.assertFalse(isinstance(r, abc.Iterator))
+        self.assertTrue(isinstance(r, abc.Sequence))
+        self.assertTrue(isinstance(r, abc.Hashable))
+
+    def test_bad_key(self):
+        r = mi.numeric_range(7.0)
+        for arg, message in [
+            ('a', 'numeric range indices must be integers or slices, not str'),
+            ((),
+             'numeric range indices must be integers or slices, not tuple'),
+        ]:
+            with self.assertRaisesRegex(TypeError, message):
+                r[arg]
 
 
 class CountCycleTests(TestCase):

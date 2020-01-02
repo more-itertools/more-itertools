@@ -1,5 +1,7 @@
 import warnings
 from collections import Counter, defaultdict, deque
+
+from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
 from functools import partial, wraps
 from heapq import merge, heapify, heapreplace, heappop
@@ -21,6 +23,7 @@ from math import exp, floor, log
 from operator import gt, itemgetter, lt, sub
 from random import random, randrange, uniform
 from operator import itemgetter, sub
+from operator import itemgetter, sub, gt, lt
 from sys import maxsize
 from time import monotonic
 
@@ -1611,7 +1614,7 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     return ((k, map(valuefunc, g)) for k, g in res) if valuefunc else res
 
 
-class numeric_range:
+class numeric_range(abc.Sequence, abc.Hashable):
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
 
@@ -1677,7 +1680,7 @@ class numeric_range:
             self._start, self._stop, self._step = args
         else:
             if argc == 0:
-                err_msg = 'numeric_range expected 1 argument, got {}'
+                err_msg = 'numeric_range expected at least 1 argument, got {}'
             else:
                 err_msg = 'numeric_range expected at most 3 arguments, got {}'
             raise TypeError(err_msg.format(argc))
@@ -1720,7 +1723,8 @@ class numeric_range:
             return numeric_range(start, stop, step)
         else:
             raise TypeError(
-                "numeric range indices must be integers or slices, not str")
+                'numeric range indices must be '
+                'integers or slices, not {}'.format(type(key).__name__))
 
     def __hash__(self):
         if self:
@@ -1729,15 +1733,11 @@ class numeric_range:
             return self._EMPTY_HASH
 
     def __iter__(self):
-        elem = self._start + self._zero
+        values = (self._start + (self._step * n) for n in count())
         if self._growing:
-            while elem < self._stop:
-                yield elem
-                elem += self._step
+            return takewhile(partial(gt, self._stop), values)
         else:
-            while elem > self._stop:
-                yield elem
-                elem += self._step
+            return takewhile(partial(lt, self._stop), values)
 
     def __len__(self):
         if self._growing:
@@ -1753,9 +1753,9 @@ class numeric_range:
         if distance <= 0:
             return 0
 
-        r = distance % step
-        q = int(distance / step)
-        return q + int(r != self._zero)
+        assert distance > 0 and step > 0
+        q, r = divmod(distance, step)
+        return int(q) + int(r != self._zero)
 
     def __reduce__(self):
         return numeric_range, (self._start, self._stop, self._step)
