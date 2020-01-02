@@ -2121,9 +2121,6 @@ class seekable:
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
 
-    The cache grows as the source iterable progresses, so beware of wrapping
-    very large or infinite iterables.
-
     You may view the contents of the cache with the :meth:`elements` method.
     That returns a :class:`SequenceView`, a view that updates automatically:
 
@@ -2137,6 +2134,22 @@ class seekable:
         '3'
         >>> elements
         SequenceView(['0', '1', '2', '3'])
+
+    By default, the cache grows as the source iterable progresses, so beware of
+    wrapping very large or infinite iterables. Supply *maxlen* to limit the
+    size of the cache (this of course limits how far back you can seek).
+
+        >>> from itertools import count
+        >>> it = seekable((str(n) for n in count()), maxlen=2)
+        >>> next(it), next(it), next(it), next(it)
+        ('0', '1', '2', '3')
+        >>> list(it.elements())
+        ['2', '3']
+        >>> it.seek(0)
+        >>> next(it), next(it), next(it), next(it)
+        ('2', '3', '4', '5')
+        >>> next(it)
+        '6'
 
     """
 
