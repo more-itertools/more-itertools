@@ -1,6 +1,4 @@
 import warnings
-from collections import Counter, defaultdict, deque
-
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
 from functools import partial, wraps
@@ -20,9 +18,7 @@ from itertools import (
     zip_longest,
 )
 from math import exp, floor, log
-from operator import gt, itemgetter, lt, sub
 from random import random, randrange, uniform
-from operator import itemgetter, sub
 from operator import itemgetter, sub, gt, lt
 from sys import maxsize
 from time import monotonic
