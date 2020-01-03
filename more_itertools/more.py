@@ -1678,12 +1678,12 @@ class numeric_range(abc.Sequence, abc.Hashable):
             self._step = 1
         elif argc == 3:
             self._start, self._stop, self._step = args
+        elif argc == 0:
+            raise TypeError('numeric_range expected at least '
+                            '1 argument, got {}'.format(argc))
         else:
-            if argc == 0:
-                err_msg = 'numeric_range expected at least 1 argument, got {}'
-            else:
-                err_msg = 'numeric_range expected at most 3 arguments, got {}'
-            raise TypeError(err_msg.format(argc))
+            raise TypeError('numeric_range expected at most '
+                            '3 arguments, got {}'.format(argc))
 
         self._zero = type(self._step)(0)
         if self._step == self._zero:
@@ -1753,7 +1753,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
         if distance <= 0:
             return 0
 
-        assert distance > 0 and step > 0
+        # distance > 0 and step > 0: regular euclidean division
         q, r = divmod(distance, step)
         return int(q) + int(r != self._zero)
 
