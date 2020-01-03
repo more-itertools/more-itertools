@@ -4,6 +4,7 @@ from setuptools import setup
 
 from more_itertools import __version__
 
+
 def get_long_description():
     # Fix display issues on PyPI caused by RST markup
     readme = open('README.rst').read()
