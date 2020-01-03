@@ -2,6 +2,7 @@ from re import sub
 
 from setuptools import setup
 
+from more_itertools import __version__
 
 def get_long_description():
     # Fix display issues on PyPI caused by RST markup
@@ -22,7 +23,7 @@ def get_long_description():
 
 setup(
     name='more-itertools',
-    version='8.0.2',
+    version=__version__,
     description='More routines for operating on iterables, beyond itertools',
     long_description=get_long_description(),
     author='Erik Rose',
