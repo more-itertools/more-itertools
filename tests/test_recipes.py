@@ -319,16 +319,19 @@ class PartitionTests(TestCase):
     """Tests for ``partition()``"""
 
     def test_bool(self):
-        """Test when pred() returns a boolean"""
         lesser, greater = mi.partition(lambda x: x > 5, range(10))
         self.assertEqual(list(lesser), [0, 1, 2, 3, 4, 5])
         self.assertEqual(list(greater), [6, 7, 8, 9])
 
     def test_arbitrary(self):
-        """Test when pred() returns an integer"""
         divisibles, remainders = mi.partition(lambda x: x % 3, range(10))
         self.assertEqual(list(divisibles), [0, 3, 6, 9])
         self.assertEqual(list(remainders), [1, 2, 4, 5, 7, 8])
+
+    def test_pred_is_none(self):
+        falses, trues = mi.partition(None, range(3))
+        self.assertEqual(list(falses), [0])
+        self.assertEqual(list(trues), [1, 2])
 
 
 class PowersetTests(TestCase):
