@@ -772,7 +772,9 @@ class bucket:
     child iterables based on a *key* function.
 
         >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
-        >>> s = bucket(iterable, key=lambda x: x[0])
+        >>> s = bucket(iterable, key=lambda x: x[0])  # Bucket by 1st character
+        >>> list(s)
+        ['a', 'b', 'c']
         >>> a_iterable = s['a']
         >>> next(a_iterable)
         'a1'
