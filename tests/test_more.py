@@ -1693,7 +1693,6 @@ class DivideTest(TestCase):
         )
 
 
-
 class TestAlwaysIterable(TestCase):
     """Tests for always_iterable()"""
 
