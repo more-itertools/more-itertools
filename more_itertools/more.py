@@ -1770,7 +1770,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
         distance = stop - start
         if distance <= self._zero:
             self._len = 0
-        else: # distance > 0 and step > 0: regular euclidean division
+        else:  # distance > 0 and step > 0: regular euclidean division
             q, r = divmod(distance, step)
             self._len = int(q) + int(r != self._zero)
 

@@ -2155,7 +2155,7 @@ class NumericRangeTests(TestCase):
               timedelta(hours=10)),
              slice(1, -1, None),
              (datetime(2019, 3, 29, 10), datetime(2019, 3, 29, 20),
-               timedelta(hours=10)))
+              timedelta(hours=10)))
         ]:
             self.assertEqual(mi.numeric_range(*expected_args),
                              mi.numeric_range(*args)[sl])
