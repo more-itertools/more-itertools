@@ -1668,10 +1668,10 @@ class numeric_range(abc.Sequence, abc.Hashable):
         if argc == 1:
             self._stop, = args
             self._start = type(self._stop)(0)
-            self._step = 1
+            self._step = type(self._stop - self._start)(1)
         elif argc == 2:
             self._start, self._stop = args
-            self._step = 1
+            self._step = type(self._stop - self._start)(1)
         elif argc == 3:
             self._start, self._stop, self._step = args
         elif argc == 0:
@@ -1685,6 +1685,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
         if self._step == self._zero:
             raise ValueError('numeric_range() arg 3 must not be zero')
         self._growing = self._step > self._zero
+        self._init_len()
 
     def __bool__(self):
         if self._growing:
@@ -1703,19 +1704,38 @@ class numeric_range(abc.Sequence, abc.Hashable):
         return False
 
     def __eq__(self, other):
-        return (self._start == other._start
-                and self._step == other._step
-                and self._get_by_index(-1) == other._get_by_index(-1))
+        if isinstance(other, numeric_range):
+            empty_self = not bool(self)
+            empty_other = not bool(other)
+            if empty_self or empty_other:
+                return empty_self and empty_other  # True if both empty
+            else:
+                return (self._start == other._start
+                        and self._step == other._step
+                        and self._get_by_index(-1) == other._get_by_index(-1))
+        else:
+            return False
 
     def __getitem__(self, key):
         if isinstance(key, int):
             return self._get_by_index(key)
         elif isinstance(key, slice):
-            start = self._start if key.start is None \
-                else self._get_by_index(key.start)
-            stop = self._stop if key.stop is None \
-                else self._get_by_index(key.stop)
             step = self._step if key.step is None else key.step * self._step
+
+            if key.start is None or key.start <= -self._len:
+                start = self._start
+            elif key.start >= self._len:
+                start = self._stop
+            else:  # -self._len < key.start < self._len
+                start = self._get_by_index(key.start)
+
+            if key.stop is None or key.stop >= self._len:
+                stop = self._stop
+            elif key.stop <= -self._len:
+                stop = self._start
+            else:  # -self._len < key.stop < self._len
+                stop = self._get_by_index(key.stop)
+
             return numeric_range(start, stop, step)
         else:
             raise TypeError(
@@ -1729,13 +1749,16 @@ class numeric_range(abc.Sequence, abc.Hashable):
             return self._EMPTY_HASH
 
     def __iter__(self):
-        values = (self._start + (self._step * n) for n in count())
+        values = (self._start + (n * self._step) for n in count())
         if self._growing:
             return takewhile(partial(gt, self._stop), values)
         else:
             return takewhile(partial(lt, self._stop), values)
 
     def __len__(self):
+        return self._len
+
+    def _init_len(self):
         if self._growing:
             start = self._start
             stop = self._stop
@@ -1744,14 +1767,12 @@ class numeric_range(abc.Sequence, abc.Hashable):
             start = self._stop
             stop = self._start
             step = -self._step
-
         distance = stop - start
-        if distance <= 0:
-            return 0
-
-        # distance > 0 and step > 0: regular euclidean division
-        q, r = divmod(distance, step)
-        return int(q) + int(r != self._zero)
+        if distance <= self._zero:
+            self._len = 0
+        else: # distance > 0 and step > 0: regular euclidean division
+            q, r = divmod(distance, step)
+            self._len = int(q) + int(r != self._zero)
 
     def __reduce__(self):
         return numeric_range, (self._start, self._stop, self._step)
@@ -1787,10 +1808,9 @@ class numeric_range(abc.Sequence, abc.Hashable):
         raise ValueError("{} is not in numeric range".format(value))
 
     def _get_by_index(self, i):
-        L = self.__len__()
         if i < 0:
-            i += L
-        if i < 0 or i >= L:
+            i += self._len
+        if i < 0 or i >= self._len:
             raise IndexError("numeric range object index out of range")
         return self._start + i * self._step
 

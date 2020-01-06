@@ -19,6 +19,7 @@ from itertools import (
     repeat,
 )
 from operator import add, mul, itemgetter
+from pickle import loads, dumps
 from random import seed
 from statistics import mean
 from sys import version_info
@@ -1949,7 +1950,7 @@ class NumericRangeTests(TestCase):
             ((4,), [0, 1, 2, 3]),
             ((4.0,), [0.0, 1.0, 2.0, 3.0]),
             ((1.0, 4), [1.0, 2.0, 3.0]),
-            ((1, 4.0), [1, 2, 3]),
+            ((1, 4.0), [1.0, 2.0, 3.0]),
             ((1.0, 5), [1.0, 2.0, 3.0, 4.0]),
             ((0, 20, 5), [0, 5, 10, 15]),
             ((0, 20, 5.0), [0.0, 5.0, 10.0, 15.0]),
@@ -1962,6 +1963,12 @@ class NumericRangeTests(TestCase):
             ((0.0,), []),
             ((1, 0), []),
             ((1.0, 0.0), []),
+            ((0.1, 0.30000000000000001, 0.2), [0.1]),   # IEE 754 !
+            ((Decimal("0.1"), Decimal("0.30000000000000001"), Decimal("0.2")),
+             [Decimal("0.1"), Decimal("0.3")]),         # okay with Decimal
+            ((Fraction(1, 10), Fraction(30000000000000001, 100000000000000000),
+              Fraction(2, 10)),
+             [Fraction(1, 10), Fraction(3, 10)]),       # okay with Fraction
             ((Fraction(2, 1),), [Fraction(0, 1), Fraction(1, 1)]),
             ((Decimal('2.0'),), [Decimal('0.0'), Decimal('1.0')]),
             (
@@ -1978,7 +1985,7 @@ class NumericRangeTests(TestCase):
             ),
         ]:
             actual = list(mi.numeric_range(*args))
-            self.assertEqual(actual, expected)
+            self.assertEqual(expected, actual)
             self.assertTrue(
                 all(type(a) == type(e) for a, e in zip(actual, expected))
             )
@@ -1999,6 +2006,9 @@ class NumericRangeTests(TestCase):
                 datetime(2019, 3, 29, 12, 37, 55),
                 timedelta(minutes=0),
             ),
+            (1.0, 2.0, 0.0),
+            (Decimal("1.0"), Decimal("2.0"), Decimal("0.0")),
+            (Fraction(2, 2), Fraction(4, 2), Fraction(0, 2)),
         ]:
             with self.assertRaises(ValueError):
                 list(mi.numeric_range(*args))
@@ -2013,63 +2023,142 @@ class NumericRangeTests(TestCase):
             ((2.0, 1.0, -1.5), True),
             ((1.0, 1.0, -1.5), False),
             ((0.0, 1.0, -1.5), False),
+            ((Decimal("1.0"), Decimal("2.0"), Decimal("1.5")), True),
+            ((Decimal("1.0"), Decimal("0.0"), Decimal("1.5")), False),
+            ((Fraction(2, 2), Fraction(4, 2), Fraction(3, 2)), True),
+            ((Fraction(2, 2), Fraction(0, 2), Fraction(3, 2)), False),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=1)), True),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 28),
+              timedelta(hours=1)), False),
         ]:
             self.assertEqual(expected, bool(mi.numeric_range(*args)))
 
     def test_contains(self):
-        r1 = mi.numeric_range(1.0, 9.9, 1.5)
-        r2 = mi.numeric_range(8.5, 0.0, -1.5)
-
-        for r in (r1, r2):
-            for v in (1.0, 2.5, 4.0, 5.5, 7.0, 8.5):
+        for args, expected_in, expected_not_in in [
+            ((10,), range(10), (0.5,)),
+            ((1.0, 9.9, 1.5), (1.0, 2.5, 4.0, 5.5, 7.0, 8.5), (0.9,)),
+            ((9.0, 1.0, -1.5), (1.5, 3.0, 4.5, 6.0, 7.5, 9.0), (0.0, 0.9)),
+            ((Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
+             (Decimal("1.0"), Decimal("2.5"), Decimal("4.0"), Decimal("5.5"),
+              Decimal("7.0"), Decimal("8.5"),),
+             (Decimal("0.9"),)),
+            ((Fraction(0, 1), Fraction(5, 1), Fraction(1, 2)),
+             (Fraction(0, 1), Fraction(1, 2), Fraction(9, 2)),
+             (Fraction(10, 2),)),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=1)),
+             (datetime(2019, 3, 29, 15),), (datetime(2019, 3, 29, 15, 30),))
+        ]:
+            r = mi.numeric_range(*args)
+            for v in expected_in:
                 self.assertTrue(v in r)
+                self.assertFalse(v not in r)
 
-            for v in (0.9,):
-                self.assertFalse(0.9 in r)
+            for v in expected_not_in:
+                self.assertFalse(v in r)
+                self.assertTrue(v not in r)
 
     def test_eq(self):
-        self.assertEqual(mi.numeric_range(1.0, 9.9, 1.5),
-                         mi.numeric_range(1.0, 8.6, 1.5))
-        self.assertEqual(mi.numeric_range(8.5, 0.0, -1.5),
-                         mi.numeric_range(8.5, 0.7, -1.5))
+        for args1, args2 in [
+            ((0, 5, 2), (0, 6, 2)),
+            ((1.0, 9.9, 1.5), (1.0, 8.6, 1.5)),
+            ((8.5, 0.0, -1.5), (8.5, 0.7, -1.5)),
+            ((7.0, 0.0, 1.0), (17.0, 7.0, 0.5)),
+            ((Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
+             (Decimal("1.0"), Decimal("8.6"), Decimal("1.5"))),
+            ((Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
+             (Fraction(1, 1), Fraction(9, 1), Fraction(3, 2))),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)),
+             (datetime(2019, 3, 29), datetime(2019, 3, 30, 1),
+              timedelta(hours=10)))
+        ]:
+            self.assertEqual(mi.numeric_range(*args1),
+                             mi.numeric_range(*args2))
 
-        self.assertNotEqual(mi.numeric_range(1.0, 9.9, 1.5),
-                            mi.numeric_range(1.2, 9.9, 1.5))
-        self.assertNotEqual(mi.numeric_range(1.0, 9.9, 1.5),
-                            mi.numeric_range(1.0, 10.3, 1.5))
-        self.assertNotEqual(mi.numeric_range(1.0, 9.9, 1.5),
-                            mi.numeric_range(1.0, 9.9, 1.4))
-        self.assertNotEqual(mi.numeric_range(8.5, 0.0, -1.5),
-                            mi.numeric_range(8.4, 0.0, -1.5))
-        self.assertNotEqual(mi.numeric_range(8.5, 0.0, -1.5),
-                            mi.numeric_range(8.5, -0.7, -1.5))
-        self.assertNotEqual(mi.numeric_range(8.5, 0.0, -1.5),
-                            mi.numeric_range(8.5, 0.0, -1.4))
+        for args1, args2 in [
+            ((0, 5, 2), (0, 7, 2)),
+            ((1.0, 9.9, 1.5), (1.2, 9.9, 1.5)),
+            ((1.0, 9.9, 1.5), (1.0, 10.3, 1.5)),
+            ((1.0, 9.9, 1.5), (1.0, 9.9, 1.4)),
+            ((8.5, 0.0, -1.5), (8.4, 0.0, -1.5)),
+            ((8.5, 0.0, -1.5), (8.5, -0.7, -1.5)),
+            ((8.5, 0.0, -1.5), (8.5, 0.0, -1.4)),
+            ((0.0, 7.0, 1.0), (7.0, 0.0, 1.0)),
+            ((Decimal("1.0"), Decimal("10.0"), Decimal("1.5")),
+             (Decimal("1.0"), Decimal("10.5"), Decimal("1.5"))),
+            ((Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
+             (Fraction(1, 1), Fraction(21, 2), Fraction(3, 2))),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)),
+             (datetime(2019, 3, 29), datetime(2019, 3, 30, 15),
+              timedelta(hours=10)))
+        ]:
+            self.assertNotEqual(mi.numeric_range(*args1),
+                                mi.numeric_range(*args2))
+
+        self.assertNotEqual(mi.numeric_range(7.0), 1)
+        self.assertNotEqual(mi.numeric_range(7.0), "abc")
 
     def test_get_item_by_index(self):
         for args, index, expected in [
+            ((1, 6), 2, 3),
             ((1.0, 6.0, 1.5), 0, 1.0),
             ((1.0, 6.0, 1.5), 1, 2.5),
             ((1.0, 6.0, 1.5), 2, 4.0),
             ((1.0, 6.0, 1.5), 3, 5.5),
             ((1.0, 6.0, 1.5), -1, 5.5),
             ((1.0, 6.0, 1.5), -2, 4.0),
+            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+             -1, Decimal("8.5")),
+            ((Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
+             2, Fraction(4, 1)),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)),
+             1, datetime(2019, 3, 29, 10))
         ]:
             self.assertEqual(expected, mi.numeric_range(*args)[index])
 
         for args, index in [
             ((1.0, 6.0, 1.5), 4),
             ((1.0, 6.0, 1.5), -5),
+            ((6.0, 1.0, 1.5), 0),
+            ((6.0, 1.0, 1.5), -1),
+            ((Decimal("1.0"), Decimal("9.0"), Decimal("-1.5")), -1),
+            ((Fraction(1, 1), Fraction(2, 1), Fraction(3, 2)), 2),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)), 8)
         ]:
             with self.assertRaises(IndexError):
                 mi.numeric_range(*args)[index]
 
     def test_get_item_by_slice(self):
-        r = mi.numeric_range(1.0, 9.9, 1.5)
-        self.assertEqual(mi.numeric_range(1.0, 2.5, 1.5), r[:1])
-        self.assertEqual(mi.numeric_range(1.0, 4.0, 1.5), r[:2])
-        self.assertEqual(mi.numeric_range(2.5, 4.0, 1.5), r[1:2])
-        self.assertEqual(mi.numeric_range(2.5, 8.5, 1.5), r[1:-1])
+        for args, sl, expected_args in [
+            ((1.0, 9.0, 1.5), slice(None, None, None), (1.0, 9.0, 1.5)),
+            ((1.0, 9.0, 1.5), slice(None, 1, None), (1.0, 2.5, 1.5)),
+            ((1.0, 9.0, 1.5), slice(None, None, 2), (1.0, 9.0, 3.0)),
+            ((1.0, 9.0, 1.5), slice(None, 2, None), (1.0, 4.0, 1.5)),
+            ((1.0, 9.0, 1.5), slice(1, 2, None), (2.5, 4.0, 1.5)),
+            ((1.0, 9.0, 1.5), slice(1, -1, None), (2.5, 8.5, 1.5)),
+            ((1.0, 9.0, 1.5), slice(10, None, 3), (9.0, 9.0, 4.5)),
+            ((1.0, 9.0, 1.5), slice(-10, None, 3), (1.0, 9.0, 4.5)),
+            ((1.0, 9.0, 1.5), slice(None, -10, 3), (1.0, 1.0, 4.5)),
+            ((1.0, 9.0, 1.5), slice(None, 10, 3), (1.0, 9.0, 4.5)),
+            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+             slice(1, -1, None),
+             (Decimal("2.5"), Decimal("8.5"), Decimal("1.5"))),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+             slice(1, -1, None),
+             (Fraction(5, 2), Fraction(4, 1), Fraction(3, 2))),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)),
+             slice(1, -1, None),
+             (datetime(2019, 3, 29, 10), datetime(2019, 3, 29, 20),
+               timedelta(hours=10)))
+        ]:
+            self.assertEqual(mi.numeric_range(*expected_args),
+                             mi.numeric_range(*args)[sl])
 
     def test_hash(self):
         for args, expected in [
@@ -2079,6 +2168,15 @@ class NumericRangeTests(TestCase):
             ((1.0, 1.5, 1.5), hash((1.0, 1.0, 1.5))),
             ((1.5, 1.0, 1.5), hash(range(0, 0))),
             ((1.5, 1.5, 1.5), hash(range(0, 0))),
+            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+             hash((Decimal("1.0"), Decimal("8.5"), Decimal("1.5")))),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+             hash((Fraction(1, 1), Fraction(4, 1), Fraction(3, 2)))),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)),
+             hash((datetime(2019, 3, 29), datetime(2019, 3, 29, 20),
+                   timedelta(hours=10))))
+
         ]:
             self.assertEqual(expected, hash(mi.numeric_range(*args)))
 
@@ -2096,7 +2194,15 @@ class NumericRangeTests(TestCase):
             ((1.0, 7.01, 1.5), 5),
             ((7.0, 1.0, -1.5), 4),
             ((7.01, 1.0, -1.5), 5),
+            ((0.1, 0.30000000000000001, 0.2), 1),  # IEE 754 !
+            ((Decimal("0.1"), Decimal("0.30000000000000001"),
+              Decimal("0.2")), 2),  # works with Decimal
+            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")), 6),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)), 3),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)), 3)
         ]:
+            print(args)
             self.assertEqual(expected, len(mi.numeric_range(*args)))
 
     def test_repr(self):
@@ -2104,6 +2210,15 @@ class NumericRangeTests(TestCase):
             ((7.0,), "numeric_range(0.0, 7.0)"),
             ((1.0, 7.0), "numeric_range(1.0, 7.0)"),
             ((7.0, 1.0, -1.5), "numeric_range(7.0, 1.0, -1.5)"),
+            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+             "numeric_range(Decimal('1.0'), Decimal('9.0'), Decimal('1.5'))"),
+            ((Fraction(7, 7), Fraction(10, 2), Fraction(3, 2)),
+             "numeric_range(Fraction(1, 1), Fraction(5, 1), Fraction(3, 2))"),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)),
+             "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
+             "datetime.datetime(2019, 3, 30, 0, 0), "
+             "datetime.timedelta(seconds=36000))")
         ]:
             self.assertEqual(expected, repr(mi.numeric_range(*args)))
 
@@ -2113,25 +2228,64 @@ class NumericRangeTests(TestCase):
             ((1.0, 7.0), [6.0, 5.0, 4.0, 3.0, 2.0, 1.0]),
             ((7.0, 1.0, -1.5), [2.5, 4.0, 5.5, 7.0]),
             ((7.0, 0.9, -1.5), [1.0, 2.5, 4.0, 5.5, 7.0]),
+            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+             [Decimal('4.0'), Decimal('2.5'), Decimal('1.0')]),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+             [Fraction(4, 1), Fraction(5, 2), Fraction(1, 1)]),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)), [datetime(2019, 3, 29, 20),
+             datetime(2019, 3, 29, 10), datetime(2019, 3, 29)]),
         ]:
             self.assertEqual(expected, list(reversed(mi.numeric_range(*args))))
 
     def test_count(self):
-        r = mi.numeric_range(7.0)
-        self.assertEqual(1, r.count(0.0))
-        self.assertEqual(0, r.count(0.5))
-        self.assertEqual(1, r.count(6.0))
-        self.assertEqual(0, r.count(7.0))
-        self.assertEqual(0, r.count(10.0))
+        for args, v, c in [
+            ((7.0,), 0.0, 1),
+            ((7.0,), 0.5, 0),
+            ((7.0,), 6.0, 1),
+            ((7.0,), 7.0, 0),
+            ((7.0,), 10.0, 0),
+            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+             Decimal('4.0'), 1),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+             Fraction(5, 2), 1),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)), datetime(2019, 3, 29, 20), 1),
+        ]:
+            self.assertEqual(c, mi.numeric_range(*args).count(v))
 
     def test_index(self):
-        r = mi.numeric_range(7.0)
-        self.assertEqual(0, r.index(0.0))
-        self.assertEqual(6, r.index(6.0))
+        for args, v, i in [
+            ((7.0,), 0.0, 0),
+            ((7.0,), 6.0, 6),
+            ((7.0, 0.0, -1.0), 7.0, 0),
+            ((7.0, 0.0, -1.0), 1.0, 6),
+            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+             Decimal('4.0'), 2),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+             Fraction(5, 2), 1),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)), datetime(2019, 3, 29, 20), 2),
+        ]:
+            self.assertEqual(i, mi.numeric_range(*args).index(v))
 
-        for v in (0.5, 7.0, 10.0):
+        for args, v in [
+            ((0.7,), 0.5),
+            ((0.7,), 7.0),
+            ((0.7,), 10.0),
+            ((7.0, 0.0, -1.0), 0.5),
+            ((7.0, 0.0, -1.0), 0.0),
+            ((7.0, 0.0, -1.0), 10.0),
+            ((7.0, 0.0), 5.0),
+            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+             Decimal('4.5')),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+             Fraction(5, 3)),
+            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
+              timedelta(hours=10)), datetime(2019, 3, 30)),
+        ]:
             with self.assertRaises(ValueError):
-                r.index(v)
+                mi.numeric_range(*args).index(v)
 
     def test_parent_classes(self):
         r = mi.numeric_range(7.0)
@@ -2149,6 +2303,22 @@ class NumericRangeTests(TestCase):
         ]:
             with self.assertRaisesRegex(TypeError, message):
                 r[arg]
+
+    def test_pickle(self):
+        for args in [
+            (7.0,),
+            (5.0, 7.0),
+            (5.0, 7.0, 3.0),
+            (7.0, 5.0),
+            (7.0, 5.0, 4.0),
+            (7.0, 5.0, -1.0),
+            (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+            (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+            (datetime(2019, 3, 29), datetime(2019, 3, 30)),
+        ]:
+            r = mi.numeric_range(*args)
+            self.assertTrue(dumps(r))  # assert not empty
+            self.assertEqual(r, loads(dumps(r)))
 
 
 class CountCycleTests(TestCase):
