@@ -2202,11 +2202,10 @@ class NumericRangeTests(TestCase):
             ((datetime(2019, 3, 29), datetime(2019, 3, 30),
               timedelta(hours=10)), 3)
         ]:
-            print(args)
             self.assertEqual(expected, len(mi.numeric_range(*args)))
 
     def test_repr(self):
-        for args, expected in [
+        for args, *expected in [
             ((7.0,), "numeric_range(0.0, 7.0)"),
             ((1.0, 7.0), "numeric_range(1.0, 7.0)"),
             ((7.0, 1.0, -1.5), "numeric_range(7.0, 1.0, -1.5)"),
@@ -2218,9 +2217,12 @@ class NumericRangeTests(TestCase):
               timedelta(hours=10)),
              "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
              "datetime.datetime(2019, 3, 30, 0, 0), "
-             "datetime.timedelta(seconds=36000))")
+             "datetime.timedelta(seconds=36000))",
+             "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
+             "datetime.datetime(2019, 3, 30, 0, 0), "
+             "datetime.timedelta(0, 36000))")
         ]:
-            self.assertEqual(expected, repr(mi.numeric_range(*args)))
+            self.assertIn(repr(mi.numeric_range(*args)), expected)
 
     def test_reversed(self):
         for args, expected in [
