@@ -25,6 +25,8 @@ from sys import version_info
 from time import sleep
 from unittest import skipIf, TestCase
 
+import numpy as np
+
 import more_itertools as mi
 
 
@@ -1058,6 +1060,13 @@ class SlicedTests(TestCase):
 
         with self.assertRaises(TypeError):
             list(mi.sliced(seq, 3))
+
+    def test_numpy_array(self):
+        """Test that it works on numpy arrays"""
+        seq = np.arange(10)
+        result = list(mi.sliced(seq, 5))
+        assert np.allclose(result[0], np.arange(5))
+        assert np.allclose(result[1], np.arange(5, 10))
 
 
 class SplitAtTests(TestCase):
