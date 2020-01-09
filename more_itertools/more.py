@@ -852,9 +852,9 @@ class bucket:
         for item in self._it:
             item_value = self._key(item)
             if self._validator(item_value):
-                if item_value not in self._cache:
-                    yield item_value
                 self._cache[item_value].append(item)
+
+        yield from self._cache.keys()
 
     def __getitem__(self, value):
         if not self._validator(value):
