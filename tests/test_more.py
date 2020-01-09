@@ -25,8 +25,6 @@ from sys import version_info
 from time import sleep
 from unittest import skipIf, TestCase
 
-import numpy as np
-
 import more_itertools as mi
 
 
@@ -1061,12 +1059,25 @@ class SlicedTests(TestCase):
         with self.assertRaises(TypeError):
             list(mi.sliced(seq, 3))
 
-    def test_numpy_array(self):
-        """Test that it works on numpy arrays"""
-        seq = np.arange(10)
-        result = list(mi.sliced(seq, 5))
-        assert np.allclose(result[0], np.arange(5))
-        assert np.allclose(result[1], np.arange(5, 10))
+    def test_numpy_like_array(self):
+        # Numpy arrays don't behave like Python lists - calling bool()
+        # on them doesn't return False for empty lists and True for non-empty
+        # ones. Emulate that behavior.
+        class FalseList(list):
+            def __getitem__(self, key):
+                ret = super().__getitem__(key)
+                if isinstance(key, slice):
+                    return FalseList(ret)
+
+                return ret
+
+            def __bool__(self):
+                return False
+
+        seq = FalseList(range(9))
+        actual = list(mi.sliced(seq, 3))
+        expected = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+        self.assertEqual(actual, expected)
 
 
 class SplitAtTests(TestCase):
