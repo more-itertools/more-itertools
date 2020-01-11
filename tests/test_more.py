@@ -1076,6 +1076,26 @@ class SlicedTests(TestCase):
         with self.assertRaises(TypeError):
             list(mi.sliced(seq, 3))
 
+    def test_numpy_like_array(self):
+        # Numpy arrays don't behave like Python lists - calling bool()
+        # on them doesn't return False for empty lists and True for non-empty
+        # ones. Emulate that behavior.
+        class FalseList(list):
+            def __getitem__(self, key):
+                ret = super().__getitem__(key)
+                if isinstance(key, slice):
+                    return FalseList(ret)
+
+                return ret
+
+            def __bool__(self):
+                return False
+
+        seq = FalseList(range(9))
+        actual = list(mi.sliced(seq, 3))
+        expected = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+        self.assertEqual(actual, expected)
+
 
 class SplitAtTests(TestCase):
     """Tests for ``split()``"""

@@ -1061,7 +1061,7 @@ def sliced(seq, n):
     For non-sliceable iterables, see :func:`chunked`.
 
     """
-    return takewhile(bool, (seq[i : i + n] for i in count(0, n)))
+    return takewhile(len, (seq[i : i + n] for i in count(0, n)))
 
 
 def split_at(iterable, pred):
