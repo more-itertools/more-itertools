@@ -1687,9 +1687,8 @@ class DivideTest(TestCase):
             )
 
     def test_large_n(self):
-        iterable = [1, 2, 3, 4]
         self.assertEqual(
-            [list(x) for x in mi.divide(6, iterable)],
+            [list(x) for x in mi.divide(6, iter(range(1, 4 + 1)))],
             [[1], [2], [3], [4], [], []],
         )
 

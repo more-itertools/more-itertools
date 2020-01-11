@@ -2762,7 +2762,6 @@ def _sample_weighted(iterable, k, weights):
     weights_to_skip = log(random()) / smallest_weight_key
 
     for weight, element in zip(weights, iterable):
-
         if weight >= weights_to_skip:
             # The notation here is consistent with the paper, but we store
             # the weight-keys in log-space for better numerical stability.
@@ -2783,11 +2782,18 @@ def _sample_weighted(iterable, k, weights):
 def sample(iterable, k, weights=None):
     """Return a *k*-length list of elements chosen (without replacement)
     from the *iterable*. Like :func:`random.sample`, but works on iterables
-    of unknown length. An iterable with *weights* may also be given.
+    of unknown length.
 
-    >>> data = range(100)
+    >>> iterable = range(100)
+    >>> sample(iterable, 5)  # doctest: +SKIP
+    [81, 60, 96, 16, 4]
+
+     An iterable with *weights* may also be given:
+
+    >>> iterable = range(100)
     >>> weights = (i * i + 1 for i in range(100))
-    >>> sampled = sample(data, k=10, weights=weights)
+    >>> sampled = sample(iterable, 5, weights=weights)  # doctest: +SKIP
+    [79, 67, 74, 66, 78]
 
     The algorithm can also be used to generate weighted random permutations.
     The relative weight of each item determines the probability that it
@@ -2795,7 +2801,8 @@ def sample(iterable, k, weights=None):
 
     >>> data = "abcdefgh"
     >>> weights = range(1, len(data) + 1)
-    >>> random_permutation = sample(data, k=len(data), weights=weights)
+    >>> sample(data, k=len(data), weights=weights)  # doctest: +SKIP
+    ['c', 'a', 'b', 'e', 'g', 'd', 'h', 'f']
     """
     if k == 0:
         return []

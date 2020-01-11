@@ -5,6 +5,19 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.1.0
+-----
+
+* Bug fixes
+    * :func:`partition` works with ``pred=None`` again. (thanks to MSeifert04)
+
+* New itertools
+    * :func:`sample` (thanks to tommyod)
+    * :func:`nth_or_last` (thanks to d-ryzhikov)
+
+* Changes to existing itertools:
+    * The implementation for :func:`divide` was improved. (thanks to jferard)
+
 8.0.2
 -----
 
