@@ -822,8 +822,6 @@ class SubstringsIndexesTests(TestCase):
 
 
 class BucketTests(TestCase):
-    """Tests for ``bucket()``"""
-
     def test_basic(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
         D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
@@ -858,6 +856,24 @@ class BucketTests(TestCase):
         self.assertNotIn(0, D)  # Non-valid entries don't return True
         self.assertNotIn(0, D._cache)  # Don't store non-valid entries
         self.assertEqual(list(D[0]), [])
+
+    def test_list(self):
+        iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
+        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        self.assertEqual(list(D[10]), [10, 11, 12])
+        self.assertEqual(list(D[20]), [20, 21, 22, 23])
+        self.assertEqual(list(D[30]), [30, 31, 33])
+        self.assertEqual(set(D), {10, 20, 30})
+
+    def test_list_validator(self):
+        iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
+        key = lambda x: 10 * (x // 10)
+        validator = lambda x: x != 20
+        D = mi.bucket(iterable, key, validator=validator)
+        self.assertEqual(set(D), {10, 30})
+        self.assertEqual(list(D[10]), [10, 11, 12])
+        self.assertEqual(list(D[20]), [])
+        self.assertEqual(list(D[30]), [30, 31, 33])
 
 
 class SpyTests(TestCase):

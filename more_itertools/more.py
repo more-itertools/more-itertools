@@ -772,7 +772,9 @@ class bucket:
     child iterables based on a *key* function.
 
         >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
-        >>> s = bucket(iterable, key=lambda x: x[0])
+        >>> s = bucket(iterable, key=lambda x: x[0])  # Bucket by 1st character
+        >>> sorted(list(s))  # Get the keys
+        ['a', 'b', 'c']
         >>> a_iterable = s['a']
         >>> next(a_iterable)
         'a1'
@@ -845,6 +847,14 @@ class bucket:
                         break
                     elif self._validator(item_value):
                         self._cache[item_value].append(item)
+
+    def __iter__(self):
+        for item in self._it:
+            item_value = self._key(item)
+            if self._validator(item_value):
+                self._cache[item_value].append(item)
+
+        yield from self._cache.keys()
 
     def __getitem__(self, value):
         if not self._validator(value):
