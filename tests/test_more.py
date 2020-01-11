@@ -2565,6 +2565,23 @@ class SeekableTest(TestCase):
         mi.take(10, s)
         self.assertEqual(list(elements), [str(n) for n in range(20)])
 
+    def test_maxlen(self):
+        iterable = map(str, count())
+
+        s = mi.seekable(iterable, maxlen=4)
+        self.assertEqual(mi.take(10, s), [str(n) for n in range(10)])
+        self.assertEqual(list(s.elements()), ['6', '7', '8', '9'])
+
+        s.seek(0)
+        self.assertEqual(mi.take(14, s), [str(n) for n in range(6, 20)])
+        self.assertEqual(list(s.elements()), ['16', '17', '18', '19'])
+
+    def test_maxlen_zero(self):
+        iterable = [str(x) for x in range(5)]
+        s = mi.seekable(iterable, maxlen=0)
+        self.assertEqual(list(s), iterable)
+        self.assertEqual(list(s.elements()), [])
+
 
 class SequenceViewTests(TestCase):
     def test_init(self):
