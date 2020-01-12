@@ -365,5 +365,5 @@ def map_except(
 def sample(
     iterable: Iterable[_T],
     k: int,
-    weights: Iterable[_T],
+    weights: Optional[Iterable[_T]],
 ) -> List[_T]: ...
