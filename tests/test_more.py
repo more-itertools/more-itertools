@@ -1761,6 +1761,12 @@ class TestAlwaysIterable(TestCase):
         str_expected = list(str_obj)
         self.assertEqual(str_actual, str_expected)
 
+        # base_type handles nested tuple (via isinstance).
+        base_type = ((dict,),)
+        custom_actual = list(mi.always_iterable(dict_obj, base_type=base_type))
+        custom_expected = [dict_obj]
+        self.assertEqual(custom_actual, custom_expected)
+
     def test_iterables(self):
         self.assertEqual(list(mi.always_iterable([0, 1])), [0, 1])
         self.assertEqual(
