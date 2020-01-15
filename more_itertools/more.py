@@ -2969,3 +2969,43 @@ def sample(iterable, k, weights=None):
     else:
         weights = iter(weights)
         return _sample_weighted(iterable, k, weights)
+
+
+class hold_back:
+    """Wrap *iterable*, holding back *from_start* items from the the beginning
+    and *from_end* items from the end.
+
+    >>> iterable = ['1', '2', '3', '4', '5', '6']
+    >>> list(hold_back(iterable, from_start=2, from_end=1))
+    ['3', '4', '5']
+
+    Access the held-back items with the ``.head`` and ``.tail`` attributes.
+    >>> iterable = ['1', '2', '3', '4', '5', '6']
+    >>> wrapped = hold_back(iterable, from_start=2, from_end=1)
+    >>> list(wrapped)
+    ['3', '4', '5']
+    >>> wrapped.head
+    ['1', '2']
+    >>> wrapped.tail
+    deque(['6'], maxlen=1)
+
+    The ``.head`` list is filled up first. The ``.tail`` deque is
+
+    """
+    def __init__(self, iterable, from_start=0, from_end=0):
+        self._it = iter(iterable)
+        self.from_start = from_start
+        self.from_end = from_end
+        self.head = None
+        self.tail = None
+
+    def __iter__(self):
+        self.head = take(self.from_start, self._it)
+        self.tail = deque(take(self.from_end, self._it), maxlen=self.from_end)
+        return self
+
+    def __next__(self):
+        item = next(self._it)
+        old_item = self.tail.popleft()
+        self.tail.append(item)
+        return old_item
