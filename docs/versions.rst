@@ -12,6 +12,7 @@ Version History
     * The .pyi files for typing were updated. (thanks to blueyed and ilai-deutel)
 
 * Changes to existing itertools:
+    * :func:`numeric_range` now behaves more like the built-in :func:`range`. (thanks to jferard)
     * :func:`bucket` now allows for enumerating keys. (thanks to alexchandel)
     * :func:`sliced` now should now work for numpy arrays. (thanks to sswingle)
     * :func:`seekable` now has a ``maxlen`` parameter.
