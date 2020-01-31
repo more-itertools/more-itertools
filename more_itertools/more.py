@@ -1091,9 +1091,11 @@ def split_at(iterable, pred, maxsplit=-1):
     yield buf
 
 
-def split_before(iterable, pred):
+def split_before(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list ends just before
-    an item for which callable *pred* returns ``True``:
+    an item for which callable *pred* returns ``True``.
+    If *maxsplit* is given, at most *maxsplit* splits are done. If *maxsplit*
+    is not specified or -1, then there is no limit on the number of splits:
 
         >>> list(split_before('OneTwo', lambda s: s.isupper()))
         [['O', 'n', 'e'], ['T', 'w', 'o']]
@@ -1104,16 +1106,19 @@ def split_before(iterable, pred):
     """
     buf = []
     for item in iterable:
-        if pred(item) and buf:
+        if pred(item) and maxsplit != 0 and buf:
             yield buf
             buf = []
+            maxsplit -= 1
         buf.append(item)
     yield buf
 
 
-def split_after(iterable, pred):
+def split_after(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list ends with an
-    item where callable *pred* returns ``True``:
+    item where callable *pred* returns ``True``.
+    if *maxsplit* is given, at most *maxsplit* splits are done. If *maxsplit*
+    is not specified or -1, then there is no limit on the number of splits:
 
         >>> list(split_after('one1two2', lambda s: s.isdigit()))
         [['o', 'n', 'e', '1'], ['t', 'w', 'o', '2']]
@@ -1125,9 +1130,10 @@ def split_after(iterable, pred):
     buf = []
     for item in iterable:
         buf.append(item)
-        if pred(item) and buf:
+        if pred(item) and maxsplit != 0 and buf:
             yield buf
             buf = []
+            maxsplit -= 1
     if buf:
         yield buf
 
