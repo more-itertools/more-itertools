@@ -1100,16 +1100,16 @@ class SlicedTests(TestCase):
 class SplitAtTests(TestCase):
     """Tests for ``split()``"""
 
-    def comp_with_str_split(self, str_to_split, delim):
+    def comp_with_str_split(self, str_to_split, delim, maxsplit):
         pred = lambda c: c == delim
-        actual = list(map(''.join, mi.split_at(str_to_split, pred)))
-        expected = str_to_split.split(delim)
+        actual = list(map(''.join, mi.split_at(str_to_split, pred, maxsplit)))
+        expected = str_to_split.split(delim, maxsplit)
         self.assertEqual(actual, expected)
 
     def test_seperators(self):
         test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
-        for s, delim in product(test_strs, 'abcd'):
-            self.comp_with_str_split(s, delim)
+        for s, delim, maxsplit in product(test_strs, 'abcd', range(-1, 4)):
+            self.comp_with_str_split(s, delim, maxsplit)
 
 
 class SplitBeforeTest(TestCase):
