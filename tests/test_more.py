@@ -1254,6 +1254,29 @@ class SplitWhenTests(TestCase):
         expected = [['x']]
         self.assertEqual(actual, expected)
 
+    def test_max_split(self):
+        for args, expected in [
+            (('a,b,c,d', lambda a, _: a == ',', -1),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda a, _: a == ',', 0),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda _, b: b == ',', 1),
+             [['a'], [',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda a, _: a == ',', 2),
+             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+            (('0124376', lambda a, b: a > b, -1),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+            (('0124376', lambda a, b: a > b, 0),
+             [['0', '1', '2', '4', '3', '7', '6']]),
+            (('0124376', lambda a, b: a > b, 1),
+             [['0', '1', '2', '4'], ['3', '7', '6']]),
+            (('0124376', lambda a, b: a > b, 2),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+        ]:
+            actual = list(mi.split_when(*args))
+            self.assertEqual(expected, actual, str(args))
+
+
 
 class SplitIntoTests(TestCase):
     """Tests for ``split_into()``"""
