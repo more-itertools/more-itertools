@@ -1148,7 +1148,7 @@ class SplitBeforeTest(TestCase):
              [['a', ','], ['b', ','], ['c', ',', 'd']]),
         ]:
             actual = list(mi.split_before(*args))
-            self.assertEqual(expected, actual)
+            self.assertEqual(actual, expected)
 
 
 class SplitAfterTest(TestCase):
@@ -1187,7 +1187,7 @@ class SplitAfterTest(TestCase):
              [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
         ]:
             actual = list(mi.split_after(*args))
-            self.assertEqual(expected, actual)
+            self.assertEqual(actual, expected)
 
 
 class SplitWhenTests(TestCase):
@@ -1274,7 +1274,7 @@ class SplitWhenTests(TestCase):
              [['0', '1', '2', '4'], ['3', '7'], ['6']]),
         ]:
             actual = list(mi.split_when(*args))
-            self.assertEqual(expected, actual, str(args))
+            self.assertEqual(actual, expected, str(args))
 
 
 class SplitIntoTests(TestCase):
