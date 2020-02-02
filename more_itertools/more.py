@@ -1081,10 +1081,18 @@ def split_at(iterable, pred, maxsplit=-1):
         >>> list(split_at(range(10), lambda n: n % 2 == 1, maxsplit=2))
         [[0], [2], [4, 5, 6, 7, 8, 9]]
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     buf = []
-    for item in iterable:
-        if pred(item) and maxsplit != 0:
+    it = iter(iterable)
+    for item in it:
+        if pred(item):
             yield buf
+            if maxsplit == 1:
+                yield list(it)
+                return
             buf = []
             maxsplit -= 1
         else:
@@ -1108,10 +1116,18 @@ def split_before(iterable, pred, maxsplit=-1):
         >>> list(split_before(range(10), lambda n: n % 3 == 0, maxsplit=2))
         [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9]]
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     buf = []
-    for item in iterable:
-        if pred(item) and maxsplit != 0 and buf:
+    it = iter(iterable)
+    for item in it:
+        if pred(item) and buf:
             yield buf
+            if maxsplit == 1:
+                yield [item] + list(it)
+                return
             buf = []
             maxsplit -= 1
         buf.append(item)
@@ -1135,11 +1151,19 @@ def split_after(iterable, pred, maxsplit=-1):
         [[0], [1, 2, 3], [4, 5, 6, 7, 8, 9]]
 
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     buf = []
-    for item in iterable:
+    it = iter(iterable)
+    for item in it:
         buf.append(item)
-        if pred(item) and maxsplit != 0 and buf:
+        if pred(item) and buf:
             yield buf
+            if maxsplit == 1:
+                yield list(it)
+                return
             buf = []
             maxsplit -= 1
     if buf:
@@ -1165,6 +1189,10 @@ def split_when(iterable, pred, maxsplit=-1):
         [[1, 2, 3, 3], [2, 5], [2, 4, 2]]
 
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     it = iter(iterable)
     try:
         cur_item = next(it)
@@ -1173,8 +1201,11 @@ def split_when(iterable, pred, maxsplit=-1):
 
     buf = [cur_item]
     for next_item in it:
-        if pred(cur_item, next_item) and maxsplit != 0:
+        if pred(cur_item, next_item):
             yield buf
+            if maxsplit == 1:
+                yield [next_item] + list(it)
+                return
             buf = []
             maxsplit -= 1
 

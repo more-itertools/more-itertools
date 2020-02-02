@@ -1277,7 +1277,6 @@ class SplitWhenTests(TestCase):
             self.assertEqual(expected, actual, str(args))
 
 
-
 class SplitIntoTests(TestCase):
     """Tests for ``split_into()``"""
 
