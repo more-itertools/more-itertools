@@ -1064,28 +1064,43 @@ def sliced(seq, n):
     return takewhile(len, (seq[i : i + n] for i in count(0, n)))
 
 
-def split_at(iterable, pred):
+def split_at(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list is delimited by
-    an item where callable *pred* returns ``True``. The lists do not include
-    the delimiting items.
+    an item where callable *pred* returns ``True``.
+    The lists do not include the delimiting items:
 
         >>> list(split_at('abcdcba', lambda x: x == 'b'))
         [['a'], ['c', 'd', 'c'], ['a']]
 
         >>> list(split_at(range(10), lambda n: n % 2 == 1))
         [[0], [2], [4], [6], [8], []]
+
+    At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
+    then there is no limit on the number of splits:
+
+        >>> list(split_at(range(10), lambda n: n % 2 == 1, maxsplit=2))
+        [[0], [2], [4, 5, 6, 7, 8, 9]]
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     buf = []
-    for item in iterable:
+    it = iter(iterable)
+    for item in it:
         if pred(item):
             yield buf
+            if maxsplit == 1:
+                yield list(it)
+                return
             buf = []
+            maxsplit -= 1
         else:
             buf.append(item)
     yield buf
 
 
-def split_before(iterable, pred):
+def split_before(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list ends just before
     an item for which callable *pred* returns ``True``:
 
@@ -1095,17 +1110,31 @@ def split_before(iterable, pred):
         >>> list(split_before(range(10), lambda n: n % 3 == 0))
         [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
 
+    At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
+    then there is no limit on the number of splits:
+
+        >>> list(split_before(range(10), lambda n: n % 3 == 0, maxsplit=2))
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9]]
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     buf = []
-    for item in iterable:
+    it = iter(iterable)
+    for item in it:
         if pred(item) and buf:
             yield buf
+            if maxsplit == 1:
+                yield [item] + list(it)
+                return
             buf = []
+            maxsplit -= 1
         buf.append(item)
     yield buf
 
 
-def split_after(iterable, pred):
+def split_after(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list ends with an
     item where callable *pred* returns ``True``:
 
@@ -1115,18 +1144,33 @@ def split_after(iterable, pred):
         >>> list(split_after(range(10), lambda n: n % 3 == 0))
         [[0], [1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
+    At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
+    then there is no limit on the number of splits:
+
+        >>> list(split_after(range(10), lambda n: n % 3 == 0, maxsplit=2))
+        [[0], [1, 2, 3], [4, 5, 6, 7, 8, 9]]
+
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     buf = []
-    for item in iterable:
+    it = iter(iterable)
+    for item in it:
         buf.append(item)
         if pred(item) and buf:
             yield buf
+            if maxsplit == 1:
+                yield list(it)
+                return
             buf = []
+            maxsplit -= 1
     if buf:
         yield buf
 
 
-def split_when(iterable, pred):
+def split_when(iterable, pred, maxsplit=-1):
     """Split *iterable* into pieces based on the output of *pred*.
     *pred* should be a function that takes successive pairs of items and
     returns ``True`` if the iterable should be split in between them.
@@ -1136,7 +1180,19 @@ def split_when(iterable, pred):
 
         >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2], lambda x, y: x > y))
         [[1, 2, 3, 3], [2, 5], [2, 4], [2]]
+
+    At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
+    then there is no limit on the number of splits:
+
+        >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2],
+        ...                 lambda x, y: x > y, maxsplit=2))
+        [[1, 2, 3, 3], [2, 5], [2, 4, 2]]
+
     """
+    if maxsplit == 0:
+        yield list(iterable)
+        return
+
     it = iter(iterable)
     try:
         cur_item = next(it)
@@ -1147,7 +1203,11 @@ def split_when(iterable, pred):
     for next_item in it:
         if pred(cur_item, next_item):
             yield buf
+            if maxsplit == 1:
+                yield [next_item] + list(it)
+                return
             buf = []
+            maxsplit -= 1
 
         buf.append(next_item)
         cur_item = next_item

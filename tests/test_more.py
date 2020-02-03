@@ -1100,16 +1100,16 @@ class SlicedTests(TestCase):
 class SplitAtTests(TestCase):
     """Tests for ``split()``"""
 
-    def comp_with_str_split(self, str_to_split, delim):
+    def comp_with_str_split(self, str_to_split, delim, maxsplit):
         pred = lambda c: c == delim
-        actual = list(map(''.join, mi.split_at(str_to_split, pred)))
-        expected = str_to_split.split(delim)
+        actual = list(map(''.join, mi.split_at(str_to_split, pred, maxsplit)))
+        expected = str_to_split.split(delim, maxsplit)
         self.assertEqual(actual, expected)
 
     def test_seperators(self):
         test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
-        for s, delim in product(test_strs, 'abcd'):
-            self.comp_with_str_split(s, delim)
+        for s, delim, maxsplit in product(test_strs, 'abcd', range(-1, 4)):
+            self.comp_with_str_split(s, delim, maxsplit)
 
 
 class SplitBeforeTest(TestCase):
@@ -1130,6 +1130,26 @@ class SplitBeforeTest(TestCase):
         expected = [['o', 'o', 'o']]
         self.assertEqual(actual, expected)
 
+    def test_max_split(self):
+        for args, expected in [
+            (('a,b,c,d', lambda c: c == ',', -1),
+             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 0),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 1),
+             [['a'], [',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 2),
+             [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 10),
+             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == '@', 2),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c != ',', 2),
+             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+        ]:
+            actual = list(mi.split_before(*args))
+            self.assertEqual(actual, expected)
+
 
 class SplitAfterTest(TestCase):
     """Tests for ``split_after()``"""
@@ -1148,6 +1168,26 @@ class SplitAfterTest(TestCase):
         actual = list(mi.split_after('ooo', lambda c: c == 'x'))
         expected = [['o', 'o', 'o']]
         self.assertEqual(actual, expected)
+
+    def test_max_split(self):
+        for args, expected in [
+            (('a,b,c,d', lambda c: c == ',', -1),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == ',', 0),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 1),
+             [['a', ','], ['b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 2),
+             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 10),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == '@', 2),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c != ',', 2),
+             [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
+        ]:
+            actual = list(mi.split_after(*args))
+            self.assertEqual(actual, expected)
 
 
 class SplitWhenTests(TestCase):
@@ -1213,6 +1253,28 @@ class SplitWhenTests(TestCase):
         actual = list(self._split_when_after('x', lambda c: c == 'x'))
         expected = [['x']]
         self.assertEqual(actual, expected)
+
+    def test_max_split(self):
+        for args, expected in [
+            (('a,b,c,d', lambda a, _: a == ',', -1),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda a, _: a == ',', 0),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda _, b: b == ',', 1),
+             [['a'], [',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda a, _: a == ',', 2),
+             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+            (('0124376', lambda a, b: a > b, -1),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+            (('0124376', lambda a, b: a > b, 0),
+             [['0', '1', '2', '4', '3', '7', '6']]),
+            (('0124376', lambda a, b: a > b, 1),
+             [['0', '1', '2', '4'], ['3', '7', '6']]),
+            (('0124376', lambda a, b: a > b, 2),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+        ]:
+            actual = list(mi.split_when(*args))
+            self.assertEqual(actual, expected, str(args))
 
 
 class SplitIntoTests(TestCase):
