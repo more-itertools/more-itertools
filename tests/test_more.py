@@ -27,7 +27,7 @@ from time import sleep
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
-from more_itertools.more import _aggregate_slice
+from more_itertools.more import _aggregate_slice, _concatenate_slice
 
 
 def load_tests(loader, tests, ignore):
@@ -1114,31 +1114,52 @@ class SplitAtTests(TestCase):
 
 
 class AggregateSliceTests(TestCase):
-    def test(self):
-        def func(it):
-            return reduce(add, it, [])
-
+    def test_aggregate(self):
         for args, expected in [
-            ((([x] for x in range(5)), func), [[0, 1, 2, 3, 4]]),
-            ((([x] for x in range(5)), func, 0),
-             [[], [0], [1], [2], [3], [4]]),
-            ((([x] for x in range(5)), func, 1), [[0], [1], [2], [3], [4]]),
-            ((([x] for x in range(5)), func, 2), [[0, 1], [2], [3], [4]]),
-            ((([x] for x in range(5)), func, 3), [[0, 1, 2], [3], [4]]),
-            ((([x] for x in range(5)), func, 4), [[0, 1, 2, 3], [4]]),
-            ((([x] for x in range(5)), func, 5), [[0, 1, 2, 3, 4]]),
-            ((([x] for x in range(5)), func, 6), [[0, 1, 2, 3, 4]]),
-            ((([x] for x in range(5)), func, -1), [[0, 1, 2, 3], [4]]),
-            ((([x] for x in range(5)), func, -2), [[0, 1, 2], [3], [4]]),
-            ((([x] for x in range(5)), func, -3), [[0, 1], [2], [3], [4]]),
-            ((([x] for x in range(5)), func, -4), [[0], [1], [2], [3], [4]]),
-            ((([x] for x in range(5)), func, -5),
-             [[], [0], [1], [2], [3], [4]]),
-            ((([x] for x in range(5)), func, -6),
-             [[], [0], [1], [2], [3], [4]]),
+            ((range(5), sum), [10]),
+            ((range(5), sum, 0), [0, 1, 2, 3, 4]),
+            ((range(5), sum, 1), [0, 1, 2, 3, 4]),
+            ((range(5), sum, 2), [1, 2, 3, 4]),
+            ((range(5), sum, 3), [3, 3, 4]),
+            ((range(5), sum, 4), [6, 4]),
+            ((range(5), sum, 5), [10]),
+            ((range(5), sum, 6), [10]),
+            ((range(5), sum, -1), [6, 4]),
+            ((range(5), sum, -2), [3, 3, 4]),
+            ((range(5), sum, -3), [1, 2, 3, 4]),
+            ((range(5), sum, -4), [0, 1, 2, 3, 4]),
+            ((range(5), sum, -5), [0, 1, 2, 3, 4]),
+            ((range(5), sum, -6), [0, 1, 2, 3, 4]),
         ]:
             actual = list(_aggregate_slice(*args))
             self.assertEqual(actual, expected)
+
+    def test_concatenate0(self):
+        self.assertEqual(list(_concatenate_slice(
+            ([x] for x in range(5)), 0)), [[0], [1], [2], [3], [4]])
+
+    def test_concatenate(self):
+        for args, expected in [
+            ((([x] for x in range(5)),), [[0, 1, 2, 3, 4]]),
+            ((([x] for x in range(5)), 0), [[0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), 1), [[0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), 2), [[0, 1], [2], [3], [4]]),
+            ((([x] for x in range(5)), 3), [[0, 1, 2], [3], [4]]),
+            ((([x] for x in range(5)), 4), [[0, 1, 2, 3], [4]]),
+            ((([x] for x in range(5)), 5), [[0, 1, 2, 3, 4]]),
+            ((([x] for x in range(5)), 6), [[0, 1, 2, 3, 4]]),
+            ((([x] for x in range(5)), -1), [[0, 1, 2, 3], [4]]),
+            ((([x] for x in range(5)), -2), [[0, 1, 2], [3], [4]]),
+            ((([x] for x in range(5)), -3), [[0, 1], [2], [3], [4]]),
+            ((([x] for x in range(5)), -4), [[0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), -5), [[0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), -6), [[0], [1], [2], [3], [4]]),
+        ]:
+            actual = list(_concatenate_slice(*args))
+            self.assertEqual(actual, expected)
+
+    def test_concatenate_empty(self):
+        self.assertEqual(list(_concatenate_slice([])), [])
 
 
 class SplitBeforeTest(TestCase):
@@ -1179,6 +1200,26 @@ class SplitBeforeTest(TestCase):
             actual = list(mi.split_before(*args))
             self.assertEqual(actual, expected)
 
+    def test_max_rsplit(self):
+        for args, expected in [
+            (('a,b,c,d', lambda c: c == ',', -1, True),
+             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 0, True),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 1, True),
+             [['a', ',', 'b', ',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 2, True),
+             [['a', ',', 'b'], [',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 10, True),
+             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == '@', 2, True),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c != ',', 2, True),
+             [['a', ',', 'b', ','], ['c', ','], ['d']]),
+        ]:
+            actual = list(mi.split_before(*args))
+            self.assertEqual(actual, expected)
+
 
 class SplitAfterTest(TestCase):
     """Tests for ``split_after()``"""
@@ -1214,6 +1255,26 @@ class SplitAfterTest(TestCase):
              [['a', ',', 'b', ',', 'c', ',', 'd']]),
             (('a,b,c,d', lambda c: c != ',', 2),
              [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
+        ]:
+            actual = list(mi.split_after(*args))
+            self.assertEqual(actual, expected)
+
+    def test_max_rsplit(self):
+        for args, expected in [
+            (('a,b,c,d', lambda c: c == ',', -1, True),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == ',', 0, True),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 1, True),
+             [['a', ',', 'b', ',', 'c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == ',', 2, True),
+             [['a', ',', 'b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == ',', 10, True),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == '@', 2, True),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c != ',', 2, True),
+             [['a', ',', 'b'], [',', 'c'], [',', 'd']]),
         ]:
             actual = list(mi.split_after(*args))
             self.assertEqual(actual, expected)
@@ -1300,6 +1361,28 @@ class SplitWhenTests(TestCase):
             (('0124376', lambda a, b: a > b, 1),
              [['0', '1', '2', '4'], ['3', '7', '6']]),
             (('0124376', lambda a, b: a > b, 2),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+        ]:
+            actual = list(mi.split_when(*args))
+            self.assertEqual(actual, expected, str(args))
+
+    def test_max_rsplit(self):
+        for args, expected in [
+            (('a,b,c,d', lambda a, _: a == ',', -1, True),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda a, _: a == ',', 0, True),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda _, b: b == ',', 1, True),
+             [['a', ',', 'b', ',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda a, _: a == ',', 2, True),
+             [['a', ',', 'b', ','], ['c', ','], ['d']]),
+            (('0124376', lambda a, b: a > b, -1, True),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+            (('0124376', lambda a, b: a > b, 0, True),
+             [['0', '1', '2', '4', '3', '7', '6']]),
+            (('0124376', lambda a, b: a > b, 1, True),
+             [['0', '1', '2', '4', '3', '7'], ['6']]),
+            (('0124376', lambda a, b: a > b, 2, True),
              [['0', '1', '2', '4'], ['3', '7'], ['6']]),
         ]:
             actual = list(mi.split_when(*args))

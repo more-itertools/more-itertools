@@ -1094,10 +1094,6 @@ def split_at(iterable, pred, maxsplit=-1, rsplit=False, keep_separator=False):
         >>> list(split_at(range(10), lambda n: n % 2 == 1,
         ...               maxsplit=2, rsplit=True, keep_separator=True))
         [[0, 1, 2, 3, 4, 5, 6], [7], [8], [9], []]
-
-        >>> list(split_at(range(0), lambda n: n % 2 == 1,
-        ...               maxsplit=2, rsplit=True, keep_separator=True))
-        []
     """
     def _split_at(iterable, pred, maxsplit, keep_separator):
         buf = []
@@ -1152,9 +1148,10 @@ def _concatenate_slice(iterable, n=None):
     it = _aggregate_slice(iterable, lambda it: reduce(add, it), n)
     try:
         yield next(it)
-    except TypeError:  # nothing to aggregate
+    except TypeError as e:  # nothing to aggregate
         pass
-    yield from it
+    else:
+        yield from it
 
 
 def _aggregate_slice(iterable, func, n=None):
@@ -1192,7 +1189,8 @@ def _aggregate_slice(iterable, func, n=None):
             n = total + n
 
     it = iter(iterable)
-    yield func(islice(it, n))
+    if n != 0:
+        yield func(islice(it, n))
     yield from it
 
 
