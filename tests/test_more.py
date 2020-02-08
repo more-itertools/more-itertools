@@ -27,6 +27,7 @@ from time import sleep
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
+from more_itertools.more import _aggregate_slice
 
 
 def load_tests(loader, tests, ignore):
@@ -1110,6 +1111,34 @@ class SplitAtTests(TestCase):
         test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
         for s, delim, maxsplit in product(test_strs, 'abcd', range(-1, 4)):
             self.comp_with_str_split(s, delim, maxsplit)
+
+
+class AggregateSliceTests(TestCase):
+    def test(self):
+        def func(it):
+            return reduce(add, it, [])
+
+        for args, expected in [
+            ((([x] for x in range(5)), func), [[0, 1, 2, 3, 4]]),
+            ((([x] for x in range(5)), func, 0),
+             [[], [0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), func, 1), [[0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), func, 2), [[0, 1], [2], [3], [4]]),
+            ((([x] for x in range(5)), func, 3), [[0, 1, 2], [3], [4]]),
+            ((([x] for x in range(5)), func, 4), [[0, 1, 2, 3], [4]]),
+            ((([x] for x in range(5)), func, 5), [[0, 1, 2, 3, 4]]),
+            ((([x] for x in range(5)), func, 6), [[0, 1, 2, 3, 4]]),
+            ((([x] for x in range(5)), func, -1), [[0, 1, 2, 3], [4]]),
+            ((([x] for x in range(5)), func, -2), [[0, 1, 2], [3], [4]]),
+            ((([x] for x in range(5)), func, -3), [[0, 1], [2], [3], [4]]),
+            ((([x] for x in range(5)), func, -4), [[0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), func, -5),
+             [[], [0], [1], [2], [3], [4]]),
+            ((([x] for x in range(5)), func, -6),
+             [[], [0], [1], [2], [3], [4]]),
+        ]:
+            actual = list(_aggregate_slice(*args))
+            self.assertEqual(actual, expected)
 
 
 class SplitBeforeTest(TestCase):
