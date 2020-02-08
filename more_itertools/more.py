@@ -1148,7 +1148,7 @@ def _concatenate_slice(iterable, n=None):
     it = _aggregate_slice(iterable, lambda it: reduce(add, it), n)
     try:
         yield next(it)
-    except TypeError as e:  # nothing to aggregate
+    except TypeError:  # empty iterator
         pass
     else:
         yield from it
