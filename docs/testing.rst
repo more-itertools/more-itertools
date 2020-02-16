@@ -4,7 +4,7 @@ Testing
 
 To run install dependencies and run tests, use this command::
 
-    python setup.py test
+    python -m unittest
 
 Multiple Python Versions
 ========================

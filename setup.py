@@ -34,7 +34,6 @@ setup(
     package_data={'more_itertools': ['py.typed', '*.pyi']},
     include_package_data=True,
     python_requires='>=3.5',
-    test_suite='tests',
     url='https://github.com/erikrose/more-itertools',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
