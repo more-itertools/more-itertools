@@ -13,7 +13,7 @@ install:
     - "if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then pip install -U mypy; fi"
 
 script:
-    - "coverage run --include='more_itertools/*.py' --omit='more_itertools/tests/*' -m unittest"
+    - "coverage run --include='more_itertools/*.py' -m unittest -v"
     - "flake8 ."
     - "sphinx-build -W -b html docs docs/_build/html"
     - "if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then mypy more_itertools; fi"
