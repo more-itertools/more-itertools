@@ -2,11 +2,11 @@
 More Itertools
 ==============
 
-.. image:: https://coveralls.io/repos/github/more-itertools/more-itertools/badge.svg?branch=master
-  :target: https://coveralls.io/github/more-itertools/more-itertools?branch=master
-
 .. image:: https://readthedocs.org/projects/more-itertools/badge/?version=latest
   :target: https://more-itertools.readthedocs.io/en/stable/
+
+.. image:: https://coveralls.io/repos/github/more-itertools/more-itertools/badge.svg?branch=master
+  :target: https://coveralls.io/github/more-itertools/more-itertools?branch=master
 
 Python's ``itertools`` library is a gem - you can compose elegant solutions
 for a variety of problems with the functions it provides. In ``more-itertools``
