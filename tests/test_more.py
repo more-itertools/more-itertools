@@ -526,6 +526,23 @@ class DistinctPermutationsTests(TestCase):
         ref_output = sorted(set(permutations(iterable)))
         self.assertEqual(test_output, ref_output)
 
+    def test_r(self):
+        for iterable, r in (
+            ('mississippi', 0),
+            ('mississippi', 1),
+            ('mississippi', 6),
+            ('mississippi', 7),
+            ([0, 1, 1, 0], 0),
+            ([0, 1, 1, 0], 1),
+            ([0, 1, 1, 0], 2),
+            ([0, 1, 1, 0], 3),
+            ([0, 1, 1, 0], 4),
+        ):
+            with self.subTest(iterable=iterable, r=r):
+                expected = sorted(set(permutations(iterable, r)))
+                actual = sorted(mi.distinct_permutations(iter(iterable), r))
+                self.assertEqual(actual, expected)
+
 
 class IlenTests(TestCase):
     def test_ilen(self):
