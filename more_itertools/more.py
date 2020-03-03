@@ -551,9 +551,6 @@ def distinct_permutations(iterable, r=None):
         >>> sorted(distinct_permutations([1, 0, 1]))
         [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
 
-        >>> sorted(distinct_permutations([1, 0, 1], r=3))
-        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
-
     Equivalent to ``set(permutations(iterable))``, except duplicates are not
     generated and thrown away. For larger input sequences this is much more
     efficient.
@@ -563,6 +560,11 @@ def distinct_permutations(iterable, r=None):
     `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
     items input, and each `x_i` is the count of a distinct item in the input
     sequence.
+
+    If *r* is given, only the *r*-length permutations are yielded.
+
+        >>> sorted(distinct_permutations([1, 0, 1], r=3))
+        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
 
     """
     # When r is none, the output permutations are built up by inserting each
