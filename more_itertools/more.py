@@ -1064,10 +1064,9 @@ def sliced(seq, n):
     return takewhile(len, (seq[i : i + n] for i in count(0, n)))
 
 
-def split_at(iterable, pred, maxsplit=-1):
+def split_at(iterable, pred, maxsplit=-1, keep_separator=False):
     """Yield lists of items from *iterable*, where each list is delimited by
     an item where callable *pred* returns ``True``.
-    The lists do not include the delimiting items:
 
         >>> list(split_at('abcdcba', lambda x: x == 'b'))
         [['a'], ['c', 'd', 'c'], ['a']]
@@ -1080,6 +1079,13 @@ def split_at(iterable, pred, maxsplit=-1):
 
         >>> list(split_at(range(10), lambda n: n % 2 == 1, maxsplit=2))
         [[0], [2], [4, 5, 6, 7, 8, 9]]
+
+    By default, the delimiting items are not included in the output.
+    The include them, set *keep_separator* to ``True``.
+
+        >>> list(split_at('abcdcba', lambda x: x == 'b', keep_separator=True))
+        [['a'], ['b'], ['c', 'd', 'c'], ['b'], ['a']]
+
     """
     if maxsplit == 0:
         yield list(iterable)
@@ -1090,6 +1096,8 @@ def split_at(iterable, pred, maxsplit=-1):
     for item in it:
         if pred(item):
             yield buf
+            if keep_separator:
+                yield [item]
             if maxsplit == 1:
                 yield list(it)
                 return
