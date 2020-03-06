@@ -532,6 +532,7 @@ class DistinctPermutationsTests(TestCase):
             ('mississippi', 1),
             ('mississippi', 6),
             ('mississippi', 7),
+            ('mississippi', 12),
             ([0, 1, 1, 0], 0),
             ([0, 1, 1, 0], 1),
             ([0, 1, 1, 0], 2),
