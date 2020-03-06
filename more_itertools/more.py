@@ -545,7 +545,7 @@ def one(iterable, too_short=None, too_long=None):
     return first_value
 
 
-def distinct_permutations(iterable):
+def distinct_permutations(iterable, r=None):
     """Yield successive distinct permutations of the elements in *iterable*.
 
         >>> sorted(distinct_permutations([1, 0, 1]))
@@ -561,30 +561,56 @@ def distinct_permutations(iterable):
     items input, and each `x_i` is the count of a distinct item in the input
     sequence.
 
+    If *r* is given, only the *r*-length permutations are yielded.
+
+        >>> sorted(distinct_permutations([1, 0, 1], r=3))
+        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+
     """
+    # When r is none, the output permutations are built up by inserting each
+    # element of the iterable at every possible position of the current list
+    # of permutations. The repeated elements are kept in (reverse) order:
+    # if e1 == e2 and e1 occurs before e2 in the iterable, then all
+    # permtuations with e1 before e2 are ignored.
+    if r is None:
+        permutations = [()]
+        for e in iterable:
+            new_perms = []
+            for perm in permutations:
+                for i in range(len(perm)):
+                    new_perms.append(perm[:i] + (e,) + perm[i:])
+                    if perm[i] == e:
+                        break
+                else:
+                    new_perms.append(perm + (e,))
+            permutations = new_perms
 
-    def make_new_permutations(pool, e):
-        """Internal helper function.
-        The output permutations are built up by adding element *e* to the
-        current *permutations* at every possible position.
-        The key idea is to keep repeated elements (reverse) ordered:
-        if e1 == e2 and e1 is before e2 in the iterable, then all permutations
-        with e1 before e2 are ignored.
+        return iter(permutations)
 
-        """
-        for perm in pool:
-            for j in range(len(perm)):
-                yield perm[:j] + (e,) + perm[j:]
-                if perm[j] == e:
-                    break
-            else:
-                yield perm + (e,)
+    # When r is not None, we use a recursive generator
+    def helper(abc, depth):
+        if depth:
+            depth -= 1
+            a, *bc = abc
+            for cb in helper(bc, depth):
+                yield (a, *cb)
+            for i, b in enumerate(bc):
+                if a == b:
+                    continue
+                a, bc[i] = b, a
+                for cb in helper(bc, depth):
+                    yield (a, *cb)
+        else:
+            yield abc
 
-    permutations = [()]
-    for e in iterable:
-        permutations = make_new_permutations(permutations, e)
-
-    return (tuple(t) for t in permutations)
+    sorted_items = sorted(iterable)
+    item_count = len(sorted_items)
+    if r == 0:
+        return iter([()])
+    if r > item_count:
+        return iter(())
+    initial_depth = r - 1 if (r == item_count) else r
+    return (res[:r] for res in helper(sorted_items, initial_depth))
 
 
 def intersperse(e, iterable, n=1):
