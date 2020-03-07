@@ -1116,18 +1116,59 @@ class SlicedTests(TestCase):
 
 
 class SplitAtTests(TestCase):
-    """Tests for ``split()``"""
+    def test_basic(self):
+        for iterable, separator in [
+            ('a,bb,ccc,dddd', ','),
+            (',a,bb,ccc,dddd', ','),
+            ('a,bb,ccc,dddd,', ','),
+            ('a,bb,ccc,,dddd', ','),
+            ('', ','),
+            (',', ','),
+            ('a,bb,ccc,dddd', ';'),
+        ]:
+            with self.subTest(iterable=iterable, separator=separator):
+                it = iter(iterable)
+                pred = lambda x: x == separator
+                actual = [''.join(x) for x in mi.split_at(it, pred)]
+                expected = iterable.split(separator)
+                self.assertEqual(actual, expected)
 
-    def comp_with_str_split(self, str_to_split, delim, maxsplit):
-        pred = lambda c: c == delim
-        actual = list(map(''.join, mi.split_at(str_to_split, pred, maxsplit)))
-        expected = str_to_split.split(delim, maxsplit)
+    def test_maxsplit(self):
+        iterable = 'a,bb,ccc,dddd'
+        separator = ','
+        pred = lambda x: x == separator
+
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                it = iter(iterable)
+                result = mi.split_at(it, pred, maxsplit=maxsplit)
+                actual = [''.join(x) for x in result]
+                expected = iterable.split(separator, maxsplit)
+                self.assertEqual(actual, expected)
+
+    def test_keep_separator(self):
+        separator = ','
+        pred = lambda x: x == separator
+
+        for iterable, expected in [
+            ('a,bb,ccc', ['a', ',', 'bb', ',', 'ccc']),
+            (',a,bb,ccc', ['', ',', 'a', ',', 'bb', ',', 'ccc']),
+            ('a,bb,ccc,', ['a', ',', 'bb', ',', 'ccc', ',', '']),
+        ]:
+            with self.subTest(iterable=iterable):
+                it = iter(iterable)
+                result = mi.split_at(it, pred, keep_separator=True)
+                actual = [''.join(x) for x in result]
+                self.assertEqual(actual, expected)
+
+    def test_combination(self):
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        pred = lambda x: x % 3 == 0
+        actual = list(
+            mi.split_at(iterable, pred, maxsplit=2, keep_separator=True)
+        )
+        expected = [[1, 2], [3], [4, 5], [6], [7, 8, 9, 10]]
         self.assertEqual(actual, expected)
-
-    def test_seperators(self):
-        test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
-        for s, delim, maxsplit in product(test_strs, 'abcd', range(-1, 4)):
-            self.comp_with_str_split(s, delim, maxsplit)
 
 
 class SplitBeforeTest(TestCase):
