@@ -958,8 +958,16 @@ def interleave_longest(*iterables):
     is large).
 
     """
-    i = chain.from_iterable(zip_longest(*iterables, fillvalue=_marker))
-    return (x for x in i if x is not _marker)
+    q = deque(iter(it).__next__ for it in iterables)
+    push, pop = q.append, q.popleft
+    while q:
+        try:
+            while True:
+                nxt = pop()
+                yield nxt()
+                push(nxt)
+        except StopIteration:
+            pass
 
 
 def collapse(iterable, base_type=None, levels=None):
