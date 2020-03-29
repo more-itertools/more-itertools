@@ -538,6 +538,12 @@ class DistinctPermutationsTests(TestCase):
             ([0, 1, 1, 0], 2),
             ([0, 1, 1, 0], 3),
             ([0, 1, 1, 0], 4),
+            (['a'], 0),
+            (['a'], 1),
+            (['a'], 5),
+            ([], 0),
+            ([], 1),
+            ([], 4),
         ):
             with self.subTest(iterable=iterable, r=r):
                 expected = sorted(set(permutations(iterable, r)))
