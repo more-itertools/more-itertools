@@ -933,6 +933,15 @@ class SpyTests(TestCase):
         self.assertEqual(head, [])
         self.assertEqual(list(new_iterable), ['a', 'b', 'c'])
 
+    def test_immutable(self):
+        original_iterable = iter('abcdefg')
+        head, new_iterable = mi.spy(original_iterable, 3)
+        head[0] = 'A'
+        self.assertEqual(head, ['A', 'b', 'c'])
+        self.assertEqual(
+            list(new_iterable), ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        )
+
 
 class InterleaveTests(TestCase):
     def test_even(self):
