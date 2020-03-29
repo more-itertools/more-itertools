@@ -609,6 +609,9 @@ def distinct_permutations(iterable, r=None):
         return iter([()])
     if r > item_count:
         return iter(())
+    if item_count == 1:
+        # r != 0 and r <= item_count, so r = 1
+        return iter([(sorted_items[0],)])
     initial_depth = r - 1 if (r == item_count) else r
     return (res[:r] for res in helper(sorted_items, initial_depth))
 
