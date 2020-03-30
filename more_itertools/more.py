@@ -932,7 +932,7 @@ def spy(iterable, n=1):
     it = iter(iterable)
     head = take(n, it)
 
-    return head, chain(head, it)
+    return head.copy(), chain(head, it)
 
 
 def interleave(*iterables):
