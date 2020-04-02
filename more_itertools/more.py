@@ -93,6 +93,8 @@ __all__ = [
     'unzip',
     'windowed',
     'with_iter',
+    'UnequalIterablesError',
+    'zip_equal',
     'zip_offset',
 ]
 
@@ -1409,6 +1411,25 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     return zip_offset(
         *children, offsets=offsets, longest=longest, fillvalue=fillvalue
     )
+
+
+class UnequalIterablesError(ValueError):
+    pass
+
+
+def zip_equal(*iterables):
+    """``zip`` the input *iterables* together, but throw an
+    ``UnequalIterablesError`` if any of the *iterables* terminate before
+    the others.
+
+    """
+    for combo in zip_longest(*iterables, fillvalue=_marker):
+        for val in combo:
+            if val is _marker:
+                raise UnequalIterablesError(
+                    "Iterables have different lengths."
+                )
+        yield combo
 
 
 def zip_offset(*iterables, offsets, longest=False, fillvalue=None):

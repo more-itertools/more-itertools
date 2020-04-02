@@ -1664,6 +1664,21 @@ class StaggerTest(TestCase):
             self.assertEqual(list(all_groups), expected)
 
 
+class ZipEqualTest(TestCase):
+    """Tests for ``zip_equal()``"""
+
+    def test_equal(self):
+        iterables = [0, 1, 2], [2, 3, 4]
+        actual = list(mi.zip_equal(*iterables))
+        expected = [(0, 2), (1, 3), (2, 4)]
+        self.assertEqual(actual, expected)
+
+    def test_unequal(self):
+        iterables = [0, 1], [2, 3, 4]
+        with self.assertRaises(mi.UnequalIterablesError):
+            list(mi.zip_equal(*iterables))
+
+
 class ZipOffsetTest(TestCase):
     """Tests for ``zip_offset()``"""
 

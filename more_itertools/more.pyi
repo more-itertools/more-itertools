@@ -190,6 +190,9 @@ def stagger(
     longest: bool = ...,
     fillvalue: _U = ...,
 ) -> Iterator[Tuple[Union[_T, _U], ...]]: ...
+def zip_equal(
+    *iterables: Iterable[_T]
+) -> Iterator[Tuple[_T]]: ...
 @overload
 def zip_offset(
     *iterables: Iterable[_T], offsets: _SizedIterable[int], longest: bool = ...
