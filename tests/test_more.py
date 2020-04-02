@@ -1674,9 +1674,13 @@ class ZipEqualTest(TestCase):
         self.assertEqual(actual, expected)
 
     def test_unequal(self):
-        iterables = [0, 1], [2, 3, 4]
+        short = [0, 1]
+        long = [2, 3, 4]
         with self.assertRaises(mi.UnequalIterablesError):
-            list(mi.zip_equal(*iterables))
+            list(mi.zip_equal(short, long))
+
+        with self.assertRaises(mi.UnequalIterablesError):
+            list(mi.zip_equal(long, short))
 
 
 class ZipOffsetTest(TestCase):
