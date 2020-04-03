@@ -3573,3 +3573,65 @@ class SampleTests(TestCase):
 
         # The observed largest difference in 10,000 simulations was 4.337999
         self.assertTrue(difference_in_means < 4.4)
+
+
+class AggregatorTests(TestCase):
+
+    def test_strjoin(self):
+        @mi.aggregator(" ".join)
+        def hello_world():
+            yield "Hello"
+            yield "World"
+
+        self.assertEqual(hello_world(), "Hello World")
+
+    def test_str_join_on_list(self):
+        @mi.aggregator(" ".join)
+        def hello_world():
+            return ["Hello", "World"]
+
+        self.assertEqual(hello_world(), "Hello World")
+
+    def test_listify(self):
+        @mi.aggregator(list)
+        def hello_world():
+            yield "Hello"
+            yield "World"
+
+        self.assertEqual(hello_world(), ["Hello", "World"])
+
+    def test_chained(self):
+        # test, not a recommended way to do things!
+        @mi.aggregator(tuple)
+        @mi.aggregator(chain.from_iterable)
+        def number_lists():
+            yield [1, 2, 3]
+            yield [4, 5, 6]
+
+        self.assertEqual(number_lists(), (1, 2, 3, 4, 5, 6))
+
+    def test_chained_2(self):
+        # indicates an apply_each might be useful?
+        @mi.aggregator(".".join)
+        @mi.aggregator(lambda x: map(str, x))
+        @mi.aggregator(chain.from_iterable)
+        def number_lists():
+            yield [1, 2, 3]
+            yield [4, 5, 6]
+
+        self.assertEqual(number_lists(), "1.2.3.4.5.6")
+
+    def test_conversion(self):
+        # test, not a recommended way to do things!
+        @mi.aggregator(set)
+        def number_set():
+            return range(7)
+
+        self.assertEqual(number_set(), {0, 1, 2, 3, 4, 5, 6})
+
+    def test_reduction(self):
+        @mi.aggregator(sum)
+        def summer():
+            return range(7)
+
+        self.assertEqual(summer(), 21)
