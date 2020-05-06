@@ -1678,21 +1678,35 @@ class ZipEqualTest(TestCase):
     def test_unequal(self):
         short = [0, 1]
         long = [2, 3, 4]
-        with self.assertRaises(mi.UnequalIterablesError, msg="Iterables have different lengths: [2, 3]"):
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths: [2, 3]",
+        ):
             list(mi.zip_equal(short, long))
 
-        with self.assertRaises(mi.UnequalIterablesError, msg="Iterables have different lengths: [3, 2]"):
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths: [3, 2]",
+        ):
             list(mi.zip_equal(long, short))
 
-        with self.assertRaises(mi.UnequalIterablesError, msg="Iterables have different lengths"):
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths",
+        ):
             list(mi.zip_equal(iter(short), iter(long)))
 
-        with self.assertRaises(mi.UnequalIterablesError, msg="Iterables have different lengths"):
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths",
+        ):
             list(mi.zip_equal(iter(long), iter(short)))
-        
-        with self.assertRaises(mi.UnequalIterablesError, msg="Iterables have different lengths: from 10 to 99"):
-            list(mi.zip_equal(*[range(n) for n in range(10, 100)]))
 
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths: from 10 to 99",
+        ):
+            list(mi.zip_equal(*[range(n) for n in range(10, 100)]))
 
 
 class ZipOffsetTest(TestCase):
