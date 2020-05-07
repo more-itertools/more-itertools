@@ -1,6 +1,6 @@
 import warnings
 from collections import Counter, defaultdict, deque, abc
-from collections.abc import Sequence, Sized
+from collections.abc import Sequence
 from functools import partial, wraps
 from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
@@ -1423,21 +1423,22 @@ def zip_equal(*iterables):
     the others.
 
     """
-    if all(isinstance(it, Sized) for it in iterables):
+    try:
         lengths = list(map(len, iterables))
-        if len(set(lengths)) == 1:
-            return zip(*iterables)
-
-        if len(iterables) <= 10:
-            description = str(lengths)
-        else:
-            description = "from {} to {}".format(min(lengths), max(lengths))
-
-        raise UnequalIterablesError(
-            "Iterables have different lengths: " + description
-        )
-    else:
+    except TypeError:
         return _zip_equal_generator(iterables)
+
+    if len(set(lengths)) == 1:
+        return zip(*iterables)
+
+    if len(iterables) <= 10:
+        description = str(lengths)
+    else:
+        description = "from {} to {}".format(min(lengths), max(lengths))
+
+    raise UnequalIterablesError(
+        "Iterables have different lengths: " + description
+    )
 
 
 def _zip_equal_generator(iterables):
