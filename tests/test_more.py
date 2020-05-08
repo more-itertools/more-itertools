@@ -1675,38 +1675,34 @@ class ZipEqualTest(TestCase):
             expected = [(0, 2), (1, 3), (2, 4)]
             self.assertEqual(actual, expected)
 
-    def test_unequal(self):
-        short = [0, 1]
-        long = [2, 3, 4]
-        with self.assertRaises(
-                mi.UnequalIterablesError,
-                msg="Iterables have different lengths: [2, 3]",
-        ):
-            list(mi.zip_equal(short, long))
+    def test_unequal_lists(self):
+        first = [0, 1]
+        second = [2, 3, 4]
+        third = [5, 6, 7, 8]
 
-        with self.assertRaises(
-                mi.UnequalIterablesError,
-                msg="Iterables have different lengths: [3, 2]",
-        ):
-            list(mi.zip_equal(long, short))
+        # All lists: delegate to zip
+        try:
+            list(mi.zip_equal(first, second, third))
+        except mi.UnequalIterablesError as e:
+            self.assertEqual(
+                e.args[0], 'Iterables have different lengths (2, 3)'
+            )
 
-        with self.assertRaises(
-                mi.UnequalIterablesError,
-                msg="Iterables have different lengths",
-        ):
-            list(mi.zip_equal(iter(short), iter(long)))
+        # Different order: report first mismatch
+        try:
+            list(mi.zip_equal(first, third, second))
+        except mi.UnequalIterablesError as e:
+            self.assertEqual(
+                e.args[0], 'Iterables have different lengths (2, 4)'
+            )
 
-        with self.assertRaises(
-                mi.UnequalIterablesError,
-                msg="Iterables have different lengths",
-        ):
-            list(mi.zip_equal(iter(long), iter(short)))
-
-        with self.assertRaises(
-                mi.UnequalIterablesError,
-                msg="Iterables have different lengths: from 10 to 99",
-        ):
-            list(mi.zip_equal(*[range(n) for n in range(10, 100)]))
+        # One without length: delegate to _zip_equal_generator
+        try:
+            list(mi.zip_equal(first, iter(second), third))
+        except mi.UnequalIterablesError as e:
+            self.assertEqual(
+                e.args[0], 'Iterables have different lengths'
+            )
 
 
 class ZipOffsetTest(TestCase):

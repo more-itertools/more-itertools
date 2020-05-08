@@ -1423,22 +1423,28 @@ def zip_equal(*iterables):
     the others.
 
     """
+    # Check whether the iterables are all the same size.
     try:
-        lengths = list(map(len, iterables))
+        first_size = len(iterables[0])
+        for it in iterables:
+            size = len(it)
+            if size != first_size:
+                break
+        else:
+            # If we didn't break out, they're all the same size.
+            # The built-in zip function will be faster.
+            return zip(*iterables)
+
+        # If we did break out, there was a mismatch.
+        raise UnequalIterablesError(
+            'Iterables have different lengths ({}, {})'.format(
+                first_size, size
+            )
+        )
+    # If any one of the iterables didn't have a length, start reading
+    # them until one runs out.
     except TypeError:
         return _zip_equal_generator(iterables)
-
-    if len(set(lengths)) == 1:
-        return zip(*iterables)
-
-    if len(iterables) <= 10:
-        description = str(lengths)
-    else:
-        description = "from {} to {}".format(min(lengths), max(lengths))
-
-    raise UnequalIterablesError(
-        "Iterables have different lengths: " + description
-    )
 
 
 def _zip_equal_generator(iterables):
@@ -1446,7 +1452,7 @@ def _zip_equal_generator(iterables):
         for val in combo:
             if val is _marker:
                 raise UnequalIterablesError(
-                    "Iterables have different lengths."
+                    'Iterables have different lengths'
                 )
         yield combo
 
