@@ -1414,33 +1414,62 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
 
 
 class UnequalIterablesError(ValueError):
-    pass
+    def __init__(self, first_size=None, unequal_index=None, unequal_size=None):
+        self.first_size = first_size
+        self.unequal_index = unequal_index
+        self.unequal_size = unequal_size
+        super().__init__('Iterables have different lengths')
 
 
 def zip_equal(*iterables):
-    """``zip`` the input *iterables* together, but throw an
-    ``UnequalIterablesError`` if any of the *iterables* terminate before
-    the others.
+    """``zip`` the input *iterables* together, but raise
+    ``UnequalIterablesError`` if they aren't all the same length.
+
+        >>> it_1 = range(3)
+        >>> it_2 = iter('abc')
+        >>> list(zip_equal(it_1, it_2))
+        [(0, 'a'), (1, 'b'), (2, 'c')]
+
+        >>> it_1 = range(3)
+        >>> it_2 = iter('abcd')
+        >>> list(zip_equal(it_1, it_2)) # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        more_itertools.more.UnequalIterablesError: Iterables have different
+        lengths
+
+    If the iterables weren't all the same size, the ``UnequalIterablesError``
+    exception may have additional information available:
+
+    * ``first_size``: the length of the iterable at index 0
+    * ``unequal_index``: the index of the first iterable that didn't match
+    * ``unequal_size``: the size of the first iterable that didn't match
+
+    This information will be available if the iterables implement `__len__`:
+
+        >>> try:
+        ...     list(zip_equal([1, 2, 3], [4, 5, 6], [7, 8]))
+        ... except UnequalIterablesError as e:
+        ...     print((e.first_size, e.unequal_index, e.unequal_size))
+        (3, 2, 2)
+
+    If the iterables don't implement ``__len__``, the exception's attributes will
+    be ``None``.
 
     """
     # Check whether the iterables are all the same size.
     try:
         first_size = len(iterables[0])
-        for it in iterables:
+        for i, it in enumerate(iterables[1:], 1):
             size = len(it)
             if size != first_size:
                 break
         else:
-            # If we didn't break out, they're all the same size.
-            # The built-in zip function will be faster.
+            # If we didn't break out, we can use the built-in zip.
             return zip(*iterables)
 
         # If we did break out, there was a mismatch.
-        raise UnequalIterablesError(
-            'Iterables have different lengths ({}, {})'.format(
-                first_size, size
-            )
-        )
+        raise UnequalIterablesError(first_size, i, size)
     # If any one of the iterables didn't have a length, start reading
     # them until one runs out.
     except TypeError:
@@ -1451,9 +1480,7 @@ def _zip_equal_generator(iterables):
     for combo in zip_longest(*iterables, fillvalue=_marker):
         for val in combo:
             if val is _marker:
-                raise UnequalIterablesError(
-                    'Iterables have different lengths'
-                )
+                raise UnequalIterablesError()
         yield combo
 
 
