@@ -93,6 +93,8 @@ __all__ = [
     'unzip',
     'windowed',
     'with_iter',
+    'UnequalIterablesError',
+    'zip_equal',
     'zip_offset',
 ]
 
@@ -609,6 +611,9 @@ def distinct_permutations(iterable, r=None):
         return iter([()])
     if r > item_count:
         return iter(())
+    if item_count == 1:
+        # r != 0 and r <= item_count, so r = 1
+        return iter([(sorted_items[0],)])
     initial_depth = r - 1 if (r == item_count) else r
     return (res[:r] for res in helper(sorted_items, initial_depth))
 
@@ -929,7 +934,7 @@ def spy(iterable, n=1):
     it = iter(iterable)
     head = take(n, it)
 
-    return head, chain(head, it)
+    return head.copy(), chain(head, it)
 
 
 def interleave(*iterables):
@@ -1406,6 +1411,44 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     return zip_offset(
         *children, offsets=offsets, longest=longest, fillvalue=fillvalue
     )
+
+
+class UnequalIterablesError(ValueError):
+    pass
+
+
+def zip_equal(*iterables):
+    """``zip`` the input *iterables* together, but throw an
+    ``UnequalIterablesError`` if any of the *iterables* terminate before
+    the others.
+
+    """
+    try:
+        lengths = list(map(len, iterables))
+    except TypeError:
+        return _zip_equal_generator(iterables)
+
+    if len(set(lengths)) == 1:
+        return zip(*iterables)
+
+    if len(iterables) <= 10:
+        description = str(lengths)
+    else:
+        description = "from {} to {}".format(min(lengths), max(lengths))
+
+    raise UnequalIterablesError(
+        "Iterables have different lengths: " + description
+    )
+
+
+def _zip_equal_generator(iterables):
+    for combo in zip_longest(*iterables, fillvalue=_marker):
+        for val in combo:
+            if val is _marker:
+                raise UnequalIterablesError(
+                    "Iterables have different lengths."
+                )
+        yield combo
 
 
 def zip_offset(*iterables, offsets, longest=False, fillvalue=None):

@@ -538,6 +538,12 @@ class DistinctPermutationsTests(TestCase):
             ([0, 1, 1, 0], 2),
             ([0, 1, 1, 0], 3),
             ([0, 1, 1, 0], 4),
+            (['a'], 0),
+            (['a'], 1),
+            (['a'], 5),
+            ([], 0),
+            ([], 1),
+            ([], 4),
         ):
             with self.subTest(iterable=iterable, r=r):
                 expected = sorted(set(permutations(iterable, r)))
@@ -926,6 +932,15 @@ class SpyTests(TestCase):
         head, new_iterable = mi.spy(original_iterable, 0)
         self.assertEqual(head, [])
         self.assertEqual(list(new_iterable), ['a', 'b', 'c'])
+
+    def test_immutable(self):
+        original_iterable = iter('abcdefg')
+        head, new_iterable = mi.spy(original_iterable, 3)
+        head[0] = 'A'
+        self.assertEqual(head, ['A', 'b', 'c'])
+        self.assertEqual(
+            list(new_iterable), ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        )
 
 
 class InterleaveTests(TestCase):
@@ -1647,6 +1662,51 @@ class StaggerTest(TestCase):
                 iterable, offsets=offsets, fillvalue='', longest=True
             )
             self.assertEqual(list(all_groups), expected)
+
+
+class ZipEqualTest(TestCase):
+    """Tests for ``zip_equal()``"""
+
+    def test_equal(self):
+        lists = [0, 1, 2], [2, 3, 4]
+
+        for iterables in [lists, map(iter, lists)]:
+            actual = list(mi.zip_equal(*iterables))
+            expected = [(0, 2), (1, 3), (2, 4)]
+            self.assertEqual(actual, expected)
+
+    def test_unequal(self):
+        short = [0, 1]
+        long = [2, 3, 4]
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths: [2, 3]",
+        ):
+            list(mi.zip_equal(short, long))
+
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths: [3, 2]",
+        ):
+            list(mi.zip_equal(long, short))
+
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths",
+        ):
+            list(mi.zip_equal(iter(short), iter(long)))
+
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths",
+        ):
+            list(mi.zip_equal(iter(long), iter(short)))
+
+        with self.assertRaises(
+                mi.UnequalIterablesError,
+                msg="Iterables have different lengths: from 10 to 99",
+        ):
+            list(mi.zip_equal(*[range(n) for n in range(10, 100)]))
 
 
 class ZipOffsetTest(TestCase):
