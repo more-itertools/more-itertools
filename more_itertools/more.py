@@ -1414,11 +1414,14 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
 
 
 class UnequalIterablesError(ValueError):
-    def __init__(self, first_size=None, unequal_index=None, unequal_size=None):
-        self.first_size = first_size
-        self.unequal_index = unequal_index
-        self.unequal_size = unequal_size
-        super().__init__('Iterables have different lengths')
+    def __init__(self, details=None):
+        msg = 'Iterables have different lengths'
+        if details is not None:
+            msg += (
+                ': index 0 has length {}; index {} has length {}'
+            ).format(*details)
+
+        super().__init__(msg)
 
 
 def zip_equal(*iterables):
@@ -1438,24 +1441,6 @@ def zip_equal(*iterables):
         more_itertools.more.UnequalIterablesError: Iterables have different
         lengths
 
-    If the iterables weren't all the same size, the ``UnequalIterablesError``
-    exception may have additional information available:
-
-    * ``first_size``: the length of the iterable at index 0
-    * ``unequal_index``: the index of the first iterable that didn't match
-    * ``unequal_size``: the size of the first iterable that didn't match
-
-    This information will be available if the iterables implement `__len__`:
-
-        >>> try:
-        ...     list(zip_equal([1, 2, 3], [4, 5, 6], [7, 8]))
-        ... except UnequalIterablesError as e:
-        ...     print((e.first_size, e.unequal_index, e.unequal_size))
-        (3, 2, 2)
-
-    If the iterables don't implement ``__len__``, the exception's attributes will
-    be ``None``.
-
     """
     # Check whether the iterables are all the same size.
     try:
@@ -1469,7 +1454,7 @@ def zip_equal(*iterables):
             return zip(*iterables)
 
         # If we did break out, there was a mismatch.
-        raise UnequalIterablesError(first_size, i, size)
+        raise UnequalIterablesError(details=(first_size, i, size))
     # If any one of the iterables didn't have a length, start reading
     # them until one runs out.
     except TypeError:

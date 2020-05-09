@@ -1685,11 +1685,11 @@ class ZipEqualTest(TestCase):
             list(mi.zip_equal(two_items, three_items, four_items))
         except mi.UnequalIterablesError as e:
             self.assertEqual(
-                e.args[0], 'Iterables have different lengths'
-            )
-            self.assertEqual(
-                (e.first_size, e.unequal_index, e.unequal_size),
-                (2, 1, 3)
+                e.args[0],
+                (
+                    'Iterables have different lengths: '
+                    'index 0 has length 2; index 1 has length 3'
+                )
             )
 
         # the mismatch is at index 2
@@ -1697,11 +1697,11 @@ class ZipEqualTest(TestCase):
             list(mi.zip_equal(two_items, two_items, four_items, four_items))
         except mi.UnequalIterablesError as e:
             self.assertEqual(
-                e.args[0], 'Iterables have different lengths'
-            )
-            self.assertEqual(
-                (e.first_size, e.unequal_index, e.unequal_size),
-                (2, 2, 4)
+                e.args[0],
+                (
+                    'Iterables have different lengths: '
+                    'index 0 has length 2; index 2 has length 4'
+                )
             )
 
         # One without length: delegate to _zip_equal_generator
@@ -1710,10 +1710,6 @@ class ZipEqualTest(TestCase):
         except mi.UnequalIterablesError as e:
             self.assertEqual(
                 e.args[0], 'Iterables have different lengths'
-            )
-            self.assertEqual(
-                (e.first_size, e.unequal_index, e.unequal_size),
-                (None, None, None)
             )
 
 
