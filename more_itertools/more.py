@@ -548,62 +548,25 @@ def one(iterable, too_short=None, too_long=None):
 
 
 def distinct_permutations(iterable, r=None):
-    """Yield successive distinct permutations of the elements in *iterable*.
+    """
+    Generates unique permutations of the elements *iterable*
+    in lexicographical order.
+    Compared with itertools.permutations:
+    >>> from itertools import permutations
+    >>> list(permutations([0, 0, 1]))
+    [(0, 0, 1), (0, 1, 0), (0, 0, 1), (0, 1, 0), (1, 0, 0), (1, 0, 0)]
+    >>> list(distinct_permutations([0, 0, 1]))
+    [(0, 0, 1), (0, 1, 0), (1, 0, 0)]
+    >>> len(list(distinct_permutations('MISSISSIPPI')))
+    34650
 
-        >>> sorted(distinct_permutations([1, 0, 1]))
-        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
-
-    Equivalent to ``set(permutations(iterable))``, except duplicates are not
-    generated and thrown away. For larger input sequences this is much more
-    efficient.
-
-    Duplicate permutations arise when there are duplicated elements in the
-    input iterable. The number of items returned is
-    `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
-    items input, and each `x_i` is the count of a distinct item in the input
-    sequence.
+    More theory on wiki:
+    https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets
 
     If *r* is given, only the *r*-length permutations are yielded.
-
-        >>> sorted(distinct_permutations([1, 0, 1], r=3))
-        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
-
+        >>> print(*map(''.join, distinct_permutations('abcc', r=3)))
+        abc acb acc bac bca bcc cab cac cba cbc cca ccb
     """
-    # When r is none, the output permutations are built up by inserting each
-    # element of the iterable at every possible position of the current list
-    # of permutations. The repeated elements are kept in (reverse) order:
-    # if e1 == e2 and e1 occurs before e2 in the iterable, then all
-    # permtuations with e1 before e2 are ignored.
-    if r is None:
-        permutations = [()]
-        for e in iterable:
-            new_perms = []
-            for perm in permutations:
-                for i in range(len(perm)):
-                    new_perms.append(perm[:i] + (e,) + perm[i:])
-                    if perm[i] == e:
-                        break
-                else:
-                    new_perms.append(perm + (e,))
-            permutations = new_perms
-
-        return iter(permutations)
-
-    # When r is not None, we use a recursive generator
-    def helper(abc, depth):
-        if depth:
-            depth -= 1
-            a, *bc = abc
-            for cb in helper(bc, depth):
-                yield (a, *cb)
-            for i, b in enumerate(bc):
-                if a == b:
-                    continue
-                a, bc[i] = b, a
-                for cb in helper(bc, depth):
-                    yield (a, *cb)
-        else:
-            yield abc
 
     sorted_items = sorted(iterable)
     item_count = len(sorted_items)
@@ -616,6 +579,65 @@ def distinct_permutations(iterable, r=None):
         return iter([(sorted_items[0],)])
     initial_depth = r - 1 if (r == item_count) else r
     return (res[:r] for res in helper(sorted_items, initial_depth))
+    def fullsize(l):
+        """
+        well known Narayana Pandita permutation algorithm
+        https://www.google.com/search?q=narayana+pandita+permutation+algorithm
+        """
+        le_1, rng = size - 1, range(size - 2, -1, -1)
+        yield l
+        while True:
+            a = l[le_1]
+            for i in rng:
+                a, b = l[i], a
+                if a < b:
+                    break
+            else:
+                return
+            for j in range(le_1, i, -1):
+                if a < l[j]:
+                    break
+            l[i], l[j] = l[j], a
+            l[i + 1:] = l[:i - size:-1]
+            yield l
+
+    def partial(l, r):
+        """
+        modified Narayana Pandita permutation algorithm
+        """
+        head, tail, rng = l[:r], l[r:], range(r - 1, -1, -1)
+        yield head
+        while True:
+            a = tail[-1]
+            for i in rng:
+                a, b = head[i], a
+                if a < b:
+                    break
+            else:
+                return
+            for j, b in enumerate(tail):
+                if a < b:
+                    head[i], tail[j] = b, a
+                    break
+            else:
+                for j in rng:
+                    b = head[j]
+                    if a < b:
+                        head[i], head[j] = b, a
+                        break
+            tail += head[:i - r:-1]
+            i += 1
+            head[i:] = tail[:r - i]
+            del tail[:r - i]
+            yield head
+
+    items = sorted(iterable)
+    size = len(items)
+    if r is None:
+        r = size
+    if 0 < r <= size:
+        return map(tuple, fullsize(items) if r == size else partial(items, r))
+    return iter(() if r else ((),))
 
 
 def intersperse(e, iterable, n=1):
