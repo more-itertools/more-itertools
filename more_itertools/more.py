@@ -677,50 +677,51 @@ def unique_to_each(*iterables):
     return [list(filter(uniques.__contains__, it)) for it in pool]
 
 
-def windowed(iterable, width, fillvalue=None, step=1):
-    """Return a sliding window of *width* over the given iterable.
-
+def windowed(seq, n, fillvalue=None, step=1):
+    """Return a sliding window of width *n* over the given iterable.
         >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
         >>> list(all_windows)
         [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
 
     When the window is larger than the iterable, *fillvalue* is used in place
     of missing values::
-
         >>> list(windowed([1, 2, 3], 4))
         [(1, 2, 3, None)]
 
     Each window will advance in increments of *step*:
-
         >>> list(windowed([1, 2, 3, 4, 5, 6], 3, fillvalue='!', step=2))
         [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
 
     To slide into the iterable's items, use :func:`chain` to add filler items
     to the left:
-
         >>> iterable = [1, 2, 3, 4]
-        >>> width = 3
-        >>> padding = [None] * (width - 1)
-        >>> list(windowed(chain(padding, iterable), width))
+        >>> n = 3
+        >>> padding = [None] * (n - 1)
+        >>> list(windowed(chain(padding, iterable), 3))
         [(None, None, 1), (None, 1, 2), (1, 2, 3), (2, 3, 4)]
     """
+    if n < 0:
+        raise ValueError('n must be >= 0')
+    if n == 0:
+        yield tuple()
+        return
+    if step < 1:
+        raise ValueError('step must be >= 1')
 
-    def helper(**kwargs):
-        window, i = deque((), width), width
-        for _ in map(window.append, iterable):
-            i -= 1
-            if not i:
-                i = step
-                yield window
-        if 0 < len(window) < width:
-            yield chain(window, (fillvalue,) * (width - len(window)))
-        elif 0 < i < min(step, width):
-            window.extend((fillvalue,) * i)
-            yield window
+    window = deque(maxlen=n)
+    i = n
+    for _ in map(window.append, seq):
+        i -= 1
+        if not i:
+            i = step
+            yield tuple(window)
 
-    if width >= 0 < step:
-        return map(tuple, helper(**locals()) if width else ((),))
-    raise ValueError('width must be >= 0\nstep must be > 0')
+    size = len(window)
+    if size < n:
+        yield tuple(chain(window, repeat(fillvalue, n - size)))
+    elif 0 < i < min(step, n):
+        window += (fillvalue,) * i
+        yield tuple(window)
 
 
 def substrings(iterable):
