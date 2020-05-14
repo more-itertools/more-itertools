@@ -548,95 +548,100 @@ def one(iterable, too_short=None, too_long=None):
 
 
 def distinct_permutations(iterable, r=None):
-    """
-    Generates unique permutations of the elements *iterable*
-    in lexicographical order.
-    Compared with itertools.permutations:
-    >>> from itertools import permutations
-    >>> list(permutations([0, 0, 1]))
-    [(0, 0, 1), (0, 1, 0), (0, 0, 1), (0, 1, 0), (1, 0, 0), (1, 0, 0)]
-    >>> list(distinct_permutations([0, 0, 1]))
-    [(0, 0, 1), (0, 1, 0), (1, 0, 0)]
-    >>> len(list(distinct_permutations('MISSISSIPPI')))
-    34650
+    """Yield successive distinct permutations of the elements in *iterable*.
 
-    More theory on wiki:
-    https://en.wikipedia.org/wiki/Permutation#Permutations_of_multisets
+        >>> sorted(distinct_permutations([1, 0, 1]))
+        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+
+    Equivalent to ``set(permutations(iterable))``, except duplicates are not
+    generated and thrown away. For larger input sequences this is much more
+    efficient.
+
+    Duplicate permutations arise when there are duplicated elements in the
+    input iterable. The number of items returned is
+    `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
+    items input, and each `x_i` is the count of a distinct item in the input
+    sequence.
 
     If *r* is given, only the *r*-length permutations are yielded.
-        >>> print(*map(''.join, distinct_permutations('abcc', r=3)))
-        abc acb acc bac bca bcc cab cac cba cbc cca ccb
+
+        >>> sorted(distinct_permutations([1, 0, 1], r=3))
+        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+
     """
-
-    sorted_items = sorted(iterable)
-    item_count = len(sorted_items)
-    if r == 0:
-        return iter([()])
-    if r > item_count:
-        return iter(())
-    if item_count == 1:
-        # r != 0 and r <= item_count, so r = 1
-        return iter([(sorted_items[0],)])
-    initial_depth = r - 1 if (r == item_count) else r
-    return (res[:r] for res in helper(sorted_items, initial_depth))
-    def fullsize(l):
-        """
-        well known Narayana Pandita permutation algorithm
-        https://www.google.com/search?q=narayana+pandita+permutation+algorithm
-        """
-        le_1, rng = size - 1, range(size - 2, -1, -1)
-        yield l
+    # Algorithm: https://w.wiki/Qai
+    def _full(A):
         while True:
-            a = l[le_1]
-            for i in rng:
-                a, b = l[i], a
-                if a < b:
+            # Yield the permutation we have
+            yield tuple(A)
+
+            # Find the largest index i such that A[i] < A[i + 1]
+            for i in range(size - 2, -1, -1):
+                if A[i] < A[i + 1]:
                     break
+            #  If no such index exists, this permutation is the last one
             else:
                 return
-            for j in range(le_1, i, -1):
-                if a < l[j]:
-                    break
-            l[i], l[j] = l[j], a
-            l[i + 1:] = l[:i - size:-1]
-            yield l
 
-    def partial(l, r):
-        """
-        modified Narayana Pandita permutation algorithm
-        """
-        head, tail, rng = l[:r], l[r:], range(r - 1, -1, -1)
-        yield head
-        while True:
-            a = tail[-1]
-            for i in rng:
-                a, b = head[i], a
-                if a < b:
+            # Find the largest index j greater than j such that A[i] < A[j]
+            for j in range(size - 1, i, -1):
+                if A[i] < A[j]:
                     break
+
+            # Swap the value of A[i] with that of A[j], then reverse the
+            # sequence from A[i + 1] to form the new permutation
+            A[i], A[j] = A[j], A[i]
+            A[i + 1:] = A[:i - size:-1]  # A[i + 1:][::-1]
+
+    # Algorithm: modified from the above
+    def _partial(A, r):
+        # Split A into the first r items and the last r items
+        head, tail = A[:r], A[r:]
+        right_head_indexes = range(r - 1, -1, -1)
+        left_tail_indexes = range(len(tail))
+
+        while True:
+            # Yield the permutation we have
+            yield tuple(head)
+
+            # Starting from the right, find the first index of the head with
+            # value smaller than the maximum value of the tail - call it i.
+            pivot = tail[-1]
+            for i in right_head_indexes:
+                if head[i] < pivot:
+                    break
+                pivot = head[i]
             else:
                 return
-            for j, b in enumerate(tail):
-                if a < b:
-                    head[i], tail[j] = b, a
+
+            # Starting from the left, find the first value of the tail
+            # with a value greater than head[i] and swap.
+            for j in left_tail_indexes:
+                if tail[j] > head[i]:
+                    head[i], tail[j] = tail[j], head[i]
                     break
+            # If we didn't find one, start from the right and find the first
+            # index of the head with a value greater than head[i] and swap.
             else:
-                for j in rng:
-                    b = head[j]
-                    if a < b:
-                        head[i], head[j] = b, a
+                for j in right_head_indexes:
+                    if head[j] > head[i]:
+                        head[i], head[j] = head[j], head[i]
                         break
-            tail += head[:i - r:-1]
+
+            # Reverse head[i + 1:] and swap it with tail[:r - (i + 1)]
+            tail += head[:i - r:-1]  # head[i + 1:][::-1]
             i += 1
-            head[i:] = tail[:r - i]
-            del tail[:r - i]
-            yield head
+            head[i:], tail[:] = tail[:r - i], tail[r - i:]
 
     items = sorted(iterable)
+
     size = len(items)
     if r is None:
         r = size
+
     if 0 < r <= size:
-        return map(tuple, fullsize(items) if r == size else partial(items, r))
+        return _full(items) if (r == size) else _partial(items, r)
+
     return iter(() if r else ((),))
 
 
