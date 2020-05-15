@@ -569,53 +569,80 @@ def distinct_permutations(iterable, r=None):
         [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
 
     """
-    # When r is none, the output permutations are built up by inserting each
-    # element of the iterable at every possible position of the current list
-    # of permutations. The repeated elements are kept in (reverse) order:
-    # if e1 == e2 and e1 occurs before e2 in the iterable, then all
-    # permtuations with e1 before e2 are ignored.
-    if r is None:
-        permutations = [()]
-        for e in iterable:
-            new_perms = []
-            for perm in permutations:
-                for i in range(len(perm)):
-                    new_perms.append(perm[:i] + (e,) + perm[i:])
-                    if perm[i] == e:
+    # Algorithm: https://w.wiki/Qai
+    def _full(A):
+        while True:
+            # Yield the permutation we have
+            yield tuple(A)
+
+            # Find the largest index i such that A[i] < A[i + 1]
+            for i in range(size - 2, -1, -1):
+                if A[i] < A[i + 1]:
+                    break
+            #  If no such index exists, this permutation is the last one
+            else:
+                return
+
+            # Find the largest index j greater than j such that A[i] < A[j]
+            for j in range(size - 1, i, -1):
+                if A[i] < A[j]:
+                    break
+
+            # Swap the value of A[i] with that of A[j], then reverse the
+            # sequence from A[i + 1] to form the new permutation
+            A[i], A[j] = A[j], A[i]
+            A[i + 1:] = A[:i - size:-1]  # A[i + 1:][::-1]
+
+    # Algorithm: modified from the above
+    def _partial(A, r):
+        # Split A into the first r items and the last r items
+        head, tail = A[:r], A[r:]
+        right_head_indexes = range(r - 1, -1, -1)
+        left_tail_indexes = range(len(tail))
+
+        while True:
+            # Yield the permutation we have
+            yield tuple(head)
+
+            # Starting from the right, find the first index of the head with
+            # value smaller than the maximum value of the tail - call it i.
+            pivot = tail[-1]
+            for i in right_head_indexes:
+                if head[i] < pivot:
+                    break
+                pivot = head[i]
+            else:
+                return
+
+            # Starting from the left, find the first value of the tail
+            # with a value greater than head[i] and swap.
+            for j in left_tail_indexes:
+                if tail[j] > head[i]:
+                    head[i], tail[j] = tail[j], head[i]
+                    break
+            # If we didn't find one, start from the right and find the first
+            # index of the head with a value greater than head[i] and swap.
+            else:
+                for j in right_head_indexes:
+                    if head[j] > head[i]:
+                        head[i], head[j] = head[j], head[i]
                         break
-                else:
-                    new_perms.append(perm + (e,))
-            permutations = new_perms
 
-        return iter(permutations)
+            # Reverse head[i + 1:] and swap it with tail[:r - (i + 1)]
+            tail += head[:i - r:-1]  # head[i + 1:][::-1]
+            i += 1
+            head[i:], tail[:] = tail[:r - i], tail[r - i:]
 
-    # When r is not None, we use a recursive generator
-    def helper(abc, depth):
-        if depth:
-            depth -= 1
-            a, *bc = abc
-            for cb in helper(bc, depth):
-                yield (a, *cb)
-            for i, b in enumerate(bc):
-                if a == b:
-                    continue
-                a, bc[i] = b, a
-                for cb in helper(bc, depth):
-                    yield (a, *cb)
-        else:
-            yield abc
+    items = sorted(iterable)
 
-    sorted_items = sorted(iterable)
-    item_count = len(sorted_items)
-    if r == 0:
-        return iter([()])
-    if r > item_count:
-        return iter(())
-    if item_count == 1:
-        # r != 0 and r <= item_count, so r = 1
-        return iter([(sorted_items[0],)])
-    initial_depth = r - 1 if (r == item_count) else r
-    return (res[:r] for res in helper(sorted_items, initial_depth))
+    size = len(items)
+    if r is None:
+        r = size
+
+    if 0 < r <= size:
+        return _full(items) if (r == size) else _partial(items, r)
+
+    return iter(() if r else ((),))
 
 
 def intersperse(e, iterable, n=1):
