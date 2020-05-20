@@ -108,6 +108,7 @@ These tools combine multiple iterables.
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
+.. autofunction:: zip_equal
 
 ----
 

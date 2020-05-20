@@ -526,6 +526,30 @@ class DistinctPermutationsTests(TestCase):
         ref_output = sorted(set(permutations(iterable)))
         self.assertEqual(test_output, ref_output)
 
+    def test_r(self):
+        for iterable, r in (
+            ('mississippi', 0),
+            ('mississippi', 1),
+            ('mississippi', 6),
+            ('mississippi', 7),
+            ('mississippi', 12),
+            ([0, 1, 1, 0], 0),
+            ([0, 1, 1, 0], 1),
+            ([0, 1, 1, 0], 2),
+            ([0, 1, 1, 0], 3),
+            ([0, 1, 1, 0], 4),
+            (['a'], 0),
+            (['a'], 1),
+            (['a'], 5),
+            ([], 0),
+            ([], 1),
+            ([], 4),
+        ):
+            with self.subTest(iterable=iterable, r=r):
+                expected = sorted(set(permutations(iterable, r)))
+                actual = sorted(mi.distinct_permutations(iter(iterable), r))
+                self.assertEqual(actual, expected)
+
 
 class IlenTests(TestCase):
     def test_ilen(self):
@@ -909,6 +933,15 @@ class SpyTests(TestCase):
         self.assertEqual(head, [])
         self.assertEqual(list(new_iterable), ['a', 'b', 'c'])
 
+    def test_immutable(self):
+        original_iterable = iter('abcdefg')
+        head, new_iterable = mi.spy(original_iterable, 3)
+        head[0] = 'A'
+        self.assertEqual(head, ['A', 'b', 'c'])
+        self.assertEqual(
+            list(new_iterable), ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+        )
+
 
 class InterleaveTests(TestCase):
     def test_even(self):
@@ -1098,18 +1131,59 @@ class SlicedTests(TestCase):
 
 
 class SplitAtTests(TestCase):
-    """Tests for ``split()``"""
+    def test_basic(self):
+        for iterable, separator in [
+            ('a,bb,ccc,dddd', ','),
+            (',a,bb,ccc,dddd', ','),
+            ('a,bb,ccc,dddd,', ','),
+            ('a,bb,ccc,,dddd', ','),
+            ('', ','),
+            (',', ','),
+            ('a,bb,ccc,dddd', ';'),
+        ]:
+            with self.subTest(iterable=iterable, separator=separator):
+                it = iter(iterable)
+                pred = lambda x: x == separator
+                actual = [''.join(x) for x in mi.split_at(it, pred)]
+                expected = iterable.split(separator)
+                self.assertEqual(actual, expected)
 
-    def comp_with_str_split(self, str_to_split, delim):
-        pred = lambda c: c == delim
-        actual = list(map(''.join, mi.split_at(str_to_split, pred)))
-        expected = str_to_split.split(delim)
+    def test_maxsplit(self):
+        iterable = 'a,bb,ccc,dddd'
+        separator = ','
+        pred = lambda x: x == separator
+
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                it = iter(iterable)
+                result = mi.split_at(it, pred, maxsplit=maxsplit)
+                actual = [''.join(x) for x in result]
+                expected = iterable.split(separator, maxsplit)
+                self.assertEqual(actual, expected)
+
+    def test_keep_separator(self):
+        separator = ','
+        pred = lambda x: x == separator
+
+        for iterable, expected in [
+            ('a,bb,ccc', ['a', ',', 'bb', ',', 'ccc']),
+            (',a,bb,ccc', ['', ',', 'a', ',', 'bb', ',', 'ccc']),
+            ('a,bb,ccc,', ['a', ',', 'bb', ',', 'ccc', ',', '']),
+        ]:
+            with self.subTest(iterable=iterable):
+                it = iter(iterable)
+                result = mi.split_at(it, pred, keep_separator=True)
+                actual = [''.join(x) for x in result]
+                self.assertEqual(actual, expected)
+
+    def test_combination(self):
+        iterable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        pred = lambda x: x % 3 == 0
+        actual = list(
+            mi.split_at(iterable, pred, maxsplit=2, keep_separator=True)
+        )
+        expected = [[1, 2], [3], [4, 5], [6], [7, 8, 9, 10]]
         self.assertEqual(actual, expected)
-
-    def test_seperators(self):
-        test_strs = ['', 'abcba', 'aaabbbcccddd', 'e']
-        for s, delim in product(test_strs, 'abcd'):
-            self.comp_with_str_split(s, delim)
 
 
 class SplitBeforeTest(TestCase):
@@ -1130,6 +1204,26 @@ class SplitBeforeTest(TestCase):
         expected = [['o', 'o', 'o']]
         self.assertEqual(actual, expected)
 
+    def test_max_split(self):
+        for args, expected in [
+            (('a,b,c,d', lambda c: c == ',', -1),
+             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 0),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 1),
+             [['a'], [',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 2),
+             [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 10),
+             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
+            (('a,b,c,d', lambda c: c == '@', 2),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c != ',', 2),
+             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+        ]:
+            actual = list(mi.split_before(*args))
+            self.assertEqual(actual, expected)
+
 
 class SplitAfterTest(TestCase):
     """Tests for ``split_after()``"""
@@ -1148,6 +1242,26 @@ class SplitAfterTest(TestCase):
         actual = list(mi.split_after('ooo', lambda c: c == 'x'))
         expected = [['o', 'o', 'o']]
         self.assertEqual(actual, expected)
+
+    def test_max_split(self):
+        for args, expected in [
+            (('a,b,c,d', lambda c: c == ',', -1),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == ',', 0),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 1),
+             [['a', ','], ['b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 2),
+             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c == ',', 10),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda c: c == '@', 2),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda c: c != ',', 2),
+             [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
+        ]:
+            actual = list(mi.split_after(*args))
+            self.assertEqual(actual, expected)
 
 
 class SplitWhenTests(TestCase):
@@ -1213,6 +1327,28 @@ class SplitWhenTests(TestCase):
         actual = list(self._split_when_after('x', lambda c: c == 'x'))
         expected = [['x']]
         self.assertEqual(actual, expected)
+
+    def test_max_split(self):
+        for args, expected in [
+            (('a,b,c,d', lambda a, _: a == ',', -1),
+             [['a', ','], ['b', ','], ['c', ','], ['d']]),
+            (('a,b,c,d', lambda a, _: a == ',', 0),
+             [['a', ',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda _, b: b == ',', 1),
+             [['a'], [',', 'b', ',', 'c', ',', 'd']]),
+            (('a,b,c,d', lambda a, _: a == ',', 2),
+             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+            (('0124376', lambda a, b: a > b, -1),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+            (('0124376', lambda a, b: a > b, 0),
+             [['0', '1', '2', '4', '3', '7', '6']]),
+            (('0124376', lambda a, b: a > b, 1),
+             [['0', '1', '2', '4'], ['3', '7', '6']]),
+            (('0124376', lambda a, b: a > b, 2),
+             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+        ]:
+            actual = list(mi.split_when(*args))
+            self.assertEqual(actual, expected, str(args))
 
 
 class SplitIntoTests(TestCase):
@@ -1528,6 +1664,55 @@ class StaggerTest(TestCase):
             self.assertEqual(list(all_groups), expected)
 
 
+class ZipEqualTest(TestCase):
+    """Tests for ``zip_equal()``"""
+
+    def test_equal(self):
+        lists = [0, 1, 2], [2, 3, 4]
+
+        for iterables in [lists, map(iter, lists)]:
+            actual = list(mi.zip_equal(*iterables))
+            expected = [(0, 2), (1, 3), (2, 4)]
+            self.assertEqual(actual, expected)
+
+    def test_unequal_lists(self):
+        two_items = [0, 1]
+        three_items = [2, 3, 4]
+        four_items = [5, 6, 7, 8]
+
+        # the mismatch is at index 1
+        try:
+            list(mi.zip_equal(two_items, three_items, four_items))
+        except mi.UnequalIterablesError as e:
+            self.assertEqual(
+                e.args[0],
+                (
+                    'Iterables have different lengths: '
+                    'index 0 has length 2; index 1 has length 3'
+                )
+            )
+
+        # the mismatch is at index 2
+        try:
+            list(mi.zip_equal(two_items, two_items, four_items, four_items))
+        except mi.UnequalIterablesError as e:
+            self.assertEqual(
+                e.args[0],
+                (
+                    'Iterables have different lengths: '
+                    'index 0 has length 2; index 2 has length 4'
+                )
+            )
+
+        # One without length: delegate to _zip_equal_generator
+        try:
+            list(mi.zip_equal(two_items, iter(two_items), three_items))
+        except mi.UnequalIterablesError as e:
+            self.assertEqual(
+                e.args[0], 'Iterables have different lengths'
+            )
+
+
 class ZipOffsetTest(TestCase):
     """Tests for ``zip_offset()``"""
 
@@ -1760,6 +1945,12 @@ class TestAlwaysIterable(TestCase):
         str_actual = list(mi.always_iterable(str_obj, base_type=None))
         str_expected = list(str_obj)
         self.assertEqual(str_actual, str_expected)
+
+        # base_type handles nested tuple (via isinstance).
+        base_type = ((dict,),)
+        custom_actual = list(mi.always_iterable(dict_obj, base_type=base_type))
+        custom_expected = [dict_obj]
+        self.assertEqual(custom_actual, custom_expected)
 
     def test_iterables(self):
         self.assertEqual(list(mi.always_iterable([0, 1])), [0, 1])

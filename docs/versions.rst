@@ -5,6 +5,35 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.3.0
+-----
+
+* New itertools
+    * :func:`zip_equal` (thanks to frankier and alexmojaki)
+
+* Changes to existing itertools:
+    * :func:`split_at`, :func:`split_before`, :func:`split_after`, and :func:`split_when` all got a ``maxsplit`` paramter (thanks to jferard and ilai-deutel)
+    * :func:`split_at` now accepts a ``keep_separator`` parameter (thanks to jferard)
+    * :func:`distinct_permutations` can now generate ``r``-length permutations (thanks to SergBobrovsky and ilai-deutel)
+    * The :func:`windowed` implementation was improved  (thanks to SergBobrovsky)
+    * The :func:`spy` implementation was improved (thanks to has2k1)
+
+* Other changes
+    * Type stubs are now tested with ``stubtest`` (thankjs to ilai-deutel)
+    * Tests now run with ``python -m unittest`` instead of ``python setup.py test`` (thanks to jdufresne)
+
+8.2.0
+-----
+
+* Bug fixes
+    * The .pyi files for typing were updated. (thanks to blueyed and ilai-deutel)
+
+* Changes to existing itertools:
+    * :func:`numeric_range` now behaves more like the built-in :func:`range`. (thanks to jferard)
+    * :func:`bucket` now allows for enumerating keys. (thanks to alexchandel)
+    * :func:`sliced` now should now work for numpy arrays. (thanks to sswingle)
+    * :func:`seekable` now has a ``maxlen`` parameter.
+
 8.1.0
 -----
 
@@ -45,7 +74,6 @@ Version History
     * :func:`partition` was optimized for expensive predicates. (thanks to stevecj)
     * :func:`unique_everseen` and :func:`groupby_transform` were re-factored. (thanks to SergBobrovsky)
     * The implementation for :func:`difference` was improved. (thanks to Jabbey92)
-
 
 * Other changes
     * Python 3.4 has reached its end of life and is no longer supported.

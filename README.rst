@@ -2,15 +2,16 @@
 More Itertools
 ==============
 
-.. image:: https://coveralls.io/repos/github/erikrose/more-itertools/badge.svg?branch=master
-  :target: https://coveralls.io/github/erikrose/more-itertools?branch=master
+.. image:: https://readthedocs.org/projects/more-itertools/badge/?version=latest
+  :target: https://more-itertools.readthedocs.io/en/stable/
+
+.. image:: https://coveralls.io/repos/github/more-itertools/more-itertools/badge.svg?branch=master
+  :target: https://coveralls.io/github/more-itertools/more-itertools?branch=master
 
 Python's ``itertools`` library is a gem - you can compose elegant solutions
 for a variety of problems with the functions it provides. In ``more-itertools``
 we collect additional building blocks, recipes, and routines for working with
 Python iterables.
-
-----
 
 +------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Grouping               | `chunked <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.chunked>`_,                                                                                                                        |
@@ -52,6 +53,7 @@ Python iterables.
 |                        | `interleave <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.interleave>`_,                                                                                                                  |
 |                        | `interleave_longest <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.interleave_longest>`_,                                                                                                  |
 |                        | `zip_offset <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.zip_offset>`_,                                                                                                                  |
+|                        | `zip_equal <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.zip_equal>`_,                                                                                                                    |
 |                        | `dotproduct <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.dotproduct>`_,                                                                                                                  |
 |                        | `flatten <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.flatten>`_,                                                                                                                        |
 |                        | `roundrobin <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.roundrobin>`_,                                                                                                                  |
@@ -157,12 +159,22 @@ Several new recipes are available as well:
 
 
 
-For the full listing of functions, see the `API documentation <https://more-itertools.readthedocs.io/en/latest/api.html>`_.
+For the full listing of functions, see the `API documentation <https://more-itertools.readthedocs.io/en/stable/api.html>`_.
+
+
+Links elsewhere
+===============
+
+Blog posts about ``more-itertools``:
+
+* `Yo, I heard you like decorators <https://bbayles.com/index/decorator_factory>`__
+* `Tour of Python Itertools <https://martinheinz.dev/blog/16>`__
+
 
 Development
 ===========
 
 ``more-itertools`` is maintained by `@erikrose <https://github.com/erikrose>`_
-and `@bbayles <https://github.com/bbayles>`_, with help from `many others <https://github.com/erikrose/more-itertools/graphs/contributors>`_.
+and `@bbayles <https://github.com/bbayles>`_, with help from `many others <https://github.com/more-itertools/more-itertools/graphs/contributors>`_.
 If you have a problem or suggestion, please file a bug or pull request in this
 repository. Thanks for contributing!
