@@ -155,7 +155,7 @@ These tools yield certain items from an iterable.
 
 **New itertools**
 
-.. autofunction:: islice_extended(start, stop, step)
+.. autofunction:: islice_extended(iterable, start[, stop, step])
 .. autofunction:: first(iterable[, default])
 .. autofunction:: last(iterable[, default])
 .. autofunction:: one(iterable, too_short=ValueError, too_long=ValueError)
