@@ -2150,7 +2150,7 @@ class islice_extended:
     def __init__(self, iterable, *args):
         it = iter(iterable)
         if args:
-            self._iterable = _islice_extended(it, slice(*args))
+            self._iterable = _islice_helper(it, slice(*args))
         else:
             self._iterable = it
 
@@ -2162,12 +2162,12 @@ class islice_extended:
 
     def __getitem__(self, key):
         if isinstance(key, slice):
-            return _islice_extended(self._iterable, key)
+            return islice_extended(_islice_helper(self._iterable, key))
 
-        raise TypeError('islice_extended.__getitem__ needs a slice')
+        raise TypeError('islice_extended.__getitem__ argument must be a slice')
 
 
-def _islice_extended(it, s):
+def _islice_helper(it, s):
     start = s.start
     stop = s.stop
     if s.step == 0:
