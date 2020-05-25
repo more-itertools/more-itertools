@@ -2654,17 +2654,25 @@ class IsliceExtendedTests(TestCase):
         indexes = list(range(-4, len(iterable) + 4)) + [None]
         steps = [1, 2, 3, 4, -1, -2, -3, 4]
         for slice_args in product(indexes, indexes, steps):
-            try:
+            with self.subTest(slice_args=slice_args):
                 actual = list(mi.islice_extended(iterable, *slice_args))
-            except Exception as e:
-                self.fail((slice_args, e))
-
-            expected = iterable[slice(*slice_args)]
-            self.assertEqual(actual, expected, slice_args)
+                expected = iterable[slice(*slice_args)]
+                self.assertEqual(actual, expected, slice_args)
 
     def test_zero_step(self):
         with self.assertRaises(ValueError):
             list(mi.islice_extended([1, 2, 3], 0, 1, 0))
+
+    def test_slicing(self):
+        iterable = map(str, count())
+        first_slice = mi.islice_extended(iterable)[10:]
+        second_slice = mi.islice_extended(first_slice)[:10]
+        third_slice = mi.islice_extended(second_slice)[::2]
+        self.assertEqual(list(third_slice), ['10', '12', '14', '16', '18'])
+
+    def test_invalid_slice(self):
+        with self.assertRaises(TypeError):
+            mi.islice_extended(count())[13]
 
 
 class ConsecutiveGroupsTest(TestCase):

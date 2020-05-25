@@ -156,8 +156,8 @@ These tools yield certain items from an iterable.
 **New itertools**
 
 
-.. function:: islice_extended(iterable, stop)
-.. autofunction:: islice_extended(iterable, start, stop[, step])
+.. class:: islice_extended(iterable, stop)
+.. autoclass:: islice_extended(iterable, start, stop[, step])
   :noindex:
 .. autofunction:: first(iterable[, default])
 .. autofunction:: last(iterable[, default])

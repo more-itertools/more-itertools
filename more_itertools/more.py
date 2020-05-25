@@ -2122,7 +2122,7 @@ def strip(iterable, pred):
     return rstrip(lstrip(iterable, pred), pred)
 
 
-def islice_extended(iterable, *args):
+class islice_extended:
     """An extension of :func:`itertools.islice` that supports negative values
     for *stop*, *start*, and *step*.
 
@@ -2139,15 +2139,40 @@ def islice_extended(iterable, *args):
         >>> list(islice_extended(count(), 110, 99, -2))
         [110, 108, 106, 104, 102, 100]
 
+    You can also use slice notation directly:
+
+        >>> iterable = map(str, count())
+        >>> it = islice_extended(iterable)[10:20:2]
+        >>> list(it)
+        ['10', '12', '14', '16', '18']
+
     """
-    s = slice(*args)
+    def __init__(self, iterable, *args):
+        it = iter(iterable)
+        if args:
+            self._iterable = _islice_helper(it, slice(*args))
+        else:
+            self._iterable = it
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return next(self._iterable)
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return islice_extended(_islice_helper(self._iterable, key))
+
+        raise TypeError('islice_extended.__getitem__ argument must be a slice')
+
+
+def _islice_helper(it, s):
     start = s.start
     stop = s.stop
     if s.step == 0:
         raise ValueError('step argument must be a non-zero integer or None.')
     step = s.step or 1
-
-    it = iter(iterable)
 
     if step > 0:
         start = 0 if (start is None) else start
