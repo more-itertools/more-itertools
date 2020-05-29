@@ -591,7 +591,7 @@ def distinct_permutations(iterable, r=None):
             # Swap the value of A[i] with that of A[j], then reverse the
             # sequence from A[i + 1] to form the new permutation
             A[i], A[j] = A[j], A[i]
-            A[i + 1:] = A[:i - size:-1]  # A[i + 1:][::-1]
+            A[i + 1 :] = A[: i - size : -1]  # A[i + 1:][::-1]
 
     # Algorithm: modified from the above
     def _partial(A, r):
@@ -629,9 +629,9 @@ def distinct_permutations(iterable, r=None):
                         break
 
             # Reverse head[i + 1:] and swap it with tail[:r - (i + 1)]
-            tail += head[:i - r:-1]  # head[i + 1:][::-1]
+            tail += head[: i - r : -1]  # head[i + 1:][::-1]
             i += 1
-            head[i:], tail[:] = tail[:r - i], tail[r - i:]
+            head[i:], tail[:] = tail[: r - i], tail[r - i :]
 
     items = sorted(iterable)
 
@@ -1434,9 +1434,9 @@ class UnequalIterablesError(ValueError):
     def __init__(self, details=None):
         msg = 'Iterables have different lengths'
         if details is not None:
-            msg += (
-                ': index 0 has length {}; index {} has length {}'
-            ).format(*details)
+            msg += (': index 0 has length {}; index {} has length {}').format(
+                *details
+            )
 
         super().__init__(msg)
 
@@ -1843,12 +1843,13 @@ class numeric_range(abc.Sequence, abc.Hashable):
         datetime.datetime(2019, 1, 2, 0, 0)
 
     """
+
     _EMPTY_HASH = hash(range(0, 0))
 
     def __init__(self, *args):
         argc = len(args)
         if argc == 1:
-            self._stop, = args
+            (self._stop,) = args
             self._start = type(self._stop)(0)
             self._step = type(self._stop - self._start)(1)
         elif argc == 2:
@@ -1857,11 +1858,15 @@ class numeric_range(abc.Sequence, abc.Hashable):
         elif argc == 3:
             self._start, self._stop, self._step = args
         elif argc == 0:
-            raise TypeError('numeric_range expected at least '
-                            '1 argument, got {}'.format(argc))
+            raise TypeError(
+                'numeric_range expected at least '
+                '1 argument, got {}'.format(argc)
+            )
         else:
-            raise TypeError('numeric_range expected at most '
-                            '3 arguments, got {}'.format(argc))
+            raise TypeError(
+                'numeric_range expected at most '
+                '3 arguments, got {}'.format(argc)
+            )
 
         self._zero = type(self._step)(0)
         if self._step == self._zero:
@@ -1892,9 +1897,11 @@ class numeric_range(abc.Sequence, abc.Hashable):
             if empty_self or empty_other:
                 return empty_self and empty_other  # True if both empty
             else:
-                return (self._start == other._start
-                        and self._step == other._step
-                        and self._get_by_index(-1) == other._get_by_index(-1))
+                return (
+                    self._start == other._start
+                    and self._step == other._step
+                    and self._get_by_index(-1) == other._get_by_index(-1)
+                )
         else:
             return False
 
@@ -1922,7 +1929,8 @@ class numeric_range(abc.Sequence, abc.Hashable):
         else:
             raise TypeError(
                 'numeric range indices must be '
-                'integers or slices, not {}'.format(type(key).__name__))
+                'integers or slices, not {}'.format(type(key).__name__)
+            )
 
     def __hash__(self):
         if self:
@@ -1961,16 +1969,20 @@ class numeric_range(abc.Sequence, abc.Hashable):
 
     def __repr__(self):
         if self._step == 1:
-            return "numeric_range({}, {})".format(repr(self._start),
-                                                  repr(self._stop))
+            return "numeric_range({}, {})".format(
+                repr(self._start), repr(self._stop)
+            )
         else:
-            return "numeric_range({}, {}, {})".format(repr(self._start),
-                                                      repr(self._stop),
-                                                      repr(self._step))
+            return "numeric_range({}, {}, {})".format(
+                repr(self._start), repr(self._stop), repr(self._step)
+            )
 
     def __reversed__(self):
-        return iter(numeric_range(self._get_by_index(-1),
-                                  self._start - self._step, -self._step))
+        return iter(
+            numeric_range(
+                self._get_by_index(-1), self._start - self._step, -self._step
+            )
+        )
 
     def count(self, value):
         return int(value in self)
@@ -2147,6 +2159,7 @@ class islice_extended:
         ['10', '12', '14', '16', '18']
 
     """
+
     def __init__(self, iterable, *args):
         it = iter(iterable)
         if args:
