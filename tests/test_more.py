@@ -2675,10 +2675,12 @@ class IsliceExtendedTests(TestCase):
         options = (None, 1, 2, 7, -1)
         for start, stop, step in product(options, options, options):
             with self.subTest(slice_args=(start, stop, step)):
-                sliced_tuple_0 = tuple(mi.islice_extended(iterable)
-                                       [start:stop:step])
-                sliced_tuple_1 = tuple(mi.islice_extended(iterable, start, stop,
-                                                          step))
+                sliced_tuple_0 = tuple(
+                    mi.islice_extended(iterable)[start:stop:step]
+                )
+                sliced_tuple_1 = tuple(
+                    mi.islice_extended(iterable, start, stop, step)
+                )
                 sliced_range = tuple(iterable[start:stop:step])
                 self.assertEqual(sliced_tuple_0, sliced_range)
                 self.assertEqual(sliced_tuple_1, sliced_range)
