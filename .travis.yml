@@ -10,7 +10,8 @@ python:
 
 install:
     - "pip install ."
-    - "pip install -U black coveralls flake8 sphinx sphinx_rtd_theme"
+    - "pip install -U coveralls flake8 sphinx sphinx_rtd_theme"
+    - "if [[ $TRAVIS_PYTHON_VERSION = 3.6 ]]; pip install -U black; fi"
     - "if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then pip install -U mypy; fi"
 
 script:
