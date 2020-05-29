@@ -2670,6 +2670,19 @@ class IsliceExtendedTests(TestCase):
         third_slice = mi.islice_extended(second_slice)[::2]
         self.assertEqual(list(third_slice), ['10', '12', '14', '16', '18'])
 
+    def test_slicing_extensive(self):
+        iterable = range(10)
+        options = (None, 1, 2, 7, -1)
+        for start, stop, step in product(options, options, options):
+            with self.subTest(slice_args=(start, stop, step)):
+                sliced_tuple_0 = tuple(mi.islice_extended(iterable)
+                                       [start:stop:step])
+                sliced_tuple_1 = tuple(mi.islice_extended(iterable, start, stop,
+                                                          step))
+                sliced_range = tuple(iterable[start:stop:step])
+                self.assertEqual(sliced_tuple_0, sliced_range)
+                self.assertEqual(sliced_tuple_1, sliced_range)
+
     def test_invalid_slice(self):
         with self.assertRaises(TypeError):
             mi.islice_extended(count())[13]
