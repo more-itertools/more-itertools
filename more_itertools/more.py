@@ -37,6 +37,8 @@ __all__ = [
     'consecutive_groups',
     'consumer',
     'count_cycle',
+    'mark_first',
+    'mark_last',
     'difference',
     'distinct_combinations',
     'distinct_permutations',
@@ -2011,6 +2013,42 @@ def count_cycle(iterable, n=None):
         return iter(())
     counter = count() if n is None else range(n)
     return ((i, item) for i in counter for item in iterable)
+
+
+def mark_first(iterable):
+    """Yield the items in *iterable*, along with a boolean indicating whether 
+    or not the current element is the first in the iterable.
+
+    >>> list(mi.mark_first('ABC'))
+    [(True, 'A'), (False, 'B'), (False, 'C')]
+    """
+    for i, x in enumerate(iterable):
+        yield i == 0, x
+
+
+def mark_last(iterable):
+    """Yield the items in *iterable*, along with a boolean indicating whether 
+    or not the current element is the last in the iterable.
+
+    >>> list(mi.mark_last('ABC'))
+    [(False, 'A'), (False, 'B'), (True, 'C')]
+    """
+    iterator = iter(iterable)
+
+    try:
+        b = next(iterator)
+    except StopIteration:
+        return
+
+    while True:
+        try:
+            a = b
+            b = next(iterator)
+        except StopIteration:
+            yield True, a
+            break
+        else:
+            yield False, a
 
 
 def locate(iterable, pred=bool, window_size=None):

@@ -2576,6 +2576,47 @@ class CountCycleTests(TestCase):
         self.assertEqual(list(mi.count_cycle('abc', -3)), [])
 
 
+class MarkFirstTests(TestCase):
+    def test_basic(self):
+        cases = [{
+            'input': [],
+            'output': [],
+        }, {
+            'input': [0],
+            'output': [(True, 0)],
+        }, {
+            'input': [0, 1],
+            'output': [(True, 0), (False, 1)],
+        }, {
+            'input': range(3),
+            'output': [(True, 0), (False, 1), (False, 2)],
+        }]
+
+        for case in cases:
+            actual = list(mi.mark_first(case['input']))
+            self.assertEqual(actual, case['output'])
+
+
+class MarkLastTests(TestCase):
+    def test_basic(self):
+        cases = [{
+            'input': [],
+            'output': [],
+        }, {
+            'input': [0],
+            'output': [(True, 0)],
+        }, {
+            'input': [0, 1],
+            'output': [(False, 0), (True, 1)],
+        }, {
+            'input': range(3),
+            'output': [(False, 0), (False, 1), (True, 2)],
+        }]
+
+        for case in cases:
+            actual = list(mi.mark_last(case['input']))
+            self.assertEqual(actual, case['output'])
+
 class LocateTests(TestCase):
     def test_default_pred(self):
         iterable = [0, 1, 1, 0, 1, 0, 0]
