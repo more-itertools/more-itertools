@@ -11,10 +11,12 @@ python:
 install:
     - "pip install ."
     - "pip install -U coveralls flake8 sphinx sphinx_rtd_theme"
+    - "if [[ $TRAVIS_PYTHON_VERSION = 3.6 ]]; then pip install -U black; fi"
     - "if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then pip install -U mypy; fi"
 
 script:
     - "coverage run --include='more_itertools/*.py' -m unittest -v"
+    - "if [[ $TRAVIS_PYTHON_VERSION = 3.6 ]]; then black --check .; fi"
     - "flake8 ."
     - "sphinx-build -W -b html docs docs/_build/html"
     - "if [[ $TRAVIS_PYTHON_VERSION != pypy* ]] && [[ $TRAVIS_PYTHON_VERSION != 3.9-dev ]]; then mypy more_itertools; fi"

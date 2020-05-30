@@ -1206,20 +1206,34 @@ class SplitBeforeTest(TestCase):
 
     def test_max_split(self):
         for args, expected in [
-            (('a,b,c,d', lambda c: c == ',', -1),
-             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
-            (('a,b,c,d', lambda c: c == ',', 0),
-             [['a', ',', 'b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c == ',', 1),
-             [['a'], [',', 'b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c == ',', 2),
-             [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c == ',', 10),
-             [['a'], [',', 'b'], [',', 'c'], [',', 'd']]),
-            (('a,b,c,d', lambda c: c == '@', 2),
-             [['a', ',', 'b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c != ',', 2),
-             [['a', ','], ['b', ','], ['c', ',', 'd']]),
+            (
+                ('a,b,c,d', lambda c: c == ',', -1),
+                [['a'], [',', 'b'], [',', 'c'], [',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 0),
+                [['a', ',', 'b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 1),
+                [['a'], [',', 'b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 2),
+                [['a'], [',', 'b'], [',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 10),
+                [['a'], [',', 'b'], [',', 'c'], [',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == '@', 2),
+                [['a', ',', 'b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c != ',', 2),
+                [['a', ','], ['b', ','], ['c', ',', 'd']],
+            ),
         ]:
             actual = list(mi.split_before(*args))
             self.assertEqual(actual, expected)
@@ -1245,20 +1259,34 @@ class SplitAfterTest(TestCase):
 
     def test_max_split(self):
         for args, expected in [
-            (('a,b,c,d', lambda c: c == ',', -1),
-             [['a', ','], ['b', ','], ['c', ','], ['d']]),
-            (('a,b,c,d', lambda c: c == ',', 0),
-             [['a', ',', 'b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c == ',', 1),
-             [['a', ','], ['b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c == ',', 2),
-             [['a', ','], ['b', ','], ['c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c == ',', 10),
-             [['a', ','], ['b', ','], ['c', ','], ['d']]),
-            (('a,b,c,d', lambda c: c == '@', 2),
-             [['a', ',', 'b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda c: c != ',', 2),
-             [['a'], [',', 'b'], [',', 'c', ',', 'd']]),
+            (
+                ('a,b,c,d', lambda c: c == ',', -1),
+                [['a', ','], ['b', ','], ['c', ','], ['d']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 0),
+                [['a', ',', 'b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 1),
+                [['a', ','], ['b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 2),
+                [['a', ','], ['b', ','], ['c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == ',', 10),
+                [['a', ','], ['b', ','], ['c', ','], ['d']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c == '@', 2),
+                [['a', ',', 'b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda c: c != ',', 2),
+                [['a'], [',', 'b'], [',', 'c', ',', 'd']],
+            ),
         ]:
             actual = list(mi.split_after(*args))
             self.assertEqual(actual, expected)
@@ -1330,22 +1358,38 @@ class SplitWhenTests(TestCase):
 
     def test_max_split(self):
         for args, expected in [
-            (('a,b,c,d', lambda a, _: a == ',', -1),
-             [['a', ','], ['b', ','], ['c', ','], ['d']]),
-            (('a,b,c,d', lambda a, _: a == ',', 0),
-             [['a', ',', 'b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda _, b: b == ',', 1),
-             [['a'], [',', 'b', ',', 'c', ',', 'd']]),
-            (('a,b,c,d', lambda a, _: a == ',', 2),
-             [['a', ','], ['b', ','], ['c', ',', 'd']]),
-            (('0124376', lambda a, b: a > b, -1),
-             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
-            (('0124376', lambda a, b: a > b, 0),
-             [['0', '1', '2', '4', '3', '7', '6']]),
-            (('0124376', lambda a, b: a > b, 1),
-             [['0', '1', '2', '4'], ['3', '7', '6']]),
-            (('0124376', lambda a, b: a > b, 2),
-             [['0', '1', '2', '4'], ['3', '7'], ['6']]),
+            (
+                ('a,b,c,d', lambda a, _: a == ',', -1),
+                [['a', ','], ['b', ','], ['c', ','], ['d']],
+            ),
+            (
+                ('a,b,c,d', lambda a, _: a == ',', 0),
+                [['a', ',', 'b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda _, b: b == ',', 1),
+                [['a'], [',', 'b', ',', 'c', ',', 'd']],
+            ),
+            (
+                ('a,b,c,d', lambda a, _: a == ',', 2),
+                [['a', ','], ['b', ','], ['c', ',', 'd']],
+            ),
+            (
+                ('0124376', lambda a, b: a > b, -1),
+                [['0', '1', '2', '4'], ['3', '7'], ['6']],
+            ),
+            (
+                ('0124376', lambda a, b: a > b, 0),
+                [['0', '1', '2', '4', '3', '7', '6']],
+            ),
+            (
+                ('0124376', lambda a, b: a > b, 1),
+                [['0', '1', '2', '4'], ['3', '7', '6']],
+            ),
+            (
+                ('0124376', lambda a, b: a > b, 2),
+                [['0', '1', '2', '4'], ['3', '7'], ['6']],
+            ),
         ]:
             actual = list(mi.split_when(*args))
             self.assertEqual(actual, expected, str(args))
@@ -1689,7 +1733,7 @@ class ZipEqualTest(TestCase):
                 (
                     'Iterables have different lengths: '
                     'index 0 has length 2; index 1 has length 3'
-                )
+                ),
             )
 
         # the mismatch is at index 2
@@ -1701,16 +1745,14 @@ class ZipEqualTest(TestCase):
                 (
                     'Iterables have different lengths: '
                     'index 0 has length 2; index 2 has length 4'
-                )
+                ),
             )
 
         # One without length: delegate to _zip_equal_generator
         try:
             list(mi.zip_equal(two_items, iter(two_items), three_items))
         except mi.UnequalIterablesError as e:
-            self.assertEqual(
-                e.args[0], 'Iterables have different lengths'
-            )
+            self.assertEqual(e.args[0], 'Iterables have different lengths')
 
 
 class ZipOffsetTest(TestCase):
@@ -2189,12 +2231,23 @@ class NumericRangeTests(TestCase):
             ((0.0,), []),
             ((1, 0), []),
             ((1.0, 0.0), []),
-            ((0.1, 0.30000000000000001, 0.2), [0.1]),   # IEE 754 !
-            ((Decimal("0.1"), Decimal("0.30000000000000001"), Decimal("0.2")),
-             [Decimal("0.1"), Decimal("0.3")]),         # okay with Decimal
-            ((Fraction(1, 10), Fraction(30000000000000001, 100000000000000000),
-              Fraction(2, 10)),
-             [Fraction(1, 10), Fraction(3, 10)]),       # okay with Fraction
+            ((0.1, 0.30000000000000001, 0.2), [0.1]),  # IEE 754 !
+            (
+                (
+                    Decimal("0.1"),
+                    Decimal("0.30000000000000001"),
+                    Decimal("0.2"),
+                ),
+                [Decimal("0.1"), Decimal("0.3")],
+            ),  # okay with Decimal
+            (
+                (
+                    Fraction(1, 10),
+                    Fraction(30000000000000001, 100000000000000000),
+                    Fraction(2, 10),
+                ),
+                [Fraction(1, 10), Fraction(3, 10)],
+            ),  # okay with Fraction
             ((Fraction(2, 1),), [Fraction(0, 1), Fraction(1, 1)]),
             ((Decimal('2.0'),), [Decimal('0.0'), Decimal('1.0')]),
             (
@@ -2219,7 +2272,10 @@ class NumericRangeTests(TestCase):
     def test_arg_count(self):
         for args, message in [
             ((), 'numeric_range expected at least 1 argument, got 0'),
-            ((0, 1, 2, 3), 'numeric_range expected at most 3 arguments, got 4')
+            (
+                (0, 1, 2, 3),
+                'numeric_range expected at most 3 arguments, got 4',
+            ),
         ]:
             with self.assertRaisesRegex(TypeError, message):
                 mi.numeric_range(*args)
@@ -2253,10 +2309,22 @@ class NumericRangeTests(TestCase):
             ((Decimal("1.0"), Decimal("0.0"), Decimal("1.5")), False),
             ((Fraction(2, 2), Fraction(4, 2), Fraction(3, 2)), True),
             ((Fraction(2, 2), Fraction(0, 2), Fraction(3, 2)), False),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=1)), True),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 28),
-              timedelta(hours=1)), False),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=1),
+                ),
+                True,
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 28),
+                    timedelta(hours=1),
+                ),
+                False,
+            ),
         ]:
             self.assertEqual(expected, bool(mi.numeric_range(*args)))
 
@@ -2265,16 +2333,32 @@ class NumericRangeTests(TestCase):
             ((10,), range(10), (0.5,)),
             ((1.0, 9.9, 1.5), (1.0, 2.5, 4.0, 5.5, 7.0, 8.5), (0.9,)),
             ((9.0, 1.0, -1.5), (1.5, 3.0, 4.5, 6.0, 7.5, 9.0), (0.0, 0.9)),
-            ((Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
-             (Decimal("1.0"), Decimal("2.5"), Decimal("4.0"), Decimal("5.5"),
-              Decimal("7.0"), Decimal("8.5"),),
-             (Decimal("0.9"),)),
-            ((Fraction(0, 1), Fraction(5, 1), Fraction(1, 2)),
-             (Fraction(0, 1), Fraction(1, 2), Fraction(9, 2)),
-             (Fraction(10, 2),)),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=1)),
-             (datetime(2019, 3, 29, 15),), (datetime(2019, 3, 29, 15, 30),))
+            (
+                (Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
+                (
+                    Decimal("1.0"),
+                    Decimal("2.5"),
+                    Decimal("4.0"),
+                    Decimal("5.5"),
+                    Decimal("7.0"),
+                    Decimal("8.5"),
+                ),
+                (Decimal("0.9"),),
+            ),
+            (
+                (Fraction(0, 1), Fraction(5, 1), Fraction(1, 2)),
+                (Fraction(0, 1), Fraction(1, 2), Fraction(9, 2)),
+                (Fraction(10, 2),),
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=1),
+                ),
+                (datetime(2019, 3, 29, 15),),
+                (datetime(2019, 3, 29, 15, 30),),
+            ),
         ]:
             r = mi.numeric_range(*args)
             for v in expected_in:
@@ -2291,17 +2375,30 @@ class NumericRangeTests(TestCase):
             ((1.0, 9.9, 1.5), (1.0, 8.6, 1.5)),
             ((8.5, 0.0, -1.5), (8.5, 0.7, -1.5)),
             ((7.0, 0.0, 1.0), (17.0, 7.0, 0.5)),
-            ((Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
-             (Decimal("1.0"), Decimal("8.6"), Decimal("1.5"))),
-            ((Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
-             (Fraction(1, 1), Fraction(9, 1), Fraction(3, 2))),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)),
-             (datetime(2019, 3, 29), datetime(2019, 3, 30, 1),
-              timedelta(hours=10)))
+            (
+                (Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
+                (Decimal("1.0"), Decimal("8.6"), Decimal("1.5")),
+            ),
+            (
+                (Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
+                (Fraction(1, 1), Fraction(9, 1), Fraction(3, 2)),
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30, 1),
+                    timedelta(hours=10),
+                ),
+            ),
         ]:
-            self.assertEqual(mi.numeric_range(*args1),
-                             mi.numeric_range(*args2))
+            self.assertEqual(
+                mi.numeric_range(*args1), mi.numeric_range(*args2)
+            )
 
         for args1, args2 in [
             ((0, 5, 2), (0, 7, 2)),
@@ -2312,17 +2409,30 @@ class NumericRangeTests(TestCase):
             ((8.5, 0.0, -1.5), (8.5, -0.7, -1.5)),
             ((8.5, 0.0, -1.5), (8.5, 0.0, -1.4)),
             ((0.0, 7.0, 1.0), (7.0, 0.0, 1.0)),
-            ((Decimal("1.0"), Decimal("10.0"), Decimal("1.5")),
-             (Decimal("1.0"), Decimal("10.5"), Decimal("1.5"))),
-            ((Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
-             (Fraction(1, 1), Fraction(21, 2), Fraction(3, 2))),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)),
-             (datetime(2019, 3, 29), datetime(2019, 3, 30, 15),
-              timedelta(hours=10)))
+            (
+                (Decimal("1.0"), Decimal("10.0"), Decimal("1.5")),
+                (Decimal("1.0"), Decimal("10.5"), Decimal("1.5")),
+            ),
+            (
+                (Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
+                (Fraction(1, 1), Fraction(21, 2), Fraction(3, 2)),
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30, 15),
+                    timedelta(hours=10),
+                ),
+            ),
         ]:
-            self.assertNotEqual(mi.numeric_range(*args1),
-                                mi.numeric_range(*args2))
+            self.assertNotEqual(
+                mi.numeric_range(*args1), mi.numeric_range(*args2)
+            )
 
         self.assertNotEqual(mi.numeric_range(7.0), 1)
         self.assertNotEqual(mi.numeric_range(7.0), "abc")
@@ -2336,13 +2446,25 @@ class NumericRangeTests(TestCase):
             ((1.0, 6.0, 1.5), 3, 5.5),
             ((1.0, 6.0, 1.5), -1, 5.5),
             ((1.0, 6.0, 1.5), -2, 4.0),
-            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
-             -1, Decimal("8.5")),
-            ((Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
-             2, Fraction(4, 1)),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)),
-             1, datetime(2019, 3, 29, 10))
+            (
+                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+                -1,
+                Decimal("8.5"),
+            ),
+            (
+                (Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
+                2,
+                Fraction(4, 1),
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                1,
+                datetime(2019, 3, 29, 10),
+            ),
         ]:
             self.assertEqual(expected, mi.numeric_range(*args)[index])
 
@@ -2353,8 +2475,14 @@ class NumericRangeTests(TestCase):
             ((6.0, 1.0, 1.5), -1),
             ((Decimal("1.0"), Decimal("9.0"), Decimal("-1.5")), -1),
             ((Fraction(1, 1), Fraction(2, 1), Fraction(3, 2)), 2),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)), 8)
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                8,
+            ),
         ]:
             with self.assertRaises(IndexError):
                 mi.numeric_range(*args)[index]
@@ -2371,20 +2499,33 @@ class NumericRangeTests(TestCase):
             ((1.0, 9.0, 1.5), slice(-10, None, 3), (1.0, 9.0, 4.5)),
             ((1.0, 9.0, 1.5), slice(None, -10, 3), (1.0, 1.0, 4.5)),
             ((1.0, 9.0, 1.5), slice(None, 10, 3), (1.0, 9.0, 4.5)),
-            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
-             slice(1, -1, None),
-             (Decimal("2.5"), Decimal("8.5"), Decimal("1.5"))),
-            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
-             slice(1, -1, None),
-             (Fraction(5, 2), Fraction(4, 1), Fraction(3, 2))),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)),
-             slice(1, -1, None),
-             (datetime(2019, 3, 29, 10), datetime(2019, 3, 29, 20),
-              timedelta(hours=10)))
+            (
+                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+                slice(1, -1, None),
+                (Decimal("2.5"), Decimal("8.5"), Decimal("1.5")),
+            ),
+            (
+                (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+                slice(1, -1, None),
+                (Fraction(5, 2), Fraction(4, 1), Fraction(3, 2)),
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                slice(1, -1, None),
+                (
+                    datetime(2019, 3, 29, 10),
+                    datetime(2019, 3, 29, 20),
+                    timedelta(hours=10),
+                ),
+            ),
         ]:
-            self.assertEqual(mi.numeric_range(*expected_args),
-                             mi.numeric_range(*args)[sl])
+            self.assertEqual(
+                mi.numeric_range(*expected_args), mi.numeric_range(*args)[sl]
+            )
 
     def test_hash(self):
         for args, expected in [
@@ -2394,15 +2535,28 @@ class NumericRangeTests(TestCase):
             ((1.0, 1.5, 1.5), hash((1.0, 1.0, 1.5))),
             ((1.5, 1.0, 1.5), hash(range(0, 0))),
             ((1.5, 1.5, 1.5), hash(range(0, 0))),
-            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
-             hash((Decimal("1.0"), Decimal("8.5"), Decimal("1.5")))),
-            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
-             hash((Fraction(1, 1), Fraction(4, 1), Fraction(3, 2)))),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)),
-             hash((datetime(2019, 3, 29), datetime(2019, 3, 29, 20),
-                   timedelta(hours=10))))
-
+            (
+                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+                hash((Decimal("1.0"), Decimal("8.5"), Decimal("1.5"))),
+            ),
+            (
+                (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+                hash((Fraction(1, 1), Fraction(4, 1), Fraction(3, 2))),
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                hash(
+                    (
+                        datetime(2019, 3, 29),
+                        datetime(2019, 3, 29, 20),
+                        timedelta(hours=10),
+                    )
+                ),
+            ),
         ]:
             self.assertEqual(expected, hash(mi.numeric_range(*args)))
 
@@ -2421,12 +2575,24 @@ class NumericRangeTests(TestCase):
             ((7.0, 1.0, -1.5), 4),
             ((7.01, 1.0, -1.5), 5),
             ((0.1, 0.30000000000000001, 0.2), 1),  # IEE 754 !
-            ((Decimal("0.1"), Decimal("0.30000000000000001"),
-              Decimal("0.2")), 2),  # works with Decimal
+            (
+                (
+                    Decimal("0.1"),
+                    Decimal("0.30000000000000001"),
+                    Decimal("0.2"),
+                ),
+                2,
+            ),  # works with Decimal
             ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")), 6),
             ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)), 3),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)), 3)
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                3,
+            ),
         ]:
             self.assertEqual(expected, len(mi.numeric_range(*args)))
 
@@ -2435,20 +2601,36 @@ class NumericRangeTests(TestCase):
             ((7.0,), "numeric_range(0.0, 7.0)"),
             ((1.0, 7.0), "numeric_range(1.0, 7.0)"),
             ((7.0, 1.0, -1.5), "numeric_range(7.0, 1.0, -1.5)"),
-            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
-             "numeric_range(Decimal('1.0'), Decimal('9.0'), Decimal('1.5'))"),
-            ((Fraction(7, 7), Fraction(10, 2), Fraction(3, 2)),
-             "numeric_range(Fraction(1, 1), Fraction(5, 1), Fraction(3, 2))"),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)),
-             "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
-             "datetime.datetime(2019, 3, 30, 0, 0), "
-             "datetime.timedelta(seconds=36000))",
-             "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
-             "datetime.datetime(2019, 3, 30, 0, 0), "
-             "datetime.timedelta(0, 36000))")
+            (
+                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+                (
+                    "numeric_range(Decimal('1.0'), Decimal('9.0'), "
+                    "Decimal('1.5'))"
+                ),
+            ),
+            (
+                (Fraction(7, 7), Fraction(10, 2), Fraction(3, 2)),
+                (
+                    "numeric_range(Fraction(1, 1), Fraction(5, 1), "
+                    "Fraction(3, 2))"
+                ),
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
+                "datetime.datetime(2019, 3, 30, 0, 0), "
+                "datetime.timedelta(seconds=36000))",
+                "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
+                "datetime.datetime(2019, 3, 30, 0, 0), "
+                "datetime.timedelta(0, 36000))",
+            ),
         ]:
-            self.assertIn(repr(mi.numeric_range(*args)), expected)
+            with self.subTest(args=args):
+                self.assertIn(repr(mi.numeric_range(*args)), expected)
 
     def test_reversed(self):
         for args, expected in [
@@ -2456,13 +2638,26 @@ class NumericRangeTests(TestCase):
             ((1.0, 7.0), [6.0, 5.0, 4.0, 3.0, 2.0, 1.0]),
             ((7.0, 1.0, -1.5), [2.5, 4.0, 5.5, 7.0]),
             ((7.0, 0.9, -1.5), [1.0, 2.5, 4.0, 5.5, 7.0]),
-            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
-             [Decimal('4.0'), Decimal('2.5'), Decimal('1.0')]),
-            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
-             [Fraction(4, 1), Fraction(5, 2), Fraction(1, 1)]),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)), [datetime(2019, 3, 29, 20),
-             datetime(2019, 3, 29, 10), datetime(2019, 3, 29)]),
+            (
+                (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+                [Decimal('4.0'), Decimal('2.5'), Decimal('1.0')],
+            ),
+            (
+                (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+                [Fraction(4, 1), Fraction(5, 2), Fraction(1, 1)],
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                [
+                    datetime(2019, 3, 29, 20),
+                    datetime(2019, 3, 29, 10),
+                    datetime(2019, 3, 29),
+                ],
+            ),
         ]:
             self.assertEqual(expected, list(reversed(mi.numeric_range(*args))))
 
@@ -2473,12 +2668,25 @@ class NumericRangeTests(TestCase):
             ((7.0,), 6.0, 1),
             ((7.0,), 7.0, 0),
             ((7.0,), 10.0, 0),
-            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
-             Decimal('4.0'), 1),
-            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
-             Fraction(5, 2), 1),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)), datetime(2019, 3, 29, 20), 1),
+            (
+                (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+                Decimal('4.0'),
+                1,
+            ),
+            (
+                (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+                Fraction(5, 2),
+                1,
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                datetime(2019, 3, 29, 20),
+                1,
+            ),
         ]:
             self.assertEqual(c, mi.numeric_range(*args).count(v))
 
@@ -2488,12 +2696,25 @@ class NumericRangeTests(TestCase):
             ((7.0,), 6.0, 6),
             ((7.0, 0.0, -1.0), 7.0, 0),
             ((7.0, 0.0, -1.0), 1.0, 6),
-            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
-             Decimal('4.0'), 2),
-            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
-             Fraction(5, 2), 1),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)), datetime(2019, 3, 29, 20), 2),
+            (
+                (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+                Decimal('4.0'),
+                2,
+            ),
+            (
+                (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
+                Fraction(5, 2),
+                1,
+            ),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                datetime(2019, 3, 29, 20),
+                2,
+            ),
         ]:
             self.assertEqual(i, mi.numeric_range(*args).index(v))
 
@@ -2505,12 +2726,16 @@ class NumericRangeTests(TestCase):
             ((7.0, 0.0, -1.0), 0.0),
             ((7.0, 0.0, -1.0), 10.0),
             ((7.0, 0.0), 5.0),
-            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
-             Decimal('4.5')),
-            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
-             Fraction(5, 3)),
-            ((datetime(2019, 3, 29), datetime(2019, 3, 30),
-              timedelta(hours=10)), datetime(2019, 3, 30)),
+            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")), Decimal('4.5')),
+            ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)), Fraction(5, 3)),
+            (
+                (
+                    datetime(2019, 3, 29),
+                    datetime(2019, 3, 30),
+                    timedelta(hours=10),
+                ),
+                datetime(2019, 3, 30),
+            ),
         ]:
             with self.assertRaises(ValueError):
                 mi.numeric_range(*args).index(v)
@@ -2526,8 +2751,10 @@ class NumericRangeTests(TestCase):
         r = mi.numeric_range(7.0)
         for arg, message in [
             ('a', 'numeric range indices must be integers or slices, not str'),
-            ((),
-             'numeric range indices must be integers or slices, not tuple'),
+            (
+                (),
+                'numeric range indices must be integers or slices, not tuple',
+            ),
         ]:
             with self.assertRaisesRegex(TypeError, message):
                 r[arg]
@@ -3543,7 +3770,6 @@ class MapExceptTests(TestCase):
 
 
 class SampleTests(TestCase):
-
     def test_unit_case(self):
         """Test against a fixed case by seeding the random module."""
         # Beware that this test really just verifies random.random() behavior.
@@ -3616,10 +3842,13 @@ class SampleTests(TestCase):
         data_rev = list(reversed(data))
 
         # Sample each data set 10 times
-        data_means = [mean(mi.sample(data, k=50, weights=data))
-                      for _ in range(10)]
-        data_rev_means = [mean(mi.sample(data_rev, k=50, weights=data_rev))
-                          for _ in range(10)]
+        data_means = [
+            mean(mi.sample(data, k=50, weights=data)) for _ in range(10)
+        ]
+        data_rev_means = [
+            mean(mi.sample(data_rev, k=50, weights=data_rev))
+            for _ in range(10)
+        ]
 
         # The difference in the means should be low, i.e. little bias
         difference_in_means = abs(mean(data_means) - mean(data_rev_means))

@@ -293,7 +293,7 @@ class GrouperTests(TestCase):
                 [('A', 'B', 'C'), ('D', 'E', 'F')],
             )
 
-        warning, = caught
+        (warning,) = caught
         assert warning.category == DeprecationWarning
 
 
