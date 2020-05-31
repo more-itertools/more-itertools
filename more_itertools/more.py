@@ -2015,7 +2015,7 @@ def count_cycle(iterable, n=None):
 
 
 def mark_ends(iterable):
-    """Yield the items in *iterable*, along with two booleans indicating 
+    """Yield the items in *iterable*, along with two booleans indicating
     whether or not each element is the first and/or last.
 
     >>> list(mark_ends('ABC'))
