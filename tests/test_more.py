@@ -2576,45 +2576,35 @@ class CountCycleTests(TestCase):
         self.assertEqual(list(mi.count_cycle('abc', -3)), [])
 
 
-class MarkFirstTests(TestCase):
+
+class MarkEndsTests(TestCase):
     def test_basic(self):
+
+        def generator():
+            yield from [0, 1, 2, 3]
+
         cases = [{
             'input': [],
             'output': [],
         }, {
             'input': [0],
-            'output': [(True, 0)],
+            'output': [(True, True, 0)],
         }, {
             'input': [0, 1],
-            'output': [(True, 0), (False, 1)],
+            'output': [(True, False, 0), (False, True, 1)],
         }, {
-            'input': range(3),
-            'output': [(True, 0), (False, 1), (False, 2)],
+            'input': [0, 1, 2],
+            'output': [(True, False, 0), (False, False, 1), (False, True, 2)],
+        }, {
+            'input': [0, 1, 2, 3],
+            'output': [(True, False, 0), (False, False, 1), (False, False, 2), (False, True, 3)],
+        }, {
+            'input': generator(),  # No `__len__()`
+            'output': [(True, False, 0), (False, False, 1), (False, False, 2), (False, True, 3)],
         }]
 
         for case in cases:
-            actual = list(mi.mark_first(case['input']))
-            self.assertEqual(actual, case['output'])
-
-
-class MarkLastTests(TestCase):
-    def test_basic(self):
-        cases = [{
-            'input': [],
-            'output': [],
-        }, {
-            'input': [0],
-            'output': [(True, 0)],
-        }, {
-            'input': [0, 1],
-            'output': [(False, 0), (True, 1)],
-        }, {
-            'input': range(3),
-            'output': [(False, 0), (False, 1), (True, 2)],
-        }]
-
-        for case in cases:
-            actual = list(mi.mark_last(case['input']))
+            actual = list(mi.mark_ends(case['input']))
             self.assertEqual(actual, case['output'])
 
 class LocateTests(TestCase):
