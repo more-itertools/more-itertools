@@ -37,6 +37,7 @@ __all__ = [
     'consecutive_groups',
     'consumer',
     'count_cycle',
+    'mark_ends',
     'difference',
     'distinct_combinations',
     'distinct_permutations',
@@ -2023,6 +2024,30 @@ def count_cycle(iterable, n=None):
         return iter(())
     counter = count() if n is None else range(n)
     return ((i, item) for i in counter for item in iterable)
+
+
+def mark_ends(iterable):
+    """Yield the items in *iterable*, along with two booleans indicating
+    whether or not each element is the first and/or last.
+
+    >>> list(mark_ends('ABC'))
+    [(True, False, 'A'), (False, False, 'B'), (False, True, 'C')]
+    """
+    it = iter(iterable)
+
+    try:
+        b = next(it)
+    except StopIteration:
+        return
+
+    try:
+        for i in count():
+            a = b
+            b = next(it)
+            yield i == 0, False, a
+
+    except StopIteration:
+        yield i == 0, True, a
 
 
 def locate(iterable, pred=bool, window_size=None):
