@@ -272,7 +272,7 @@ def count_cycle(
 ) -> Iterable[Tuple[int, _T]]: ...
 def mark_ends(
     iterable: Iterable[_T],
-) -> Iterable[Tuple[bool, bool, _T]]
+) -> Iterable[Tuple[bool, bool, _T]]: ...
 def locate(
     iterable: Iterable[object],
     pred: Callable[..., Any] = ...,
