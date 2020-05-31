@@ -2805,43 +2805,25 @@ class CountCycleTests(TestCase):
 
 class MarkEndsTests(TestCase):
     def test_basic(self):
-
-        def generator():
-            yield from [0, 1, 2, 3]
-
-        cases = [{
-            'input': [],
-            'output': [],
-        }, {
-            'input': [0],
-            'output': [(True, True, 0)],
-        }, {
-            'input': [0, 1],
-            'output': [(True, False, 0), (False, True, 1)],
-        }, {
-            'input': [0, 1, 2],
-            'output': [(True, False, 0), (False, False, 1), (False, True, 2)],
-        }, {
-            'input': [0, 1, 2, 3],
-            'output': [
-                (True, False, 0),
-                (False, False, 1),
-                (False, False, 2),
-                (False, True, 3),
-            ],
-        }, {
-            'input': generator(),  # No `__len__()`
-            'output': [
-                (True, False, 0),
-                (False, False, 1),
-                (False, False, 2),
-                (False, True, 3),
-            ],
-        }]
-
-        for case in cases:
-            actual = list(mi.mark_ends(case['input']))
-            self.assertEqual(actual, case['output'])
+        for size, expected in [
+            (0, []),
+            (1, [(True, True, '0')]),
+            (2, [(True, False, '0'), (False, True, '1')]),
+            (3, [(True, False, '0'), (False, False, '1'), (False, True, '2')]),
+            (
+                4,
+                [
+                    (True, False, '0'),
+                    (False, False, '1'),
+                    (False, False, '2'),
+                    (False, True, '3'),
+                ],
+            ),
+        ]:
+            with self.subTest(size=size):
+                iterable = map(str, range(size))
+                actual = list(mi.mark_ends(iterable))
+                self.assertEqual(actual, expected)
 
 
 class LocateTests(TestCase):
