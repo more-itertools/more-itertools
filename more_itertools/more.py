@@ -2018,7 +2018,7 @@ def mark_ends(iterable):
     """Yield the items in *iterable*, along with two booleans indicating 
     whether or not each element is the first and/or last.
 
-    >>> list(mi.mark_ends('ABC'))
+    >>> list(mark_ends('ABC'))
     [(True, False, 'A'), (False, False, 'B'), (False, True, 'C')]
     """
     it = iter(iterable)
