@@ -3090,7 +3090,6 @@ def filter_except(validator, iterable, *exceptions):
     If an exception other than one given by *exceptions* is raised by
     *validator*, it is raised like normal.
     """
-    exceptions = tuple(exceptions)
     for item in iterable:
         try:
             validator(item)
@@ -3114,7 +3113,6 @@ def map_except(function, iterable, *exceptions):
     If an exception other than one given by *exceptions* is raised by
     *function*, it is raised like normal.
     """
-    exceptions = tuple(exceptions)
     for item in iterable:
         try:
             yield function(item)
