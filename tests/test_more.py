@@ -3894,6 +3894,11 @@ class IsSortedTests(TestCase):
             ([1, 10, 2, 3], {'reverse': True}, False),
             (['3', '2', '10', '1'], {'reverse': True}, True),
             (['3', '2', '10', '1'], {'key': int, 'reverse': True}, False),
+            # We'll do the same weird thing as Python here
+            (['nan', 0, 'nan', 0], {'key': float}, True),
+            ([0, 'nan', 0, 'nan'], {'key': float}, True),
+            (['nan', 0, 'nan', 0], {'key': float, 'reverse': True}, True),
+            ([0, 'nan', 0, 'nan'], {'key': float, 'reverse': True}, True),
         ]:
             with self.subTest(args=(iterable, kwargs)):
                 mi_result = mi.is_sorted(iter(iterable), **kwargs)
