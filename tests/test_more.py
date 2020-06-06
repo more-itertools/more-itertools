@@ -3878,3 +3878,23 @@ class SampleTests(TestCase):
 
         # The observed largest difference in 10,000 simulations was 4.337999
         self.assertTrue(difference_in_means < 4.4)
+
+
+class IsSortedTests(TestCase):
+    def test_basic(self):
+        for iterable, kwargs, expected in [
+            ([], {}, True),
+            ([1, 2, 3], {}, True),
+            ([1, 1, 2, 3], {}, True),
+            ([1, 10, 2, 3], {}, False),
+            (['1', '10', '2', '3'], {}, True),
+            (['1', '10', '2', '3'], {'key': int}, False),
+            ([1, 2, 3], {'reverse': True}, False),
+            ([1, 1, 2, 3], {'reverse': True}, False),
+            ([1, 10, 2, 3], {'reverse': True}, False),
+            (['3', '2', '10', '1'], {'reverse': True}, True),
+            (['3', '2', '10', '1'], {'key': int, 'reverse': True}, False),
+        ]:
+            with self.subTest(args=(iterable, kwargs)):
+                actual = mi.is_sorted(iterable, **kwargs)
+                self.assertEqual(actual, expected)

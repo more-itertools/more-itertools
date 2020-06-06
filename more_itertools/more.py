@@ -61,6 +61,7 @@ __all__ = [
     'islice_extended',
     'iterate',
     'ichunked',
+    'is_sorted',
     'last',
     'locate',
     'lstrip',
