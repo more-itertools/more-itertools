@@ -3896,5 +3896,7 @@ class IsSortedTests(TestCase):
             (['3', '2', '10', '1'], {'key': int, 'reverse': True}, False),
         ]:
             with self.subTest(args=(iterable, kwargs)):
-                actual = mi.is_sorted(iterable, **kwargs)
-                self.assertEqual(actual, expected)
+                mi_result = mi.is_sorted(iter(iterable), **kwargs)
+                py_result = iterable == sorted(iterable, **kwargs)
+                self.assertEqual(mi_result, expected)
+                self.assertEqual(mi_result, py_result)
