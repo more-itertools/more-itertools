@@ -137,6 +137,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autoclass:: run_length
 .. autofunction:: map_reduce
 .. autofunction:: exactly_n(iterable, n, predicate=bool)
+.. autofunction:: is_sorted
 
 ----
 

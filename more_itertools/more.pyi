@@ -414,3 +414,8 @@ def map_except(
 def sample(
     iterable: Iterable[_T], k: int, weights: Optional[Iterable[float]] = ...,
 ) -> List[_T]: ...
+def is_sorted(
+    iterable: Iterable[_T],
+    key: Optional[Callable[[_T], _U]] = ...,
+    reverse: bool = False,
+) -> bool: ...

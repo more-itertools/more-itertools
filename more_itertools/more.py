@@ -23,7 +23,14 @@ from operator import itemgetter, sub, gt, lt
 from sys import maxsize
 from time import monotonic
 
-from .recipes import consume, flatten, powerset, take, unique_everseen
+from .recipes import (
+    consume,
+    flatten,
+    pairwise,
+    powerset,
+    take,
+    unique_everseen,
+)
 
 __all__ = [
     'adjacent',
@@ -54,6 +61,7 @@ __all__ = [
     'islice_extended',
     'iterate',
     'ichunked',
+    'is_sorted',
     'last',
     'locate',
     'lstrip',
@@ -3215,3 +3223,26 @@ def sample(iterable, k, weights=None):
     else:
         weights = iter(weights)
         return _sample_weighted(iterable, k, weights)
+
+
+def is_sorted(iterable, key=None, reverse=False):
+    """Returns ``True`` if the items of iterable are in sorted order, and
+    ``False`` otherwise. *key* and *reverse* have the same meaning that they do
+    in the built-in :func:`sorted` function.
+
+    >>> is_sorted(['1', '2', '3', '4', '5'], key=int)
+    True
+    >>> is_sorted([5, 4, 3, 1, 2], reverse=True)
+    False
+
+    The function returns ``False`` after encountering the first out-of-order
+    item. If there are no out-of-order items, the iterable is exhausted.
+    """
+
+    compare = lt if reverse else gt
+    it = iterable if (key is None) else map(key, iterable)
+    for a, b in pairwise(it):
+        if compare(a, b):
+            return False
+
+    return True
