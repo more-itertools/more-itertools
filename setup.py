@@ -14,6 +14,8 @@ def get_long_description():
         next(infile)
         for line in infile:
             line = line.rstrip().replace('.. automodule:: more_itertools', '')
+            if line == '5.0.0':
+                break
             version_lines.append(line)
     version_history = '\n'.join(version_lines)
     version_history = sub(r':func:`([a-zA-Z0-9._]+)`', r'\1', version_history)
@@ -27,6 +29,7 @@ setup(
     version=__version__,
     description='More routines for operating on iterables, beyond itertools',
     long_description=get_long_description(),
+    long_description_content_type='text/x-rst',
     author='Erik Rose',
     author_email='erikrose@grinchcentral.com',
     license='MIT',
