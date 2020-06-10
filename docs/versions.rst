@@ -5,6 +5,23 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.4.0
+-----
+
+* New itertools
+    * :func:`mark_ends` (thanks to kalekundert)
+    * :func:`is_sorted`
+
+* Changes to existing itertools:
+    * :class:`islice_extended` can now be used with real slices (thanks to cool-RR)
+    * The implementations for :func:`filter_except` and :func:`map_except` were improved (thanks to SergBobrovsky)
+
+* Other changes
+    * Automated tests now enforce code style (using `black <https://github.com/psf/black>`__)
+    * The various signatures of :class:`islice_extended` and :func:`numeric_range` now appear in the docs (thanks to dsfulf)
+    * The test configuration for mypy was updated (thanks to blueyed)
+
+
 8.3.0
 -----
 
@@ -283,7 +300,7 @@ It now always returns iterator objects:
 * New itertools:
     * :func:`lstrip`, :func:`rstrip`, and :func:`strip`
       (thanks to MSeifert04 and pylang)
-    * :func:`islice_extended`
+    * :class:`islice_extended`
 * Improvements to existing itertools:
     * Some bugs with slicing :func:`peekable`-wrapped iterables were fixed
 
