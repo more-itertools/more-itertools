@@ -2341,7 +2341,7 @@ def always_reversible(iterable):
 
 
 def consecutive_groups(iterable, ordering=lambda x: x):
-    """Yield groups of consecutive items using :func:`itertools.groupby`.
+    """Yield groups of consecutive items.
     The *ordering* function determines whether two items are adjacent by
     returning their position.
 
@@ -2381,11 +2381,52 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         >>> saved_groups
         [[1, 2], [11, 12], [21, 22]]
 
+    See also :func:`summarize_consecutive`.
+
     """
     for k, g in groupby(
         enumerate(iterable), key=lambda x: x[0] - ordering(x[1])
     ):
         yield map(itemgetter(1), g)
+
+
+def summarize_consecutive(iterable, ordering=lambda x: x):
+    """Yield ``(first, last)`` that summarize runs of consecutive items
+    in *iterable*.
+    The *ordering* function determines whether two items are adjacent by
+    returning their position.
+
+    By default, the ordering function is the identity function. This is
+    suitable for finding runs of numbers:
+
+        >>> iterable = [1, 10, 11, 12, 20, 30, 31, 32, 33, 40]
+        >>> for first, last in summarize_consecutive(iterable):
+        ...     print('{} - {}'.format(first, last))
+        1 - 1
+        10 - 12
+        20 - 20
+        30 - 33
+        40 - 40
+
+    For finding runs of adjacent letters, try using the :meth:`index` method
+    of a string of letters:
+
+        >>> from string import ascii_lowercase
+        >>> iterable = 'abcdfgilmnop'
+        >>> ordering = ascii_lowercase.index
+        >>> for first, last in summarize_consecutive(iterable, ordering):
+        ...     print('{} - {}'.format(first, last))
+        a - d
+        f - g
+        i - i
+        l - p
+
+    See also :func:`consecutive_groups`.
+
+    """
+    for group in consecutive_groups(iterable, ordering=ordering):
+        group = tuple(group)
+        yield group[0], group[-1]
 
 
 def difference(iterable, func=sub, *, initial=None):
