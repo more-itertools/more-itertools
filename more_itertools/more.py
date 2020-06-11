@@ -153,7 +153,7 @@ def first(iterable, default=_marker):
     """
     try:
         return next(iter(iterable))
-    except StopIteration:
+    except StopIteration as e:
         # I'm on the edge about raising ValueError instead of StopIteration. At
         # the moment, ValueError wins, because the caller could conceivably
         # want to do something different with flow control when I raise the
@@ -162,7 +162,7 @@ def first(iterable, default=_marker):
             raise ValueError(
                 'first() was called on an empty iterable, and no '
                 'default value was provided.'
-            )
+            ) from e
         return default
 
 
@@ -185,12 +185,12 @@ def last(iterable, default=_marker):
         except (TypeError, AttributeError, KeyError):
             # If not slice-able, iterate entirely using length-1 deque
             return deque(iterable, maxlen=1)[0]
-    except IndexError:  # If the iterable was empty
+    except IndexError as e:  # If the iterable was empty
         if default is _marker:
             raise ValueError(
                 'last() was called on an empty iterable, and no '
                 'default value was provided.'
-            )
+            ) from e
         return default
 
 
@@ -539,8 +539,8 @@ def one(iterable, too_short=None, too_long=None):
 
     try:
         first_value = next(it)
-    except StopIteration:
-        raise too_short or ValueError('too few items in iterable (expected 1)')
+    except StopIteration as e:
+        raise (too_short or ValueError('too few items in iterable (expected 1)')) from e
 
     try:
         second_value = next(it)
