@@ -1,4 +1,4 @@
-from collections import OrderedDict, Counter, abc
+from collections import Counter, abc
 from collections.abc import Set
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -24,6 +24,7 @@ from random import seed
 from statistics import mean
 from sys import version_info
 from time import sleep
+from traceback import format_exc
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
@@ -100,24 +101,27 @@ class ChunkedTests(TestCase):
 
 
 class FirstTests(TestCase):
-    """Tests for ``first()``"""
-
     def test_many(self):
-        """Test that it works on many-item iterables."""
         # Also try it on a generator expression to make sure it works on
         # whatever those return, across Python versions.
         self.assertEqual(mi.first(x for x in range(4)), 0)
 
     def test_one(self):
-        """Test that it doesn't raise StopIteration prematurely."""
         self.assertEqual(mi.first([3]), 3)
 
     def test_empty_stop_iteration(self):
-        """It should raise StopIteration for empty iterables."""
-        self.assertRaises(ValueError, lambda: mi.first([]))
+        try:
+            mi.first([])
+        except ValueError:
+            formatted_exc = format_exc()
+            self.assertIn('StopIteration', formatted_exc)
+            self.assertIn(
+                'The above exception was the direct cause', formatted_exc
+            )
+        else:
+            self.fail()
 
     def test_default(self):
-        """It should return the provided default arg for empty iterables."""
         self.assertEqual(mi.first([], 'boo'), 'boo')
 
 
@@ -145,62 +149,40 @@ class IterOnlyRange:
 
 
 class LastTests(TestCase):
-    """Tests for ``last()``"""
+    def test_basic(self):
+        for iterable, expected in [
+            (range(4), 3),
+            (iter(range(4)), 3),
+            (range(1), 0),
+            (iter(range(1)), 0),
+            (IterOnlyRange(5), 4),
+        ]:
+            with self.subTest(iterable=iterable):
+                self.assertEqual(mi.last(iterable), expected)
 
-    def test_many_nonsliceable(self):
-        """Test that it works on many-item non-slice-able iterables."""
-        # Also try it on a generator expression to make sure it works on
-        # whatever those return, across Python versions.
-        self.assertEqual(mi.last(x for x in range(4)), 3)
+    def test_default(self):
+        for iterable, default, expected in [
+            (range(1), None, 0),
+            ([], None, None),
+            (iter([]), None, None),
+        ]:
+            with self.subTest(args=(iterable, default)):
+                self.assertEqual(mi.last(iterable, default=default), expected)
 
-    def test_one_nonsliceable(self):
-        """Test that it doesn't raise StopIteration prematurely."""
-        self.assertEqual(mi.last(x for x in range(1)), 0)
-
-    def test_empty_stop_iteration_nonsliceable(self):
-        """It should raise ValueError for empty non-slice-able iterables."""
-        self.assertRaises(ValueError, lambda: mi.last(x for x in range(0)))
-
-    def test_default_nonsliceable(self):
-        """It should return the provided default arg for empty non-slice-able
-        iterables.
-        """
-        self.assertEqual(mi.last((x for x in range(0)), 'boo'), 'boo')
-
-    def test_many_sliceable(self):
-        """Test that it works on many-item slice-able iterables."""
-        self.assertEqual(mi.last([0, 1, 2, 3]), 3)
-
-    def test_one_sliceable(self):
-        """Test that it doesn't raise StopIteration prematurely."""
-        self.assertEqual(mi.last([3]), 3)
-
-    def test_empty_stop_iteration_sliceable(self):
-        """It should raise ValueError for empty slice-able iterables."""
-        self.assertRaises(ValueError, lambda: mi.last([]))
-
-    def test_default_sliceable(self):
-        """It should return the provided default arg for empty slice-able
-        iterables.
-        """
-        self.assertEqual(mi.last([], 'boo'), 'boo')
-
-    def test_dict(self):
-        """last(dic) and last(dic.keys()) should return same result."""
-        dic = {'a': 1, 'b': 2, 'c': 3}
-        self.assertEqual(mi.last(dic), mi.last(dic.keys()))
-
-    def test_ordereddict(self):
-        """last(dic) should return the last key."""
-        od = OrderedDict()
-        od['a'] = 1
-        od['b'] = 2
-        od['c'] = 3
-        self.assertEqual(mi.last(od), 'c')
-
-    def test_customrange(self):
-        """It should work on custom class where [] raises AttributeError."""
-        self.assertEqual(mi.last(IterOnlyRange(5)), 4)
+    def test_empty(self):
+        for iterable in ([], iter(range(0))):
+            with self.subTest(iterable=iterable):
+                try:
+                    mi.last(iterable)
+                except ValueError:
+                    formatted_exc = format_exc()
+                    self.assertIn('IndexError', formatted_exc)
+                    self.assertIn(
+                        'The above exception was the direct cause',
+                        formatted_exc,
+                    )
+                else:
+                    self.fail()
 
 
 class NthOrLastTests(TestCase):
@@ -584,8 +566,22 @@ class OneTests(TestCase):
 
     def test_too_short(self):
         it = iter([])
-        self.assertRaises(ValueError, lambda: mi.one(it))
-        self.assertRaises(IndexError, lambda: mi.one(it, too_short=IndexError))
+        for too_short, exc_type in [
+            (None, ValueError),
+            (IndexError, IndexError),
+        ]:
+            with self.subTest(too_short=too_short):
+                try:
+                    mi.one(it, too_short=too_short)
+                except exc_type:
+                    formatted_exc = format_exc()
+                    self.assertIn('StopIteration', formatted_exc)
+                    self.assertIn(
+                        'The above exception was the direct cause',
+                        formatted_exc,
+                    )
+                else:
+                    self.fail()
 
     def test_too_long(self):
         it = count()

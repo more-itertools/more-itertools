@@ -154,10 +154,6 @@ def first(iterable, default=_marker):
     try:
         return next(iter(iterable))
     except StopIteration as e:
-        # I'm on the edge about raising ValueError instead of StopIteration. At
-        # the moment, ValueError wins, because the caller could conceivably
-        # want to do something different with flow control when I raise the
-        # exception, and it's weird to explicitly catch StopIteration.
         if default is _marker:
             raise ValueError(
                 'first() was called on an empty iterable, and no '
@@ -540,7 +536,9 @@ def one(iterable, too_short=None, too_long=None):
     try:
         first_value = next(it)
     except StopIteration as e:
-        raise (too_short or ValueError('too few items in iterable (expected 1)')) from e
+        raise (
+            too_short or ValueError('too few items in iterable (expected 1)')
+        ) from e
 
     try:
         second_value = next(it)
