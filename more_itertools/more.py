@@ -1,6 +1,8 @@
 import warnings
+
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
 from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
@@ -18,6 +20,7 @@ from itertools import (
     zip_longest,
 )
 from math import exp, floor, log
+from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, sub, gt, lt
 from sys import maxsize
@@ -3244,3 +3247,58 @@ def is_sorted(iterable, key=None, reverse=False):
             return False
 
     return True
+
+
+def callback_iter(func, yield_result=False, wait_seconds=0.1):
+    """Allow iterating over the results of a function that takes a callback.
+
+    Let *func* be a function that takes a `callback` keyword argument.
+    It will be called in a background thread, and its output (what would
+    normally be delivered to the callback) will yielded as it becomes
+    available.
+
+    If *yield_result* is ``True``, the return value of *func* will be yielded
+    after all its other output.
+
+    >>> def output_maker(cb=None):
+    ...     for i in ['1', '2', '3', '4']:
+    ...         if func:
+    ...             cb(i)
+    ...     return '5'
+    >>> func = lambda callback=None: output_maker(cb=callback)
+    >>> it = callback_iter(func, yield_result=True)
+    >>> list(it)
+    ['1', '2', '3', '4', '5']
+
+    Set *wait_seconds* to adjust how frequently the function is polled
+    for output.
+    """
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        q = Queue()
+        future = executor.submit(func, callback=lambda x: q.put(x))
+        while True:
+            try:
+                item = q.get(timeout=wait_seconds)
+            except Empty:
+                pass
+            else:
+                q.task_done()
+                yield item
+
+            if future.done():
+                result = future.result()
+                break
+
+        while True:
+            try:
+                item = q.get_nowait()
+            except Empty:
+                break
+            else:
+                q.task_done()
+                yield item
+
+        q.join()
+
+        if yield_result:
+            yield result
