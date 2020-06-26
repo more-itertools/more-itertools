@@ -3328,3 +3328,4 @@ class callback_iter:
         q.join()
 
         yield from remaining
+    return not any(starmap(compare, pairwise(it)))

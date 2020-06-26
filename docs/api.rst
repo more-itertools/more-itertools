@@ -240,7 +240,9 @@ Others
 .. autofunction:: locate(iterable, pred=bool, window_size=None)
 .. autofunction:: rlocate(iterable, pred=bool, window_size=None)
 .. autofunction:: replace
-.. autofunction:: numeric_range(start, stop, step)
+.. function:: numeric_range(stop)
+.. autofunction:: numeric_range(start, stop[, step])
+  :noindex:
 .. autofunction:: side_effect
 .. autofunction:: iterate
 .. autofunction:: difference(iterable, func=operator.sub, *, initial=None)
