@@ -19,6 +19,7 @@ from typing import (
     TypeVar,
     type_check_only,
 )
+from types import TracebackType
 from typing_extensions import ContextManager, Protocol, Type, overload
 
 # Type and type variable definitions
@@ -419,3 +420,25 @@ def is_sorted(
     key: Optional[Callable[[_T], _U]] = ...,
     reverse: bool = False,
 ) -> bool: ...
+
+class callback_iter(Generic[_T], Iterator[_T]):
+    def __init__(
+        self,
+        func: Callable[..., Any],
+        callback_kwd: str = ...,
+        wait_seconds: float = ...,
+    ) -> None: ...
+    def __enter__(self) -> callback_iter[_T]: ...
+    def __exit__(
+        self,
+        __exc_type: Optional[Type[BaseException]],
+        __exc_value: Optional[BaseException],
+        __traceback: Optional[TracebackType],
+    ) -> Optional[bool]: ...
+    def __iter__(self) -> callback_iter[_T]: ...
+    def __next__(self) -> _T: ...
+    def _reader(self) -> Iterator[_T]: ...
+    @property
+    def done(self) -> bool: ...
+    @property
+    def result(self) -> Any: ...
