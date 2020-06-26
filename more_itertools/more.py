@@ -3249,7 +3249,7 @@ def is_sorted(iterable, key=None, reverse=False):
     return True
 
 
-def callback_iter(func, yield_result=False, wait_seconds=0.1):
+class callback_iter:
     """Allow iterating over the results of a function that takes a callback.
 
     Let *func* be a function that takes a `callback` keyword argument.
@@ -3257,28 +3257,54 @@ def callback_iter(func, yield_result=False, wait_seconds=0.1):
     normally be delivered to the callback) will yielded as it becomes
     available.
 
-    If *yield_result* is ``True``, the return value of *func* will be yielded
-    after all its other output.
-
     >>> def output_maker(cb=None):
-    ...     for i in ['1', '2', '3', '4']:
+    ...     for i, c in enumerate('abcd', 1):
     ...         if func:
-    ...             cb(i)
-    ...     return '5'
+    ...             cb(i, c)
+    ...     return (5, 'e')
+    ...
     >>> func = lambda callback=None: output_maker(cb=callback)
-    >>> it = callback_iter(func, yield_result=True)
-    >>> list(it)
-    ['1', '2', '3', '4', '5']
+    >>> with callback_iter(func) as it:
+    ...     for args, kwargs in it:
+    ...         print(args)
+    ...     print(it.result)
+    (1, 'a')
+    (2, 'b')
+    (3, 'c')
+    (4, 'd')
+    (5, 'e')
 
     Set *wait_seconds* to adjust how frequently the function is polled
     for output.
     """
-    with ThreadPoolExecutor(max_workers=1) as executor:
+    def __init__(self, func, wait_seconds=0.1):
+        self._func = func
+        self.result = None
+        self.done = False
+        self._wait_seconds = wait_seconds
+        self._executor = ThreadPoolExecutor(max_workers=1)
+        self._iterator = self.reader()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self._executor.shutdown()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return next(self._iterator)
+
+    def reader(self):
         q = Queue()
-        future = executor.submit(func, callback=lambda x: q.put(x))
+        future = self._executor.submit(
+            self._func, callback=lambda *args, **kwargs: q.put((args, kwargs))
+        )
         while True:
             try:
-                item = q.get(timeout=wait_seconds)
+                item = q.get(timeout=self._wait_seconds)
             except Empty:
                 pass
             else:
@@ -3286,9 +3312,11 @@ def callback_iter(func, yield_result=False, wait_seconds=0.1):
                 yield item
 
             if future.done():
-                result = future.result()
+                self.done = True
+                self.result = future.result()
                 break
 
+        remaining = []
         while True:
             try:
                 item = q.get_nowait()
@@ -3296,9 +3324,7 @@ def callback_iter(func, yield_result=False, wait_seconds=0.1):
                 break
             else:
                 q.task_done()
-                yield item
-
+                remaining.append(item)
         q.join()
 
-        if yield_result:
-            yield result
+        yield from remaining
