@@ -3313,7 +3313,7 @@ class callback_iter:
     def __enter__(self):
         return self
 
-    def __exit__(self, *args, **kwargs):
+    def __exit__(self, exc_type, exc_value, traceback):
         self._aborted = True
         self._executor.shutdown()
 
