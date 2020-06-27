@@ -3965,7 +3965,7 @@ class CallbackIterTests(TestCase):
         with mi.callback_iter(func) as it:
             self.assertEqual(next(it), ((1, 'a'), {'intermediate_total': 1}))
 
-        with self.assertRaises(mi.more.AbortThread):
+        with self.assertRaises(mi.AbortThread):
             it.result
 
     def test_no_result(self):

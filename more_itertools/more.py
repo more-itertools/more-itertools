@@ -36,6 +36,7 @@ from .recipes import (
 )
 
 __all__ = [
+    'AbortThread',
     'adjacent',
     'always_iterable',
     'always_reversible',
@@ -3295,7 +3296,7 @@ class callback_iter:
       property from within the ``with`` block will raise ``RuntimeError``.
     * If it hasn't finished executing, accessing the ``result`` property from
       outside the ``with`` block will raise a
-      ``more_itertools.more.AbortThread`` exception.
+      ``more_itertools.AbortThread`` exception.
     * Provide *wait_seconds* to adjust how frequently the it is polled for
       output.
 
