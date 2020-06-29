@@ -260,7 +260,7 @@ class peekable:
         >>> if p:  # peekable has items
         ...     list(p)
         ['a', 'b']
-        >>> if not p:  # peekable is exhaused
+        >>> if not p:  # peekable is exhausted
         ...     list(p)
         []
 
