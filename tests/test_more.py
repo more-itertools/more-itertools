@@ -2205,17 +2205,17 @@ class GroupByTransformTests(TestCase):
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
 
-    def test_groupfunc(self):
+    def test_reducefunc(self):
         iterable = range(50)
         keyfunc = lambda k: 10 * (k // 10)
         valuefunc = lambda v: v + 1
-        groupfunc = sum
+        reducefunc = sum
         actual = list(
             mi.groupby_transform(
                 iterable,
                 keyfunc=keyfunc,
                 valuefunc=valuefunc,
-                groupfunc=groupfunc,
+                reducefunc=reducefunc,
             )
         )
         expected = [(0, 55), (10, 155), (20, 255), (30, 355), (40, 455)]

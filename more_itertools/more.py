@@ -1761,20 +1761,20 @@ def adjacent(predicate, iterable, distance=1):
     return zip(adjacent_to_selected, i2)
 
 
-def groupby_transform(iterable, keyfunc=None, valuefunc=None, groupfunc=None):
+def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
     """An extension of :func:`itertools.groupby` that can apply transformations
     to the grouped data.
 
     * *keyfunc* is a function computing a key value for each item in *iterable*
     * *valuefunc* is a function that transforms the individual items from
       *iterable* after grouping
-    * *groupfunc* is a function that tranforms each group of items
+    * *reducefunc* is a function that tranforms each group of items
 
     >>> iterable = 'aAAbBBcCC'
     >>> keyfunc = lambda k: k.upper()
     >>> valuefunc = lambda v: v.lower()
-    >>> groupfunc = lambda g: ''.join(g)
-    >>> list(groupby_transform(iterable, keyfunc, valuefunc, groupfunc))
+    >>> reducefunc = lambda g: ''.join(g)
+    >>> list(groupby_transform(iterable, keyfunc, valuefunc, reducefunc))
     [('A', 'aaa'), ('B', 'bbb'), ('C', 'ccc')]
 
     Each optional argument defaults to an identity function if not specified.
@@ -1800,8 +1800,8 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, groupfunc=None):
     ret = groupby(iterable, keyfunc)
     if valuefunc:
         ret = ((k, map(valuefunc, g)) for k, g in ret)
-    if groupfunc:
-        ret = ((k, groupfunc(g)) for k, g in ret)
+    if reducefunc:
+        ret = ((k, reducefunc(g)) for k, g in ret)
 
     return ret
 
