@@ -21,6 +21,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install .
         pip install -U coverage flake8 sphinx sphinx_rtd_theme
+        if [[ ${{ matrix.python-version }} = 3.6 ]]; then pip install -U black; fi
     - name: Run tests
       run: |
         coverage run --include="more_itertools/*.py" -m unittest
