@@ -28,3 +28,6 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8 .
+    - name: Check formatting with black
+      run: |
+        if [[ ${{ matrix.python-version }} = 3.6 ]]; then black --check .; fi
