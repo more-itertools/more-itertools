@@ -53,7 +53,7 @@ jobs:
     - name: Build packages
       if: "matrix.python-version == '3.6'"
       run: |
-        pip install -U twine
+        pip install -U twine wheel
         python setup.py sdist bdist_wheel
         twine check dist/*
     - name: Upload packages
