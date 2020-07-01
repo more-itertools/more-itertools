@@ -28,7 +28,7 @@ jobs:
         coverage run --include="more_itertools/*.py" -m unittest
     - name: Check coverage
       run: |
-        coverage report --show-missing --fail-under=99
+        coverage report --show-missing --fail-under=99.9
     - name: Lint with flake8
       run: |
         flake8 .
