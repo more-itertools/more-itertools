@@ -50,3 +50,15 @@ jobs:
       run: |
         pip install -U sphinx sphinx_rtd_theme
         sphinx-build -W -b html docs docs/_build/html
+    - name: Build packages
+      if: "matrix.python-version == '3.6'"
+      run: |
+        pip install -U twine
+        python setup.py sdist bdist_wheel
+        twine check dist/*
+    - name: Upload packages
+      if: "matrix.python-version == '3.6'"
+      uses: actions/upload-artifact@v2
+      with:
+        name: more-itertools-packages
+        path: dist/*
