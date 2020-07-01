@@ -41,7 +41,7 @@ jobs:
         pip install -U black
         black --check .
     - name: Check type stubs with mypy
-      if: "matrix.python-version != pypy3"
+      if: "matrix.python-version != 'pypy3'"
       run: |
         pip install -U mypy
         stubtest more_itertools.more more_itertools.recipes
