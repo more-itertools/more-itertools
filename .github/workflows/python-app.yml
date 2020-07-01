@@ -22,6 +22,7 @@ jobs:
         pip install .
         pip install -U coverage flake8 sphinx sphinx_rtd_theme
         if [[ ${{ matrix.python-version }} = 3.6 ]]; then pip install -U black; fi
+        if [[ ${{ matrix.python-version }} != pypy3 ]]; then pip install -U mypy; fi
     - name: Run tests
       run: |
         coverage run --include="more_itertools/*.py" -m unittest
@@ -32,3 +33,6 @@ jobs:
     - name: Check formatting with black
       run: |
         if [[ ${{ matrix.python-version }} = 3.6 ]]; then black --check .; fi
+    - name: Check type stubs with mypy
+      run: |
+        if [[ ${{ matrix.python-version }} = pypy3 ]]; then stubtest more_itertools.more more_itertools.recipes; fi
