@@ -38,7 +38,7 @@ jobs:
       run: |
         flake8 .
     - name: Check formatting with black
-      if "matrix.python-version == 3.6"
+      if: "matrix.python-version == 3.6"
       run: |
         black --check .
     - name: Check type stubs with mypy
