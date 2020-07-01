@@ -38,8 +38,9 @@ jobs:
       run: |
         flake8 .
     - name: Check formatting with black
+      if "matrix.python-version == 3.6"
       run: |
-        if [[ ${{ matrix.python-version }} = 3.6 ]]; then black --check .; fi
+        black --check .
     - name: Check type stubs with mypy
       run: |
         if [[ ${{ matrix.python-version }} != pypy3 ]]; then stubtest more_itertools.more more_itertools.recipes; fi
