@@ -260,7 +260,7 @@ class peekable:
         >>> if p:  # peekable has items
         ...     list(p)
         ['a', 'b']
-        >>> if not p:  # peekable is exhaused
+        >>> if not p:  # peekable is exhausted
         ...     list(p)
         []
 
@@ -3246,8 +3246,4 @@ def is_sorted(iterable, key=None, reverse=False):
 
     compare = lt if reverse else gt
     it = iterable if (key is None) else map(key, iterable)
-    for a, b in pairwise(it):
-        if compare(a, b):
-            return False
-
-    return True
+    return not any(starmap(compare, pairwise(it)))
