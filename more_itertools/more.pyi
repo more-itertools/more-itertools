@@ -424,6 +424,9 @@ def is_sorted(
     reverse: bool = False,
 ) -> bool: ...
 
+class AbortThread(BaseException):
+    pass
+
 class callback_iter(Generic[_T], Iterator[_T]):
     def __init__(
         self,
