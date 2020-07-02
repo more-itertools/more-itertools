@@ -577,8 +577,10 @@ def distinct_permutations(iterable, r=None):
 
     If *r* is given, only the *r*-length permutations are yielded.
 
-        >>> sorted(distinct_permutations([1, 0, 1], r=3))
-        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+        >>> sorted(distinct_permutations([1, 0, 1], r=2))
+        [(0, 1), (1, 0), (1, 1)]
+        >>> sorted(distinct_permutations(range(3), r=2))
+        [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
 
     """
     # Algorithm: https://w.wiki/Qai
