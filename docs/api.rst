@@ -224,6 +224,7 @@ consume iterables.
 .. autofunction:: always_reversible
 .. autofunction:: consumer
 .. autofunction:: with_iter
+.. autoclass:: callback_iter
 
 ----
 

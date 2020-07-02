@@ -19,6 +19,7 @@ from typing import (
     TypeVar,
     type_check_only,
 )
+from types import TracebackType
 from typing_extensions import ContextManager, Protocol, Type, overload
 
 # Type and type variable definitions
@@ -193,7 +194,7 @@ def stagger(
 
 class UnequalIterablesError(ValueError):
     def __init__(
-        self, details: Optional[Tuple[str, str, str]] = ...
+        self, details: Optional[Tuple[int, int, int]] = ...
     ) -> None: ...
 
 def zip_equal(*iterables: Iterable[_T]) -> Iterator[Tuple[_T, ...]]: ...
@@ -408,3 +409,28 @@ def is_sorted(
     key: Optional[Callable[[_T], _U]] = ...,
     reverse: bool = False,
 ) -> bool: ...
+
+class AbortThread(BaseException):
+    pass
+
+class callback_iter(Generic[_T], Iterator[_T]):
+    def __init__(
+        self,
+        func: Callable[..., Any],
+        callback_kwd: str = ...,
+        wait_seconds: float = ...,
+    ) -> None: ...
+    def __enter__(self) -> callback_iter[_T]: ...
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> Optional[bool]: ...
+    def __iter__(self) -> callback_iter[_T]: ...
+    def __next__(self) -> _T: ...
+    def _reader(self) -> Iterator[_T]: ...
+    @property
+    def done(self) -> bool: ...
+    @property
+    def result(self) -> Any: ...

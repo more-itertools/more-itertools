@@ -3915,3 +3915,85 @@ class IsSortedTests(TestCase):
                 py_result = iterable == sorted(iterable, **kwargs)
                 self.assertEqual(mi_result, expected)
                 self.assertEqual(mi_result, py_result)
+
+
+class CallbackIterTests(TestCase):
+    def _target(self, cb=None, exc=None, wait=0):
+        total = 0
+        for i, c in enumerate('abc', 1):
+            total += i
+            if wait:
+                sleep(wait)
+            if cb:
+                cb(i, c, intermediate_total=total)
+            if exc:
+                raise exc('error in target')
+
+        return total
+
+    def test_basic(self):
+        func = lambda callback=None: self._target(cb=callback, wait=0.02)
+        with mi.callback_iter(func, wait_seconds=0.01) as it:
+            # Execution doesn't start until we begin iterating
+            self.assertFalse(it.done)
+
+            # Consume everything
+            self.assertEqual(
+                list(it),
+                [
+                    ((1, 'a'), {'intermediate_total': 1}),
+                    ((2, 'b'), {'intermediate_total': 3}),
+                    ((3, 'c'), {'intermediate_total': 6}),
+                ],
+            )
+
+            # After consuming everything the future is done and the
+            # result is available.
+            self.assertTrue(it.done)
+            self.assertEqual(it.result, 6)
+
+        # This examines the internal state of the ThreadPoolExecutor. This
+        # isn't documented, so may break in future Python versions.
+        self.assertTrue(it._executor._shutdown)
+
+    def test_callback_kwd(self):
+        with mi.callback_iter(self._target, callback_kwd='cb') as it:
+            self.assertEqual(
+                list(it),
+                [
+                    ((1, 'a'), {'intermediate_total': 1}),
+                    ((2, 'b'), {'intermediate_total': 3}),
+                    ((3, 'c'), {'intermediate_total': 6}),
+                ],
+            )
+
+    def test_partial_consumption(self):
+        func = lambda callback=None: self._target(cb=callback)
+        with mi.callback_iter(func) as it:
+            self.assertEqual(next(it), ((1, 'a'), {'intermediate_total': 1}))
+
+        self.assertTrue(it._executor._shutdown)
+
+    def test_abort(self):
+        func = lambda callback=None: self._target(cb=callback, wait=0.1)
+        with mi.callback_iter(func) as it:
+            self.assertEqual(next(it), ((1, 'a'), {'intermediate_total': 1}))
+
+        with self.assertRaises(mi.AbortThread):
+            it.result
+
+    def test_no_result(self):
+        func = lambda callback=None: self._target(cb=callback)
+        with mi.callback_iter(func) as it:
+            with self.assertRaises(RuntimeError):
+                it.result
+
+    def test_exception(self):
+        func = lambda callback=None: self._target(cb=callback, exc=ValueError)
+        with mi.callback_iter(func) as it:
+            self.assertEqual(
+                next(it), ((1, 'a'), {'intermediate_total': 1}),
+            )
+
+            with self.assertRaises(ValueError):
+                it.result
