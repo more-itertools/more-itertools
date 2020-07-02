@@ -1761,21 +1761,23 @@ def adjacent(predicate, iterable, distance=1):
     return zip(adjacent_to_selected, i2)
 
 
-def groupby_transform(iterable, keyfunc=None, valuefunc=None):
-    """An extension of :func:`itertools.groupby` that transforms the values of
-    *iterable* after grouping them.
-    *keyfunc* is a function used to compute a grouping key for each item.
-    *valuefunc* is a function for transforming the items after grouping.
+def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
+    """An extension of :func:`itertools.groupby` that can apply transformations
+    to the grouped data.
 
-        >>> iterable = 'AaaABbBCcA'
-        >>> keyfunc = lambda x: x.upper()
-        >>> valuefunc = lambda x: x.lower()
-        >>> grouper = groupby_transform(iterable, keyfunc, valuefunc)
-        >>> [(k, ''.join(g)) for k, g in grouper]
-        [('A', 'aaaa'), ('B', 'bbb'), ('C', 'cc'), ('A', 'a')]
+    * *keyfunc* is a function computing a key value for each item in *iterable*
+    * *valuefunc* is a function that transforms the individual items from
+      *iterable* after grouping
+    * *reducefunc* is a function that tranforms each group of items
 
-    *keyfunc* and *valuefunc* default to identity functions if they are not
-    specified.
+    >>> iterable = 'aAAbBBcCC'
+    >>> keyfunc = lambda k: k.upper()
+    >>> valuefunc = lambda v: v.lower()
+    >>> reducefunc = lambda g: ''.join(g)
+    >>> list(groupby_transform(iterable, keyfunc, valuefunc, reducefunc))
+    [('A', 'aaa'), ('B', 'bbb'), ('C', 'ccc')]
+
+    Each optional argument defaults to an identity function if not specified.
 
     :func:`groupby_transform` is useful when grouping elements of an iterable
     using a separate iterable as the key. To do this, :func:`zip` the iterables
@@ -1795,8 +1797,13 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None):
     duplicate groups, you should sort the iterable by the key function.
 
     """
-    res = groupby(iterable, keyfunc)
-    return ((k, map(valuefunc, g)) for k, g in res) if valuefunc else res
+    ret = groupby(iterable, keyfunc)
+    if valuefunc:
+        ret = ((k, map(valuefunc, g)) for k, g in ret)
+    if reducefunc:
+        ret = ((k, reducefunc(g)) for k, g in ret)
+
+    return ret
 
 
 class numeric_range(abc.Sequence, abc.Hashable):

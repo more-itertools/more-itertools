@@ -226,26 +226,12 @@ def adjacent(
     iterable: Iterable[_T],
     distance: int = ...,
 ) -> Iterator[Tuple[bool, _T]]: ...
-@overload
-def groupby_transform(
-    iterable: Iterable[_T], keyfunc: None = ..., valuefunc: None = ...
-) -> Iterator[Tuple[_T, Iterator[_T]]]: ...
-@overload
-def groupby_transform(
-    iterable: Iterable[_T], keyfunc: Callable[[_T], _U], valuefunc: None = ...
-) -> Iterator[Tuple[_U, Iterator[_T]]]: ...
-@overload
 def groupby_transform(
     iterable: Iterable[_T],
-    keyfunc: None = ...,
-    valuefunc: Callable[[_T], _V] = ...,
-) -> Iterator[Tuple[_T, Iterator[_V]]]: ...
-@overload
-def groupby_transform(
-    iterable: Iterable[_T],
-    keyfunc: Callable[[_T], _U],
-    valuefunc: Callable[[_T], _V],
-) -> Iterator[Tuple[_U, Iterator[_V]]]: ...
+    keyfunc: Optional[Callable[[_T], _U]] = ...,
+    valuefunc: Optional[Callable[[_T], _V]] = ...,
+    reducefunc: Optional[Callable[..., _W]] = ...,
+) -> Iterator[Tuple[_T, _W]]: ...
 
 class numeric_range(Generic[_T, _U], Sequence[_T], Hashable, Reversible[_T]):
     @overload

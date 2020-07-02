@@ -2150,7 +2150,6 @@ class AdjacentTests(TestCase):
 
 class GroupByTransformTests(TestCase):
     def assertAllGroupsEqual(self, groupby1, groupby2):
-        """Compare two groupby objects for equality, both keys and groups."""
         for a, b in zip(groupby1, groupby2):
             key1, group1 = a
             key2, group2 = b
@@ -2160,7 +2159,6 @@ class GroupByTransformTests(TestCase):
         self.assertRaises(StopIteration, lambda: next(groupby2))
 
     def test_default_funcs(self):
-        """Test that groupby_transform() with default args mimics groupby()"""
         iterable = [(x // 5, x) for x in range(1000)]
         actual = mi.groupby_transform(iterable)
         expected = groupby(iterable)
@@ -2206,6 +2204,22 @@ class GroupByTransformTests(TestCase):
         actual = mi.groupby_transform(iterable, key)  # default valuefunc
         expected = groupby(iterable, key)
         self.assertAllGroupsEqual(actual, expected)
+
+    def test_reducefunc(self):
+        iterable = range(50)
+        keyfunc = lambda k: 10 * (k // 10)
+        valuefunc = lambda v: v + 1
+        reducefunc = sum
+        actual = list(
+            mi.groupby_transform(
+                iterable,
+                keyfunc=keyfunc,
+                valuefunc=valuefunc,
+                reducefunc=reducefunc,
+            )
+        )
+        expected = [(0, 55), (10, 155), (20, 255), (30, 355), (40, 455)]
+        self.assertEqual(actual, expected)
 
 
 class NumericRangeTests(TestCase):
