@@ -2890,7 +2890,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
 
 def partitions(iterable):
-    """Yield all possible order-perserving partitions of *iterable*.
+    """Yield all possible order-preserving partitions of *iterable*.
 
     >>> iterable = 'abc'
     >>> for part in partitions(iterable):
