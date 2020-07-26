@@ -3723,20 +3723,20 @@ class IchunkedTests(TestCase):
 
 class DistinctCombinationsTests(TestCase):
     def test_basic(self):
-        iterable = (1, 2, 2, 3, 3, 3)
-        for r in range(len(iterable)):
-            with self.subTest(r=r):
-                actual = sorted(mi.distinct_combinations(iterable, r))
-                expected = sorted(set(combinations(iterable, r)))
-                self.assertEqual(actual, expected)
-
-    def test_distinct(self):
-        iterable = list(range(6))
-        for r in range(len(iterable)):
-            with self.subTest(r=r):
-                actual = list(mi.distinct_combinations(iterable, r))
-                expected = list(combinations(iterable, r))
-                self.assertEqual(actual, expected)
+        for iterable in [
+            (1, 2, 2, 3, 3, 3),  # In order
+            range(6),  # All distinct
+            'abbccc',  # Not numbers
+            'cccbba',  # Backward
+            'mississippi',  # No particular order
+        ]:
+            for r in range(len(iterable)):
+                with self.subTest(iterable=iterable, r=r):
+                    actual = list(mi.distinct_combinations(iterable, r))
+                    expected = list(
+                        mi.unique_everseen(combinations(iterable, r))
+                    )
+                    self.assertEqual(actual, expected)
 
     def test_negative(self):
         with self.assertRaises(ValueError):
