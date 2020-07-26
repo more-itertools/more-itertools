@@ -3732,8 +3732,10 @@ class DistinctCombinationsTests(TestCase):
         ]:
             for r in range(len(iterable)):
                 with self.subTest(iterable=iterable, r=r):
-                    actual = sorted(mi.distinct_combinations(iterable, r))
-                    expected = sorted(set(combinations(iterable, r)))
+                    actual = list(mi.distinct_combinations(iterable, r))
+                    expected = list(
+                        mi.unique_everseen(combinations(iterable, r))
+                    )
                     self.assertEqual(actual, expected)
 
     def test_negative(self):
