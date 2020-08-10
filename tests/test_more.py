@@ -150,15 +150,19 @@ class IterOnlyRange:
 
 class LastTests(TestCase):
     def test_basic(self):
-        for iterable, expected in [
+        cases = [
             (range(4), 3),
             (iter(range(4)), 3),
             (range(1), 0),
             (iter(range(1)), 0),
             (IterOnlyRange(5), 4),
             ({n: str(n) for n in range(5)}, 4),
-            ({0: '0', -1: '-1', 2: '-2'}, 2),
-        ]:
+        ]
+        # Versions below 3.6.0 don't have ordered dicts
+        if version_info >= (3, 6, 0):
+            cases.append(({0: '0', -1: '-1', 2: '-2'}, 2))
+
+        for iterable, expected in cases:
             with self.subTest(iterable=iterable):
                 self.assertEqual(mi.last(iterable), expected)
 
