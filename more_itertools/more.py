@@ -1,7 +1,7 @@
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
-from collections.abc import Reversible, Sequence
+from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
 from heapq import merge, heapify, heapreplace, heappop
@@ -23,7 +23,7 @@ from math import exp, floor, log
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, sub, gt, lt
-from sys import maxsize
+from sys import hexversion, maxsize
 from time import monotonic
 
 from .recipes import (
@@ -182,7 +182,8 @@ def last(iterable, default=_marker):
     try:
         if isinstance(iterable, Sequence):
             return iterable[-1]
-        elif isinstance(iterable, Reversible):
+        # Work around https://bugs.python.org/issue38525
+        elif hasattr(iterable, '__reversed__') and (hexversion != 0x030800F0):
             return next(reversed(iterable))
         else:
             return deque(iterable, maxlen=1)[-1]
