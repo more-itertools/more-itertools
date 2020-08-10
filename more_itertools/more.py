@@ -1,7 +1,7 @@
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
-from collections.abc import Sequence
+from collections.abc import Reversible, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
 from heapq import merge, heapify, heapreplace, heappop
@@ -180,25 +180,19 @@ def last(iterable, default=_marker):
     raise ``ValueError``.
     """
     try:
-        # If the iterable is reversible, reverse it and return the first item.
-        return next(reversed(iterable))
-    except TypeError:
-        # If it's not reversible, feed it into a length-1 deque and return
-        # the last item.
-        try:
+        if isinstance(iterable, Sequence):
+            return iterable[-1]
+        elif isinstance(iterable, Reversible):
+            return next(reversed(iterable))
+        else:
             return deque(iterable, maxlen=1)[-1]
-        except IndexError:
-            pass
-    except StopIteration:
-        pass
-
-    # The iterable was empty.
-    if default is _marker:
-        raise ValueError(
-            'last() was called on an empty iterable, and no default value was '
-            'provided.'
-        )
-    return default
+    except (IndexError, TypeError, StopIteration):
+        if default is _marker:
+            raise ValueError(
+                'last() was called on an empty iterable, and no default was '
+                'provided.'
+            )
+        return default
 
 
 def nth_or_last(iterable, n, default=_marker):

@@ -157,6 +157,7 @@ class LastTests(TestCase):
             (iter(range(1)), 0),
             (IterOnlyRange(5), 4),
             ({n: str(n) for n in range(5)}, 4),
+            ({0: '0', -1: '-1', 2: '-2'}, 2),
         ]:
             with self.subTest(iterable=iterable):
                 self.assertEqual(mi.last(iterable), expected)
