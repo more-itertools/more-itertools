@@ -150,13 +150,19 @@ class IterOnlyRange:
 
 class LastTests(TestCase):
     def test_basic(self):
-        for iterable, expected in [
+        cases = [
             (range(4), 3),
             (iter(range(4)), 3),
             (range(1), 0),
             (iter(range(1)), 0),
             (IterOnlyRange(5), 4),
-        ]:
+            ({n: str(n) for n in range(5)}, 4),
+        ]
+        # Versions below 3.6.0 don't have ordered dicts
+        if version_info >= (3, 6, 0):
+            cases.append(({0: '0', -1: '-1', 2: '-2'}, 2))
+
+        for iterable, expected in cases:
             with self.subTest(iterable=iterable):
                 self.assertEqual(mi.last(iterable), expected)
 
@@ -164,6 +170,7 @@ class LastTests(TestCase):
         for iterable, default, expected in [
             (range(1), None, 0),
             ([], None, None),
+            ({}, None, None),
             (iter([]), None, None),
         ]:
             with self.subTest(args=(iterable, default)):
@@ -172,17 +179,8 @@ class LastTests(TestCase):
     def test_empty(self):
         for iterable in ([], iter(range(0))):
             with self.subTest(iterable=iterable):
-                try:
+                with self.assertRaises(ValueError):
                     mi.last(iterable)
-                except ValueError:
-                    formatted_exc = format_exc()
-                    self.assertIn('IndexError', formatted_exc)
-                    self.assertIn(
-                        'The above exception was the direct cause',
-                        formatted_exc,
-                    )
-                else:
-                    self.fail()
 
 
 class NthOrLastTests(TestCase):
