@@ -62,7 +62,6 @@ These tools yield windows of items from an iterable.
 .. autofunction:: substrings
 .. autofunction:: substrings_indexes
 .. autofunction:: stagger
-.. autofunction:: pitchforked
 
 ----
 
@@ -198,6 +197,7 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: circular_shifts
 .. autofunction:: partitions
 .. autofunction:: set_partitions
+.. autofunction:: pitchforked
 
 ----
 
