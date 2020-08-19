@@ -166,7 +166,7 @@ Links elsewhere
 
 Blog posts about ``more-itertools``:
 
-* `Yo, I heard you like decorators <https://bbayles.com/index/decorator_factory>`__
+* `Yo, I heard you like decorators <https://www.bbayles.com/index/decorator_factory>`__
 * `Tour of Python Itertools <https://martinheinz.dev/blog/16>`__
 
 
