@@ -110,7 +110,7 @@ __all__ = [
     'UnequalIterablesError',
     'zip_equal',
     'zip_offset',
-    'pitchforked'
+    'windowed_complete'
 ]
 
 _marker = object()
@@ -3386,64 +3386,53 @@ class callback_iter:
         yield from remaining
 
 
-def pitchforked(seq, n=1):
-    """Splits the iterable into three pieces, with the middle piece of width *n* (the width of the pitchfork). Returns the prefix, middle and the suffix. Similar to :func:`windowed`, but allows reconstruction of the full sequence from each split.
+def windowed_complete(iterable, n=1):
+    """
+    Yield ``(beginning, middle, end)`` tuples, where:
+    * Each ``middle`` has *n* items from *iterable*
+    * Each ``beginning`` has the items before the ones in ``middle``
+    * Each ``end`` has the items after the ones in ``middle``
 
-    >>> for p in pitchforked('ABCDEF', 2):
-    ...     print(*map(lambda x: ''.join(x),p))
-     AB CDEF
-    A BC DEF
-    AB CD EF
-    ABC DE F
-    ABCD EF 
+    >>> iterable = range(7)
+    >>> n = 3
+    >>> for beginning, middle, end in windowed_complete(iterable, n):
+    ...     print(beginning, middle, end)
+    () (0, 1, 2) (3, 4, 5, 6)
+    (0,) (1, 2, 3) (4, 5, 6)
+    (0, 1) (2, 3, 4) (5, 6)
+    (0, 1, 2) (3, 4, 5) (6,)
+    (0, 1, 2, 3) (4, 5, 6) ()
 
-    To obtain every partitioning of a sequence, use :func:`chain` and :func:`map` to iterate over all possible partitioning lengths in one go:
+    *n* can have values between 0 and length of the iterable. ValueError will be raised for value of *n* outside of that range. Note that, in order to assert the ``n<len(iterable)`` case, the interable has to get consumed.
+
+    To obtain every such partitioning of a sequence, use :func:`chain` and :func:`map` to iterate over all possible partitioning lengths in one go:
 
     >>> from itertools import chain
     >>> from functools import partial
-    >>> every_pitchfork = lambda seq: chain(*map(
-    ...     partial(pitchforked,seq),range(len(seq))))
-    >>> sequence = 'ABCDE'
-    >>> for p in every_pitchfork(sequence):
-    ...     print(*map(lambda x: ''.join(x),p))
-      ABCDE
-    A  BCDE
-    AB  CDE
-    ABC  DE
-    ABCD  E
-    ABCDE  
-     A BCDE
-    A B CDE
-    AB C DE
-    ABC D E
-    ABCD E 
-     AB CDE
-    A BC DE
-    AB CD E
-    ABC DE 
-     ABC DE
-    A BCD E
-    AB CDE 
-     ABCD E
-    A BCDE 
+    >>> every_partition = lambda seq: chain(*map(
+    ...     partial(windowed_complete,seq),range(len(seq))))
+    >>> sequence = 'ABC'
+    >>> for p in every_partition(sequence):
+    ...     print(*map(lambda x: ''.join(x),p),sep='|',end=' ')
+    ||ABC A||BC AB||C ABC|| |A|BC A|B|C AB|C| |AB|C A|BC| 
 
     A nested lambda function can also be used instead of :func:`partial`:
 
     >>> from itertools import chain
-    >>> every_pitchfork = lambda seq: chain(*map(
-    ...     lambda n: pitchforked(seq,n),range(len(seq))))
+    >>> every_partition = lambda seq: chain(*map(
+    ...     lambda n: windowed_complete(seq,n),range(len(seq))))
     """
     if n < 0:
         raise ValueError('n must be >= 0')
-    if n > len(seq):
-        raise ValueError('n must be <= len(seq)')
     
-    prefix, hay, suffix = deque(), deque(), deque(seq)
-    for _ in range(n):
-        hay.append(suffix.popleft())
-    yield tuple(prefix), tuple(hay), tuple(suffix)
+    seq = tuple(iterable)
+    size = len(seq)
 
-    for _ in range(len(suffix)):
-        hay.append(suffix.popleft())
-        prefix.append(hay.popleft())
-        yield tuple(prefix), tuple(hay), tuple(suffix)
+    if n > size:
+        raise ValueError('n must be <= len(seq)')
+
+    for i in range(size - n + 1):
+        beginning = seq[:i]
+        middle = seq[i: i + n]
+        end = seq[i + n:]
+        yield beginning, middle, end
