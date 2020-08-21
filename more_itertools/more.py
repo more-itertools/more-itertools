@@ -3386,7 +3386,7 @@ class callback_iter:
         yield from remaining
 
 
-def windowed_complete(iterable, n=1):
+def windowed_complete(iterable, n):
     """
     Yield ``(beginning, middle, end)`` tuples, where:
 
