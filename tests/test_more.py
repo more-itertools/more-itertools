@@ -3995,3 +3995,66 @@ class CallbackIterTests(TestCase):
 
             with self.assertRaises(ValueError):
                 it.result
+
+
+class WindowedCompleteTests(TestCase):
+    """Tests for ``windowed_complete()``"""
+
+    def test_basic(self):
+        actual = list(mi.windowed_complete([1, 2, 3, 4, 5], 3))
+        expected = [
+            ((), (1, 2, 3), (4, 5)),
+            ((1,), (2, 3, 4), (5,)),
+            ((1, 2), (3, 4, 5), ())
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_zero_length(self):
+        """
+        Length 0 window
+        """
+        actual = list(mi.windowed_complete([1, 2, 3], 0))
+        expected = [
+            ((), (), (1, 2, 3)),
+            ((1,), (), (2, 3)),
+            ((1, 2), (), (3,)),
+            ((1, 2, 3), (), ())
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_wrong_length(self):
+        """
+        Check that ValueError is raised for invalid values of n
+        """
+        seq = [1,2,3,4,5]
+        for n in (-10,-1,len(seq)+1,len(seq)+10):
+            with self.subTest(n=n):
+                with self.assertRaises(ValueError):
+                    list(mi.windowed_complete(seq, n))
+
+    def test_every_partition(self):
+        """
+        Split a sequence into every possible partitioning thereof
+        """
+        every_partition = lambda seq: chain(*map(
+            partial(mi.windowed_complete,seq),range(len(seq))))
+
+        seq = 'ABC'
+        actual = list(every_partition(seq))
+        expected = [
+            ((), (), ('A', 'B', 'C')),
+            (('A',), (), ('B', 'C')),
+            (('A', 'B'), (), ('C',)),
+            (('A', 'B', 'C'), (), ()),
+            ((), ('A',), ('B', 'C')),
+            (('A',), ('B',), ('C',)),
+            (('A', 'B'), ('C',), ()),
+            ((), ('A', 'B'), ('C',)),
+            (('A',), ('B', 'C'), ())
+        ]
+        
+        self.assertEqual(actual, expected)
+
+if __name__=="__main__":
+    from unittest import main
+    main(verbosity=2)
