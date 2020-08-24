@@ -1777,7 +1777,7 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
     * *keyfunc* is a function computing a key value for each item in *iterable*
     * *valuefunc* is a function that transforms the individual items from
       *iterable* after grouping
-    * *reducefunc* is a function that tranforms each group of items
+    * *reducefunc* is a function that transforms each group of items
 
     >>> iterable = 'aAAbBBcCC'
     >>> keyfunc = lambda k: k.upper()
