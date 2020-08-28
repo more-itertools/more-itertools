@@ -5,6 +5,31 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.5.0
+-----
+
+
+* New itertools
+    * :func:`windowed_complete` (thanks to MarcinKonowalczyk)
+
+* Changes to existing itertools:
+    * The :func:`is_sorted` implementation was improved (thanks to cool-RR)
+    * The :func:`groupby_transform` now accepts a ``reducefunc`` parameter.
+    * The :func:`last` implementation was improved (thanks to brianmaissy)
+
+* Other changes
+    * Various documentation fixes (thanks to craigrosie, samuelstjean, PiCT0)
+    * The tests for :func:`distinct_combinations` were improved (thanks to Minabsapi)
+    * Automated tests now run on GitHub Actions. All commits now check:
+        * That unit tests pass
+        * That the examples in docstrings work
+        * That test coverage remains high (using `coverage`)
+        * For linting errors (using `flake8`)
+        * For consistent style (using `black`)
+        * That the type stubs work (using `mypy`)
+        * That the docs build correctly (using `sphinx`)
+        * That packages build correctly (using `twine`)
+
 8.4.0
 -----
 
