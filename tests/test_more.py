@@ -3990,7 +3990,8 @@ class CallbackIterTests(TestCase):
         func = lambda callback=None: self._target(cb=callback, exc=ValueError)
         with mi.callback_iter(func) as it:
             self.assertEqual(
-                next(it), ((1, 'a'), {'intermediate_total': 1}),
+                next(it),
+                ((1, 'a'), {'intermediate_total': 1}),
             )
 
             with self.assertRaises(ValueError):

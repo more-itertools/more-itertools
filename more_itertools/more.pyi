@@ -262,7 +262,9 @@ class numeric_range(Generic[_T, _U], Sequence[_T], Hashable, Reversible[_T]):
 def count_cycle(
     iterable: Iterable[_T], n: Optional[int] = ...
 ) -> Iterable[Tuple[int, _T]]: ...
-def mark_ends(iterable: Iterable[_T],) -> Iterable[Tuple[bool, bool, _T]]: ...
+def mark_ends(
+    iterable: Iterable[_T],
+) -> Iterable[Tuple[bool, bool, _T]]: ...
 def locate(
     iterable: Iterable[object],
     pred: Callable[..., Any] = ...,
@@ -402,7 +404,9 @@ def map_except(
     *exceptions: Type[BaseException]
 ) -> Iterator[_U]: ...
 def sample(
-    iterable: Iterable[_T], k: int, weights: Optional[Iterable[float]] = ...,
+    iterable: Iterable[_T],
+    k: int,
+    weights: Optional[Iterable[float]] = ...,
 ) -> List[_T]: ...
 def is_sorted(
     iterable: Iterable[_T],

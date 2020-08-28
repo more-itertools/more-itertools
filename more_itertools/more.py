@@ -469,9 +469,9 @@ def ilen(iterable):
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
 
-        >>> from itertools import islice
-        >>> list(islice(iterate(lambda x: 2*x, 1), 10))
-        [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    >>> from itertools import islice
+    >>> list(islice(iterate(lambda x: 2*x, 1), 10))
+    [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
     """
     while True:
@@ -2648,8 +2648,8 @@ def exactly_n(iterable, n, predicate=bool):
 def circular_shifts(iterable):
     """Return a list of circular shifts of *iterable*.
 
-        >>> circular_shifts(range(4))
-        [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
+    >>> circular_shifts(range(4))
+    [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
     """
     lst = list(iterable)
     return take(len(lst), windowed(cycle(lst), len(lst)))
