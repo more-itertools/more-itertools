@@ -61,7 +61,7 @@ Version History
     * The :func:`spy` implementation was improved (thanks to has2k1)
 
 * Other changes
-    * Type stubs are now tested with ``stubtest`` (thankjs to ilai-deutel)
+    * Type stubs are now tested with ``stubtest`` (thanks to ilai-deutel)
     * Tests now run with ``python -m unittest`` instead of ``python setup.py test`` (thanks to jdufresne)
 
 8.2.0
