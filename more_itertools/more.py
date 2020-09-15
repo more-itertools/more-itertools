@@ -1132,8 +1132,8 @@ def sliced(seq, n, strict=False):
         >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
         [(1, 2, 3), (4, 5, 6), (7, 8)]
     
-    If `strict` is `True` and the length of the sequence is not divisible by 
-    the requested slice length, sliced raises a `ValueError`.
+    `sliced` raises a `ValueError` if *strict* is `True` and the length of the sequence is not divisible by 
+    the requested slice length.
 
     This function will only work for iterables that support slicing.
     For non-sliceable iterables, see :func:`chunked`.
