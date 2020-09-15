@@ -1131,7 +1131,7 @@ def sliced(seq, n, strict=False):
 
         >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
         [(1, 2, 3), (4, 5, 6), (7, 8)]
-    
+
     `sliced` raises a `ValueError` if *strict* is `True` and the length of
     the sequence is not divisible by the requested slice length.
 
