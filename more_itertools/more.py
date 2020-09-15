@@ -116,7 +116,7 @@ __all__ = [
 _marker = object()
 
 
-def chunked(iterable, n):
+def chunked(iterable, n, strict=False):
     """Break *iterable* into lists of length *n*:
 
         >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
@@ -128,6 +128,20 @@ def chunked(iterable, n):
         >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
+    If this is the case and *strict* is True, then :func:`chunked` will
+    raise an exception.
+
+        list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3, strict=True))
+        Exception raised:
+            Traceback (most recent call last):
+              File "/usr/lib64/python3.8/doctest.py", line 1336, in __run
+                exec(compile(example.source, filename, "single",
+              File "<doctest more_itertools.more.chunked[2]>", line 1, in <module>
+                list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3, strict=True))
+              File "/home/shlomif/Download/unpack/to-del/more-itertools/more_itertools/more.py", line 150, in ret
+                raise ValueError('There are fewer items in the last chunk!')
+            ValueError: There are fewer items in the last chunk!
+
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
     :func:`chunked` is useful for splitting up a computation on a large number
@@ -137,7 +151,16 @@ def chunked(iterable, n):
     into RAM on the client.
 
     """
-    return iter(partial(take, n, iter(iterable)), [])
+    it = iter(partial(take, n, iter(iterable)), [])
+    if strict:
+        def ret(it):
+            for x in it:
+                if not (len(x) == n):
+                    raise ValueError('There are fewer items in the last chunk!')
+                yield x
+        return iter(ret(it))
+    else:
+        return it
 
 
 def first(iterable, default=_marker):

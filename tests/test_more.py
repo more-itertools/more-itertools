@@ -99,6 +99,25 @@ class ChunkedTests(TestCase):
             list(mi.chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']]
         )
 
+    def test_strict_false(self):
+        """Test when ``n`` does not divide evenly into the length of the
+        iterable and strict is false.
+
+        """
+        self.assertEqual(
+            list(mi.chunked('ABCDE', 3, strict=False)), [['A', 'B', 'C'], ['D', 'E']]
+        )
+
+    def test_strict_being_true(self):
+        """Test when ``n`` does not divide evenly into the length of the
+        iterable and strict is True (raising an exception).
+
+        """
+        def f():
+            return list(mi.chunked('ABCDE', 3, strict=True))
+        self.assertRaisesRegex(ValueError, "There are fewer", f)
+
+
 
 class FirstTests(TestCase):
     def test_many(self):
