@@ -134,12 +134,6 @@ def chunked(iterable, n, strict=False):
         list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3, strict=True))
         Exception raised:
             Traceback (most recent call last):
-              File "/usr/lib64/python3.8/doctest.py", line 1336, in __run
-                exec(compile(example.source, filename, "single",
-              File "<doctest more_itertools.more.chunked[2]>", line 1, in <module>
-                list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3, strict=True))
-              File "/home/shlomif/Download/unpack/to-del/more-itertools/more_itertools/more.py", line 150, in ret
-                raise ValueError('There are fewer items in the last chunk!')
             ValueError: There are fewer items in the last chunk!
 
     To use a fill-in value instead, see the :func:`grouper` recipe.

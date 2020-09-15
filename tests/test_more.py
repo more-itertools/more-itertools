@@ -116,6 +116,9 @@ class ChunkedTests(TestCase):
         def f():
             return list(mi.chunked('ABCDE', 3, strict=True))
         self.assertRaisesRegex(ValueError, "There are fewer", f)
+        self.assertEqual(
+            list(mi.chunked('ABCDEF', 3, strict=True)), [['A', 'B', 'C'], ['D', 'E', 'F']]
+        )
 
 
 
