@@ -1120,7 +1120,7 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
             after()
 
 
-def sliced(seq, n):
+def sliced(seq, n, strict=False):
     """Yield slices of length *n* from the sequence *seq*.
 
         >>> list(sliced((1, 2, 3, 4, 5, 6), 3))
@@ -1131,13 +1131,18 @@ def sliced(seq, n):
 
         >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
         [(1, 2, 3), (4, 5, 6), (7, 8)]
+    
+    If `strict` is `True` and the length of the sequence is not divisible by 
+    the requested slice length, sliced raises a `ValueError`.
 
     This function will only work for iterables that support slicing.
     For non-sliceable iterables, see :func:`chunked`.
 
     """
-    return takewhile(len, (seq[i : i + n] for i in count(0, n)))
-
+    for _slice in takewhile(len, (seq[i : i + n] for i in count(0, n))):
+        if strict and (len(_slice) != n):
+            raise ValueError("seq is not divisible by n.")
+        yield _slice
 
 def split_at(iterable, pred, maxsplit=-1, keep_separator=False):
     """Yield lists of items from *iterable*, where each list is delimited by
