@@ -128,13 +128,7 @@ def chunked(iterable, n, strict=False):
         >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
-    If this is the case and *strict* is True, then :func:`chunked` will
-    raise an exception.
-
-        list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3, strict=True))
-        Exception raised:
-            Traceback (most recent call last):
-            ValueError: There are fewer items in the last chunk!
+    If *strict* is True, then :func:`chunked` raises a `ValueError`.
 
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
@@ -150,7 +144,7 @@ def chunked(iterable, n, strict=False):
         def ret(iterator):
             for chunk in iterator:
                 if len(chunk) != n:
-                    raise ValueError('There are fewer items in the last chunk!')
+                    raise ValueError('iterable is not divisible by n.')
                 yield chunk
         return iter(ret(iterator))
     else:
