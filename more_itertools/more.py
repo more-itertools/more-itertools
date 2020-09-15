@@ -145,16 +145,16 @@ def chunked(iterable, n, strict=False):
     into RAM on the client.
 
     """
-    it = iter(partial(take, n, iter(iterable)), [])
+    iterator = iter(partial(take, n, iter(iterable)), [])
     if strict:
-        def ret(it):
-            for x in it:
-                if not (len(x) == n):
+        def ret(iterator):
+            for chunk in iterator:
+                if len(chunk) != n:
                     raise ValueError('There are fewer items in the last chunk!')
-                yield x
-        return iter(ret(it))
+                yield chunk
+        return iter(ret(iterator))
     else:
-        return it
+        return iterator
 
 
 def first(iterable, default=_marker):
