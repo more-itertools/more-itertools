@@ -1143,10 +1143,20 @@ def sliced(seq, n, strict=False):
     For non-sliceable iterables, see :func:`chunked`.
 
     """
-    for _slice in takewhile(len, (seq[i : i + n] for i in count(0, n))):
-        if strict and (len(_slice) != n):
-            raise ValueError("seq is not divisible by n.")
-        yield _slice
+    iterator = takewhile(len, (seq[i : i + n] for i in count(0, n)))
+    if strict:
+        # We return the wrapped iterator instead of doing a
+        # for/yield directly because otherwise the tests
+        # fail.
+        def ret():
+            for _slice in iterator:
+                if len(_slice) != n:
+                    raise ValueError("seq is not divisible by n.")
+                yield _slice
+        return iter(ret())
+    else:
+        return iterator
+
 
 def split_at(iterable, pred, maxsplit=-1, keep_separator=False):
     """Yield lists of items from *iterable*, where each list is delimited by
