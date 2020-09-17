@@ -128,7 +128,8 @@ def chunked(iterable, n, strict=False):
         >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
-    If *strict* is True, then :func:`chunked` raises a `ValueError`.
+    If *strict* is True, and *n* is not evenly divisible, then :func:`chunked`
+    will raise a `ValueError`.
 
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
@@ -141,12 +142,15 @@ def chunked(iterable, n, strict=False):
     """
     iterator = iter(partial(take, n, iter(iterable)), [])
     if strict:
-        def ret(iterator):
+        # We return the wrapped iterator instead of doing a
+        # for/yield directly because otherwise the tests
+        # fail.
+        def ret():
             for chunk in iterator:
                 if len(chunk) != n:
                     raise ValueError('iterable is not divisible by n.')
                 yield chunk
-        return iter(ret(iterator))
+        return iter(ret())
     else:
         return iterator
 
