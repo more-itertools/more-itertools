@@ -150,6 +150,7 @@ def chunked(iterable, n, strict=False):
                 if len(chunk) != n:
                     raise ValueError('iterable is not divisible by n.')
                 yield chunk
+
         return iter(ret())
     else:
         return iterator
@@ -1153,6 +1154,7 @@ def sliced(seq, n, strict=False):
                 if len(_slice) != n:
                     raise ValueError("seq is not divisible by n.")
                 yield _slice
+
         return iter(ret())
     else:
         return iterator

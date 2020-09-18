@@ -106,7 +106,7 @@ class ChunkedTests(TestCase):
         """
         self.assertEqual(
             list(mi.chunked('ABCDE', 3, strict=False)),
-            [['A', 'B', 'C'], ['D', 'E']]
+            [['A', 'B', 'C'], ['D', 'E']],
         )
 
     def test_strict_being_true(self):
@@ -114,12 +114,14 @@ class ChunkedTests(TestCase):
         iterable and strict is True (raising an exception).
 
         """
+
         def f():
             return list(mi.chunked('ABCDE', 3, strict=True))
+
         self.assertRaisesRegex(ValueError, "iterable is not divisible by n", f)
         self.assertEqual(
             list(mi.chunked('ABCDEF', 3, strict=True)),
-            [['A', 'B', 'C'], ['D', 'E', 'F']]
+            [['A', 'B', 'C'], ['D', 'E', 'F']],
         )
 
 
