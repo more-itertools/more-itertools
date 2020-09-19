@@ -122,29 +122,22 @@ def chunked(iterable, n, strict=False):
         >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
         [[1, 2, 3], [4, 5, 6]]
 
-    If the length of *iterable* is not evenly divisible by *n*, the last
-    returned list will be shorter:
+    By the default, the last yielded list will have fewer than *n* elements
+    if the length of *iterable* is not divisible by *n*:
 
         >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
-    If *strict* is True, and *n* is not evenly divisible, then :func:`chunked`
-    will raise a `ValueError`.
-
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
-    :func:`chunked` is useful for splitting up a computation on a large number
-    of keys into batches, to be pickled and sent off to worker processes. One
-    example is operations on rows in MySQL, which does not implement
-    server-side cursors properly and would otherwise load the entire dataset
-    into RAM on the client.
+    If the length of *iterable* is not divisible by *n* and *strict* is
+    ``True``, then then ``ValueError`` will be raised before the last
+    list is yielded.
 
     """
     iterator = iter(partial(take, n, iter(iterable)), [])
     if strict:
-        # We return the wrapped iterator instead of doing a
-        # for/yield directly because otherwise the tests
-        # fail.
+
         def ret():
             for chunk in iterator:
                 if len(chunk) != n:
@@ -1128,17 +1121,18 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
 def sliced(seq, n, strict=False):
     """Yield slices of length *n* from the sequence *seq*.
 
-        >>> list(sliced((1, 2, 3, 4, 5, 6), 3))
-        [(1, 2, 3), (4, 5, 6)]
+    >>> list(sliced((1, 2, 3, 4, 5, 6), 3))
+    [(1, 2, 3), (4, 5, 6)]
 
-    If the length of the sequence is not divisible by the requested slice
-    length, the last slice will be shorter.
+    By the default, the last yielded slice will have fewer than *n* elements
+    if the length of *seq* is not divisible by *n*:
 
-        >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
-        [(1, 2, 3), (4, 5, 6), (7, 8)]
+    >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
+    [(1, 2, 3), (4, 5, 6), (7, 8)]
 
-    `sliced` raises a `ValueError` if *strict* is `True` and the length of
-    the sequence is not divisible by the requested slice length.
+    If the length of *seq* is not divisible by *n* and *strict* is
+    ``True``, then then ``ValueError`` will be raised before the last
+    slice is yielded.
 
     This function will only work for iterables that support slicing.
     For non-sliceable iterables, see :func:`chunked`.
@@ -1146,9 +1140,7 @@ def sliced(seq, n, strict=False):
     """
     iterator = takewhile(len, (seq[i : i + n] for i in count(0, n)))
     if strict:
-        # We return the wrapped iterator instead of doing a
-        # for/yield directly because otherwise the tests
-        # fail.
+
         def ret():
             for _slice in iterator:
                 if len(_slice) != n:
