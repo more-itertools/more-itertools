@@ -116,7 +116,7 @@ __all__ = [
 _marker = object()
 
 
-def chunked(iterable, n):
+def chunked(iterable, n, strict=False):
     """Break *iterable* into lists of length *n*:
 
         >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
@@ -128,6 +128,9 @@ def chunked(iterable, n):
         >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
         [[1, 2, 3], [4, 5, 6], [7, 8]]
 
+    If *strict* is True, and *n* is not evenly divisible, then :func:`chunked`
+    will raise a `ValueError`.
+
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
     :func:`chunked` is useful for splitting up a computation on a large number
@@ -137,7 +140,20 @@ def chunked(iterable, n):
     into RAM on the client.
 
     """
-    return iter(partial(take, n, iter(iterable)), [])
+    iterator = iter(partial(take, n, iter(iterable)), [])
+    if strict:
+        # We return the wrapped iterator instead of doing a
+        # for/yield directly because otherwise the tests
+        # fail.
+        def ret():
+            for chunk in iterator:
+                if len(chunk) != n:
+                    raise ValueError('iterable is not divisible by n.')
+                yield chunk
+
+        return iter(ret())
+    else:
+        return iterator
 
 
 def first(iterable, default=_marker):
@@ -1109,7 +1125,7 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
             after()
 
 
-def sliced(seq, n):
+def sliced(seq, n, strict=False):
     """Yield slices of length *n* from the sequence *seq*.
 
         >>> list(sliced((1, 2, 3, 4, 5, 6), 3))
@@ -1121,11 +1137,27 @@ def sliced(seq, n):
         >>> list(sliced((1, 2, 3, 4, 5, 6, 7, 8), 3))
         [(1, 2, 3), (4, 5, 6), (7, 8)]
 
+    `sliced` raises a `ValueError` if *strict* is `True` and the length of
+    the sequence is not divisible by the requested slice length.
+
     This function will only work for iterables that support slicing.
     For non-sliceable iterables, see :func:`chunked`.
 
     """
-    return takewhile(len, (seq[i : i + n] for i in count(0, n)))
+    iterator = takewhile(len, (seq[i : i + n] for i in count(0, n)))
+    if strict:
+        # We return the wrapped iterator instead of doing a
+        # for/yield directly because otherwise the tests
+        # fail.
+        def ret():
+            for _slice in iterator:
+                if len(_slice) != n:
+                    raise ValueError("seq is not divisible by n.")
+                yield _slice
+
+        return iter(ret())
+    else:
+        return iterator
 
 
 def split_at(iterable, pred, maxsplit=-1, keep_separator=False):

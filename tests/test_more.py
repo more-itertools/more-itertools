@@ -99,6 +99,31 @@ class ChunkedTests(TestCase):
             list(mi.chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']]
         )
 
+    def test_strict_false(self):
+        """Test when ``n`` does not divide evenly into the length of the
+        iterable and strict is false.
+
+        """
+        self.assertEqual(
+            list(mi.chunked('ABCDE', 3, strict=False)),
+            [['A', 'B', 'C'], ['D', 'E']],
+        )
+
+    def test_strict_being_true(self):
+        """Test when ``n`` does not divide evenly into the length of the
+        iterable and strict is True (raising an exception).
+
+        """
+
+        def f():
+            return list(mi.chunked('ABCDE', 3, strict=True))
+
+        self.assertRaisesRegex(ValueError, "iterable is not divisible by n", f)
+        self.assertEqual(
+            list(mi.chunked('ABCDEF', 3, strict=True)),
+            [['A', 'B', 'C'], ['D', 'E', 'F']],
+        )
+
 
 class FirstTests(TestCase):
     def test_many(self):
@@ -1102,6 +1127,12 @@ class SlicedTests(TestCase):
 
         with self.assertRaises(TypeError):
             list(mi.sliced(seq, 3))
+
+    def test_odd_and_strict(self):
+        seq = [x for x in 'ABCDEFGHI']
+
+        with self.assertRaises(ValueError):
+            list(mi.sliced(seq, 4, strict=True))
 
     def test_numpy_like_array(self):
         # Numpy arrays don't behave like Python lists - calling bool()
