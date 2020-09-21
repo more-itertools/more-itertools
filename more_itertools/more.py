@@ -111,6 +111,7 @@ __all__ = [
     'zip_equal',
     'zip_offset',
     'windowed_complete',
+    'all_unique',
 ]
 
 _marker = object()
@@ -3447,3 +3448,40 @@ def windowed_complete(iterable, n):
         middle = seq[i : i + n]
         end = seq[i + n :]
         yield beginning, middle, end
+
+
+def all_unique(iterable, key=None):
+    """
+    Returns ``True`` if all the elements of *iterable* are unique (no two
+    elements are equal).
+
+    If a *key* function is specified, it will be used to preprocess the
+    elements of the iterable before comparing.
+
+        >>> all_unique('ABCB')
+        False
+        >>> all_unique('ABCb')
+        True
+        >>> all_unique('ABCb', str.lower)
+        False
+
+    Sequences with a mix of hashable and unhashable items can be used, but the
+    function will be slower for unhashable items. This is similar to
+    :func:`unique_everseen`, see details there.
+    """
+    seenset = set()
+    seenset_add = seenset.add
+    seenlist = []
+    seenlist_add = seenlist.append
+    for element in map(key, iterable) if key else iterable:
+        try:
+            if element in seenset:
+                return False
+            else:
+                seenset_add(element)
+        except TypeError:
+            if element in seenlist:
+                return False
+            else:
+                seenlist_add(element)
+    return True
