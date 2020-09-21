@@ -4097,8 +4097,12 @@ class AllUniqueTests(TestCase):
 
     def test_partially_hashable(self):
         self.assertEqual(mi.all_unique([[1, 2], [3, 4], (5, 6)]), True)
-        self.assertEqual(mi.all_unique([[1, 2], [3, 4], (5, 6), [1, 2]]), False)
-        self.assertEqual(mi.all_unique([[1, 2], [3, 4], (5, 6), (5, 6)]), False)
+        self.assertEqual(
+            mi.all_unique([[1, 2], [3, 4], (5, 6), [1, 2]]), False
+        )
+        self.assertEqual(
+            mi.all_unique([[1, 2], [3, 4], (5, 6), (5, 6)]), False
+        )
 
     def test_key(self):
         iterable = ['A', 'B', 'C', 'b']
