@@ -3477,11 +3477,9 @@ def all_unique(iterable, key=None):
         try:
             if element in seenset:
                 return False
-            else:
-                seenset_add(element)
+            seenset_add(element)
         except TypeError:
             if element in seenlist:
                 return False
-            else:
-                seenlist_add(element)
+            seenlist_add(element)
     return True
