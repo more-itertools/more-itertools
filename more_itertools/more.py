@@ -3465,9 +3465,9 @@ def all_unique(iterable, key=None):
         >>> all_unique('ABCb', str.lower)
         False
 
-    Sequences with a mix of hashable and unhashable items can be used, but the
-    function will be slower for unhashable items. This is similar to
-    :func:`unique_everseen`, see details there.
+    The function returns as soon as the first non-unique element is
+    encountered. Iterables with a mix of hashable and unhashable items can
+    be used, but the function will be slower for unhashable items.
     """
     seenset = set()
     seenset_add = seenset.add
