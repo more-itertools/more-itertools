@@ -4077,3 +4077,37 @@ class WindowedCompleteTests(TestCase):
             (('A',), ('B', 'C'), ()),
         ]
         self.assertEqual(actual, expected)
+
+
+class AllUniqueTests(TestCase):
+    def test_basic(self):
+        for iterable, expected in [
+            ([], True),
+            ([1, 2, 3], True),
+            ([1, 1], False),
+            ([1, 2, 3, 1], False),
+            ([1, 2, 3, '1'], True),
+        ]:
+            with self.subTest(args=(iterable,)):
+                self.assertEqual(mi.all_unique(iterable), expected)
+
+    def test_non_hashable(self):
+        self.assertEqual(mi.all_unique([[1, 2], [3, 4]]), True)
+        self.assertEqual(mi.all_unique([[1, 2], [3, 4], [1, 2]]), False)
+
+    def test_partially_hashable(self):
+        self.assertEqual(mi.all_unique([[1, 2], [3, 4], (5, 6)]), True)
+        self.assertEqual(
+            mi.all_unique([[1, 2], [3, 4], (5, 6), [1, 2]]), False
+        )
+        self.assertEqual(
+            mi.all_unique([[1, 2], [3, 4], (5, 6), (5, 6)]), False
+        )
+
+    def test_key(self):
+        iterable = ['A', 'B', 'C', 'b']
+        self.assertEqual(mi.all_unique(iterable, lambda x: x), True)
+        self.assertEqual(mi.all_unique(iterable, str.lower), False)
+
+    def test_infinite(self):
+        self.assertEqual(mi.all_unique(mi.prepend(3, count())), False)
