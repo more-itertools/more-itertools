@@ -166,7 +166,7 @@ def padded(
     iterable: Iterable[_T],
     *,
     n: Optional[int] = ...,
-    next_multiple: bool = ...
+    next_multiple: bool = ...,
 ) -> Iterator[Optional[_T]]: ...
 @overload
 def padded(
@@ -211,7 +211,7 @@ def zip_offset(
     *iterables: Iterable[_T],
     offsets: _SizedIterable[int],
     longest: bool = ...,
-    fillvalue: _U
+    fillvalue: _U,
 ) -> Iterator[Tuple[Union[_T, _U], ...]]: ...
 def sort_together(
     iterables: Iterable[Iterable[_T]],
@@ -301,7 +301,7 @@ def difference(
     iterable: Iterable[_T],
     func: Callable[[_T, _T], _U] = ...,
     *,
-    initial: None = ...
+    initial: None = ...,
 ) -> Iterator[Union[_T, _U]]: ...
 @overload
 def difference(
@@ -400,12 +400,12 @@ def distinct_combinations(
 def filter_except(
     validator: Callable[[Any], object],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException]
+    *exceptions: Type[BaseException],
 ) -> Iterator[_T]: ...
 def map_except(
     function: Callable[[Any], _U],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException]
+    *exceptions: Type[BaseException],
 ) -> Iterator[_U]: ...
 def sample(
     iterable: Iterable[_T],
