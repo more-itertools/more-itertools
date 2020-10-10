@@ -16,6 +16,7 @@ from itertools import (
     cycle,
     groupby,
     islice,
+    product,
     repeat,
     starmap,
     tee,
@@ -35,6 +36,7 @@ __all__ = [
     'ncycles',
     'nth',
     'nth_combination',
+    'nth_product',
     'padnone',
     'pairwise',
     'partition',
@@ -520,6 +522,33 @@ def random_combination_with_replacement(iterable, r):
     n = len(pool)
     indices = sorted(randrange(n) for i in range(r))
     return tuple(pool[i] for i in indices)
+
+
+def nth_product(index, *args):
+    """Equivalent to ``list(product(*args))[index]``.
+
+    The products of **args* can be ordered lexicographically. 
+    :func:`nth_product` computes the product at sort position *index* without 
+    computing the previous products.
+    
+    """
+    pools = list(map(tuple, reversed(args)))
+    ns = list(map(len, pools))
+    
+    c = reduce(mul, ns)
+    
+    if index < 0:
+        index += c
+    
+    if (index < 0) or (index >= c):
+        raise IndexError
+    
+    result = []
+    for pool, n in zip(pools, ns):
+        result.append(pool[index % n])
+        index //= n
+    
+    return tuple(reversed(result))
 
 
 def nth_combination(iterable, r, index):
