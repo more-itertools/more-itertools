@@ -16,6 +16,7 @@ from itertools import (
     cycle,
     groupby,
     islice,
+    product,
     repeat,
     starmap,
     tee,
@@ -35,6 +36,7 @@ __all__ = [
     'ncycles',
     'nth',
     'nth_combination',
+    'nth_product',
     'padnone',
     'pairwise',
     'partition',
@@ -93,9 +95,9 @@ def tabulate(function, start=0):
 def tail(n, iterable):
     """Return an iterator over the last *n* items of *iterable*.
 
-        >>> t = tail(3, 'ABCDEFG')
-        >>> list(t)
-        ['E', 'F', 'G']
+    >>> t = tail(3, 'ABCDEFG')
+    >>> list(t)
+    ['E', 'F', 'G']
 
     """
     return iter(deque(iterable, maxlen=n))
@@ -144,11 +146,11 @@ def consume(iterator, n=None):
 def nth(iterable, n, default=None):
     """Returns the nth item or a default value.
 
-        >>> l = range(10)
-        >>> nth(l, 3)
-        3
-        >>> nth(l, 20, "zebra")
-        'zebra'
+    >>> l = range(10)
+    >>> nth(l, 3)
+    3
+    >>> nth(l, 20, "zebra")
+    'zebra'
 
     """
     return next(islice(iterable, n, None), default)
@@ -171,8 +173,8 @@ def all_equal(iterable):
 def quantify(iterable, pred=bool):
     """Return the how many times the predicate is true.
 
-        >>> quantify([True, False, True])
-        2
+    >>> quantify([True, False, True])
+    2
 
     """
     return sum(map(pred, iterable))
@@ -195,8 +197,8 @@ def padnone(iterable):
 def ncycles(iterable, n):
     """Returns the sequence elements *n* times
 
-        >>> list(ncycles(["a", "b"], 3))
-        ['a', 'b', 'a', 'b', 'a', 'b']
+    >>> list(ncycles(["a", "b"], 3))
+    ['a', 'b', 'a', 'b', 'a', 'b']
 
     """
     return chain.from_iterable(repeat(tuple(iterable), n))
@@ -205,8 +207,8 @@ def ncycles(iterable, n):
 def dotproduct(vec1, vec2):
     """Returns the dot product of the two iterables.
 
-        >>> dotproduct([10, 10], [20, 20])
-        400
+    >>> dotproduct([10, 10], [20, 20])
+    400
 
     """
     return sum(map(operator.mul, vec1, vec2))
@@ -254,8 +256,8 @@ def repeatfunc(func, times=None, *args):
 def pairwise(iterable):
     """Returns an iterator of paired items, overlapping, from the original
 
-        >>> take(4, pairwise(count()))
-        [(0, 1), (1, 2), (2, 3), (3, 4)]
+    >>> take(4, pairwise(count()))
+    [(0, 1), (1, 2), (2, 3), (3, 4)]
 
     """
     a, b = tee(iterable)
@@ -266,8 +268,8 @@ def pairwise(iterable):
 def grouper(iterable, n, fillvalue=None):
     """Collect data into fixed-length chunks or blocks.
 
-        >>> list(grouper('ABCDEFG', 3, 'x'))
-        [('A', 'B', 'C'), ('D', 'E', 'F'), ('G', 'x', 'x')]
+    >>> list(grouper('ABCDEFG', 3, 'x'))
+    [('A', 'B', 'C'), ('D', 'E', 'F'), ('G', 'x', 'x')]
 
     """
     if isinstance(iterable, int):
@@ -314,8 +316,17 @@ def partition(pred, iterable):
         >>> list(even_items), list(odd_items)
         ([0, 2, 4, 6, 8], [1, 3, 5, 7, 9])
 
+    If *pred* is None, :func:`bool` is used.
+
+        >>> iterable = [0, 1, False, True, '', ' ']
+        >>> false_items, true_items = partition(None, iterable)
+        >>> list(false_items), list(true_items)
+        ([0, False, ''], [1, True, ' '])
+
     """
-    # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
+    if pred is None:
+        pred = bool
+
     evaluations = ((pred(x), x) for x in iterable)
     t1, t2 = tee(evaluations)
     return (
@@ -503,10 +514,10 @@ def unique_everseen(iterable, key=None):
 def unique_justseen(iterable, key=None):
     """Yields elements in order, ignoring serial duplicates
 
-        >>> list(unique_justseen('AAAABBBCCDAABBB'))
-        ['A', 'B', 'C', 'D', 'A', 'B']
-        >>> list(unique_justseen('ABBCcAD', str.lower))
-        ['A', 'B', 'C', 'A', 'D']
+    >>> list(unique_justseen('AAAABBBCCDAABBB'))
+    ['A', 'B', 'C', 'D', 'A', 'B']
+    >>> list(unique_justseen('ABBCcAD', str.lower))
+    ['A', 'B', 'C', 'A', 'D']
 
     """
     return map(next, map(operator.itemgetter(1), groupby(iterable, key)))
@@ -622,6 +633,33 @@ def random_combination_with_replacement(iterable, r):
     n = len(pool)
     indices = sorted(randrange(n) for i in range(r))
     return tuple(pool[i] for i in indices)
+
+
+def nth_product(index, *args):
+    """Equivalent to ``list(product(*args))[index]``.
+
+    The products of **args* can be ordered lexicographically. 
+    :func:`nth_product` computes the product at sort position *index* without 
+    computing the previous products.
+    
+    """
+    pools = list(map(tuple, reversed(args)))
+    ns = list(map(len, pools))
+    
+    c = reduce(mul, ns)
+    
+    if index < 0:
+        index += c
+    
+    if (index < 0) or (index >= c):
+        raise IndexError
+    
+    result = []
+    for pool, n in zip(pools, ns):
+        result.append(pool[index % n])
+        index //= n
+    
+    return tuple(reversed(result))
 
 
 def nth_combination(iterable, r, index):

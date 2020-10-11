@@ -62,6 +62,7 @@ These tools yield windows of items from an iterable.
 .. autofunction:: substrings
 .. autofunction:: substrings_indexes
 .. autofunction:: stagger
+.. autofunction:: windowed_complete
 
 ----
 
@@ -82,6 +83,7 @@ These tools yield items from an iterable, plus additional data.
 .. autofunction:: count_cycle
 .. autofunction:: intersperse
 .. autofunction:: padded
+.. autofunction:: mark_ends
 .. autofunction:: repeat_last
 .. autofunction:: adjacent
 .. autofunction:: groupby_transform
@@ -108,6 +110,7 @@ These tools combine multiple iterables.
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
+.. autofunction:: zip_equal
 
 ----
 
@@ -129,17 +132,14 @@ These tools return summarized or aggregated data from an iterable.
 **New itertools**
 
 .. autofunction:: ilen
-.. autofunction:: first(iterable[, default])
-.. autofunction:: last(iterable[, default])
-.. autofunction:: one(iterable, too_short=ValueError, too_long=ValueError)
-.. autofunction:: only(iterable, default=None, too_long=ValueError)
 .. autofunction:: unique_to_each
-.. autofunction:: locate(iterable, pred=bool, window_size=None)
-.. autofunction:: rlocate(iterable, pred=bool, window_size=None)
+.. autofunction:: sample(iterable, k=1, weights=None)
 .. autofunction:: consecutive_groups(iterable, ordering=lambda x: x)
-.. autofunction:: exactly_n(iterable, n, predicate=bool)
 .. autoclass:: run_length
 .. autofunction:: map_reduce
+.. autofunction:: exactly_n(iterable, n, predicate=bool)
+.. autofunction:: is_sorted
+.. autofunction:: all_unique
 
 ----
 
@@ -147,7 +147,6 @@ These tools return summarized or aggregated data from an iterable.
 
 .. autofunction:: all_equal
 .. autofunction:: first_true
-.. autofunction:: nth
 .. autofunction:: quantify(iterable, pred=bool)
 
 
@@ -160,17 +159,26 @@ These tools yield certain items from an iterable.
 
 **New itertools**
 
-.. autofunction:: islice_extended(start, stop, step)
+
+.. class:: islice_extended(iterable, stop)
+.. autoclass:: islice_extended(iterable, start, stop[, step])
+  :noindex:
+.. autofunction:: first(iterable[, default])
+.. autofunction:: last(iterable[, default])
+.. autofunction:: one(iterable, too_short=ValueError, too_long=ValueError)
+.. autofunction:: only(iterable, default=None, too_long=ValueError)
 .. autofunction:: strip
 .. autofunction:: lstrip
 .. autofunction:: rstrip
 .. autofunction:: filter_except
 .. autofunction:: map_except
+.. autofunction:: nth_or_last(iterable, n[, default])
 
 ----
 
 **Itertools recipes**
 
+.. autofunction:: nth
 .. autofunction:: take
 .. autofunction:: tail
 .. autofunction:: unique_everseen
@@ -215,8 +223,10 @@ consume iterables.
 **New itertools**
 
 .. autofunction:: always_iterable
+.. autofunction:: always_reversible
 .. autofunction:: consumer
 .. autofunction:: with_iter
+.. autoclass:: callback_iter
 
 ----
 
@@ -230,12 +240,15 @@ Others
 
 **New itertools**
 
+.. autofunction:: locate(iterable, pred=bool, window_size=None)
+.. autofunction:: rlocate(iterable, pred=bool, window_size=None)
 .. autofunction:: replace
-.. autofunction:: numeric_range(start, stop, step)
-.. autofunction:: always_reversible
+.. function:: numeric_range(stop)
+.. autofunction:: numeric_range(start, stop[, step])
+  :noindex:
 .. autofunction:: side_effect
 .. autofunction:: iterate
-.. autofunction:: difference(iterable, func=operator.sub)
+.. autofunction:: difference(iterable, func=operator.sub, *, initial=None)
 .. autofunction:: make_decorator
 .. autoclass:: SequenceView
 .. autofunction:: time_limited

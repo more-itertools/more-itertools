@@ -5,6 +5,128 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.5.0
+-----
+
+
+* New itertools
+    * :func:`windowed_complete` (thanks to MarcinKonowalczyk)
+
+* Changes to existing itertools:
+    * The :func:`is_sorted` implementation was improved (thanks to cool-RR)
+    * The :func:`groupby_transform` now accepts a ``reducefunc`` parameter.
+    * The :func:`last` implementation was improved (thanks to brianmaissy)
+
+* Other changes
+    * Various documentation fixes (thanks to craigrosie, samuelstjean, PiCT0)
+    * The tests for :func:`distinct_combinations` were improved (thanks to Minabsapi)
+    * Automated tests now run on GitHub Actions. All commits now check:
+        * That unit tests pass
+        * That the examples in docstrings work
+        * That test coverage remains high (using `coverage`)
+        * For linting errors (using `flake8`)
+        * For consistent style (using `black`)
+        * That the type stubs work (using `mypy`)
+        * That the docs build correctly (using `sphinx`)
+        * That packages build correctly (using `twine`)
+
+8.4.0
+-----
+
+* New itertools
+    * :func:`mark_ends` (thanks to kalekundert)
+    * :func:`is_sorted`
+
+* Changes to existing itertools:
+    * :func:`islice_extended` can now be used with real slices (thanks to cool-RR)
+    * The implementations for :func:`filter_except` and :func:`map_except` were improved (thanks to SergBobrovsky)
+
+* Other changes
+    * Automated tests now enforce code style (using `black <https://github.com/psf/black>`__)
+    * The various signatures of :func:`islice_extended` and :func:`numeric_range` now appear in the docs (thanks to dsfulf)
+    * The test configuration for mypy was updated (thanks to blueyed)
+
+
+8.3.0
+-----
+
+* New itertools
+    * :func:`zip_equal` (thanks to frankier and alexmojaki)
+
+* Changes to existing itertools:
+    * :func:`split_at`, :func:`split_before`, :func:`split_after`, and :func:`split_when` all got a ``maxsplit`` paramter (thanks to jferard and ilai-deutel)
+    * :func:`split_at` now accepts a ``keep_separator`` parameter (thanks to jferard)
+    * :func:`distinct_permutations` can now generate ``r``-length permutations (thanks to SergBobrovsky and ilai-deutel)
+    * The :func:`windowed` implementation was improved  (thanks to SergBobrovsky)
+    * The :func:`spy` implementation was improved (thanks to has2k1)
+
+* Other changes
+    * Type stubs are now tested with ``stubtest`` (thanks to ilai-deutel)
+    * Tests now run with ``python -m unittest`` instead of ``python setup.py test`` (thanks to jdufresne)
+
+8.2.0
+-----
+
+* Bug fixes
+    * The .pyi files for typing were updated. (thanks to blueyed and ilai-deutel)
+
+* Changes to existing itertools:
+    * :func:`numeric_range` now behaves more like the built-in :func:`range`. (thanks to jferard)
+    * :func:`bucket` now allows for enumerating keys. (thanks to alexchandel)
+    * :func:`sliced` now should now work for numpy arrays. (thanks to sswingle)
+    * :func:`seekable` now has a ``maxlen`` parameter.
+
+8.1.0
+-----
+
+* Bug fixes
+    * :func:`partition` works with ``pred=None`` again. (thanks to MSeifert04)
+
+* New itertools
+    * :func:`sample` (thanks to tommyod)
+    * :func:`nth_or_last` (thanks to d-ryzhikov)
+
+* Changes to existing itertools:
+    * The implementation for :func:`divide` was improved. (thanks to jferard)
+
+8.0.2
+-----
+
+* Bug fixes
+    * The type stub files are now part of the wheel distribution (thanks to keisheiled)
+
+8.0.1
+-----
+
+* Bug fixes
+    * The type stub files now work for functions imported from the
+      root package (thanks to keisheiled)
+
+8.0.0
+-----
+
+* New itertools and other additions
+    * This library now ships type hints for use with mypy.
+      (thanks to ilai-deutel for the implementation, and to gabbard and fmagin for assistance)
+    * :func:`split_when` (thanks to jferard)
+    * :func:`repeat_last` (thanks to d-ryzhikov)
+
+* Changes to existing itertools:
+    * The implementation for :func:`set_partitions` was improved. (thanks to jferard)
+    * :func:`partition` was optimized for expensive predicates. (thanks to stevecj)
+    * :func:`unique_everseen` and :func:`groupby_transform` were re-factored. (thanks to SergBobrovsky)
+    * The implementation for :func:`difference` was improved. (thanks to Jabbey92)
+
+* Other changes
+    * Python 3.4 has reached its end of life and is no longer supported.
+    * Python 3.8 is officially supported. (thanks to jdufresne)
+    * The ``collate`` function has been deprecated.
+      It raises a ``DeprecationWarning`` if used, and will be removed in a future release.
+    * :func:`one` and :func:`only` now provide more informative error messages. (thanks to gabbard)
+    * Unit tests were moved outside of the main package (thanks to jdufresne)
+    * Various documentation fixes (thanks to kriomant, gabbard, jdufresne)
+
+
 7.2.0
 -----
 

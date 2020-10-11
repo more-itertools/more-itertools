@@ -293,7 +293,7 @@ class GrouperTests(TestCase):
                 [('A', 'B', 'C'), ('D', 'E', 'F')],
             )
 
-        warning, = caught
+        (warning,) = caught
         assert warning.category == DeprecationWarning
 
 
@@ -319,16 +319,19 @@ class PartitionTests(TestCase):
     """Tests for ``partition()``"""
 
     def test_bool(self):
-        """Test when pred() returns a boolean"""
         lesser, greater = mi.partition(lambda x: x > 5, range(10))
         self.assertEqual(list(lesser), [0, 1, 2, 3, 4, 5])
         self.assertEqual(list(greater), [6, 7, 8, 9])
 
     def test_arbitrary(self):
-        """Test when pred() returns an integer"""
         divisibles, remainders = mi.partition(lambda x: x % 3, range(10))
         self.assertEqual(list(divisibles), [0, 3, 6, 9])
         self.assertEqual(list(remainders), [1, 2, 4, 5, 7, 8])
+
+    def test_pred_is_none(self):
+        falses, trues = mi.partition(None, range(3))
+        self.assertEqual(list(falses), [0])
+        self.assertEqual(list(trues), [1, 2])
 
 
 class PowersetTests(TestCase):
@@ -604,6 +607,29 @@ class RandomCombinationWithReplacementTests(TestCase):
             combination = mi.random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         self.assertEqual(all_items, set(items))
+
+
+class NthProductTests(TestCase):
+    def test_basic(self):
+        iterables = ['ab', 'cdef', 'ghi']
+        for index, expected in enumerate(product(index, **iterables)):
+            actual = mi.nth_product(index, **iterables)
+            self.assertEqual(actual, expected)
+    
+    def test_long(self):
+        actual = mi.nth_product(1337, range(101), range(22), range(53))
+        expected = (1, 3, 12)
+        self.assertEqual(actual, expected)
+    
+    def test_negative(self):
+        iterables = ['abc', 'de', 'fghi']
+        for index, expected in enumerate(product(index, **iterables)):
+            actual = mi.nth_product(index - 24, **iterables)
+            self.assertEqual(actual, expected)
+    
+    def test_invalid_index(self):
+        with self.assertRaises(IndexError):
+            mi.nth_product(24, 'ab', 'cde', 'fghi')
 
 
 class NthCombinationTests(TestCase):
