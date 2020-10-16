@@ -2,7 +2,7 @@ import warnings
 from doctest import DocTestSuite
 from unittest import TestCase
 
-from itertools import combinations
+from itertools import combinations, product
 
 import more_itertools as mi
 
@@ -562,6 +562,29 @@ class RandomCombinationWithReplacementTests(TestCase):
             combination = mi.random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         self.assertEqual(all_items, set(items))
+
+
+class NthProductTests(TestCase):
+    def test_basic(self):
+        iterables = ['ab', 'cdef', 'ghi']
+        for index, expected in enumerate(product(*iterables)):
+            actual = mi.nth_product(index, *iterables)
+            self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.nth_product(1337, range(101), range(22), range(53))
+        expected = (1, 3, 12)
+        self.assertEqual(actual, expected)
+
+    def test_negative(self):
+        iterables = ['abc', 'de', 'fghi']
+        for index, expected in enumerate(product(*iterables)):
+            actual = mi.nth_product(index - 24, *iterables)
+            self.assertEqual(actual, expected)
+
+    def test_invalid_index(self):
+        with self.assertRaises(IndexError):
+            mi.nth_product(24, 'ab', 'cde', 'fghi')
 
 
 class NthCombinationTests(TestCase):
