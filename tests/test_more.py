@@ -4111,3 +4111,26 @@ class AllUniqueTests(TestCase):
 
     def test_infinite(self):
         self.assertEqual(mi.all_unique(mi.prepend(3, count())), False)
+
+
+class NthProductTests(TestCase):
+    def test_basic(self):
+        iterables = ['ab', 'cdef', 'ghi']
+        for index, expected in enumerate(product(*iterables)):
+            actual = mi.nth_product(index, *iterables)
+            self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.nth_product(1337, range(101), range(22), range(53))
+        expected = (1, 3, 12)
+        self.assertEqual(actual, expected)
+
+    def test_negative(self):
+        iterables = ['abc', 'de', 'fghi']
+        for index, expected in enumerate(product(*iterables)):
+            actual = mi.nth_product(index - 24, *iterables)
+            self.assertEqual(actual, expected)
+
+    def test_invalid_index(self):
+        with self.assertRaises(IndexError):
+            mi.nth_product(24, 'ab', 'cde', 'fghi')

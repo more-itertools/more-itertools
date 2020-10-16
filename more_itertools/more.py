@@ -3,7 +3,7 @@ import warnings
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
-from functools import partial, wraps
+from functools import partial, reduce, wraps
 from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
     chain,
@@ -22,7 +22,7 @@ from itertools import (
 from math import exp, floor, log
 from queue import Empty, Queue
 from random import random, randrange, uniform
-from operator import itemgetter, sub, gt, lt
+from operator import itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -74,6 +74,7 @@ __all__ = [
     'map_except',
     'map_reduce',
     'nth_or_last',
+    'nth_product',
     'numeric_range',
     'one',
     'only',
@@ -3483,3 +3484,28 @@ def all_unique(iterable, key=None):
                 return False
             seenlist_add(element)
     return True
+
+
+def nth_product(index, *args):
+    """Equivalent to ``list(product(*args))[index]``.
+    The products of **args* can be ordered lexicographically.
+    :func:`nth_product` computes the product at sort position *index* without
+    computing the previous products.
+    """
+    pools = list(map(tuple, reversed(args)))
+    ns = list(map(len, pools))
+
+    c = reduce(mul, ns)
+
+    if index < 0:
+        index += c
+
+    if not 0 <= index < c:
+        raise IndexError
+
+    result = []
+    for pool, n in zip(pools, ns):
+        result.append(pool[index % n])
+        index //= n
+
+    return tuple(reversed(result))
