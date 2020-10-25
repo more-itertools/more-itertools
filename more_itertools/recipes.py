@@ -9,6 +9,7 @@ Some backward-compatible usability improvements have been made.
 """
 import warnings
 from collections import deque
+from functools import reduce
 from itertools import (
     chain,
     combinations,
@@ -39,7 +40,6 @@ __all__ = [
     'nth',
     'nth_combination',
     'nth_permutation',
-    'nth_product',
     'padnone',
     'pairwise',
     'partition',
@@ -645,31 +645,6 @@ def random_combination_with_replacement(iterable, r):
     n = len(pool)
     indices = sorted(randrange(n) for i in range(r))
     return tuple(pool[i] for i in indices)
-
-
-def nth_product(index, *args):
-    """Equivalent to ``list(product(*args))[index]``.
-    The products of **args* can be ordered lexicographically.
-    :func:`nth_product` computes the product at sort position *index* without
-    computing the previous products.
-
-    """
-    pools = tuple(map(tuple, reversed(args)))
-    ns = tuple(map(len, pools))
-    c = prod(ns)
-
-    if index < 0:
-        index += c
-
-    if not 0 <= index < c:
-        raise IndexError
-
-    result = []
-    for pool, n in zip(pools, ns):
-        result.append(pool[index % n])
-        index //= n
-
-    return tuple(reversed(result))
 
 
 def nth_combination(iterable, r, index):

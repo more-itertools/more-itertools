@@ -1,16 +1,9 @@
 import warnings
 
-<<<<<<< HEAD
 from doctest import DocTestSuite
 from itertools import combinations
 from unittest import TestCase
-=======
-<<<<<<< Updated upstream
-from itertools import combinations
-=======
 from itertools import combinations, permutations, product
->>>>>>> Stashed changes
->>>>>>> Add combinatoric caclulations and nth_permutation
 
 import more_itertools as mi
 
