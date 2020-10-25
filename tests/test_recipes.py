@@ -630,7 +630,7 @@ class NthPermutationTests(TestCase):
         for index in [-1 - n, n + 1]:
             with self.assertRaises(IndexError):
                 mi.nth_combination(iterable, r, index)
-    
+
     def test_invalid_r(self):
         iterable = 'abcde'
         r = 4
