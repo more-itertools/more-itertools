@@ -2,6 +2,7 @@ import warnings
 
 from doctest import DocTestSuite
 from itertools import combinations, permutations
+from math import factorial
 from unittest import TestCase
 
 import more_itertools as mi
@@ -11,132 +12,6 @@ def load_tests(loader, tests, ignore):
     # Add the doctests
     tests.addTests(DocTestSuite('more_itertools.recipes'))
     return tests
-
-
-def make_n_k_tests(func, k_less_than_n, k_equal_to_n):
-    # Class factory for comb, perm, comb_w_r, and perm_w_r tests
-
-    class FuncTests(TestCase):
-        """Tests for ``func()``"""
-
-        def test_k_less_than_n(self):
-            actual = func(10, 5)
-            self.assertEqual(actual, k_less_than_n)
-
-        def test_k_greater_than_n(self):
-            actual = func(3, 5)
-            self.assertEqual(actual, 0)
-
-        def test_k_equal_to_n(self):
-            actual = func(8, 8)
-            self.assertEqual(actual, k_equal_to_n)
-
-        def test_k_equal_to_zero(self):
-            actual = func(6, 0)
-            self.assertEqual(actual, 1)
-
-        def test_non_integer(self):
-            with self.assertRaises(TypeError):
-                func(0.5, 0.3)
-
-        def test_non_numeric(self):
-            with self.assertRaises(TypeError):
-                func('a', 'b')
-
-        def test_negative_n(self):
-            with self.assertRaises(ValueError):
-                func(-5, 5)
-
-        def test_negative_k(self):
-            with self.assertRaises(ValueError):
-                func(3, -10)
-
-    return FuncTests
-
-
-class CombTests(make_n_k_tests(mi.comb, 252, 1)):
-    pass
-
-
-class PermTests(make_n_k_tests(mi.perm, 30240, 40320)):
-    pass
-
-
-class ProdTests(TestCase):
-    """Tests for ``prod()``"""
-
-    def test_basic(self):
-        actual = mi.prod(range(1, 11))
-        expected = 3628800
-        self.assertEqual(actual, expected)
-
-    def test_negative(self):
-        actual = mi.prod([-8, 4, -2, -8])
-        expected = -512
-        self.assertEqual(actual, expected)
-
-    def test_zero(self):
-        actual = mi.prod([3, 0, 2])
-        expected = 0
-        self.assertEqual(actual, expected)
-
-    def test_start(self):
-        actual = mi.prod([3, 6, 2], start=2)
-        expected = 72
-        self.assertEqual(actual, expected)
-
-    def test_empty(self):
-        actual = mi.prod(range(0), start=8)
-        expected = 8
-        self.assertEqual(actual, expected)
-
-    def test_inf(self):
-        actual = mi.prod([1, float('inf')])
-        expected = float('inf')
-        self.assertAlmostEqual(actual, expected)
-
-    def test_float(self):
-        actual = mi.prod([0.5, 0.6, 0.7])
-        expected = 0.5 * 0.6 * 0.7
-        self.assertAlmostEqual(actual, expected)
-
-    def test_non_numeric(self):
-        with self.assertRaises(TypeError):
-            mi.prod([1, 'b', '3'])
-
-
-class CombWRTests(make_n_k_tests(mi.comb_w_r, 2002, 6435)):
-    pass
-
-
-class PermWRTests(make_n_k_tests(mi.perm_w_r, 100000, 16777216)):
-    pass
-
-
-class PwrTests(TestCase):
-    """Tests for ``pwr()``"""
-
-    def test_basic(self):
-        actual = mi.pwr(10)
-        expected = 1024
-        self.assertEqual(actual, expected)
-
-    def test_zero(self):
-        actual = mi.pwr(0)
-        expected = 1
-        self.assertEqual(actual, expected)
-
-    def test_negative(self):
-        with self.assertRaises(ValueError):
-            mi.pwr(-1)
-
-    def test_float(self):
-        with self.assertRaises(TypeError):
-            mi.pwr(0.5)
-
-    def test_non_numeric(self):
-        with self.assertRaises(TypeError):
-            mi.pwr('a')
 
 
 class TakeTests(TestCase):
@@ -743,7 +618,7 @@ class NthPermutationTests(TestCase):
     def test_negative_index(self):
         iterable = 'abcde'
         r = 4
-        n = mi.perm(len(iterable), r)
+        n = factorial(len(iterable)) // factorial(len(iterable) - r)
         for index, expected in enumerate(permutations(iterable, r)):
             actual = mi.nth_permutation(iterable, r, index - n)
             self.assertEqual(actual, expected)
@@ -751,7 +626,7 @@ class NthPermutationTests(TestCase):
     def test_invalid_index(self):
         iterable = 'abcde'
         r = 4
-        n = mi.perm(len(iterable), r)
+        n = factorial(len(iterable)) // factorial(len(iterable) - r)
         for index in [-1 - n, n + 1]:
             with self.assertRaises(IndexError):
                 mi.nth_combination(iterable, r, index)

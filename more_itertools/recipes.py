@@ -29,8 +29,6 @@ from random import randrange, sample, choice
 __all__ = [
     'all_equal',
     'consume',
-    'comb',
-    'comb_w_r',
     'dotproduct',
     'first_true',
     'flatten',
@@ -43,12 +41,8 @@ __all__ = [
     'padnone',
     'pairwise',
     'partition',
-    'perm',
-    'perm_w_r',
     'powerset',
     'prepend',
-    'prod',
-    'pwr',
     'quantify',
     'random_combination_with_replacement',
     'random_combination',
@@ -62,120 +56,6 @@ __all__ = [
     'unique_everseen',
     'unique_justseen',
 ]
-
-
-def comb(n, k):
-    """
-    Return the number of ways to choose *k* items from *n* items without
-    repetition and without order. Evaluations to
-    *n*! / (*k*! * (*n* - *k*)!) when *k* <= *n* and evaluates to zero when
-    *k* > *n*. Raises ValueError if n or k are negative. Raises TypeError
-    if n or k are not integers.
-
-    """
-    if n < 0 or k < 0:
-        raise ValueError
-    elif not isinstance(n, int) or not isinstance(k, int):
-        raise TypeError
-
-    if k > n:
-        return 0
-
-    return factorial(n) // (factorial(k) * factorial(n - k))
-
-
-def perm(n, k=None):
-    """Return the number of ways to choose *k* items from *n* items
-    without repetition and with order. Evaluates to *n*! / (*n* - *k*)!
-    when *k* <= *n* and evaluates to zero when *k* > *n*. If *k* is not
-    specified or is None, then *k* defaults to *n* and the function returns
-    *n*!. Raises ValueError if n or k are negative. Raises TypeError if n
-    or k are not integers.
-
-    """
-    if n < 0:
-        raise ValueError
-    elif not isinstance(n, int):
-        raise TypeError
-
-    if k is None or k == n:
-        return factorial(n)
-    elif k < 0:
-        raise ValueError
-    elif not isinstance(k, int):
-        raise TypeError
-
-    if k > n:
-        return 0
-
-    return factorial(n) // factorial(n - k)
-
-
-def prod(iterable, *, start=1):
-    """Calculate the product of all elements of *iterable*. The default
-    start value for the product is *start*. When *iterable* is empty
-    return the *start* value. :func:`prod` is designed specifically for use
-    with numeric values and may reject non-numeric types.
-
-    """
-    return reduce(operator.mul, iterable, start)
-
-
-def comb_w_r(n, k):
-    """Return the number of ways to choose *k* items from *n* items
-    with repetition and without order. Evaluates to
-    (*n* + *k* + 1)! / (*n* - 1)! when *k* <= *n* and evaluates to zero when
-    *k* > *n*. Raises ValueError is n or k are negative. Raises TypeError if
-    either n or k are not integers.
-
-    """
-    if n < 0 or k < 0:
-        raise ValueError
-    elif not isinstance(n, int) or not isinstance(k, int):
-        raise TypeError
-
-    if k > n:
-        return 0
-
-    return factorial(n + k - 1) // (factorial(n - 1) * factorial(k))
-
-
-def perm_w_r(n, k=None):
-    """Return the number of ways to choose *k* items from *n* items
-    with repetition and with order. Evaluates to *n*^*k* when *k* <= *n* and
-    evaluates to zero when *k* > *n*. If k is not specified or k is None, then
-    k defaults to n. Raises ValueError if n or k are negative. Raises TypeError
-    if n or k are not integers.
-
-    """
-    if n < 0:
-        raise ValueError
-    elif not isinstance(n, int):
-        raise TypeError
-
-    if k is None:
-        k = n
-    elif k < 0:
-        raise ValueError
-    elif not isinstance(k, int):
-        raise TypeError
-    elif k > n:
-        return 0
-
-    return n ** k
-
-
-def pwr(n):
-    """Return the number of subsets with any amount of elements in the power set
-    of a set with n elements. Raises ValueError if n is negative. Raises
-    TypeError is n is not an integer.
-    """
-    if n < 0:
-        raise ValueError
-    elif not isinstance(n, int):
-        raise TypeError
-
-    return 2 ** n
 
 
 def take(n, iterable):
@@ -692,8 +572,13 @@ def nth_permutation(iterable, r, index):
     """
     pool = list(iterable)
     n = len(pool)
-    r = n if r is None else r
-    c = perm(n, r)
+
+    if r is None or r == n:
+        r, c = n, factorial(n)
+    elif not 0 <= r < n:
+        raise ValueError
+    else:
+        c = factorial(n) // factorial(n - r)
 
     if index < 0:
         index += c
@@ -705,7 +590,7 @@ def nth_permutation(iterable, r, index):
         return tuple()
 
     result = [0] * r
-    q = index * perm(n) // c if r < n else index
+    q = index * factorial(n) // c if r < n else index
     for d in range(1, n + 1):
         q, i = divmod(q, d)
         if 0 <= n - d < r:
