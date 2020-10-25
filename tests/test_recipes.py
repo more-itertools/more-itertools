@@ -1,9 +1,8 @@
 import warnings
 
 from doctest import DocTestSuite
-from itertools import combinations
-from unittest import TestCase
 from itertools import combinations, permutations, product
+from unittest import TestCase
 
 import more_itertools as mi
 
