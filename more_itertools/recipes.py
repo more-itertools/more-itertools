@@ -68,7 +68,7 @@ try:
     from math import comb, perm, prod
 except ImportError:  # pragma: no cover
 
-    def comb(n, k):
+    def comb(n, k, /):
         """
         Return the number of ways to choose *k* items from *n* items without
         repetition and without order. Evaluations to
@@ -87,7 +87,7 @@ except ImportError:  # pragma: no cover
 
         return factorial(n) // (factorial(k) * factorial(n - k))
 
-    def perm(n, k=None):
+    def perm(n, k=None, /):
         """Return the number of ways to choose *k* items from *n* items
         without repetition and with order. Evaluates to *n*! / (*n* - *k*)!
         when *k* <= *n* and evaluates to zero when *k* > *n*. If *k* is not
@@ -113,7 +113,7 @@ except ImportError:  # pragma: no cover
 
         return factorial(n) // factorial(n - k)
 
-    def prod(iterable, *, start=1):
+    def prod(iterable, /, *, start=1):
         """Calculate the product of all elements of *iterable*. The default
         start value for the product is *start*. When *iterable* is empty
         return the *start* value. :func:`prod` is designed specifically for use
