@@ -64,67 +64,63 @@ __all__ = [
 ]
 
 
-def comb(n, k):
-    """
-    Return the number of ways to choose *k* items from *n* items without
-    repetition and without order. Evaluations to
-    *n*! / (*k*! * (*n* - *k*)!) when *k* <= *n* and evaluates to zero when
-    *k* > *n*. Raises ValueError if n or k are negative. Raises TypeError
-    if n or k are not integers.
-
-    """
-    if n < 0 or k < 0:
-        raise ValueError
-    elif not isinstance(n, int) or not isinstance(k, int):
-        raise TypeError
-
-    if k > n:
-        return 0
-
-    return factorial(n) // (factorial(k) * factorial(n - k))
-
-
-def perm(n, k=None):
-    """Return the number of ways to choose *k* items from *n* items
-    without repetition and with order. Evaluates to *n*! / (*n* - *k*)!
-    when *k* <= *n* and evaluates to zero when *k* > *n*. If *k* is not
-    specified or is None, then *k* defaults to *n* and the function returns
-    *n*!. Raises ValueError if n or k are negative. Raises TypeError if n
-    or k are not integers.
-
-    """
-    if n < 0:
-        raise ValueError
-    elif not isinstance(n, int):
-        raise TypeError
-
-    if k is None or k == n:
-        return factorial(n)
-    elif k < 0:
-        raise ValueError
-    elif not isinstance(k, int):
-        raise TypeError
-
-    if k > n:
-        return 0
-
-    return factorial(n) // factorial(n - k)
-
-
-def prod(iterable, *, start=1):
-    """Calculate the product of all elements of *iterable*. The default
-    start value for the product is *start*. When *iterable* is empty
-    return the *start* value. :func:`prod` is designed specifically for use
-    with numeric values and may reject non-numeric types.
-
-    """
-    return reduce(operator.mul, iterable, start)
-
-
 try:
     from math import comb, perm, prod
-except ImportError:
-    pass
+except ImportError:  # pragma: no cover
+
+    def comb(n, k):
+        """
+        Return the number of ways to choose *k* items from *n* items without
+        repetition and without order. Evaluations to
+        *n*! / (*k*! * (*n* - *k*)!) when *k* <= *n* and evaluates to zero when
+        *k* > *n*. Raises ValueError if n or k are negative. Raises TypeError
+        if n or k are not integers.
+
+        """
+        if n < 0 or k < 0:
+            raise ValueError
+        elif not isinstance(n, int) or not isinstance(k, int):
+            raise TypeError
+
+        if k > n:
+            return 0
+
+        return factorial(n) // (factorial(k) * factorial(n - k))
+
+    def perm(n, k=None):
+        """Return the number of ways to choose *k* items from *n* items
+        without repetition and with order. Evaluates to *n*! / (*n* - *k*)!
+        when *k* <= *n* and evaluates to zero when *k* > *n*. If *k* is not
+        specified or is None, then *k* defaults to *n* and the function returns
+        *n*!. Raises ValueError if n or k are negative. Raises TypeError if n
+        or k are not integers.
+
+        """
+        if n < 0:
+            raise ValueError
+        elif not isinstance(n, int):
+            raise TypeError
+
+        if k is None or k == n:
+            return factorial(n)
+        elif k < 0:
+            raise ValueError
+        elif not isinstance(k, int):
+            raise TypeError
+
+        if k > n:
+            return 0
+
+        return factorial(n) // factorial(n - k)
+
+    def prod(iterable, *, start=1):
+        """Calculate the product of all elements of *iterable*. The default
+        start value for the product is *start*. When *iterable* is empty
+        return the *start* value. :func:`prod` is designed specifically for use
+        with numeric values and may reject non-numeric types.
+
+        """
+        return reduce(operator.mul, iterable, start)
 
 
 def comb_w_r(n, k):
