@@ -9,7 +9,6 @@ Some backward-compatible usability improvements have been made.
 """
 import warnings
 from collections import deque
-from functools import reduce
 from itertools import (
     chain,
     combinations,
