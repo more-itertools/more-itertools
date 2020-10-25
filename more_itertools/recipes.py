@@ -21,12 +21,15 @@ from itertools import (
     tee,
     zip_longest,
 )
+from math import factorial
 import operator
 from random import randrange, sample, choice
 
 __all__ = [
     'all_equal',
     'consume',
+    'comb',
+    'comb_w_r',
     'dotproduct',
     'first_true',
     'flatten',
@@ -35,11 +38,17 @@ __all__ = [
     'ncycles',
     'nth',
     'nth_combination',
+    'nth_permutation',
+    'nth_product',
     'padnone',
     'pairwise',
     'partition',
+    'perm',
+    'perm_w_r',
     'powerset',
     'prepend',
+    'prod',
+    'pwr',
     'quantify',
     'random_combination_with_replacement',
     'random_combination',
@@ -53,6 +62,122 @@ __all__ = [
     'unique_everseen',
     'unique_justseen',
 ]
+
+
+try:
+    from math import comb, perm, prod
+except ImportError:
+
+    def comb(n, k):
+        """
+        Return the number of ways to choose *k* items from *n* items without
+        repetition and without order. Evaluations to
+        *n*! / (*k*! * (*n* - *k*)!) when *k* <= *n* and evaluates to zero when
+        *k* > *n*. Raises ValueError if n or k are negative. Raises TypeError
+        if n or k are not integers.
+
+        """
+        if n < 0 or k < 0:
+            raise ValueError
+        elif not isinstance(n, int) or not isinstance(k, int):
+            raise TypeError
+
+        if k > n:
+            return 0
+
+        return factorial(n) // (factorial(k) * factorial(n - k))
+
+    def perm(n, k=None):
+        """Return the number of ways to choose *k* items from *n* items
+        without repetition and with order. Evaluates to *n*! / (*n* - *k*)!
+        when *k* <= *n* and evaluates to zero when *k* > *n*. If *k* is not
+        specified or is None, then *k* defaults to *n* and the function returns
+        *n*!. Raises ValueError if n or k are negative. Raises TypeError if n
+        or k are not integers.
+
+        """
+        if n < 0:
+            raise ValueError
+        elif not isinstance(n, int):
+            raise TypeError
+
+        if k is None or k == n:
+            return factorial(n)
+        elif k < 0:
+            raise ValueError
+        elif not isinstance(k, int):
+            raise TypeError
+
+        if k > n:
+            return 0
+
+        return factorial(n) // factorial(n - k)
+
+    def prod(iterable, *, start=1):
+        """Calculate the product of all elements of *iterable*. The default
+        start value for the product is *start*. When *iterable* is empty
+        return the *start* value. :func:`prod` is designed specifically for use
+        with numeric values and may reject non-numeric types.
+
+        """
+        return reduce(operator.mul, iterable, start)
+
+
+def comb_w_r(n, k):
+    """Return the number of ways to choose *k* items from *n* items
+    with repetition and without order. Evaluates to
+    (*n* + *k* + 1)! / (*n* - 1)! when *k* <= *n* and evaluates to zero when
+    *k* > *n*. Raises ValueError is n or k are negative. Raises TypeError if
+    either n or k are not integers.
+
+    """
+    if n < 0 or k < 0:
+        raise ValueError
+    elif not isinstance(n, int) or not isinstance(k, int):
+        raise TypeError
+
+    if k > n:
+        return 0
+
+    return factorial(n + k - 1) // (factorial(n - 1) * factorial(k))
+
+
+def perm_w_r(n, k=None):
+    """Return the number of ways to choose *k* items from *n* items
+    with repetition and with order. Evaluates to *n*^*k* when *k* <= *n* and
+    evaluates to zero when *k* > *n*. If k is not specified or k is None, then
+    k defaults to n. Raises ValueError if n or k are negative. Raises TypeError
+    if n or k are not integers.
+
+    """
+    if n < 0:
+        raise ValueError
+    elif not isinstance(n, int):
+        raise TypeError
+
+    if k is None:
+        k = n
+    elif k < 0:
+        raise ValueError
+    elif not isinstance(k, int):
+        raise TypeError
+    elif k > n:
+        return 0
+
+    return n ** k
+
+
+def pwr(n):
+    """Return the number of subsets with any amount of elements in the power set
+    of a set with n elements. Raises ValueError if n is negative. Raises
+    TypeError is n is not an integer.
+    """
+    if n < 0:
+        raise ValueError
+    elif not isinstance(n, int):
+        raise TypeError
+
+    return 2 ** n
 
 
 def take(n, iterable):
@@ -522,6 +647,31 @@ def random_combination_with_replacement(iterable, r):
     return tuple(pool[i] for i in indices)
 
 
+def nth_product(index, *args):
+    """Equivalent to ``list(product(*args))[index]``.
+    The products of **args* can be ordered lexicographically.
+    :func:`nth_product` computes the product at sort position *index* without
+    computing the previous products.
+
+    """
+    pools = tuple(map(tuple, reversed(args)))
+    ns = tuple(map(len, pools))
+    c = prod(ns)
+
+    if index < 0:
+        index += c
+
+    if not 0 <= index < c:
+        raise IndexError
+
+    result = []
+    for pool, n in zip(pools, ns):
+        result.append(pool[index % n])
+        index //= n
+
+    return tuple(reversed(result))
+
+
 def nth_combination(iterable, r, index):
     """Equivalent to ``list(combinations(iterable, r))[index]``.
 
@@ -556,6 +706,41 @@ def nth_combination(iterable, r, index):
         result.append(pool[-1 - n])
 
     return tuple(result)
+
+
+def nth_permutation(iterable, r, index):
+    """Equivalent to ``list(permutations(iterable, r))[index]
+
+    The subsequences of *iterable* that are of length *r* where order is
+    important can be ordered lexicographically. :func:`nth_permutation`
+    computes the subsequence at sort position *index* directly, without
+    computing the previous subsequences.
+
+    """
+    pool = list(iterable)
+    n = len(pool)
+    r = n if r is None else r
+    c = perm(n, r)
+
+    if index < 0:
+        index += c
+
+    if not 0 <= index < c:
+        raise IndexError
+
+    if c == 0:
+        return tuple()
+
+    result = [0] * r
+    q = index * perm(n) // c if r < n else index
+    for d in range(1, n + 1):
+        q, i = divmod(q, d)
+        if 0 <= n - d < r:
+            result[n - d] = i
+        if q == 0:
+            break
+
+    return tuple(map(pool.pop, result))
 
 
 def prepend(value, iterator):
