@@ -21,6 +21,7 @@ from itertools import (
     tee,
     zip_longest,
 )
+from math import factorial
 import operator
 from random import randrange, sample, choice
 
@@ -35,6 +36,7 @@ __all__ = [
     'ncycles',
     'nth',
     'nth_combination',
+    'nth_permutation',
     'padnone',
     'pairwise',
     'partition',
@@ -556,6 +558,46 @@ def nth_combination(iterable, r, index):
         result.append(pool[-1 - n])
 
     return tuple(result)
+
+
+def nth_permutation(iterable, r, index):
+    """Equivalent to ``list(permutations(iterable, r))[index]
+
+    The subsequences of *iterable* that are of length *r* where order is
+    important can be ordered lexicographically. :func:`nth_permutation`
+    computes the subsequence at sort position *index* directly, without
+    computing the previous subsequences.
+
+    """
+    pool = list(iterable)
+    n = len(pool)
+
+    if r is None or r == n:
+        r, c = n, factorial(n)
+    elif not 0 <= r < n:
+        raise ValueError
+    else:
+        c = factorial(n) // factorial(n - r)
+
+    if index < 0:
+        index += c
+
+    if not 0 <= index < c:
+        raise IndexError
+
+    if c == 0:
+        return tuple()
+
+    result = [0] * r
+    q = index * factorial(n) // c if r < n else index
+    for d in range(1, n + 1):
+        q, i = divmod(q, d)
+        if 0 <= n - d < r:
+            result[n - d] = i
+        if q == 0:
+            break
+
+    return tuple(map(pool.pop, result))
 
 
 def prepend(value, iterator):

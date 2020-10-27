@@ -1,7 +1,8 @@
 import warnings
 
 from doctest import DocTestSuite
-from itertools import combinations
+from itertools import combinations, permutations
+from math import factorial
 from unittest import TestCase
 
 import more_itertools as mi
@@ -585,6 +586,58 @@ class NthCombinationTests(TestCase):
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
             mi.nth_combination('abcdefg', 3, -36)
+
+
+class NthPermutationTests(TestCase):
+    def test_r_less_than_n(self):
+        iterable = 'abcde'
+        r = 4
+        for index, expected in enumerate(permutations(iterable, r)):
+            actual = mi.nth_permutation(iterable, r, index)
+            self.assertEqual(actual, expected)
+
+    def test_r_equal_to_n(self):
+        iterable = 'abcde'
+        for index, expected in enumerate(permutations(iterable)):
+            actual = mi.nth_permutation(iterable, None, index)
+            self.assertEqual(actual, expected)
+
+    def test_long(self):
+        iterable = tuple(range(180))
+        r = 4
+        index = 1000000
+        actual = mi.nth_permutation(iterable, r, index)
+        expected = mi.nth(permutations(iterable, r), index)
+        self.assertEqual(actual, expected)
+
+    def test_null(self):
+        actual = mi.nth_permutation([], 0, 0)
+        expected = tuple()
+        self.assertEqual(actual, expected)
+
+    def test_negative_index(self):
+        iterable = 'abcde'
+        r = 4
+        n = factorial(len(iterable)) // factorial(len(iterable) - r)
+        for index, expected in enumerate(permutations(iterable, r)):
+            actual = mi.nth_permutation(iterable, r, index - n)
+            self.assertEqual(actual, expected)
+
+    def test_invalid_index(self):
+        iterable = 'abcde'
+        r = 4
+        n = factorial(len(iterable)) // factorial(len(iterable) - r)
+        for index in [-1 - n, n + 1]:
+            with self.assertRaises(IndexError):
+                mi.nth_combination(iterable, r, index)
+
+    def test_invalid_r(self):
+        iterable = 'abcde'
+        r = 4
+        n = factorial(len(iterable)) // factorial(len(iterable) - r)
+        for r in [-1, n + 1]:
+            with self.assertRaises(ValueError):
+                mi.nth_combination(iterable, r, 0)
 
 
 class PrependTests(TestCase):
