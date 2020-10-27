@@ -210,6 +210,7 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: random_combination
 .. autofunction:: random_combination_with_replacement
 .. autofunction:: nth_combination
+.. autofunction:: nth_permutation
 
 
 Wrapping
