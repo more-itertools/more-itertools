@@ -3431,10 +3431,11 @@ def windowed_complete(iterable, n):
     (0, 1, 2) (3, 4, 5) (6,)
     (0, 1, 2, 3) (4, 5, 6) ()
 
-    Notes:
-       * *n* must be at least 0 and most equal to the length of *iterable*.
-       * This function will exhaust *iterable* and store all its items.
+    Note that *n* must be at least 0 and most equal to the length of
+    *iterable*.
 
+    This function will exhaust the iterable and may require significant
+    storage.
     """
     if n < 0:
         raise ValueError('n must be >= 0')
@@ -3457,11 +3458,11 @@ def all_unique(iterable, key=None):
     Returns ``True`` if all the elements of *iterable* are unique (no two
     elements are equal).
 
-    If a *key* function is specified, it will be used to preprocess the
-    elements of the iterable before comparing.
-
         >>> all_unique('ABCB')
         False
+
+    If a *key* function is specified, it will be used to make comparisons.
+
         >>> all_unique('ABCb')
         True
         >>> all_unique('ABCb', str.lower)
@@ -3489,7 +3490,8 @@ def all_unique(iterable, key=None):
 
 def nth_product(index, *args):
     """Equivalent to ``list(product(*args))[index]``.
-    The products of **args* can be ordered lexicographically.
+
+    The products of *args* can be ordered lexicographically.
     :func:`nth_product` computes the product at sort position *index* without
     computing the previous products.
     """

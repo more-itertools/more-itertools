@@ -5,9 +5,23 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
-8.5.0
+8.6.0
 -----
 
+* New itertools
+    * :func:`all_unique` (thanks to brianmaissy)
+    * :func:`nth_product` and :func:`nth_permutation` (thanks to N8Brooks)
+
+* Changes to existing itertools
+    * :func:`chunked` and :func:`sliced` now accept a ``strict`` parameter (thanks to shlomif and jtwool)
+
+* Other changes
+    * Python 3.5 has reached its end of life and is no longer supported.
+    * Python 3.9 is officially supported.
+    * Various documentation fixes (thanks to timgates42)
+
+8.5.0
+-----
 
 * New itertools
     * :func:`windowed_complete` (thanks to MarcinKonowalczyk)
