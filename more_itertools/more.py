@@ -2463,7 +2463,7 @@ def difference(iterable, func=sub, *, initial=None):
     set to something other than ``None``, it will skip the first element when
     computing successive differences.
 
-        >>> iterable = [10, 11, 13, 16]  # accumulate([1, 2, 3], initial=100)
+        >>> iterable = [10, 11, 13, 16]  # accumulate([1, 2, 3], initial=10)
         >>> list(difference(iterable, initial=10))
         [1, 2, 3]
 
