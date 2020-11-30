@@ -92,9 +92,9 @@ These tools yield items from an iterable, plus additional data.
 
 **Itertools recipes**
 
-.. autofunction:: pad_none
 .. function:: padnone
   :noindex:
+.. autofunction:: pad_none
 .. autofunction:: ncycles
 
 Combining
