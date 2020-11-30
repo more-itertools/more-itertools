@@ -33,6 +33,7 @@ from .recipes import (
     powerset,
     take,
     unique_everseen,
+    prepend,
 )
 
 __all__ = [
@@ -114,6 +115,7 @@ __all__ = [
     'zip_offset',
     'windowed_complete',
     'all_unique',
+    'value_chain',
 ]
 
 _marker = object()
@@ -3552,3 +3554,39 @@ def nth_permutation(iterable, r, index):
             break
 
     return tuple(map(pool.pop, result))
+
+
+def value_chain(*args):
+    """Yield all arguments passed to the function in the same
+    order in which they were passed. If an argument itself is
+    iterable then iterate over its values.
+
+        >>> list(value_chain(1, 2, 'foo'))
+        [1, 2, 'foo']
+        >>> list(value_chain(b'bar', [1, 2, 3], 4, {'key': 1}))
+        [b'bar', 1, 2, 3, 4, 'key']
+        >>> list(value_chain([], {}, '', 0, None))
+        [[], {}, '', 0, None]
+        >>> list(value_chain())
+        []
+
+    Note that :func:`value_chain` is the more general version
+    of :func:`prepend`:
+
+        >>> list(prepend(0, [1, 2, 3]))
+        [0, 1, 2, 3]
+        >>> list(value_chain(0, [1, 2, 3]))
+        [0, 1, 2, 3]
+
+    """
+    for value in args:
+        if isinstance(value, (str, bytes,)):
+            yield value
+            continue
+        if not value:
+            yield value
+            continue
+        try:
+            yield from value
+        except TypeError:
+            yield value
