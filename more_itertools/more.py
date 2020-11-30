@@ -81,6 +81,7 @@ __all__ = [
     'only',
     'padded',
     'partitions',
+    'prod',
     'set_partitions',
     'peekable',
     'repeat_last',
@@ -3552,3 +3553,30 @@ def nth_permutation(iterable, r, index):
             break
 
     return tuple(map(pool.pop, result))
+
+
+try:
+    from math import prod as _prod
+except ImportError:
+
+    def _prod(iterable, *, start=1):
+        return reduce(mul, iterable, start)
+
+
+def prod(iterable, *, start=1):
+    """Return the product of all the elements in the input *iterable*.
+    If *iterable* is empty, *start* will be returned.
+    This function is intended to be used for iterables with numeric values,
+    but should work for any objects that implement multiplication.
+    On Python 3.8+, this is an alias for :func:`math.prod`.
+
+        >>> prod([2, 3, 4, 5])
+        120
+        >>> prod([2.0, 2.0, 2.0], start=2.0)
+        16.0
+        >>> prod([])
+        1
+        >>> prod([], start=10)
+        10
+    """
+    return _prod(iterable, start=start)

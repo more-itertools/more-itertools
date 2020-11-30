@@ -4134,3 +4134,28 @@ class NthProductTests(TestCase):
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
             mi.nth_product(24, 'ab', 'cde', 'fghi')
+
+
+class ProdTests(TestCase):
+    def test_basic(self):
+        for iterable, kwargs, expected in [
+            ([], {}, 1),
+            ([], {'start': 2}, 2),
+            ([2, 2.25, complex(3, 4)], {}, complex(13.5, 18)),
+            (iter(range(10)), {'start': 10}, 0),
+            (iter(range(1, 10 + 1)), {}, 3628800),
+        ]:
+            with self.subTest():
+                actual = mi.prod(iterable, **kwargs)
+                self.assertEqual(actual, expected)
+
+    def test_errors(self):
+        for args, kwargs in [
+            ([], {}),
+            ([1, 2, 3], {}),
+            ([1, 2, 3], {'start': 'not-number'}),
+            (['not-numbers'], {}),
+            ([(1, 2, 3), 1], {}),
+        ]:
+            with self.subTest():
+                self.assertRaises(TypeError, mi.prod, *args, **kwargs)
