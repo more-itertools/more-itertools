@@ -4143,8 +4143,8 @@ class ValueChainTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_simple(self):
-        actual = list(mi.value_chain(1, 2, 'foo'))
-        expected = [1, 2, 'foo']
+        actual = list(mi.value_chain(1, 2.71828, False, 'foo'))
+        expected = [1, 2.71828, False, 'foo']
         self.assertEqual(actual, expected)
 
     def test_more(self):
