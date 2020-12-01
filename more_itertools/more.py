@@ -33,7 +33,6 @@ from .recipes import (
     powerset,
     take,
     unique_everseen,
-    prepend,
 )
 
 __all__ = [
@@ -3573,6 +3572,7 @@ def value_chain(*args):
     Note that :func:`value_chain` is the more general version
     of :func:`prepend`:
 
+        >>> from more_itertools import prepend, value_chain
         >>> list(prepend(0, [1, 2, 3]))
         [0, 1, 2, 3]
         >>> list(value_chain(0, [1, 2, 3]))

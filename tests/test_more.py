@@ -4154,9 +4154,9 @@ class ValueChainTests(TestCase):
 
     def test_complex(self):
         obj = object()
-        actual = list(mi.value_chain((1, (2, (3,), 4)),
+        actual = list(mi.value_chain((1, (2, (3,))),
                                      ['foo', ['bar', ['baz']], 'tic'],
                                      {'key': {'foo': 1}},
                                      obj))
-        expected = [1, (2, (3,), 4), 'foo', ['bar', ['baz']], 'tic', 'key', obj]
+        expected = [1, (2, (3,)), 'foo', ['bar', ['baz']], 'tic', 'key', obj]
         self.assertEqual(actual, expected)
