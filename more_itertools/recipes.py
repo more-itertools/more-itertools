@@ -36,6 +36,7 @@ __all__ = [
     'nth',
     'nth_combination',
     'padnone',
+    'pad_none',
     'pairwise',
     'partition',
     'powerset',
@@ -177,10 +178,10 @@ def quantify(iterable, pred=bool):
     return sum(map(pred, iterable))
 
 
-def padnone(iterable):
+def pad_none(iterable):
     """Returns the sequence of elements and then returns ``None`` indefinitely.
 
-        >>> take(5, padnone(range(3)))
+        >>> take(5, pad_none(range(3)))
         [0, 1, 2, None, None]
 
     Useful for emulating the behavior of the built-in :func:`map` function.
@@ -189,6 +190,9 @@ def padnone(iterable):
 
     """
     return chain(iterable, repeat(None))
+
+
+padnone = pad_none
 
 
 def ncycles(iterable, n):

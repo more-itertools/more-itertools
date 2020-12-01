@@ -166,13 +166,14 @@ class QuantifyTests(TestCase):
 
 
 class PadnoneTests(TestCase):
-    """Tests for ``padnone()``"""
-
-    def test_happy_path(self):
-        """wrapper iterator should return None indefinitely"""
-        r = range(2)
-        p = mi.padnone(r)
-        self.assertEqual([0, 1, None, None], [next(p) for _ in range(4)])
+    def test_basic(self):
+        iterable = range(2)
+        for func in (mi.pad_none, mi.padnone):
+            with self.subTest(func=func):
+                p = func(iterable)
+                self.assertEqual(
+                    [0, 1, None, None], [next(p) for _ in range(4)]
+                )
 
 
 class NcyclesTests(TestCase):
