@@ -3580,7 +3580,7 @@ def value_chain(*args):
 
     """
     for value in args:
-        if isinstance(value, (str, bytes,)):
+        if isinstance(value, (str, bytes, int, float, bool,)):
             yield value
             continue
         if not value:
