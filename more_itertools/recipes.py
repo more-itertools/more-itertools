@@ -570,7 +570,8 @@ def prepend(value, iterator):
         >>> list(prepend(value, iterator))
         ['0', '1', '2', '3']
 
-    To prepend multiple values, see :func:`itertools.chain`.
+    To prepend multiple values, see :func:`itertools.chain`
+    or :func:`value_chain`.
 
     """
     return chain([value], iterator)
