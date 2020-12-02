@@ -4152,6 +4152,11 @@ class ValueChainTests(TestCase):
         expected = [b'bar', 1, 2, 3, 4, 'key']
         self.assertEqual(actual, expected)
 
+    def test_empty_lists(self):
+        actual = list(mi.value_chain(1, 2, [], [3, 4]))
+        expected = [1, 2, 3, 4]
+        self.assertEqual(actual, expected)
+
     def test_complex(self):
         obj = object()
         actual = list(

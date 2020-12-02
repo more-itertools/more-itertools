@@ -3556,43 +3556,25 @@ def nth_permutation(iterable, r, index):
 
 
 def value_chain(*args):
-    """Yield all arguments passed to the function in the same
-    order in which they were passed. If an argument itself is
-    iterable then iterate over its values.
+    """Yield all arguments passed to the function in the same order in which
+    they were passed. If an argument itself is iterable then iterate over its
+    values.
 
-        >>> list(value_chain(1, 2, 'foo'))
-        [1, 2, 'foo']
-        >>> list(value_chain(b'bar', [1, 2, 3], 4, {'key': 1}))
-        [b'bar', 1, 2, 3, 4, 'key']
-        >>> list(value_chain([], {}, '', 0, None))
-        [[], {}, '', 0, None]
-        >>> list(value_chain())
-        []
+        >>> list(value_chain(1, 2, 3, [4, 5, 6]))
+        [1, 2, 3, 4, 5, 6]
 
-    Note that :func:`value_chain` is the more general version
-    of :func:`prepend`:
+    Binary and text strings are not considered iterable and are emitted
+    as-is:
 
-        >>> from more_itertools import prepend, value_chain
-        >>> list(prepend(0, [1, 2, 3]))
-        [0, 1, 2, 3]
-        >>> list(value_chain(0, [1, 2, 3]))
-        [0, 1, 2, 3]
+        >>> list(value_chain('12', '34', ['56', '78']))
+        ['12', '34', '56', '78']
+
+
+    Multiple levels of nesting are not flattened.
 
     """
     for value in args:
-        if isinstance(
-            value,
-            (
-                str,
-                bytes,
-                int,
-                float,
-                bool,
-            ),
-        ):
-            yield value
-            continue
-        if not value:
+        if isinstance(value, (str, bytes)):
             yield value
             continue
         try:
