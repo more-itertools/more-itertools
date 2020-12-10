@@ -3121,7 +3121,7 @@ def distinct_combinations(iterable, r):
         return
     pool = tuple(iterable)
     generators = [unique_everseen(enumerate(pool), key=itemgetter(1))]
-    current_combo = [None]*r
+    current_combo = [None] * r
     level = 0
     while generators:
         try:
@@ -3131,12 +3131,17 @@ def distinct_combinations(iterable, r):
             level -= 1
             continue
         current_combo[level] = p
-        if level+1 == r:
+        if level + 1 == r:
             yield tuple(current_combo)
         else:
             generators.append(
-                unique_everseen(enumerate(pool[cur_idx+1:], cur_idx+1), key=itemgetter(1)))
+                unique_everseen(
+                    enumerate(pool[cur_idx + 1 :], cur_idx + 1),
+                    key=itemgetter(1),
+                )
+            )
             level += 1
+
 
 def filter_except(validator, iterable, *exceptions):
     """Yield the items from *iterable* for which the *validator* function does
