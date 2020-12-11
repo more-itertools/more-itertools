@@ -3118,11 +3118,29 @@ def distinct_combinations(iterable, r):
         raise ValueError('r must be non-negative')
     elif r == 0:
         yield ()
-    else:
-        pool = tuple(iterable)
-        for i, prefix in unique_everseen(enumerate(pool), key=itemgetter(1)):
-            for suffix in distinct_combinations(pool[i + 1 :], r - 1):
-                yield (prefix,) + suffix
+        return
+    pool = tuple(iterable)
+    generators = [unique_everseen(enumerate(pool), key=itemgetter(1))]
+    current_combo = [None] * r
+    level = 0
+    while generators:
+        try:
+            cur_idx, p = next(generators[-1])
+        except StopIteration:
+            generators.pop()
+            level -= 1
+            continue
+        current_combo[level] = p
+        if level + 1 == r:
+            yield tuple(current_combo)
+        else:
+            generators.append(
+                unique_everseen(
+                    enumerate(pool[cur_idx + 1 :], cur_idx + 1),
+                    key=itemgetter(1),
+                )
+            )
+            level += 1
 
 
 def filter_except(validator, iterable, *exceptions):
