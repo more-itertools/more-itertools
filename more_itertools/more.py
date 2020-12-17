@@ -2559,6 +2559,27 @@ class seekable:
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
 
+    Call :meth:`peek` to look ahead one item without advancing the iterator:
+
+        >>> it = seekable('1234')
+        >>> it.peek()
+        '1'
+        >>> list(it)
+        ['1', '2', '3', '4']
+        >>> it.peek(default='empty')
+        'empty'
+
+    Before the iterator is at its end, calling :func:`bool` on it will return
+    ``True``. After it will return ``False``:
+
+        >>> it = seekable('5678')
+        >>> bool(it)
+        True
+        >>> list(it)
+        ['5', '6', '7', '8']
+        >>> bool(it)
+        False
+
     You may view the contents of the cache with the :meth:`elements` method.
     That returns a :class:`SequenceView`, a view that updates automatically:
 
