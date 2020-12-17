@@ -2616,6 +2616,25 @@ class seekable:
         self._cache.append(item)
         return item
 
+    def __bool__(self):
+        try:
+            self.peek()
+        except StopIteration:
+            return False
+        return True
+
+    def peek(self, default=_marker):
+        try:
+            peeked = next(self)
+        except StopIteration:
+            if default is _marker:
+                raise
+            return default
+        if self._index is None:
+            self._index = len(self._cache)
+        self._index -= 1
+        return peeked
+
     def elements(self):
         return SequenceView(self._cache)
 

@@ -223,15 +223,22 @@ class NthOrLastTests(TestCase):
         self.assertRaises(ValueError, lambda: mi.nth_or_last(range(0), 0))
 
 
-class PeekableTests(TestCase):
-    """Tests for ``peekable()`` behavor not incidentally covered by testing
-    ``collate()``
+class PeekableMixinTests:
+    """Common tests for ``peekable()`` and ``seekable()`` behavior"""
 
-    """
+    cls = None
+
+    def test_passthrough(self):
+        """Iterating a peekable without using ``peek()`` or ``prepend()``
+        should just give the underlying iterable's elements (a trivial test but
+        useful to set a baseline in case something goes wrong)"""
+        expected = [1, 2, 3, 4, 5]
+        actual = list(self.cls(expected))
+        self.assertEqual(actual, expected)
 
     def test_peek_default(self):
         """Make sure passing a default into ``peek()`` works."""
-        p = mi.peekable([])
+        p = self.cls([])
         self.assertEqual(p.peek(7), 7)
 
     def test_truthiness(self):
@@ -239,10 +246,10 @@ class PeekableTests(TestCase):
         the iterable.
 
         """
-        p = mi.peekable([])
+        p = self.cls([])
         self.assertFalse(p)
 
-        p = mi.peekable(range(3))
+        p = self.cls(range(3))
         self.assertTrue(p)
 
     def test_simple_peeking(self):
@@ -250,10 +257,20 @@ class PeekableTests(TestCase):
         iterator, respectively.
 
         """
-        p = mi.peekable(range(10))
+        p = self.cls(range(10))
         self.assertEqual(next(p), 0)
         self.assertEqual(p.peek(), 1)
+        self.assertEqual(p.peek(), 1)
         self.assertEqual(next(p), 1)
+
+
+class PeekableTests(PeekableMixinTests, TestCase):
+    """Tests for ``peekable()`` behavior not incidentally covered by testing
+    ``collate()``
+
+    """
+
+    cls = mi.peekable
 
     def test_indexing(self):
         """
@@ -333,14 +350,6 @@ class PeekableTests(TestCase):
         # Neither the cache nor the iteration should be affected
         self.assertEqual(old_cache, list(p._cache))
         self.assertEqual(list(p), list(iterable))
-
-    def test_passthrough(self):
-        """Iterating a peekable without using ``peek()`` or ``prepend()``
-        should just give the underlying iterable's elements (a trivial test but
-        useful to set a baseline in case something goes wrong)"""
-        expected = [1, 2, 3, 4, 5]
-        actual = list(mi.peekable(expected))
-        self.assertEqual(actual, expected)
 
     # prepend() behavior tests
 
@@ -3045,7 +3054,9 @@ class DifferenceTest(TestCase):
         self.assertEqual(actual, original)
 
 
-class SeekableTest(TestCase):
+class SeekableTest(PeekableMixinTests, TestCase):
+    cls = mi.seekable
+
     def test_exhaustion_reset(self):
         iterable = [str(n) for n in range(10)]
 
