@@ -111,6 +111,7 @@ __all__ = [
     'with_iter',
     'UnequalIterablesError',
     'zip_equal',
+    'zip_longest_fill_last',
     'zip_offset',
     'windowed_complete',
     'all_unique',
