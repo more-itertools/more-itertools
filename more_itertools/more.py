@@ -3035,9 +3035,11 @@ def set_partitions(iterable, k=None):
         yield from set_partitions_helper(L, k)
 
 
-def time_limited(limit_seconds, iterable):
+class time_limited:
     """
     Yield items from *iterable* until *limit_seconds* have passed.
+    If the time limit expires before all items have been yielded, the
+    ``timed_out`` parameter will be set to ``True``.
 
     >>> from time import sleep
     >>> def generator():
@@ -3045,9 +3047,11 @@ def time_limited(limit_seconds, iterable):
     ...     yield 2
     ...     sleep(0.2)
     ...     yield 3
-    >>> iterable = generator()
-    >>> list(time_limited(0.1, iterable))
+    >>> iterable = time_limited(0.1, generator())
+    >>> list(iterable)
     [1, 2]
+    >>> iterable.timed_out
+    True
 
     Note that the time is checked before each item is yielded, and iteration
     stops if  the time elapsed is greater than *limit_seconds*. If your time
@@ -3055,14 +3059,25 @@ def time_limited(limit_seconds, iterable):
     the iterable, the function will run for 2 seconds and not yield anything.
 
     """
-    if limit_seconds < 0:
-        raise ValueError('limit_seconds must be positive')
 
-    start_time = monotonic()
-    for item in iterable:
-        if monotonic() - start_time > limit_seconds:
-            break
-        yield item
+    def __init__(self, limit_seconds, iterable):
+        if limit_seconds < 0:
+            raise ValueError('limit_seconds must be positive')
+        self.limit_seconds = limit_seconds
+        self._iterable = iter(iterable)
+        self._start_time = monotonic()
+        self.timed_out = False
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        item = next(self._iterable)
+        if monotonic() - self._start_time > self.limit_seconds:
+            self.timed_out = True
+            raise StopIteration
+
+        return item
 
 
 def only(iterable, default=None, too_long=None):
