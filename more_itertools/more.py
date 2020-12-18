@@ -3038,8 +3038,8 @@ def set_partitions(iterable, k=None):
 class time_limited:
     """
     Yield items from *iterable* until *limit_seconds* have passed.
-    If the iterable is not exhausted in the time limit, the ``timed_out``
-    attribute will be ``True``.
+    If the time limit expires before all items have been yielded, the
+    ``timed_out`` parameter will be set to ``True``.
 
     >>> from time import sleep
     >>> def generator():
