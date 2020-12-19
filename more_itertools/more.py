@@ -1595,9 +1595,13 @@ def sort_together(iterables, key_list=(0,), key=None, reverse=False):
     function. Its arguments are the elements of the iterables corresponding to
     the key list::
 
-        >>> iterables = [(3, 1, 2), (1, 0, 2), ('c', 'b', 'a')]
-        >>> sort_together(iterables, key_list=(0, 1), key=lambda x, y: x - y)
-        [(2, 1, 3), (2, 0, 1), ('a', 'b', 'c')]
+        >>> names = ('a', 'b', 'c')
+        >>> lengths = (1, 2, 3)
+        >>> widths = (5, 2, 1)
+        >>> def area(length, width):
+        ...     return length * width
+        >>> sort_together([names, lengths, widths], key_list=(1, 2), key=area)
+        [('c', 'b', 'a'), (3, 2, 1), (1, 2, 5)]
 
     Set *reverse* to ``True`` to sort in descending order.
 
