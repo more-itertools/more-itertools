@@ -216,6 +216,7 @@ def zip_offset(
 def sort_together(
     iterables: Iterable[Iterable[_T]],
     key_list: Iterable[int] = ...,
+    key: Optional[Callable[..., Any]] = ...,
     reverse: bool = ...,
 ) -> List[Tuple[_T, ...]]: ...
 def unzip(iterable: Iterable[Sequence[_T]]) -> Tuple[Iterator[_T], ...]: ...

@@ -1929,6 +1929,44 @@ class SortTogetherTest(TestCase):
             IndexError, lambda: mi.sort_together(iterables, key_list=(5,))
         )
 
+    def test_key_function(self):
+        """tests `key` function, including interaction with `key_list`"""
+        iterables = [
+            ['GA', 'GA', 'GA', 'CT', 'CT', 'CT'],
+            ['May', 'Aug.', 'May', 'June', 'July', 'July'],
+            [97, 20, 100, 70, 100, 20],
+        ]
+        self.assertEqual(
+            mi.sort_together(iterables, key=lambda x: x),
+            [
+                ('CT', 'CT', 'CT', 'GA', 'GA', 'GA'),
+                ('June', 'July', 'July', 'May', 'Aug.', 'May'),
+                (70, 100, 20, 97, 20, 100),
+            ],
+        )
+        self.assertEqual(
+            mi.sort_together(iterables, key=lambda x: x[::-1]),
+            [
+                ('GA', 'GA', 'GA', 'CT', 'CT', 'CT'),
+                ('May', 'Aug.', 'May', 'June', 'July', 'July'),
+                (97, 20, 100, 70, 100, 20),
+            ],
+        )
+        self.assertEqual(
+            mi.sort_together(
+                iterables,
+                key_list=(0, 2),
+                key=lambda state, number: number
+                if state == 'CT'
+                else 2 * number,
+            ),
+            [
+                ('CT', 'GA', 'CT', 'CT', 'GA', 'GA'),
+                ('July', 'Aug.', 'June', 'July', 'May', 'May'),
+                (20, 20, 70, 100, 97, 100),
+            ],
+        )
+
     def test_reverse(self):
         """tests `reverse` to ensure a reverse sort for `key_list` iterables"""
         iterables = [

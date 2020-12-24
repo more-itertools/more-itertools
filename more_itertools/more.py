@@ -1569,7 +1569,7 @@ def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     return zip(*staggered)
 
 
-def sort_together(iterables, key_list=(0,), reverse=False):
+def sort_together(iterables, key_list=(0,), key=None, reverse=False):
     """Return the input iterables sorted together, with *key_list* as the
     priority for sorting. All iterables are trimmed to the length of the
     shortest one.
@@ -1591,18 +1591,47 @@ def sort_together(iterables, key_list=(0,), reverse=False):
         >>> sort_together(iterables, key_list=(1, 2))
         [(2, 3, 1), (0, 0, 1), ('a', 'c', 'b')]
 
+    To sort by a function of the elements of the iterable, pass a *key*
+    function. Its arguments are the elements of the iterables corresponding to
+    the key list::
+
+        >>> names = ('a', 'b', 'c')
+        >>> lengths = (1, 2, 3)
+        >>> widths = (5, 2, 1)
+        >>> def area(length, width):
+        ...     return length * width
+        >>> sort_together([names, lengths, widths], key_list=(1, 2), key=area)
+        [('c', 'b', 'a'), (3, 2, 1), (1, 2, 5)]
+
     Set *reverse* to ``True`` to sort in descending order.
 
         >>> sort_together([(1, 2, 3), ('c', 'b', 'a')], reverse=True)
         [(3, 2, 1), ('a', 'b', 'c')]
 
     """
-    return list(
-        zip(
-            *sorted(
-                zip(*iterables), key=itemgetter(*key_list), reverse=reverse
+    if key is None:
+        # if there is no key function, the key argument to sorted is an
+        # itemgetter
+        key_argument = itemgetter(*key_list)
+    else:
+        # if there is a key function, call it with the items at the offsets
+        # specified by the key function as arguments
+        key_list = list(key_list)
+        if len(key_list) == 1:
+            # if key_list contains a single item, pass the item at that offset
+            # as the only argument to the key function
+            key_offset = key_list[0]
+            key_argument = lambda zipped_items: key(zipped_items[key_offset])
+        else:
+            # if key_list contains multiple items, use itemgetter to return a
+            # tuple of items, which we pass as *args to the key function
+            get_key_items = itemgetter(*key_list)
+            key_argument = lambda zipped_items: key(
+                *get_key_items(zipped_items)
             )
-        )
+
+    return list(
+        zip(*sorted(zip(*iterables), key=key_argument, reverse=reverse))
     )
 
 
