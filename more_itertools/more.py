@@ -115,6 +115,9 @@ __all__ = [
     'windowed_complete',
     'all_unique',
     'value_chain',
+    'product_index',
+    'combinations_index',
+    'permutations_index',
 ]
 
 _marker = object()
@@ -3683,3 +3686,77 @@ def value_chain(*args):
             yield from value
         except TypeError:
             yield value
+
+
+def product_index(element, *args):
+    """Equivalent to ``list(product(*args)).index(element)``
+
+    The products of *args* can be ordered lexicographically.
+    :func:`product_index` computes the first index of *element* without
+    computing the previous products.
+    """
+    index = 0
+
+    for x, pool in zip_longest(element, args, fillvalue=_marker):
+        if x is _marker or pool is _marker:
+            raise ValueError('element is not a product of args')
+
+        pool = tuple(pool)
+        index = index * len(pool) + pool.index(x)
+
+    return index
+
+
+def combinations_index(iterable, element):
+    """Equivalent to ``list(combinations(iterable, r)).index(element)
+
+    The subsequences of *iterable* that are of length *r* can be ordered
+    lexicographically. :func:`combinations_index` computes the index of the
+    first *element*, without computing the previous combinations.
+    """
+    element = enumerate(element)
+    k, y = next(element, (None, None))
+    if k is None:
+        return 0
+
+    indexes = []
+    pool = enumerate(iterable)
+    for n, x in pool:
+        if x == y:
+            indexes.append(n)
+            tmp, y = next(element, (None, None))
+            if tmp is None:
+                break
+            else:
+                k = tmp
+    else:
+        raise ValueError('element is not a combination of iterable')
+
+    n, _ = last(pool, default=(n, None))
+
+    # TODO: replace factorials with math.comb when 3.8 is the minimum version
+    index = 1
+    for i, j in enumerate(reversed(indexes), start=1):
+        j = n - j
+        if i <= j:
+            index += factorial(j) // (factorial(i) * factorial(j - i))
+
+    return factorial(n + 1) // (factorial(k + 1) * factorial(n - k)) - index
+
+
+def permutations_index(iterable, element):
+    """Equivalent to ``list(permutations(iterable, r)).index(element)```
+
+    The subsequences of *iterable* that are of length *r* where order is
+    important can be ordered lexicographically. :func:`permutation_index`
+    computes the index of *element directly, without computing the previous
+    permutations.
+    """
+    index = 0
+    pool = list(iterable)
+    for i, x in zip(range(len(pool), -1, -1), element):
+        r = pool.index(x)
+        index = index * i + r
+        del pool[r]
+
+    return index

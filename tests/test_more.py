@@ -4227,3 +4227,139 @@ class ValueChainTests(TestCase):
         )
         expected = [1, (2, (3,)), 'foo', ['bar', ['baz']], 'tic', 'key', obj]
         self.assertEqual(actual, expected)
+
+
+class ProductIndexTests(TestCase):
+    def test_basic(self):
+        iterables = ['ab', 'cdef', 'ghi']
+        first_index = {}
+        for index, element in enumerate(product(*iterables)):
+            actual = mi.product_index(element, *iterables)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_multiplicity(self):
+        iterables = ['ab', 'bab', 'cab']
+        first_index = {}
+        for index, element in enumerate(product(*iterables)):
+            actual = mi.product_index(element, *iterables)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.product_index((1, 3, 12), range(101), range(22), range(53))
+        expected = 1337
+        self.assertEqual(actual, expected)
+
+    def test_invalid_empty(self):
+        with self.assertRaises(ValueError):
+            mi.product_index('', 'ab', 'cde', 'fghi')
+
+    def test_invalid_small(self):
+        with self.assertRaises(ValueError):
+            mi.product_index('ac', 'ab', 'cde', 'fghi')
+
+    def test_invalid_large(self):
+        with self.assertRaises(ValueError):
+            mi.product_index('achi', 'ab', 'cde', 'fghi')
+
+    def test_invalid_match(self):
+        with self.assertRaises(ValueError):
+            mi.product_index('axf', 'ab', 'cde', 'fghi')
+
+
+class CombinationsIndexTests(TestCase):
+    def test_r_less_than_n(self):
+        iterable = 'abcdefg'
+        r = 4
+        first_index = {}
+        for index, element in enumerate(combinations(iterable, r)):
+            actual = mi.combinations_index(iterable, element)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_r_equal_to_n(self):
+        iterable = 'abcd'
+        r = len(iterable)
+        first_index = {}
+        for index, element in enumerate(combinations(iterable, r=r)):
+            actual = mi.permutations_index(iterable, element)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_multiplicity(self):
+        iterable = 'abacba'
+        r = 3
+        first_index = {}
+        for index, element in enumerate(combinations(iterable, r)):
+            actual = mi.combinations_index(iterable, element)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_null(self):
+        actual = mi.combinations_index([], tuple())
+        expected = 0
+        self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.combinations_index(range(180), (2, 12, 35, 126))
+        expected = 2000000
+        self.assertEqual(actual, expected)
+
+    def test_invalid_order(self):
+        with self.assertRaises(ValueError):
+            mi.combinations_index('abcde', tuple('acb'))
+
+    def test_invalid_large(self):
+        with self.assertRaises(ValueError):
+            mi.combinations_index('abcdef', tuple('abcdefg'))
+
+    def test_invalid_match(self):
+        with self.assertRaises(ValueError):
+            mi.product_index('abcde', tuple('axe'))
+
+
+class PermutationsIndexTests(TestCase):
+    def test_r_less_than_n(self):
+        iterable = 'abcdefg'
+        r = 4
+        first_index = {}
+        for index, element in enumerate(permutations(iterable, r)):
+            actual = mi.permutations_index(iterable, element)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_r_equal_to_n(self):
+        iterable = 'abcd'
+        first_index = {}
+        for index, element in enumerate(permutations(iterable)):
+            actual = mi.permutations_index(iterable, element)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_multiplicity(self):
+        iterable = 'abacba'
+        r = 3
+        first_index = {}
+        for index, element in enumerate(permutations(iterable, r)):
+            actual = mi.permutations_index(iterable, element)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_null(self):
+        actual = mi.permutations_index([], tuple())
+        expected = 0
+        self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.permutations_index(range(180), (2, 12, 35, 126))
+        expected = 11631678
+        self.assertEqual(actual, expected)
+
+    def test_invalid_large(self):
+        with self.assertRaises(ValueError):
+            mi.permutations_index('abcdef', tuple('abcdefg'))
+
+    def test_invalid_match(self):
+        with self.assertRaises(ValueError):
+            mi.product_index('abcde', tuple('axe'))
