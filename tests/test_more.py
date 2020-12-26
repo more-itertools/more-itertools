@@ -4268,7 +4268,7 @@ class ProductIndexTests(TestCase):
             mi.product_index('axf', 'ab', 'cde', 'fghi')
 
 
-class CombinationsIndexTests(TestCase):
+class CombinationIndexTests(TestCase):
     def test_r_less_than_n(self):
         iterable = 'abcdefg'
         r = 4
@@ -4319,7 +4319,7 @@ class CombinationsIndexTests(TestCase):
             mi.product_index('abcde', tuple('axe'))
 
 
-class PermutationsIndexTests(TestCase):
+class PermutationIndexTests(TestCase):
     def test_r_less_than_n(self):
         iterable = 'abcdefg'
         r = 4
