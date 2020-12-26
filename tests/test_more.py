@@ -4274,7 +4274,7 @@ class CombinationsIndexTests(TestCase):
         r = 4
         first_index = {}
         for index, element in enumerate(combinations(iterable, r)):
-            actual = mi.combinations_index(iterable, element)
+            actual = mi.combination_index(iterable, element)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
 
@@ -4283,7 +4283,7 @@ class CombinationsIndexTests(TestCase):
         r = len(iterable)
         first_index = {}
         for index, element in enumerate(combinations(iterable, r=r)):
-            actual = mi.permutations_index(iterable, element)
+            actual = mi.permutation_index(iterable, element)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
 
@@ -4292,27 +4292,27 @@ class CombinationsIndexTests(TestCase):
         r = 3
         first_index = {}
         for index, element in enumerate(combinations(iterable, r)):
-            actual = mi.combinations_index(iterable, element)
+            actual = mi.combination_index(iterable, element)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
 
     def test_null(self):
-        actual = mi.combinations_index([], tuple())
+        actual = mi.combination_index([], tuple())
         expected = 0
         self.assertEqual(actual, expected)
 
     def test_long(self):
-        actual = mi.combinations_index(range(180), (2, 12, 35, 126))
+        actual = mi.combination_index(range(180), (2, 12, 35, 126))
         expected = 2000000
         self.assertEqual(actual, expected)
 
     def test_invalid_order(self):
         with self.assertRaises(ValueError):
-            mi.combinations_index('abcde', tuple('acb'))
+            mi.combination_index('abcde', tuple('acb'))
 
     def test_invalid_large(self):
         with self.assertRaises(ValueError):
-            mi.combinations_index('abcdef', tuple('abcdefg'))
+            mi.combination_index('abcdef', tuple('abcdefg'))
 
     def test_invalid_match(self):
         with self.assertRaises(ValueError):
@@ -4325,7 +4325,7 @@ class PermutationsIndexTests(TestCase):
         r = 4
         first_index = {}
         for index, element in enumerate(permutations(iterable, r)):
-            actual = mi.permutations_index(iterable, element)
+            actual = mi.permutation_index(iterable, element)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
 
@@ -4333,7 +4333,7 @@ class PermutationsIndexTests(TestCase):
         iterable = 'abcd'
         first_index = {}
         for index, element in enumerate(permutations(iterable)):
-            actual = mi.permutations_index(iterable, element)
+            actual = mi.permutation_index(iterable, element)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
 
@@ -4342,23 +4342,23 @@ class PermutationsIndexTests(TestCase):
         r = 3
         first_index = {}
         for index, element in enumerate(permutations(iterable, r)):
-            actual = mi.permutations_index(iterable, element)
+            actual = mi.permutation_index(iterable, element)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
 
     def test_null(self):
-        actual = mi.permutations_index([], tuple())
+        actual = mi.permutation_index([], tuple())
         expected = 0
         self.assertEqual(actual, expected)
 
     def test_long(self):
-        actual = mi.permutations_index(range(180), (2, 12, 35, 126))
+        actual = mi.permutation_index(range(180), (2, 12, 35, 126))
         expected = 11631678
         self.assertEqual(actual, expected)
 
     def test_invalid_large(self):
         with self.assertRaises(ValueError):
-            mi.permutations_index('abcdef', tuple('abcdefg'))
+            mi.permutation_index('abcdef', tuple('abcdefg'))
 
     def test_invalid_match(self):
         with self.assertRaises(ValueError):
