@@ -3707,7 +3707,7 @@ def product_index(element, *args):
     return index
 
 
-def combination_index(iterable, element):
+def combination_index(element, iterable):
     """Equivalent to ``list(combinations(iterable, r)).index(element)
 
     The subsequences of *iterable* that are of length *r* can be ordered
@@ -3744,7 +3744,7 @@ def combination_index(iterable, element):
     return factorial(n + 1) // (factorial(k + 1) * factorial(n - k)) - index
 
 
-def permutation_index(iterable, element):
+def permutation_index(element, iterable):
     """Equivalent to ``list(permutations(iterable, r)).index(element)```
 
     The subsequences of *iterable* that are of length *r* where order is
