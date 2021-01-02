@@ -4316,7 +4316,7 @@ class CombinationIndexTests(TestCase):
 
     def test_invalid_match(self):
         with self.assertRaises(ValueError):
-            mi.product_index(tuple('axe'), 'abcde')
+            mi.combination_index(tuple('axe'), 'abcde')
 
 
 class PermutationIndexTests(TestCase):
@@ -4362,4 +4362,4 @@ class PermutationIndexTests(TestCase):
 
     def test_invalid_match(self):
         with self.assertRaises(ValueError):
-            mi.product_index(tuple('axe'), 'abcde')
+            mi.permutation_index(tuple('axe'), 'abcde')
