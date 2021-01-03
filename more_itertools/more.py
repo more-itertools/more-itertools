@@ -7,12 +7,15 @@ from functools import partial, reduce, wraps
 from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
     chain,
+    combinations,
     compress,
     count,
     cycle,
     dropwhile,
     groupby,
     islice,
+    permutations,
+    product,
     repeat,
     starmap,
     takewhile,
@@ -3600,6 +3603,17 @@ def nth_product(index, *args):
     The products of *args* can be ordered lexicographically.
     :func:`nth_product` computes the product at sort position *index* without
     computing the previous products.
+
+        >>> nth_product(8, range(2), range(2), range(2), range(2))
+        (1, 0, 0, 0)
+
+    The equivalent being:
+
+        >>> list(product(range(2), range(2), range(2), range(2)))[8]
+        (1, 0, 0, 0)
+
+    Calling :func:`nth_product` with an index that does not exist when taking
+    the product of *args* raises an ``IndexError``.
     """
     pools = list(map(tuple, reversed(args)))
     ns = list(map(len, pools))
@@ -3627,6 +3641,19 @@ def nth_permutation(iterable, r, index):
     important can be ordered lexicographically. :func:`nth_permutation`
     computes the subsequence at sort position *index* directly, without
     computing the previous subsequences.
+
+        >>> nth_permutation('ghijk', 2, 5)
+        ('h', 'i')
+
+    The equivalent being:
+
+        >>> list(permutations('ghijk', 2))[5]
+        ('h', 'i')
+
+    Calling :func:`nth_permutation` with an index that does not exist when
+    choosing *r* from an *iterable* of the given length raises an
+    ``IndexError``. Calling :func:`nth_permutation` where *r* is negative or
+    greater than the length of the *iterable* raises a ``ValueError``.
 
     """
     pool = list(iterable)
@@ -3694,6 +3721,18 @@ def product_index(element, *args):
     The products of *args* can be ordered lexicographically.
     :func:`product_index` computes the first index of *element* without
     computing the previous products.
+
+        >>> product_index([8, 2], range(10), range(5))
+        42
+
+    The equivalent being:
+
+        >>> list(product(range(10), range(5))).index((8, 2))
+        42
+
+    Indexing an *element* that does not exist as a product of *args* raises a
+    ``ValueError``.
+
     """
     index = 0
 
@@ -3708,11 +3747,24 @@ def product_index(element, *args):
 
 
 def combination_index(element, iterable):
-    """Equivalent to ``list(combinations(iterable, r)).index(element)
+    """Equivalent to ``list(combinations(iterable, r)).index(element)``
 
     The subsequences of *iterable* that are of length *r* can be ordered
     lexicographically. :func:`combination_index` computes the index of the
     first *element*, without computing the previous combinations.
+
+        >>> combination_index('adf', 'abcdefg')
+        10
+
+    The equivalent being:
+
+        >>> list(combinations('abcdefg', 3)).index(('a', 'd', 'f'))
+        10
+
+    Indexing an *element* that does not exist as a combination of *iterable*
+    raises a ``ValueError``. The length of the combination is given implicitly
+    by the length of the *element*.
+
     """
     element = enumerate(element)
     k, y = next(element, (None, None))
@@ -3749,8 +3801,21 @@ def permutation_index(element, iterable):
 
     The subsequences of *iterable* that are of length *r* where order is
     important can be ordered lexicographically. :func:`permutation_index`
-    computes the index of *element directly, without computing the previous
-    permutations.
+    computes the index of the first *element* directly, without computing
+    the previous permutations.
+
+        >>> permutation_index([1, 3, 2], range(5))
+        19
+
+    The equivalent being:
+
+        >>> list(permutations(range(5), 3)).index((1, 3, 2))
+        19
+
+    Indexing an *element* that does not exist as a permutation of *iterable*
+    raises a ``ValueError``. The length of the permutation is given implicitly
+    by the length of the *element*.
+
     """
     index = 0
     pool = list(iterable)
