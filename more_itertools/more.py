@@ -7,15 +7,12 @@ from functools import partial, reduce, wraps
 from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
     chain,
-    combinations,
     compress,
     count,
     cycle,
     dropwhile,
     groupby,
     islice,
-    permutations,
-    product,
     repeat,
     starmap,
     takewhile,
