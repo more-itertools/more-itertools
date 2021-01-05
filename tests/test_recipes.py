@@ -1,7 +1,7 @@
 import warnings
 
 from doctest import DocTestSuite
-from itertools import combinations, permutations
+from itertools import combinations, count, permutations
 from math import factorial
 from unittest import TestCase
 
@@ -654,4 +654,34 @@ class PrependTests(TestCase):
         iterator = iter('cdefg')
         actual = tuple(mi.prepend(value, iterator))
         expected = ('ab',) + tuple('cdefg')
+        self.assertEqual(actual, expected)
+
+
+class Convolvetests(TestCase):
+    def test_moving_average(self):
+        signal = iter([10, 20, 30, 40, 50])
+        kernel = [0.5, 0.5]
+        actual = list(mi.convolve(signal, kernel))
+        expected = [
+            (10 + 0) / 2,
+            (20 + 10) / 2,
+            (30 + 20) / 2,
+            (40 + 30) / 2,
+            (50 + 40) / 2,
+            (0 + 50) / 2,
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_derivative(self):
+        signal = iter([10, 20, 30, 40, 50])
+        kernel = [1, -1]
+        actual = list(mi.convolve(signal, kernel))
+        expected = [10 - 0, 20 - 10, 30 - 20, 40 - 30, 50 - 40, 0 - 50]
+        self.assertEqual(actual, expected)
+
+    def test_infinite_signal(self):
+        signal = count()
+        kernel = [1, -1]
+        actual = mi.take(5, mi.convolve(signal, kernel))
+        expected = [0, 1, 1, 1, 1]
         self.assertEqual(actual, expected)

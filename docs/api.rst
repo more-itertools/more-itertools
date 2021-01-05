@@ -119,6 +119,7 @@ These tools combine multiple iterables.
 **Itertools recipes**
 
 .. autofunction:: dotproduct
+.. autofunction:: convolve
 .. autofunction:: flatten
 .. autofunction:: roundrobin
 .. autofunction:: prepend
