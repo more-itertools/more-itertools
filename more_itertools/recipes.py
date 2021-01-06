@@ -27,6 +27,7 @@ from random import randrange, sample, choice
 __all__ = [
     'all_equal',
     'consume',
+    'convolve',
     'dotproduct',
     'first_true',
     'flatten',
@@ -576,3 +577,23 @@ def prepend(value, iterator):
 
     """
     return chain([value], iterator)
+
+
+def convolve(signal, kernel):
+    """Convolve the iterable *signal* with the iterable *kernel*.
+
+        >>> signal = (1, 2, 3, 4, 5)
+        >>> kernel = [3, 2, 1]
+        >>> list(convolve(signal, kernel))
+        [3, 8, 14, 20, 26, 14, 5]
+
+    Note: the input arguments are not interchangeable, as the *kernel*
+    is immediately consumed and stored.
+
+    """
+    kernel = tuple(kernel)[::-1]
+    n = len(kernel)
+    window = deque([0], maxlen=n) * n
+    for x in chain(signal, repeat(0, n - 1)):
+        window.append(x)
+        yield sum(map(operator.mul, kernel, window))
