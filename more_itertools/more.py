@@ -3606,6 +3606,7 @@ def nth_product(index, *args):
 
     The equivalent being:
 
+        >>> from itertools import product
         >>> list(product(range(2), range(2), range(2), range(2)))[8]
         (1, 0, 0, 0)
 
@@ -3644,6 +3645,7 @@ def nth_permutation(iterable, r, index):
 
     The equivalent being:
 
+        >>> from itertools import permutations
         >>> list(permutations('ghijk', 2))[5]
         ('h', 'i')
 
@@ -3724,6 +3726,7 @@ def product_index(element, *args):
 
     The equivalent being:
 
+        >>> from itertools import product
         >>> list(product(range(10), range(5))).index((8, 2))
         42
 
@@ -3755,6 +3758,7 @@ def combination_index(element, iterable):
 
     The equivalent being:
 
+        >>> from itertools import combinations
         >>> list(combinations('abcdefg', 3)).index(('a', 'd', 'f'))
         10
 
@@ -3806,6 +3810,7 @@ def permutation_index(element, iterable):
 
     The equivalent being:
 
+        >>> from itertools import permutations
         >>> list(permutations(range(5), 3)).index((1, 3, 2))
         19
 
