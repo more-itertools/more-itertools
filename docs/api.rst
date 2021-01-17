@@ -202,6 +202,9 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: circular_shifts
 .. autofunction:: partitions
 .. autofunction:: set_partitions
+.. autofunction:: product_index
+.. autofunction:: combination_index
+.. autofunction:: permutation_index
 
 ----
 

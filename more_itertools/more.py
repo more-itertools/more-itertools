@@ -3604,14 +3604,7 @@ def nth_product(index, *args):
         >>> nth_product(8, range(2), range(2), range(2), range(2))
         (1, 0, 0, 0)
 
-    The equivalent being:
-
-        >>> from itertools import product
-        >>> list(product(range(2), range(2), range(2), range(2)))[8]
-        (1, 0, 0, 0)
-
-    Calling :func:`nth_product` with an index that does not exist when taking
-    the product of *args* raises an ``IndexError``.
+    ``IndexError`` will be raised if the given *index* is invalid.
     """
     pools = list(map(tuple, reversed(args)))
     ns = list(map(len, pools))
@@ -3643,17 +3636,9 @@ def nth_permutation(iterable, r, index):
         >>> nth_permutation('ghijk', 2, 5)
         ('h', 'i')
 
-    The equivalent being:
-
-        >>> from itertools import permutations
-        >>> list(permutations('ghijk', 2))[5]
-        ('h', 'i')
-
-    Calling :func:`nth_permutation` with an index that does not exist when
-    choosing *r* from an *iterable* of the given length raises an
-    ``IndexError``. Calling :func:`nth_permutation` where *r* is negative or
-    greater than the length of the *iterable* raises a ``ValueError``.
-
+    ``ValueError`` will be raised If *r* is negative or greater than the length
+    of *iterable*.
+    ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = list(iterable)
     n = len(pool)
@@ -3724,15 +3709,8 @@ def product_index(element, *args):
         >>> product_index([8, 2], range(10), range(5))
         42
 
-    The equivalent being:
-
-        >>> from itertools import product
-        >>> list(product(range(10), range(5))).index((8, 2))
-        42
-
-    Indexing an *element* that does not exist as a product of *args* raises a
-    ``ValueError``.
-
+    ``ValueError`` will be raised if the given *element* isn't in the product
+    of *args*.
     """
     index = 0
 
@@ -3756,16 +3734,8 @@ def combination_index(element, iterable):
         >>> combination_index('adf', 'abcdefg')
         10
 
-    The equivalent being:
-
-        >>> from itertools import combinations
-        >>> list(combinations('abcdefg', 3)).index(('a', 'd', 'f'))
-        10
-
-    Indexing an *element* that does not exist as a combination of *iterable*
-    raises a ``ValueError``. The length of the combination is given implicitly
-    by the length of the *element*.
-
+    ``ValueError`` will be raised if the given *element* isn't one of the
+    combinations of *args*.
     """
     element = enumerate(element)
     k, y = next(element, (None, None))
@@ -3787,7 +3757,7 @@ def combination_index(element, iterable):
 
     n, _ = last(pool, default=(n, None))
 
-    # TODO: replace factorials with math.comb when 3.8 is the minimum version
+    # Python versiosn below 3.8 don't have math.comb
     index = 1
     for i, j in enumerate(reversed(indexes), start=1):
         j = n - j
@@ -3808,16 +3778,8 @@ def permutation_index(element, iterable):
         >>> permutation_index([1, 3, 2], range(5))
         19
 
-    The equivalent being:
-
-        >>> from itertools import permutations
-        >>> list(permutations(range(5), 3)).index((1, 3, 2))
-        19
-
-    Indexing an *element* that does not exist as a permutation of *iterable*
-    raises a ``ValueError``. The length of the permutation is given implicitly
-    by the length of the *element*.
-
+    ``ValueError`` will be raised if the given *element* isn't one of the
+    permutations of *args*.
     """
     index = 0
     pool = list(iterable)
