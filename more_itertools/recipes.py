@@ -536,6 +536,19 @@ def nth_combination(iterable, r, index):
     sort position *index* directly, without computing the previous
     subsequences.
 
+        >>> nth_combination(range(5), 3, 5)
+        (0, 3, 4)
+
+    The equivalent being:
+
+        >>> list(combinations(range(5), 3))[5]
+        (0, 3, 4)
+
+    Calling :func:`nth_combination` with an index that does not exist when
+    choosing *r* from an *iterable* of the given length raises an
+    ``IndexError``. Calling :func:`nth_combination` where *r* is negative or
+    greater than the length of the *iterable* raises a ``ValueError``.
+
     """
     pool = tuple(iterable)
     n = len(pool)
