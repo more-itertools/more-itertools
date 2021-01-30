@@ -275,6 +275,7 @@ except ImportError:
     pairwise = _pairwise
 else:
     from functools import partial
+
     pairwise = partial(itertools_pairwise)
     pairwise.__doc__ = _pairwise.__doc__
 
