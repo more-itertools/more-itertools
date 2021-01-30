@@ -1,5 +1,5 @@
 """Stubs for more_itertools.recipes"""
-
+from functools import partial
 from typing import (
     Any,
     Callable,

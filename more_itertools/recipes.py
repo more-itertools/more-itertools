@@ -266,7 +266,7 @@ def _pairwise(iterable):
     """
     a, b = tee(iterable)
     next(b, None)
-    return zip(a, b)
+    yield from zip(a, b)
 
 
 try:
@@ -274,9 +274,9 @@ try:
 except ImportError:
     pairwise = _pairwise
 else:
-    from functools import partial
+    def pairwise(iterable):
+        yield from itertools_pairwise(iterable)
 
-    pairwise = partial(itertools_pairwise)
     pairwise.__doc__ = _pairwise.__doc__
 
 
