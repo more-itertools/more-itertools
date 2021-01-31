@@ -274,6 +274,7 @@ try:
 except ImportError:
     pairwise = _pairwise
 else:
+
     def pairwise(iterable):
         yield from itertools_pairwise(iterable)
 
