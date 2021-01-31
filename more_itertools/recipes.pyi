@@ -1,5 +1,4 @@
 """Stubs for more_itertools.recipes"""
-
 from typing import (
     Any,
     Callable,

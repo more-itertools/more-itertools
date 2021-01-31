@@ -255,16 +255,30 @@ def repeatfunc(func, times=None, *args):
     return starmap(func, repeat(args, times))
 
 
-def pairwise(iterable):
+def _pairwise(iterable):
     """Returns an iterator of paired items, overlapping, from the original
 
     >>> take(4, pairwise(count()))
     [(0, 1), (1, 2), (2, 3), (3, 4)]
 
+    On Python 3.10 and above, this is an alias for :func:`itertools.pairwise`.
+
     """
     a, b = tee(iterable)
     next(b, None)
-    return zip(a, b)
+    yield from zip(a, b)
+
+
+try:
+    from itertools import pairwise as itertools_pairwise
+except ImportError:
+    pairwise = _pairwise
+else:
+
+    def pairwise(iterable):
+        yield from itertools_pairwise(iterable)
+
+    pairwise.__doc__ = _pairwise.__doc__
 
 
 def grouper(iterable, n, fillvalue=None):

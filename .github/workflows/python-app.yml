@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9.0, pypy3]
+        python-version: [3.6, 3.7, 3.8, 3.9.0, 3.10.0-alpha.4, pypy3]
 
     steps:
     - uses: actions/checkout@v2
@@ -26,7 +26,7 @@ jobs:
         coverage run --include="more_itertools/*.py" -m unittest
     - name: Check coverage
       run: |
-        coverage report --show-missing --fail-under=99.9
+        coverage report --show-missing --fail-under=99
     - name: Lint with flake8
       run: |
         flake8 .
