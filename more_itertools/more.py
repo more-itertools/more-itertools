@@ -138,7 +138,7 @@ def chunked(iterable, n, strict=False):
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
     If the length of *iterable* is not divisible by *n* and *strict* is
-    ``True``, then then ``ValueError`` will be raised before the last
+    ``True``, then ``ValueError`` will be raised before the last
     list is yielded.
 
     """
@@ -1138,7 +1138,7 @@ def sliced(seq, n, strict=False):
     [(1, 2, 3), (4, 5, 6), (7, 8)]
 
     If the length of *seq* is not divisible by *n* and *strict* is
-    ``True``, then then ``ValueError`` will be raised before the last
+    ``True``, then ``ValueError`` will be raised before the last
     slice is yielded.
 
     This function will only work for iterables that support slicing.
