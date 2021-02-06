@@ -3735,7 +3735,7 @@ def combination_index(element, iterable):
         10
 
     ``ValueError`` will be raised if the given *element* isn't one of the
-    combinations of *args*.
+    combinations of *iterable*.
     """
     element = enumerate(element)
     k, y = next(element, (None, None))
@@ -3779,7 +3779,7 @@ def permutation_index(element, iterable):
         19
 
     ``ValueError`` will be raised if the given *element* isn't one of the
-    permutations of *args*.
+    permutations of *iterable*.
     """
     index = 0
     pool = list(iterable)

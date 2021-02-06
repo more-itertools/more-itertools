@@ -5,6 +5,26 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.7.0
+-----
+
+* New functions
+    * :func:`convolve` (from the Python itertools docs)
+    * :func:`product_index`, :func:`combination_index`, and :func:`permutation_index` (thanks to N8Brooks)
+    * :func:`value_chain` (thanks to jenstroeger)
+
+* Changes to existing functions
+    * :func:`distinct_combinations` now uses a non-recursive algorithm (thanks to  knutdrand)
+    * :func:`pad_none` is now the preferred name for :func:`padnone`, though the latter remains available.
+    * :func:`pairwise` will now use the Python standard library implementation on Python 3.10+
+    * :func:`sort_together` now accepts a ``key`` argument (thanks to brianmaissy)
+    * :class:`seekable` now has a ``peek`` method, and can indicate whether the iterator it's wrapping is exhausted (thanks to gsakkis)
+    * :class:`time_limited` can now indicate whether its iterator has expired (thanks to roysmith)
+    * The implementation of :func:`unique_everseen` was improved (thanks to plammens)
+
+* Other changes:
+    * Various documentation updates (thanks to cthoyt, Evantm, and cyphase)
+
 8.6.0
 -----
 
