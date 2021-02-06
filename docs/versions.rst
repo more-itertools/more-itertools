@@ -18,8 +18,8 @@ Version History
     * :func:`pad_none` is now the preferred name for :func:`padnone`, though the latter remains available.
     * :func:`pairwise` will now use the Python standard library implementation on Python 3.10+
     * :func:`sort_together` now accepts a ``key`` argument (thanks to brianmaissy)
-    * :class:`seekable` now has a ``peek`` method, and can indicate whether the iterator it's wrapping is exhausted (thanks to gsakkis)
-    * :class:`time_limited` can now indicate whether its iterator has expired (thanks to roysmith)
+    * :func:`seekable` now has a ``peek`` method, and can indicate whether the iterator it's wrapping is exhausted (thanks to gsakkis)
+    * :func:`time_limited` can now indicate whether its iterator has expired (thanks to roysmith)
     * The implementation of :func:`unique_everseen` was improved (thanks to plammens)
 
 * Other changes:
