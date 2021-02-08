@@ -4363,3 +4363,20 @@ class PermutationIndexTests(TestCase):
     def test_invalid_match(self):
         with self.assertRaises(ValueError):
             mi.permutation_index(tuple('axe'), 'abcde')
+
+
+class CountableTests(TestCase):
+    def test_empty(self):
+        iterable = []
+        it = mi.countable(iterable)
+        self.assertEqual(it.items_seen, 0)
+        self.assertEqual(list(it), [])
+
+    def test_basic(self):
+        iterable = '0123456789'
+        it = mi.countable(iterable)
+        self.assertEqual(it.items_seen, 0)
+        self.assertEqual(next(it), '0')
+        self.assertEqual(it.items_seen, 1)
+        self.assertEqual(''.join(it), '123456789')
+        self.assertEqual(it.items_seen, 10)
