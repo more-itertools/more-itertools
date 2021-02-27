@@ -320,7 +320,7 @@ def roundrobin(*iterables):
             nexts = cycle(islice(nexts, pending))
 
 
-def partition(pred, iterable):
+def partition(pred, iterable, side_effect=lambda x: x):
     """
     Returns a 2-tuple of iterables derived from the input iterable.
     The first yields the items that have ``pred(item) == False``.
@@ -339,6 +339,13 @@ def partition(pred, iterable):
         >>> list(false_items), list(true_items)
         ([0, False, ''], [1, True, ' '])
 
+    Optional parameter ``side_effect`` is callable, applied to every item in both partitions.
+    By default, side_effect() is identity function (and does nothing).
+
+        >>> iterable = ['a', 'b', 'C']
+        >>> lowercase_items, uppercase_items = partition(str.isupper, iterable, side_effect=lambda x: x + '!')
+        >>> list(lowercase_items), list(uppercase_items)
+        (['a!', 'b!'], ['C!'])
     """
     if pred is None:
         pred = bool
@@ -346,8 +353,8 @@ def partition(pred, iterable):
     evaluations = ((pred(x), x) for x in iterable)
     t1, t2 = tee(evaluations)
     return (
-        (x for (cond, x) in t1 if not cond),
-        (x for (cond, x) in t2 if cond),
+        (side_effect(x) for (cond, x) in t1 if not cond),
+        (side_effect(x) for (cond, x) in t2 if cond),
     )
 
 

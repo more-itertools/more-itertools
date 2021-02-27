@@ -5,6 +5,12 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.8.0
+-----
+
+* Changes to existing itertools:
+    * :func:`partition` got a ``side_effect`` parameter. (thanks to zmej-serow)
+
 8.7.0
 -----
 
