@@ -339,12 +339,15 @@ def partition(pred, iterable, side_effect=lambda x: x):
         >>> list(false_items), list(true_items)
         ([0, False, ''], [1, True, ' '])
 
-    Optional parameter ``side_effect`` is callable, applied to every item in both partitions.
+    Optional parameter ``side_effect`` is callable,
+    applied to every item in both partitioning results.
     By default, side_effect() is identity function (and does nothing).
 
+        >>> pred = str.isupper
+        >>> func = lambda x: x + '!'
         >>> iterable = ['a', 'b', 'C']
-        >>> lowercase_items, uppercase_items = partition(str.isupper, iterable, side_effect=lambda x: x + '!')
-        >>> list(lowercase_items), list(uppercase_items)
+        >>> lo_items, up_items = partition(pred, iterable, side_effect=func)
+        >>> list(lo_items), list(up_items)
         (['a!', 'b!'], ['C!'])
     """
     if pred is None:

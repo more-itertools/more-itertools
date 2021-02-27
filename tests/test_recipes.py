@@ -336,9 +336,10 @@ class PartitionTests(TestCase):
         self.assertEqual(list(trues), [1, 2])
 
     def test_side_effect(self):
-        lowercases, uppercases = mi.partition(str.isupper, ['a', 'B', 'c'], side_effect=lambda x: x + '!')
-        self.assertEqual(list(lowercases), ['a!', 'c!'])
-        self.assertEqual(list(uppercases), ['B!'])
+        add_100 = lambda x: x + 100
+        a, b = mi.partition(lambda x: x > 5, range(10), side_effect=add_100)
+        self.assertEqual(list(a), [100, 101, 102, 103, 104, 105])
+        self.assertEqual(list(b), [106, 107, 108, 109])
 
 
 class PowersetTests(TestCase):
