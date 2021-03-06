@@ -3346,7 +3346,7 @@ def sample(iterable, k, weights=None):
     >>> sample(iterable, 5)  # doctest: +SKIP
     [81, 60, 96, 16, 4]
 
-     An iterable with *weights* may also be given:
+    An iterable with *weights* may also be given:
 
     >>> iterable = range(100)
     >>> weights = (i * i + 1 for i in range(100))
