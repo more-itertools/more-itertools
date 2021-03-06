@@ -2464,41 +2464,32 @@ def consecutive_groups(iterable, ordering=lambda x: x):
 
 
 def difference(iterable, func=sub, *, initial=None):
-    """By default, compute the first difference of *iterable* using
-    :func:`operator.sub`.
+    """This function is the inverse of :func:`itertools.accumulate`. By default
+    it will compute the first difference of *iterable* using
+    :func:`operator.sub`:
 
-        >>> iterable = [0, 1, 3, 6, 10]
+        >>> from itertools import accumulate
+        >>> iterable = accumulate([0, 1, 2, 3, 4])  # produces 0, 1, 3, 6, 10
         >>> list(difference(iterable))
         [0, 1, 2, 3, 4]
 
-    This is the opposite of :func:`itertools.accumulate`'s default behavior:
-
-        >>> from itertools import accumulate
-        >>> iterable = [0, 1, 2, 3, 4]
-        >>> list(accumulate(iterable))
-        [0, 1, 3, 6, 10]
-        >>> list(difference(accumulate(iterable)))
-        [0, 1, 2, 3, 4]
-
-    By default *func* is :func:`operator.sub`, but other functions can be
+    *func* defaults to :func:`operator.sub`, but other functions can be
     specified. They will be applied as follows::
 
         A, B, C, D, ... --> A, func(B, A), func(C, B), func(D, C), ...
 
     For example, to do progressive division:
 
-        >>> iterable = [1, 2, 6, 24, 120]  # Factorial sequence
+        >>> iterable = [1, 2, 6, 24, 120]
         >>> func = lambda x, y: x // y
         >>> list(difference(iterable, func))
         [1, 2, 3, 4, 5]
 
-    Since Python 3.8, :func:`itertools.accumulate` can be supplied with an
-    *initial* keyword argument. If :func:`difference` is called with *initial*
-    set to something other than ``None``, it will skip the first element when
+    If the *initial* keyword is set, the first element will be skipped when
     computing successive differences.
 
-        >>> iterable = [10, 11, 13, 16]  # accumulate([1, 2, 3], initial=10)
-        >>> list(difference(iterable, initial=10))
+        >>> it = [10, 11, 13, 16]  # from accumulate([1, 2, 3], initial=10)
+        >>> list(difference(it, initial=10))
         [1, 2, 3]
 
     """
