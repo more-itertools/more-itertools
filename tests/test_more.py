@@ -1238,6 +1238,11 @@ class SplitBeforeTest(TestCase):
         expected = [['o', 'o', 'o']]
         self.assertEqual(actual, expected)
 
+    def test_empty_collection(self):
+        actual = list(mi.split_before([], lambda c: bool(c)))
+        expected = []
+        self.assertEqual(actual, expected)
+
     def test_max_split(self):
         for args, expected in [
             (
