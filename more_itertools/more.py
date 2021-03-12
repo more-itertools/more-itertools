@@ -1235,7 +1235,8 @@ def split_before(iterable, pred, maxsplit=-1):
             buf = []
             maxsplit -= 1
         buf.append(item)
-    yield buf
+    if buf:
+        yield buf
 
 
 def split_after(iterable, pred, maxsplit=-1):
