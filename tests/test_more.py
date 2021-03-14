@@ -1755,8 +1755,7 @@ class ZipEqualTest(TestCase):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter('always')
             self.assertEqual(
-                list(mi.zip_equal([1, 2], [3, 4])),
-                [(1, 3), (2, 4)]
+                list(mi.zip_equal([1, 2], [3, 4])), [(1, 3), (2, 4)]
             )
 
         (warning,) = caught

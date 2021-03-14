@@ -1490,7 +1490,6 @@ class UnequalIterablesError(ValueError):
         super().__init__(msg)
 
 
-
 def _zip_equal_generator(iterables):
     for combo in zip_longest(*iterables, fillvalue=_marker):
         for val in combo:
@@ -1517,7 +1516,7 @@ def zip_equal(*iterables):
         lengths
 
     """
-    if hexversion >= 0x30a00a6:
+    if hexversion >= 0x30A00A6:
         warnings.warn(
             (
                 'zip_equal will be removed in a future version of '
