@@ -1,3 +1,5 @@
+import warnings
+
 from collections import Counter, abc
 from collections.abc import Set
 from datetime import datetime, timedelta
@@ -1748,7 +1750,16 @@ class StaggerTest(TestCase):
 
 
 class ZipEqualTest(TestCase):
-    """Tests for ``zip_equal()``"""
+    @skipIf(version_info[:2] < (3, 10), 'zip_equal deprecated for 3.10+')
+    def test_deprecation(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            self.assertEqual(
+                list(mi.zip_equal([1, 2], [3, 4])), [(1, 3), (2, 4)]
+            )
+
+        (warning,) = caught
+        assert warning.category == DeprecationWarning
 
     def test_equal(self):
         lists = [0, 1, 2], [2, 3, 4]

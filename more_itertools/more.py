@@ -1490,6 +1490,14 @@ class UnequalIterablesError(ValueError):
         super().__init__(msg)
 
 
+def _zip_equal_generator(iterables):
+    for combo in zip_longest(*iterables, fillvalue=_marker):
+        for val in combo:
+            if val is _marker:
+                raise UnequalIterablesError()
+        yield combo
+
+
 def zip_equal(*iterables):
     """``zip`` the input *iterables* together, but raise
     ``UnequalIterablesError`` if they aren't all the same length.
@@ -1508,6 +1516,15 @@ def zip_equal(*iterables):
         lengths
 
     """
+    if hexversion >= 0x30A00A6:
+        warnings.warn(
+            (
+                'zip_equal will be removed in a future version of '
+                'more-itertools. Use the builtin zip function with '
+                'strict=True instead.'
+            ),
+            DeprecationWarning,
+        )
     # Check whether the iterables are all the same size.
     try:
         first_size = len(iterables[0])
@@ -1525,14 +1542,6 @@ def zip_equal(*iterables):
     # them until one runs out.
     except TypeError:
         return _zip_equal_generator(iterables)
-
-
-def _zip_equal_generator(iterables):
-    for combo in zip_longest(*iterables, fillvalue=_marker):
-        for val in combo:
-            if val is _marker:
-                raise UnequalIterablesError()
-        yield combo
 
 
 def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
