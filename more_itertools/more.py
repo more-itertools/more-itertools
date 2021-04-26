@@ -25,6 +25,7 @@ from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
+from string import ascii_uppercase
 
 from .recipes import (
     consume,
@@ -119,6 +120,7 @@ __all__ = [
     'product_index',
     'combination_index',
     'permutation_index',
+    'xcount',
 ]
 
 _marker = object()
@@ -3791,6 +3793,43 @@ def permutation_index(element, iterable):
         del pool[r]
 
     return index
+
+
+def xcount(start=None):
+    """Create an iterator which returns values that follow an Excel style
+    increasing column count starting with *start*, i.e. "A", "B", "C", ...,
+    "Z", "AA", "AB", ...
+
+        >>> counter = xcount()
+        >>> next(counter)
+        'A'
+        >>> next(counter)
+        'B'
+
+    Raises ``TypeError`` if *start* is not a string, and raises ``ValueError``
+    if *start* is not a valid column count.
+    """
+    if start is None:
+        start = ascii_uppercase[0]
+    if not isinstance(start, str):
+        raise TypeError("start is not a str")
+    if not all(digit.isupper() for digit in start):
+        raise ValueError("start is not a valid valid xcount value")
+    digit_indices = list(ascii_uppercase.index(digit) for digit in start)
+
+    def _count():
+        while True:
+            yield "".join(ascii_uppercase[index] for index in digit_indices)
+            for index in reversed(range(len(digit_indices))):
+                digit = digit_indices[index]
+                digit = (digit + 1) % len(ascii_uppercase)
+                digit_indices[index] = digit
+                if digit != 0:
+                    break
+            else:
+                digit_indices.insert(0, 0)
+
+    return _count()
 
 
 class countable:

@@ -126,6 +126,7 @@ Python iterables.
 |                        | `consume <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.consume>`_,                                                                                                                        |
 |                        | `tabulate <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.tabulate>`_,                                                                                                                      |
 |                        | `repeatfunc <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.repeatfunc>`_                                                                                                                   |
+|                        | `xcount <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.xcount>`_                                                                                                                           |
 +------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 

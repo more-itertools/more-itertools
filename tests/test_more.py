@@ -4396,3 +4396,49 @@ class CountableTests(TestCase):
         self.assertEqual(it.items_seen, 1)
         self.assertEqual(''.join(it), '123456789')
         self.assertEqual(it.items_seen, 10)
+
+
+class XCountTests(TestCase):
+    def test_empty(self):
+        xcounter = mi.xcount()
+        self.assertEqual("A", next(xcounter))
+        self.assertEqual("B", next(xcounter))
+        self.assertEqual("C", next(xcounter))
+
+    def test_start(self):
+        xcounter = mi.xcount(start="J")
+        self.assertEqual("J", next(xcounter))
+        self.assertEqual("K", next(xcounter))
+        self.assertEqual("L", next(xcounter))
+        xcounter = mi.xcount(start="JJJ")
+        self.assertEqual("JJJ", next(xcounter))
+        self.assertEqual("JJK", next(xcounter))
+        self.assertEqual("JJL", next(xcounter))
+
+    def test_overflow(self):
+        xcounter = mi.xcount(start="Y")
+        self.assertEqual("Y", next(xcounter))
+        self.assertEqual("Z", next(xcounter))
+        self.assertEqual("AA", next(xcounter))
+        xcounter = mi.xcount(start="AAZY")
+        self.assertEqual("AAZY", next(xcounter))
+        self.assertEqual("AAZZ", next(xcounter))
+        self.assertEqual("ABAA", next(xcounter))
+
+    def test_large(self):
+        xcounter = mi.xcount(start="ABCDEFG")
+        self.assertEqual("ABCDEFG", next(xcounter))
+        self.assertEqual("ABCDEFH", next(xcounter))
+        xcounter = mi.xcount(start="STUVWXYZ")
+        self.assertEqual("STUVWXYZ", next(xcounter))
+        self.assertEqual("STUVWXZA", next(xcounter))
+
+    def test_illegal_start(self):
+        with self.assertRaises(ValueError):
+            _ = mi.xcount(start="123")
+        with self.assertRaises(ValueError):
+            _ = mi.xcount(start="abc")
+        with self.assertRaises(TypeError):
+            _ = mi.xcount(start=1)
+        with self.assertRaises(TypeError):
+            _ = mi.xcount(start=False)
