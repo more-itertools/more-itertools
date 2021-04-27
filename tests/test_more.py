@@ -637,7 +637,7 @@ class OneTests(TestCase):
 
 
 class IntersperseTest(TestCase):
-    """ Tests for intersperse() """
+    """Tests for intersperse()"""
 
     def test_even(self):
         iterable = (x for x in '01')

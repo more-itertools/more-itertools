@@ -30,6 +30,7 @@ _W = TypeVar('_W')
 _T_co = TypeVar('_T_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[object]])
 _Raisable = Union[BaseException, 'Type[BaseException]']
+
 @type_check_only
 class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]): ...
 
