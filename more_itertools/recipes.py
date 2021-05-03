@@ -401,13 +401,14 @@ def unique_everseen(iterable, key=None):
     ``key=lambda x: frozenset(x.items())`` can be used.
 
     """
-    key = key if key is not None else lambda x: x
     seenset = set()
     seenset_add = seenset.add
     seenlist = []
     seenlist_add = seenlist.append
+    use_key = key is not None
+
     for element in iterable:
-        k = key(element)
+        k = key(element) if use_key else element
         try:
             if k not in seenset:
                 seenset_add(k)
