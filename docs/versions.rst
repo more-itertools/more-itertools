@@ -9,7 +9,7 @@ Version History
 -----
 
 * New functions
-    * :class:`countable` (thanks to krzysieq)
+    * :func:`countable` (thanks to krzysieq)
 
 * Changes to existing functions
     * :func:`split_before` was updated to handle empy collections (thanks to TiunovNN)
