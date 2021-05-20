@@ -5,6 +5,17 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.8.0
+-----
+
+* New functions
+    * :class:`countable` (thanks to krzysieq)
+
+* Changes to existing functions
+    * :func:`split_before` was updated to handle empy collections (thanks to TiunovNN)
+    * :func:`unique_everseen` got a performance boost (thanks to Numerlor)
+    * The type hint for :func:`value_chain` was corrected (thanks to vr2262)
+
 8.7.0
 -----
 
