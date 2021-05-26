@@ -639,23 +639,23 @@ class OneTests(TestCase):
 class UnanimousTests(TestCase):
     def test_unanimous(self):
         for iterable, expected in [
-                ([1], 1),
-                ([1, 1], 1),
-                (["", ""], ""),
-                ([[], []], []),
-                ([{}, {}], {}),
-                (range(1), 0),
+            ([1], 1),
+            ([1, 1], 1),
+            (["", ""], ""),
+            ([[], []], []),
+            ([{}, {}], {}),
+            (range(1), 0),
         ]:
             with self.subTest(iterable=iterable):
                 self.assertEqual(mi.unanimous(iterable), expected)
 
     def test_not_unanimous(self):
         for iterable in [
-                [1, 2],
-                [1, 1, 2],
-                [1, 2, 2],
-                [1, 2, 1],
-                range(2),
+            [1, 2],
+            [1, 1, 2],
+            [1, 2, 2],
+            [1, 2, 1],
+            range(2),
         ]:
             with self.subTest(iterable=iterable):
                 with self.assertRaises(ValueError):
