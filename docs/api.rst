@@ -170,6 +170,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: last(iterable[, default])
 .. autofunction:: one(iterable, too_short=ValueError, too_long=ValueError)
 .. autofunction:: only(iterable, default=None, too_long=ValueError)
+.. autofunction:: unanimous(iterable[, default])
 .. autofunction:: strip
 .. autofunction:: lstrip
 .. autofunction:: rstrip

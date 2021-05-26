@@ -110,6 +110,7 @@ __all__ = [
     'unzip',
     'windowed',
     'with_iter',
+    'unanimous',
     'UnequalIterablesError',
     'zip_equal',
     'zip_offset',
@@ -576,6 +577,42 @@ def one(iterable, too_short=None, too_long=None):
         raise too_long or ValueError(msg)
 
     return first_value
+
+
+def unanimous(iterable, default=_marker):
+    """
+    If every value in *iterable* is the same, return that value.  Otherwise 
+    raise ``ValueError``.
+
+        >>> unanimous([1, 1, 1])
+        1
+        >>> unanimous([1, 1, 2]) # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: found multiple values: 1, 2
+
+    If *iterable* is empty, either *default* will be returned (if it was 
+    specified) or ``ValueError`` will be raised.
+
+    If you just need to know whether or not all of the values in an iterable 
+    are the same (but don't need to know what that value actually is), use 
+    :func:`all_equal`.
+    """
+    it = iter(iterable)
+
+    try:
+        value = next(it)
+    except StopIteration:
+        if default is not _marker:
+            return default
+        else:
+            raise ValueError("empty iterable")
+
+    for next_value in it:
+        if next_value != value:
+            raise ValueError("found multiple values: {!r}, {!r}".format(value, next_value))
+
+    return value
 
 
 def distinct_permutations(iterable, r=None):

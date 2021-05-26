@@ -164,6 +164,14 @@ def all_equal(iterable):
         >>> all_equal('aaab')
         False
 
+    Empty iterables are considered ``True``:
+
+        >>> all_equal([])
+        True
+
+    If you need to know the actual value is (e.g. ``'a'`` in the first example 
+    above), use :func:`unanimous`.
+
     """
     g = groupby(iterable)
     return next(g, True) and not next(g, False)
