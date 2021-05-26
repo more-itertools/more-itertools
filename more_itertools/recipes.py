@@ -169,7 +169,7 @@ def all_equal(iterable):
         >>> all_equal([])
         True
 
-    If you need to know the actual value is (e.g. ``'a'`` in the first example 
+    If you need to know the actual value is (e.g. ``'a'`` in the first example
     above), use :func:`unanimous`.
 
     """

@@ -581,7 +581,7 @@ def one(iterable, too_short=None, too_long=None):
 
 def unanimous(iterable, default=_marker):
     """
-    If every value in *iterable* is the same, return that value.  Otherwise 
+    If every value in *iterable* is the same, return that value.  Otherwise
     raise ``ValueError``.
 
         >>> unanimous([1, 1, 1])
@@ -591,11 +591,11 @@ def unanimous(iterable, default=_marker):
         ...
         ValueError: found multiple values: 1, 2
 
-    If *iterable* is empty, either *default* will be returned (if it was 
+    If *iterable* is empty, either *default* will be returned (if it was
     specified) or ``ValueError`` will be raised.
 
-    If you just need to know whether or not all of the values in an iterable 
-    are the same (but don't need to know what that value actually is), use 
+    If you just need to know whether or not all of the values in an iterable
+    are the same (but don't need to know what that value actually is), use
     :func:`all_equal`.
     """
     it = iter(iterable)
@@ -610,7 +610,8 @@ def unanimous(iterable, default=_marker):
 
     for next_value in it:
         if next_value != value:
-            raise ValueError("found multiple values: {!r}, {!r}".format(value, next_value))
+            m = "found multiple values: {!r}, {!r}".format(value, next_value)
+            raise ValueError(m)
 
     return value
 
