@@ -606,7 +606,7 @@ def unanimous(iterable, default=_marker):
         if default is not _marker:
             return default
         else:
-            raise ValueError("empty iterable")
+            raise ValueError("empty iterable") from None
 
     for next_value in it:
         if next_value != value:
