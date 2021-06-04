@@ -207,17 +207,30 @@ class UnequalIterablesError(ValueError):
 @overload
 def zip_equal(__iter1: Iterable[_T1]) -> Iterator[Tuple[_T1]]: ...
 @overload
-def zip_equal(__iter1: Iterable[_T1], __iter2: Iterable[_T2]) -> Iterator[Tuple[_T1, _T2]]: ...
+def zip_equal(
+    __iter1: Iterable[_T1], __iter2: Iterable[_T2]
+) -> Iterator[Tuple[_T1, _T2]]: ...
 @overload
-def zip_equal(__iter1: Iterable[_T], __iter2: Iterable[_T], __iter3: Iterable[_T], *iterables: Iterable[_T]) -> Iterator[Tuple[_T, ...]]: ...
-
+def zip_equal(
+    __iter1: Iterable[_T],
+    __iter2: Iterable[_T],
+    __iter3: Iterable[_T],
+    *iterables: Iterable[_T]
+) -> Iterator[Tuple[_T, ...]]: ...
 @overload
 def zip_offset(
-    __iter1: Iterable[_T1], *, offsets: _SizedIterable[int], longest: bool = ...
+    __iter1: Iterable[_T1],
+    *,
+    offsets: _SizedIterable[int],
+    longest: bool = ...
 ) -> Iterator[Tuple[Optional[_T1]]]: ...
 @overload
 def zip_offset(
-    __iter1: Iterable[_T1], __iter2: Iterable[_T2], *, offsets: _SizedIterable[int], longest: bool = ...
+    __iter1: Iterable[_T1],
+    __iter2: Iterable[_T2],
+    *,
+    offsets: _SizedIterable[int],
+    longest: bool = ...
 ) -> Iterator[Tuple[Optional[_T1], Optional[_T2]]]: ...
 @overload
 def zip_offset(
@@ -255,7 +268,6 @@ def zip_offset(
     longest: bool = ...,
     fillvalue: _U,
 ) -> Iterator[Tuple[Union[_T, _U], ...]]: ...
-
 def sort_together(
     iterables: Iterable[Iterable[_T]],
     key_list: Iterable[int] = ...,
