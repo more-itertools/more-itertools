@@ -222,7 +222,8 @@ def zip_offset(
     __iter1: Iterable[_T1],
     *,
     offsets: _SizedIterable[int],
-    longest: bool = ...
+    longest: bool = ...,
+    fillvalue: None = None
 ) -> Iterator[Tuple[Optional[_T1]]]: ...
 @overload
 def zip_offset(
@@ -230,7 +231,8 @@ def zip_offset(
     __iter2: Iterable[_T2],
     *,
     offsets: _SizedIterable[int],
-    longest: bool = ...
+    longest: bool = ...,
+    fillvalue: None = None
 ) -> Iterator[Tuple[Optional[_T1], Optional[_T2]]]: ...
 @overload
 def zip_offset(
@@ -239,7 +241,8 @@ def zip_offset(
     __iter3: Iterable[_T],
     *iterables: Iterable[_T],
     offsets: _SizedIterable[int],
-    longest: bool = ...
+    longest: bool = ...,
+    fillvalue: None = None
 ) -> Iterator[Tuple[Optional[_T], ...]]: ...
 @overload
 def zip_offset(
