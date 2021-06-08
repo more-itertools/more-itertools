@@ -24,6 +24,8 @@ from typing_extensions import ContextManager, Protocol, Type, overload
 
 # Type and type variable definitions
 _T = TypeVar('_T')
+_T1 = TypeVar('_T1')
+_T2 = TypeVar('_T2')
 _U = TypeVar('_U')
 _V = TypeVar('_V')
 _W = TypeVar('_W')
@@ -202,17 +204,72 @@ class UnequalIterablesError(ValueError):
         self, details: Optional[Tuple[int, int, int]] = ...
     ) -> None: ...
 
-def zip_equal(*iterables: Iterable[_T]) -> Iterator[Tuple[_T, ...]]: ...
+@overload
+def zip_equal(__iter1: Iterable[_T1]) -> Iterator[Tuple[_T1]]: ...
+@overload
+def zip_equal(
+    __iter1: Iterable[_T1], __iter2: Iterable[_T2]
+) -> Iterator[Tuple[_T1, _T2]]: ...
+@overload
+def zip_equal(
+    __iter1: Iterable[_T],
+    __iter2: Iterable[_T],
+    __iter3: Iterable[_T],
+    *iterables: Iterable[_T]
+) -> Iterator[Tuple[_T, ...]]: ...
 @overload
 def zip_offset(
-    *iterables: Iterable[_T], offsets: _SizedIterable[int], longest: bool = ...
-) -> Iterator[Tuple[Optional[_T], ...]]: ...
+    __iter1: Iterable[_T1],
+    *,
+    offsets: _SizedIterable[int],
+    longest: bool = ...,
+    fillvalue: None = None
+) -> Iterator[Tuple[Optional[_T1]]]: ...
 @overload
 def zip_offset(
+    __iter1: Iterable[_T1],
+    __iter2: Iterable[_T2],
+    *,
+    offsets: _SizedIterable[int],
+    longest: bool = ...,
+    fillvalue: None = None
+) -> Iterator[Tuple[Optional[_T1], Optional[_T2]]]: ...
+@overload
+def zip_offset(
+    __iter1: Iterable[_T],
+    __iter2: Iterable[_T],
+    __iter3: Iterable[_T],
     *iterables: Iterable[_T],
     offsets: _SizedIterable[int],
     longest: bool = ...,
-    fillvalue: _U
+    fillvalue: None = None
+) -> Iterator[Tuple[Optional[_T], ...]]: ...
+@overload
+def zip_offset(
+    __iter1: Iterable[_T1],
+    *,
+    offsets: _SizedIterable[int],
+    longest: bool = ...,
+    fillvalue: _U,
+) -> Iterator[Tuple[Union[_T1, _U]]]: ...
+@overload
+def zip_offset(
+    __iter1: Iterable[_T1],
+    __iter2: Iterable[_T2],
+    *,
+    offsets: _SizedIterable[int],
+    longest: bool = ...,
+    fillvalue: _U,
+) -> Iterator[Tuple[Union[_T1, _U], Union[_T2, _U]]]: ...
+@overload
+def zip_offset(
+    __iter1: Iterable[_T],
+    __iter2: Iterable[_T],
+    __iter3: Iterable[_T],
+    *iterables: Iterable[_T],
+    offsets: _SizedIterable[int],
+    longest: bool = ...,
+    fillvalue: _U,
 ) -> Iterator[Tuple[Union[_T, _U], ...]]: ...
 def sort_together(
     iterables: Iterable[Iterable[_T]],
