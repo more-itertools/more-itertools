@@ -530,6 +530,10 @@ def combination_index(
 def permutation_index(
     element: Iterable[_T], iterable: Iterable[_T]
 ) -> int: ...
+def transpose(iter_of_iters: Iterable,
+              inner_type: Union[_T, None],
+              fillvalue: object
+              ) -> Iterator[Union[Iterable[_T], tuple]]: ...
 
 class countable(Generic[_T], Iterator[_T]):
     def __init__(self, iterable: Iterable[_T]) -> None: ...
