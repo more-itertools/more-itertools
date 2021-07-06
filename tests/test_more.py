@@ -22,8 +22,9 @@ from itertools import (
 )
 from operator import add, mul, itemgetter
 from pickle import loads, dumps
-from random import seed
+from random import seed, Random
 from statistics import mean
+from string import ascii_letters
 from sys import version_info
 from time import sleep
 from traceback import format_exc
@@ -1011,6 +1012,80 @@ class InterleaveLongestTests(TestCase):
         actual = list(mi.interleave_longest(it_list, it_str, it_gen))
         expected = ['a', '1', 0, 'b', '2', 1, 'c', '3', 2, 'd', '4', '5']
         self.assertEqual(actual, expected)
+
+
+class InterleaveEvenlyTests(TestCase):
+    def test_equal_lengths(self):
+        # when lengths are equal, the relative order shouldn't change
+        a = [1, 2, 3]
+        b = [5, 6, 7]
+        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        expected = [1, 5, 2, 6, 3, 7]
+        self.assertEqual(actual, expected)
+
+    def test_proportional(self):
+        # easy case where the iterables have proportional length
+        a = [1, 2, 3, 4]
+        b = [5, 6]
+        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        expected = [1, 2, 5, 3, 4, 6]
+        self.assertEqual(actual, expected)
+
+        # swapping a and b should yield the same result
+        actual_swapped = list(mi.interleave_evenly([b, a], [len(b), len(a)]))
+        self.assertEqual(actual_swapped, expected)
+
+    def test_not_proportional(self):
+        a = [1, 2, 3, 4, 5, 6, 7]
+        b = [8, 9, 10]
+        expected = [1, 2, 8, 3, 4, 9, 5, 6, 10, 7]
+        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        self.assertEqual(actual, expected)
+
+    def test_degenerate_one(self):
+        a = [0, 1, 2, 3, 4]
+        b = [5]
+        expected = [0, 1, 2, 5, 3, 4]
+        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        self.assertEqual(actual, expected)
+
+    def test_degenerate_empty(self):
+        a = [1, 2, 3]
+        b = []
+        expected = [1, 2, 3]
+        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        self.assertEqual(actual, expected)
+
+    def test_three_iters(self):
+        a = ["a1", "a2", "a3", "a4", "a5"]
+        b = ["b1", "b2", "b3"]
+        c = ["c1"]
+        actual = list(
+            mi.interleave_evenly([a, b, c], [len(a), len(b), len(c)])
+        )
+        expected = ["a1", "b1", "a2", "c1", "a3", "b2", "a4", "b3", "a5"]
+        self.assertEqual(actual, expected)
+
+    def test_many_iters(self):
+        # smoke test with many iterables: create iterables with a random
+        # number of elements starting with a character ("a0", "a1", ...)
+        rng = Random(0)
+        iterables = []
+        lengths = []
+        for ch in ascii_letters:
+            length = rng.randint(0, 100)
+            iterable = [f"{ch}{i}" for i in range(length)]
+            lengths.append(length)
+            iterables.append(iterable)
+
+        interleaved = list(mi.interleave_evenly(iterables, lengths))
+
+        # for each iterable, check that the result contains all its items
+        for iterable, ch_expect in zip(iterables, ascii_letters):
+            interleaved_actual = [
+                e for e in interleaved if e.startswith(ch_expect)
+            ]
+            assert len(set(interleaved_actual)) == len(iterable)
 
 
 class TestCollapse(TestCase):
