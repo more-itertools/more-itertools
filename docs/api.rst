@@ -84,6 +84,7 @@ These tools yield items from an iterable, plus additional data.
 .. autofunction:: intersperse
 .. autofunction:: padded
 .. autofunction:: mark_ends
+.. autofunction:: repeat_each
 .. autofunction:: repeat_last
 .. autofunction:: adjacent
 .. autofunction:: groupby_transform

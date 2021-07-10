@@ -1662,6 +1662,40 @@ class PaddedTest(TestCase):
         )
 
 
+class RepeatEachTests(TestCase):
+    """Tests for repeat_each()"""
+
+    def test_default(self):
+        actual = list(mi.repeat_each('ABC'))
+        expected = ['A', 'A', 'B', 'B', 'C', 'C']
+        self.assertEqual(actual, expected)
+
+    def test_basic(self):
+        actual = list(mi.repeat_each('ABC', 3))
+        expected = ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C']
+        self.assertEqual(actual, expected)
+
+    def test_positive_step(self):
+        actual = list(mi.repeat_each('ABC', 1, 1))
+        expected = ['A', 'B', 'B', 'C', 'C', 'C']
+        self.assertEqual(actual, expected)
+
+    def test_negative_step(self):
+        actual = list(mi.repeat_each('ABC', 3, -1))
+        expected = ['A', 'A', 'A', 'B', 'B', 'C']
+        self.assertEqual(actual, expected)
+
+    def test_truncate_front(self):
+        actual = list(mi.repeat_each('ABC', 0, 1))
+        expected = ['B', 'C', 'C']
+        self.assertEqual(actual, expected)
+
+    def test_truncate_end(self):
+        actual = list(mi.repeat_each('ABC', 2, -1))
+        expected = ['A', 'A', 'B']
+        self.assertEqual(actual, expected)
+
+
 class RepeatLastTests(TestCase):
     def test_empty_iterable(self):
         slice_length = 3

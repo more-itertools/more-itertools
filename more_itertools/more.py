@@ -84,6 +84,7 @@ __all__ = [
     'partitions',
     'set_partitions',
     'peekable',
+    'repeat_each'
     'repeat_last',
     'replace',
     'rlocate',
@@ -1395,6 +1396,34 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
         remaining = (n - item_count) % n if next_multiple else n - item_count
         for _ in range(remaining):
             yield fillvalue
+
+
+def repeat_each(iterable, n=2, step=0):
+    """Repeats each element in *iterable* _n_ times.
+
+       >>> list(repeat_each('ABC', 3))
+       ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C']
+
+       If _step_ is specified consecutive elements get repeated incrementally
+       while _n_ is the number of repeats for the first element:
+
+       >>> list(repeat_each('ABC', 2, 1))
+       ['A', 'A', 'B', 'B', 'B', 'C', 'C', 'C', 'C']
+
+       If _n_ < 1 the first elements of the *iterable* get truncated accordingly:
+
+       >>> list(repeat_each('ABC', 0, 1))
+       ['B', 'C', 'C']
+
+       By passing a negative value for _step_ decreasing repeats are also possible.
+       In this case _n_ needs to be >= len(iterable), otherwise the *iterable* gets truncated at the end:
+
+       >>> list(repeat_each('ABC', 3, -1))
+       ['A', 'A', 'A', 'B', 'B', 'C']
+       >>> list(repeat_each('ABC', 2, -1))
+       ['A', 'A', 'B']
+    """
+    return chain(*map(repeat, iterable, count(n, step)))
 
 
 def repeat_last(iterable, default=None):
