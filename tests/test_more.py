@@ -1675,6 +1675,21 @@ class RepeatEachTests(TestCase):
         expected = ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C']
         self.assertEqual(actual, expected)
 
+    def test_empty(self):
+        actual = list(mi.repeat_each(''))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_no_repeat(self):
+        actual = list(mi.repeat_each('ABC', 0))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_negative_repeat(self):
+        actual = list(mi.repeat_each('ABC', -1))
+        expected = []
+        self.assertEqual(actual, expected)
+
 
 class RepeatLastTests(TestCase):
     def test_empty_iterable(self):
