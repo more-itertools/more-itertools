@@ -84,6 +84,7 @@ __all__ = [
     'partitions',
     'set_partitions',
     'peekable',
+    'repeat_each',
     'repeat_last',
     'replace',
     'rlocate',
@@ -1395,6 +1396,15 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
         remaining = (n - item_count) % n if next_multiple else n - item_count
         for _ in range(remaining):
             yield fillvalue
+
+
+def repeat_each(iterable, n=2):
+    """Repeats each element in *iterable* _n_ times.
+
+    >>> list(repeat_each('ABC', 3))
+    ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C']
+    """
+    return chain(*map(repeat, iterable, repeat(n)))
 
 
 def repeat_last(iterable, default=None):
