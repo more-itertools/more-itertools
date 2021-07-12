@@ -1693,17 +1693,7 @@ class RepeatEachTests(TestCase):
 
     def test_infinite_input(self):
         repeater = mi.repeat_each(cycle('AB'))
-        actual = []
-        counter = 0
-
-        while True:
-            current = next(repeater)
-            actual.append(current)
-            counter += 1
-
-            if counter == 6:
-                break
-
+        actual = mi.take(6, repeater)
         expected = ['A', 'A', 'B', 'B', 'A', 'A']
         self.assertEqual(actual, expected)
 
