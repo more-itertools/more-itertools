@@ -14,6 +14,7 @@ from itertools import (
     chain,
     combinations,
     count,
+    cycle,
     groupby,
     islice,
     permutations,
@@ -1688,6 +1689,12 @@ class RepeatEachTests(TestCase):
     def test_negative_repeat(self):
         actual = list(mi.repeat_each('ABC', -1))
         expected = []
+        self.assertEqual(actual, expected)
+
+    def test_infinite_input(self):
+        repeater = mi.repeat_each(cycle('AB'))
+        actual = mi.take(6, repeater)
+        expected = ['A', 'A', 'B', 'B', 'A', 'A']
         self.assertEqual(actual, expected)
 
 

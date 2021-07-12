@@ -1404,7 +1404,7 @@ def repeat_each(iterable, n=2):
     >>> list(repeat_each('ABC', 3))
     ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C']
     """
-    return chain(*map(repeat, iterable, repeat(n)))
+    return chain.from_iterable(map(repeat, iterable, repeat(n)))
 
 
 def repeat_last(iterable, default=None):
