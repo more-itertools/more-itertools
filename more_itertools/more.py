@@ -63,6 +63,7 @@ __all__ = [
     'ilen',
     'interleave_longest',
     'interleave',
+    'interleave_evenly',
     'intersperse',
     'islice_extended',
     'iterate',
