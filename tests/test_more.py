@@ -1019,7 +1019,7 @@ class InterleaveEvenlyTests(TestCase):
         # when lengths are equal, the relative order shouldn't change
         a = [1, 2, 3]
         b = [5, 6, 7]
-        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        actual = list(mi.interleave_evenly([a, b]))
         expected = [1, 5, 2, 6, 3, 7]
         self.assertEqual(actual, expected)
 
@@ -1027,42 +1027,40 @@ class InterleaveEvenlyTests(TestCase):
         # easy case where the iterables have proportional length
         a = [1, 2, 3, 4]
         b = [5, 6]
-        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        actual = list(mi.interleave_evenly([a, b]))
         expected = [1, 2, 5, 3, 4, 6]
         self.assertEqual(actual, expected)
 
         # swapping a and b should yield the same result
-        actual_swapped = list(mi.interleave_evenly([b, a], [len(b), len(a)]))
+        actual_swapped = list(mi.interleave_evenly([b, a]))
         self.assertEqual(actual_swapped, expected)
 
     def test_not_proportional(self):
         a = [1, 2, 3, 4, 5, 6, 7]
         b = [8, 9, 10]
         expected = [1, 2, 8, 3, 4, 9, 5, 6, 10, 7]
-        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        actual = list(mi.interleave_evenly([a, b]))
         self.assertEqual(actual, expected)
 
     def test_degenerate_one(self):
         a = [0, 1, 2, 3, 4]
         b = [5]
         expected = [0, 1, 2, 5, 3, 4]
-        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        actual = list(mi.interleave_evenly([a, b]))
         self.assertEqual(actual, expected)
 
     def test_degenerate_empty(self):
         a = [1, 2, 3]
         b = []
         expected = [1, 2, 3]
-        actual = list(mi.interleave_evenly([a, b], [len(a), len(b)]))
+        actual = list(mi.interleave_evenly([a, b]))
         self.assertEqual(actual, expected)
 
     def test_three_iters(self):
         a = ["a1", "a2", "a3", "a4", "a5"]
         b = ["b1", "b2", "b3"]
         c = ["c1"]
-        actual = list(
-            mi.interleave_evenly([a, b, c], [len(a), len(b), len(c)])
-        )
+        actual = list(mi.interleave_evenly([a, b, c]))
         expected = ["a1", "b1", "a2", "c1", "a3", "b2", "a4", "b3", "a5"]
         self.assertEqual(actual, expected)
 
@@ -1071,14 +1069,12 @@ class InterleaveEvenlyTests(TestCase):
         # number of elements starting with a character ("a0", "a1", ...)
         rng = Random(0)
         iterables = []
-        lengths = []
         for ch in ascii_letters:
             length = rng.randint(0, 100)
             iterable = [f"{ch}{i}" for i in range(length)]
-            lengths.append(length)
             iterables.append(iterable)
 
-        interleaved = list(mi.interleave_evenly(iterables, lengths))
+        interleaved = list(mi.interleave_evenly(iterables))
 
         # for each iterable, check that the result contains all its items
         for iterable, ch_expect in zip(iterables, ascii_letters):
@@ -1086,6 +1082,40 @@ class InterleaveEvenlyTests(TestCase):
                 e for e in interleaved if e.startswith(ch_expect)
             ]
             assert len(set(interleaved_actual)) == len(iterable)
+
+    def test_manual_lengths(self):
+        a = combinations(range(4), 2)
+        len_a = 4 * (4 - 1) // 2  # == 6
+        b = combinations(range(4), 3)
+        len_b = 4
+
+        expected = [
+            (0, 1),
+            (0, 1, 2),
+            (0, 2),
+            (0, 3),
+            (0, 1, 3),
+            (1, 2),
+            (0, 2, 3),
+            (1, 3),
+            (2, 3),
+            (1, 2, 3),
+        ]
+        actual = list(mi.interleave_evenly([a, b], lengths=[len_a, len_b]))
+        self.assertEqual(expected, actual)
+
+    def test_no_length_raises(self):
+        # combinations doesn't have __len__, should trigger ValueError
+        iterables = [range(5), combinations(range(5), 2)]
+        with self.assertRaises(ValueError):
+            list(mi.interleave_evenly(iterables))
+
+    def test_argument_mismatch_raises(self):
+        # pass mismatching number of iterables and lengths
+        iterables = [range(3)]
+        lengths = [3, 4]
+        with self.assertRaises(ValueError):
+            list(mi.interleave_evenly(iterables, lengths=lengths))
 
 
 class TestCollapse(TestCase):

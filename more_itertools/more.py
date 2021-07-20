@@ -1,3 +1,4 @@
+import collections.abc
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
@@ -1018,25 +1019,48 @@ def interleave_longest(*iterables):
     return (x for x in i if x is not _marker)
 
 
-def interleave_evenly(iterables, lengths):
+def interleave_evenly(iterables, lengths=None):
     """
-    Interleave multiple iterables with known length so that their elements are
-    evenly distributed throughout the output sequence.
+    Interleave multiple iterables so that their elements are evenly distributed
+    throughout the output sequence.
 
         >>> iterables = [1, 2, 3, 4, 5], ['a', 'b']
-        >>> lengths = [5, 2]
-        >>> list(interleave_evenly(iterables, lengths))
+        >>> list(interleave_evenly(iterables))
         [1, 2, 'a', 3, 4, 'b', 5]
 
         >>> iterables = [[1, 2, 3], [4, 5], [6, 7, 8]]
-        >>> lengths = [3, 2, 3]
-        >>> list(interleave_evenly(iterables, lengths))
+        >>> list(interleave_evenly(iterables))
         [1, 6, 4, 2, 7, 3, 8, 5]
+
+    This method requires iterables of known length. For iterables implementing
+    `__len__()`, lengths are determined automatically. Iterables without
+    `__len__()` can be used by manually specifying lengths with the `lengths`
+    kwarg:
+
+        >>> from itertools import combinations, repeat
+        >>> iterables = [combinations(range(4), 2), ['a', 'b', 'c']]
+        >>> lengths = [4 * (4 - 1) // 2, 3]
+        >>> list(interleave_evenly(iterables, lengths=lengths))
+        [(0, 1), (0, 2), 'a', (0, 3), (1, 2), 'b', (1, 3), (2, 3), 'c']
 
     Based on Bresenham's algorithm.
     """
+    if lengths is None:
+        # infer lengths if not provided
+        lengths = []
+        for i, it in enumerate(iterables):
+            if isinstance(it, collections.abc.Sized):
+                lengths.append(len(it))
+            else:
+                raise ValueError(
+                    f"Iterable {i} has no __len__. Please use the"
+                    " `lengths` kwarg and specify iterable lengths"
+                    " manually."
+                )
+    elif len(iterables) != len(lengths):
+        raise ValueError("Mismatching number of iterables and lengths.")
+
     dims = len(lengths)
-    assert len(iterables) == dims
 
     # sort iterables by length, descending
     lengths_permute = sorted(
