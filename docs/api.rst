@@ -110,6 +110,7 @@ These tools combine multiple iterables.
 .. autofunction:: collapse
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
+.. autofunction:: interleave_evenly
 .. autofunction:: sort_together
 .. autofunction:: value_chain
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
