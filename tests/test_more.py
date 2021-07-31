@@ -4537,3 +4537,55 @@ class CountableTests(TestCase):
         self.assertEqual(it.items_seen, 1)
         self.assertEqual(''.join(it), '123456789')
         self.assertEqual(it.items_seen, 10)
+
+
+class ChunkedEvenTests(TestCase):
+    """Tests for ``chunked_even()``"""
+
+    def test_0(self):
+        self._test_finite('', 3, [])
+
+    def test_1(self):
+        self._test_finite('A', 1, [['A']])
+
+    def test_4(self):
+        self._test_finite('ABCD', 3, [['A', 'B'], ['C', 'D']])
+
+    def test_5(self):
+        self._test_finite('ABCDE', 3, [['A', 'B', 'C'], ['D', 'E']])
+
+    def test_6(self):
+        self._test_finite('ABCDEF', 3, [['A', 'B', 'C'], ['D', 'E', 'F']])
+
+    def test_7(self):
+        self._test_finite('ABCDEFG', 3, [['A', 'B', 'C'], ['D', 'E'], ['F', 'G']])
+
+    def _test_finite(self, seq, n, expected):
+        # Check with and without `len()`
+        self.assertEqual(list(mi.chunked_even(seq, n)), expected)
+        self.assertEqual(list(mi.chunked_even(iter(seq), n)), expected)
+
+    def test_infinite(self):
+        n = 4
+        def limited_count():
+            for i in count():
+                # To generate list `k`, it should not look ahead more than n^2
+                self.assertLessEqual(i, n*k + n*n)
+                yield i
+        ls = mi.chunked_even(limited_count(), n)
+        for k in range(2):
+            self.assertEqual(next(ls), list(range(k*n, (k+1)*n)))
+
+    def test_evenness(self):
+        for N in range(1, 1000):
+            for n in range(1, N + 2):
+                lengths = []
+                items = []
+                for l in mi.chunked_even(range(N), n):
+                    L = len(l)
+                    self.assertLessEqual(L, n)
+                    self.assertGreaterEqual(L, 1)
+                    lengths.append(L)
+                    items.extend(l)
+                self.assertEqual(items, list(range(N)))
+                self.assertLessEqual(max(lengths) - min(lengths), 1)
