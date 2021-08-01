@@ -4558,7 +4558,9 @@ class ChunkedEvenTests(TestCase):
         self._test_finite('ABCDEF', 3, [['A', 'B', 'C'], ['D', 'E', 'F']])
 
     def test_7(self):
-        self._test_finite('ABCDEFG', 3, [['A', 'B', 'C'], ['D', 'E'], ['F', 'G']])
+        self._test_finite(
+            'ABCDEFG', 3, [['A', 'B', 'C'], ['D', 'E'], ['F', 'G']]
+        )
 
     def _test_finite(self, seq, n, expected):
         # Check with and without `len()`
@@ -4568,14 +4570,16 @@ class ChunkedEvenTests(TestCase):
     def test_infinite(self):
         for n in range(1, 5):
             k = 0
+            
             def count_with_assert():
                 for i in count():
                     # To generate list `k`, it should not look ahead more than n^2
-                    self.assertLessEqual(i, n*k + n*n)
+                    self.assertLessEqual(i, n * k + n * n)
                     yield i
+            
             ls = mi.chunked_even(count_with_assert(), n)
             while k < 2:
-                self.assertEqual(next(ls), list(range(k*n, (k+1)*n)))
+                self.assertEqual(next(ls), list(range(k * n, (k + 1) * n)))
                 k += 1
 
     def test_evenness(self):

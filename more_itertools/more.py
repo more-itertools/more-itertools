@@ -19,7 +19,7 @@ from itertools import (
     tee,
     zip_longest,
 )
-from math import exp, factorial, floor, log, ceil
+from math import exp, factorial, floor, log
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt
@@ -3911,12 +3911,12 @@ def chunked_even(iterable, n):
             >>> list(chunked_even([1, 2, 3, 4, 5, 6, 7], 3))
             [[1, 2, 3], [4, 5], [6, 7]]
 
-        If *iterable* has `__len__`, O(n) space is used, with O(n) time per list.
+        If *iterable* has `len()`, O(n) space is used, with O(n) time per list.
         Otherwise, O(n^2) space is needed, and O(n^2) time per list.
     """
-    
+
     len_method = getattr(iterable, '__len__', None)
-    
+
     if len_method is None:
         return _chunked_even_online(iterable, n)
     else:
@@ -3937,19 +3937,19 @@ def _chunked_even_online(iterable, n):
 def _chunked_even_finite(iterable, N, n):
     if N < 1:
         return
-    
-    # Every list is either size `full_size <= n` or `partial_size = full_size - 1`
-    num_lists = ceil(N / n)
+
+    # Lists are either size `full_size <= n` or `partial_size = full_size - 1`
+    q, r = divmod(N, n)
+    num_lists = q + (1 if r > 0 else 0)
     q, r = divmod(N, num_lists)
     full_size = q + (1 if r > 0 else 0)
     partial_size = full_size - 1
     num_full = N - partial_size * num_lists
     num_partial = num_lists - num_full
-    
+
     buffer = []
-    
     iterator = iter(iterable)
-    
+
     # Yield num_full lists of full_size
     for x in iterator:
         buffer.append(x)
@@ -3959,7 +3959,7 @@ def _chunked_even_finite(iterable, N, n):
             num_full -= 1
             if num_full <= 0:
                 break
-    
+
     # Yield num_partial lists of partial_size
     for x in iterator:
         buffer.append(x)
@@ -3967,4 +3967,3 @@ def _chunked_even_finite(iterable, N, n):
             yield buffer
             buffer = []
             num_partial -= 1
-            assert num_partial >= 0
