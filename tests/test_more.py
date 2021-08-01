@@ -4566,18 +4566,20 @@ class ChunkedEvenTests(TestCase):
         self.assertEqual(list(mi.chunked_even(iter(seq), n)), expected)
 
     def test_infinite(self):
-        n = 4
-        def limited_count():
-            for i in count():
-                # To generate list `k`, it should not look ahead more than n^2
-                self.assertLessEqual(i, n*k + n*n)
-                yield i
-        ls = mi.chunked_even(limited_count(), n)
-        for k in range(2):
-            self.assertEqual(next(ls), list(range(k*n, (k+1)*n)))
+        for n in range(1, 5):
+            k = 0
+            def count_with_assert():
+                for i in count():
+                    # To generate list `k`, it should not look ahead more than n^2
+                    self.assertLessEqual(i, n*k + n*n)
+                    yield i
+            ls = mi.chunked_even(count_with_assert(), n)
+            while k < 2:
+                self.assertEqual(next(ls), list(range(k*n, (k+1)*n)))
+                k += 1
 
     def test_evenness(self):
-        for N in range(1, 1000):
+        for N in range(1, 50):
             for n in range(1, N + 2):
                 lengths = []
                 items = []

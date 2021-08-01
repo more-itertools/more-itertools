@@ -3925,8 +3925,7 @@ def chunked_even(iterable, n):
 
 def _chunked_even_online(iterable, n):
     buffer = []
-    # TODO: n*(n - 1) - 2 is not enough (tests fail), but this might be. Proof?
-    maxbuf = n*(n - 1) - 1
+    maxbuf = n + (n - 2) * (n - 1)
     for x in iterable:
         buffer.append(x)
         if len(buffer) == maxbuf:
