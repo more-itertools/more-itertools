@@ -144,7 +144,7 @@ class ChunkedTests(TestCase):
             return list(mi.chunked('ABCDE', None, strict=True))
 
         self.assertRaisesRegex(
-            ValueError, "n must not be None when using strict mode."
+            ValueError, "n must not be None when using strict mode.", f
         )
 
 
