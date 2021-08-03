@@ -4570,13 +4570,13 @@ class ChunkedEvenTests(TestCase):
     def test_infinite(self):
         for n in range(1, 5):
             k = 0
-            
+
             def count_with_assert():
                 for i in count():
-                    # To generate list `k`, it should not look ahead more than n^2
+                    # Look-ahead should be less than n^2
                     self.assertLessEqual(i, n * k + n * n)
                     yield i
-            
+
             ls = mi.chunked_even(count_with_assert(), n)
             while k < 2:
                 self.assertEqual(next(ls), list(range(k * n, (k + 1) * n)))
