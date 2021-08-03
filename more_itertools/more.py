@@ -3905,14 +3905,14 @@ class countable:
 
 def chunked_even(iterable, n):
     """Break *iterable* into lists of length *n*, but in contrast with `chunked`,
-        items are distributed as evenly as possible so that all lists' lengths
-        are within 1 of each other:
+    items are distributed as evenly as possible so that all lists' lengths
+    are within 1 of each other:
 
-            >>> list(chunked_even([1, 2, 3, 4, 5, 6, 7], 3))
-            [[1, 2, 3], [4, 5], [6, 7]]
+    >>> list(chunked_even([1, 2, 3, 4, 5, 6, 7], 3))
+    [[1, 2, 3], [4, 5], [6, 7]]
 
-        If *iterable* has `len()`, O(n) space is used, with O(n) time per list.
-        Otherwise, O(n^2) space is needed, and O(n^2) time per list.
+    If *iterable* has `len()`, O(n) space is used, with O(n) time per list.
+    Otherwise, O(n^2) space is needed, and O(n^2) time per list.
     """
 
     len_method = getattr(iterable, '__len__', None)
