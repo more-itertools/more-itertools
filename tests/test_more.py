@@ -103,6 +103,12 @@ class ChunkedTests(TestCase):
             list(mi.chunked('ABCDE', 3)), [['A', 'B', 'C'], ['D', 'E']]
         )
 
+    def test_none(self):
+        """Test when ``n`` has the value ``None``."""
+        self.assertEqual(
+            list(mi.chunked('ABCDE', None)), [['A', 'B', 'C', 'D', 'E']]
+        )
+
     def test_strict_false(self):
         """Test when ``n`` does not divide evenly into the length of the
         iterable and strict is false.
@@ -126,6 +132,19 @@ class ChunkedTests(TestCase):
         self.assertEqual(
             list(mi.chunked('ABCDEF', 3, strict=True)),
             [['A', 'B', 'C'], ['D', 'E', 'F']],
+        )
+
+    def test_strict_being_true_with_size_none(self):
+        """Test when ``n`` has value ``None`` and the keyword strict is True
+        (raising an exception).
+
+        """
+
+        def f():
+            return list(mi.chunked('ABCDE', None, strict=True))
+
+        self.assertRaisesRegex(
+            ValueError, "n must not be None when using strict mode.", f
         )
 
 
