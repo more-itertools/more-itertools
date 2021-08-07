@@ -43,6 +43,7 @@ __all__ = [
     'bucket',
     'callback_iter',
     'chunked',
+    'chunked_even',
     'circular_shifts',
     'collapse',
     'collate',
@@ -3902,3 +3903,69 @@ class countable:
         self.items_seen += 1
 
         return item
+
+
+def chunked_even(iterable, n):
+    """Break *iterable* into lists of length *n*, but in contrast with `chunked`,
+    items are distributed as evenly as possible so that all lists' lengths
+    are within 1 of each other:
+
+    >>> list(chunked_even([1, 2, 3, 4, 5, 6, 7], 3))
+    [[1, 2, 3], [4, 5], [6, 7]]
+
+    If *iterable* has `len()`, O(n) space is used, with O(n) time per list.
+    Otherwise, O(n^2) space is needed, and O(n^2) time per list.
+    """
+
+    len_method = getattr(iterable, '__len__', None)
+
+    if len_method is None:
+        return _chunked_even_online(iterable, n)
+    else:
+        return _chunked_even_finite(iterable, len_method(), n)
+
+
+def _chunked_even_online(iterable, n):
+    buffer = []
+    maxbuf = n + (n - 2) * (n - 1)
+    for x in iterable:
+        buffer.append(x)
+        if len(buffer) == maxbuf:
+            yield buffer[:n]
+            buffer = buffer[n:]
+    yield from _chunked_even_finite(buffer, len(buffer), n)
+
+
+def _chunked_even_finite(iterable, N, n):
+    if N < 1:
+        return
+
+    # Lists are either size `full_size <= n` or `partial_size = full_size - 1`
+    q, r = divmod(N, n)
+    num_lists = q + (1 if r > 0 else 0)
+    q, r = divmod(N, num_lists)
+    full_size = q + (1 if r > 0 else 0)
+    partial_size = full_size - 1
+    num_full = N - partial_size * num_lists
+    num_partial = num_lists - num_full
+
+    buffer = []
+    iterator = iter(iterable)
+
+    # Yield num_full lists of full_size
+    for x in iterator:
+        buffer.append(x)
+        if len(buffer) == full_size:
+            yield buffer
+            buffer = []
+            num_full -= 1
+            if num_full <= 0:
+                break
+
+    # Yield num_partial lists of partial_size
+    for x in iterator:
+        buffer.append(x)
+        if len(buffer) == partial_size:
+            yield buffer
+            buffer = []
+            num_partial -= 1

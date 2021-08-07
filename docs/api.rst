@@ -15,6 +15,7 @@ These tools yield groups of items from a source iterable.
 
 .. autofunction:: chunked
 .. autofunction:: ichunked
+.. autofunction:: chunked_even
 .. autofunction:: sliced
 .. autofunction:: distribute
 .. autofunction:: divide
