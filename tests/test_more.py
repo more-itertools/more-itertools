@@ -4556,3 +4556,61 @@ class CountableTests(TestCase):
         self.assertEqual(it.items_seen, 1)
         self.assertEqual(''.join(it), '123456789')
         self.assertEqual(it.items_seen, 10)
+
+
+class ChunkedEvenTests(TestCase):
+    """Tests for ``chunked_even()``"""
+
+    def test_0(self):
+        self._test_finite('', 3, [])
+
+    def test_1(self):
+        self._test_finite('A', 1, [['A']])
+
+    def test_4(self):
+        self._test_finite('ABCD', 3, [['A', 'B'], ['C', 'D']])
+
+    def test_5(self):
+        self._test_finite('ABCDE', 3, [['A', 'B', 'C'], ['D', 'E']])
+
+    def test_6(self):
+        self._test_finite('ABCDEF', 3, [['A', 'B', 'C'], ['D', 'E', 'F']])
+
+    def test_7(self):
+        self._test_finite(
+            'ABCDEFG', 3, [['A', 'B', 'C'], ['D', 'E'], ['F', 'G']]
+        )
+
+    def _test_finite(self, seq, n, expected):
+        # Check with and without `len()`
+        self.assertEqual(list(mi.chunked_even(seq, n)), expected)
+        self.assertEqual(list(mi.chunked_even(iter(seq), n)), expected)
+
+    def test_infinite(self):
+        for n in range(1, 5):
+            k = 0
+
+            def count_with_assert():
+                for i in count():
+                    # Look-ahead should be less than n^2
+                    self.assertLessEqual(i, n * k + n * n)
+                    yield i
+
+            ls = mi.chunked_even(count_with_assert(), n)
+            while k < 2:
+                self.assertEqual(next(ls), list(range(k * n, (k + 1) * n)))
+                k += 1
+
+    def test_evenness(self):
+        for N in range(1, 50):
+            for n in range(1, N + 2):
+                lengths = []
+                items = []
+                for l in mi.chunked_even(range(N), n):
+                    L = len(l)
+                    self.assertLessEqual(L, n)
+                    self.assertGreaterEqual(L, 1)
+                    lengths.append(L)
+                    items.extend(l)
+                self.assertEqual(items, list(range(N)))
+                self.assertLessEqual(max(lengths) - min(lengths), 1)
