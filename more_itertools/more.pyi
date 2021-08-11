@@ -479,6 +479,12 @@ def map_except(
     iterable: Iterable[_T],
     *exceptions: Type[BaseException]
 ) -> Iterator[_U]: ...
+def map_if(
+    iterable: Iterable[Any],
+    pred: Callable[[Any], bool],
+    func: Callable[[Any], Any],
+    func_else: Callable[[Any], Any]
+) -> Iterator[Any]: ...
 def sample(
     iterable: Iterable[_T],
     k: int,
