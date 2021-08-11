@@ -4074,13 +4074,16 @@ class MapIfTests(TestCase):
 
     def test_with_func_else(self):
         iterable = list(range(-5, 5))
-        actual = list(mi.map_if(iterable, lambda x: x >= 0,
-            lambda x: 'notneg', lambda x: 'neg'))
+        actual = list(
+            mi.map_if(
+                iterable, lambda x: x >= 0, lambda x: 'notneg', lambda x: 'neg'
+            )
+        )
         expected = ['neg'] * 5 + ['notneg'] * 5
         self.assertEqual(actual, expected)
 
     def test_empty(self):
-        actual = list(mi.map_if([], lambda x: len(x), lambda x: None))
+        actual = list(mi.map_if([], lambda x: len(x) > 5, lambda x: None))
         expected = []
         self.assertEqual(actual, expected)
 

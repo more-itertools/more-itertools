@@ -483,7 +483,7 @@ def map_if(
     iterable: Iterable[Any],
     pred: Callable[[Any], bool],
     func: Callable[[Any], Any],
-    func_else: Callable[[Any], Any]
+    func_else: Optional[Callable[[Any], Any]] = ...,
 ) -> Iterator[Any]: ...
 def sample(
     iterable: Iterable[_T],
