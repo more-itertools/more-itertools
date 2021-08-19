@@ -3342,7 +3342,7 @@ def map_except(function, iterable, *exceptions):
     result, unless *function* raises one of the specified *exceptions*.
 
     *function* is called to transform each item in *iterable*.
-    It should be a accept one argument.
+    It should accept one argument.
 
     >>> iterable = ['1', '2', 'three', '4', None]
     >>> list(map_except(int, iterable, ValueError, TypeError))
@@ -3359,8 +3359,12 @@ def map_except(function, iterable, *exceptions):
 
 
 def map_if(iterable, pred, func, func_else=lambda x: x):
-    """Apply *func* if *pred* is ``True``, else apply *func_else*.
-    If *func_else* is not given, use identity.
+    """Evaluate each item from *iterable* using *pred*. If the result is
+    equivalent to ``True``, transform the item with *func* and yield it.
+    Otherwise, transform the item with *func_else* and yield it.
+
+    *pred*, *func*, and *func_else* should each be functions that accept
+    one argument. By default, *func_else* is the identity function.
 
     >>> from math import sqrt
     >>> iterable = list(range(-5, 5))

@@ -264,7 +264,7 @@ Others
 .. autofunction:: make_decorator
 .. autoclass:: SequenceView
 .. autofunction:: time_limited
-.. autofunction:: map_if
+.. autofunction:: map_if(iterable, pred, func, func_else=lambda x: x)
 
 ----
 
