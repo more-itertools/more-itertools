@@ -4637,3 +4637,54 @@ class ChunkedEvenTests(TestCase):
                     items.extend(l)
                 self.assertEqual(items, list(range(N)))
                 self.assertLessEqual(max(lengths) - min(lengths), 1)
+
+
+class ZipBroadcastTests(TestCase):
+    def test_basic(self):
+        for objects, expected in [
+            # All scalar
+            ([1, 2], [(1, 2)]),
+            # Scalar, iterable
+            ([1, [2]], [(1, 2)]),
+            # Iterable, scalar
+            ([[1], 2], [(1, 2)]),
+            # Mixed length
+            ([1, [2, 3]], [(1, 2), (1, 3)]),
+            # All iterable
+            ([[1, 2], [3, 4]], [(1, 3), (2, 4)]),
+        ]:
+            with self.subTest(expected=expected):
+                actual = list(mi.zip_broadcast(*objects))
+                self.assertEqual(actual, expected)
+
+    def test_scalar_types(self):
+        # Default: str and bytes are treated as scalar
+        self.assertEqual(
+            list(mi.zip_broadcast('ab', [1, 2, 3])),
+            [('ab', 1), ('ab', 2), ('ab', 3)],
+        )
+        self.assertEqual(
+            list(mi.zip_broadcast(b'ab', [1, 2, 3])),
+            [(b'ab', 1), (b'ab', 2), (b'ab', 3)],
+        )
+        # scalar_types=None allows str and bytes to be treated as iterable
+        self.assertEqual(
+            list(mi.zip_broadcast('abc', [1, 2, 3], scalar_types=None)),
+            [('a', 1), ('b', 2), ('c', 3)],
+        )
+        # Use a custom type
+        self.assertEqual(
+            list(mi.zip_broadcast({'a': 'b'}, [1, 2, 3], scalar_types=dict)),
+            [({'a': 'b'}, 1), ({'a': 'b'}, 2), ({'a': 'b'}, 3)],
+        )
+
+    def test_strict(self):
+        # Truncate by default
+        self.assertEqual(
+            list(mi.zip_broadcast('a', [1, 2], [3, 4, 5])),
+            [('a', 1, 3), ('a', 2, 4)],
+        )
+
+        # Raise an exception for strict=True
+        with self.assertRaises(mi.UnequalIterablesError):
+            list(mi.zip_broadcast('a', [1, 2], [3, 4, 5], strict=True))
