@@ -123,6 +123,7 @@ __all__ = [
     'product_index',
     'combination_index',
     'permutation_index',
+    'zip_broadcast',
 ]
 
 _marker = object()
@@ -3994,3 +3995,60 @@ def _chunked_even_finite(iterable, N, n):
             yield buffer
             buffer = []
             num_partial -= 1
+
+
+def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
+    """A version of :func:`zip` that "broadcasts" any scalar
+    (i.e., non-iterable) items into output tuples.
+
+    >>> iterable_1 = [1, 2, 3]
+    >>> iterable_2 = ['a', 'b', 'c']
+    >>> scalar = '_'
+    >>> list(zip_broadcast(iterable_1, iterable_2, scalar))
+    [(1, 'a', '_'), (2, 'b', '_'), (3, 'c', '_')]
+
+    The *scalar_types* keyword argument determines what types are considered
+    scalar. It is set to ``(str, bytes)`` by default. Set it to ``None`` to
+    treat strings and byte strings as iterable:
+
+    >>> list(zip_broadcast('abc', 0, 'xyz', scalar_types=None))
+    [('a', 0, 'x'), ('b', 0, 'y'), ('c', 0, 'z')]
+
+    If the *strict* keyword argument is ``True``, then
+    ``UnequalIterablesError`` will be raised if any of the iterables have
+    different lengths.
+
+    """
+    if not objects:
+        return
+
+    iterables = []
+    all_scalar = True
+    for obj in objects:
+        # If the object is one of our scalar types, turn it into an iterable
+        # by wrapping it with itertools.repeat
+        if scalar_types and isinstance(obj, scalar_types):
+            iterables.append((repeat(obj), False))
+        # Otherwise, test to see whether the object is iterable.
+        # If it is, collect it. If it's not, treat it as a scalar.
+        else:
+            try:
+                iterables.append((iter(obj), True))
+            except TypeError:
+                iterables.append((repeat(obj), False))
+            else:
+                all_scalar = False
+
+    # If all the objects were scalar, we just emit them as a tuple.
+    # Otherwise we zip the collected iterable objects.
+    if all_scalar:
+        yield tuple(objects)
+    else:
+        yield from zip(*(it for it, is_it in iterables))
+
+        # For strict mode, we ensure that all the iterable objects have been
+        # exhausted.
+        if strict:
+            for it, is_it in filter(itemgetter(1), iterables):
+                if next(it, _marker) is not _marker:
+                    raise UnequalIterablesError
