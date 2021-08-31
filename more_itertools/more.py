@@ -4019,6 +4019,9 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     different lengths.
 
     """
+    if not objects:
+        return
+
     iterables = []
     all_scalar = True
     for obj in objects:
@@ -4046,7 +4049,6 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         # For strict mode, we ensure that all the iterable objects have been
         # exhausted.
         if strict:
-            for it, is_it in iterables:
-                if is_it:
-                    if next(it, _marker) is not _marker:
-                        raise UnequalIterablesError
+            for it, is_it in filter(itemgetter(1), iterables):
+                if next(it, _marker) is not _marker:
+                    raise UnequalIterablesError

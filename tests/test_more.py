@@ -4688,3 +4688,6 @@ class ZipBroadcastTests(TestCase):
         # Raise an exception for strict=True
         with self.assertRaises(mi.UnequalIterablesError):
             list(mi.zip_broadcast('a', [1, 2], [3, 4, 5], strict=True))
+
+    def test_empty(self):
+        self.assertEqual(list(mi.zip_broadcast()), [])
