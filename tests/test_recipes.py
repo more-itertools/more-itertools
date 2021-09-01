@@ -415,6 +415,23 @@ class IterExceptTests(TestCase):
         i = mi.iter_except(l.pop, IndexError, f)
         self.assertEqual(list(i), [25, 3, 2, 1])
 
+    def test_multiple(self):
+        """ensure can catch multiple exceptions"""
+
+        class Foo(Exception): pass
+        class Bar(Exception): pass
+        
+        i = 0
+        def FooBar():
+            nonlocal i
+            i += 1
+            if i % 3 == 0: raise Foo
+            if i % 5 == 0: raise Bar
+            return i
+
+        expected = ([1,2], [4], [], [7,8], [])
+        for output in expected:
+            self.assertEqual(list(mi.iter_except(FooBar, (Foo, Bar))), output)
 
 class FirstTrueTests(TestCase):
     """Tests for ``first_true()``"""
