@@ -418,20 +418,26 @@ class IterExceptTests(TestCase):
     def test_multiple(self):
         """ensure can catch multiple exceptions"""
 
-        class Foo(Exception): pass
-        class Bar(Exception): pass
-        
+        class Fiz(Exception):
+            pass
+        class Buzz(Exception):
+            pass
+
         i = 0
-        def FooBar():
+
+        def fizbuzz():
             nonlocal i
             i += 1
-            if i % 3 == 0: raise Foo
-            if i % 5 == 0: raise Bar
+            if i % 3 == 0:
+                raise Fiz
+            if i % 5 == 0:
+                raise Buzz
             return i
 
-        expected = ([1,2], [4], [], [7,8], [])
+        expected = ([1, 2], [4], [], [7, 8], [])
         for output in expected:
-            self.assertEqual(list(mi.iter_except(FooBar, (Foo, Bar))), output)
+            self.assertEqual(list(mi.iter_except(fizbuzz, (Fiz, Buzz))), output)
+
 
 class FirstTrueTests(TestCase):
     """Tests for ``first_true()``"""
