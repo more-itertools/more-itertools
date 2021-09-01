@@ -420,6 +420,7 @@ class IterExceptTests(TestCase):
 
         class Fiz(Exception):
             pass
+
         class Buzz(Exception):
             pass
 
@@ -435,8 +436,8 @@ class IterExceptTests(TestCase):
             return i
 
         expected = ([1, 2], [4], [], [7, 8], [])
-        for output in expected:
-            self.assertEqual(list(mi.iter_except(fizbuzz, (Fiz, Buzz))), output)
+        for x in expected:
+            self.assertEqual(list(mi.iter_except(fizbuzz, (Fiz, Buzz))), x)
 
 
 class FirstTrueTests(TestCase):
