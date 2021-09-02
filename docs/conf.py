@@ -262,3 +262,8 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
+
+# -- Options for Linkcheck ------------------------------------------------
+
+# Links to ignore during linkcheck, specified as regex patterns
+linkcheck_ignore = [r'^api\.html(#more_itertools\.\w+)?']
