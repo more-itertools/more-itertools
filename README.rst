@@ -104,8 +104,8 @@ Python iterables.
 |                        | `random_permutation <api.html#more_itertools.random_permutation>`_,                                   |
 |                        | `random_combination <api.html#more_itertools.random_combination>`_,                                   |
 |                        | `random_combination_with_replacement <api.html#more_itertools.random_combination_with_replacement>`_, |
-|                        | `nth_product <api.html#more_itertools.nth_product>`_                                                  |
-|                        | `nth_permutation <api.html#more_itertools.nth_permutation>`_                                          |
+|                        | `nth_product <api.html#more_itertools.nth_product>`_,                                                 |
+|                        | `nth_permutation <api.html#more_itertools.nth_permutation>`_,                                         |
 |                        | `nth_combination <api.html#more_itertools.nth_combination>`_                                          |
 +------------------------+-------------------------------------------------------------------------------------------------------+
 | Wrapping               | `always_iterable <api.html#more_itertools.always_iterable>`_,                                         |
