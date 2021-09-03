@@ -1471,7 +1471,7 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
 
 
 def repeat_each(iterable, n=2):
-    """Repeats each element in *iterable* _n_ times.
+    """Repeat each element in *iterable* *n* times.
 
     >>> list(repeat_each('ABC', 3))
     ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C']
