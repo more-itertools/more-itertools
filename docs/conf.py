@@ -23,6 +23,8 @@ import more_itertools
 
 # -- Preprocess README.rst -----------------------------------------------------
 
+import re
+
 with open('../README.rst', 'r+') as source:
     readme_file = source.readlines()
 
@@ -30,11 +32,21 @@ with open('../README.rst', 'r+') as source:
 # documentation copmiles with relative links, while README.rst on GitHub can
 # have absolute links. See issue #551.
 root_path = 'https://more-itertools.readthedocs.io/en/stable/'
+in_table = False
 with open('./_build/README.pprst', 'w') as target:
-    for line in readme_file:
-        # skip lines where the absolute link is specified as an explicit target
+    for line, next_line in more_itertools.pairwise(readme_file + ['']):
+
+        # Check whether we're in the middle of a rst table
+        if re.match('\+-+\+-+', line):
+            in_table = bool(re.match('\|[^\|]+\|[^\|]+\|', next_line))
+
+        # Skip lines where the absolute link is specified as an explicit target
         if ':target: ' + root_path not in line:
-            line = line.replace(root_path, '')
+            if root_path in line:
+                line = line.replace(root_path, '')
+                if in_table:
+                    line = line[:-2] + ' ' * len(root_path) + line[-2:]
+
         target.write(line)
 
 # -- General configuration -----------------------------------------------------
