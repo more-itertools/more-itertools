@@ -33,7 +33,7 @@ with open(os.path.abspath('../README.rst'), 'r+') as source:
 # have absolute links. See issue #551.
 root_path = 'https://more-itertools.readthedocs.io/en/stable/'
 in_table = False
-with open(os.path.abspath('./_build/README.pprst'), 'w') as target:
+with open(os.path.abspath('./_build/README.pprst'), 'w+') as target:
     for line, next_line in more_itertools.pairwise(readme_file + ['']):
 
         # Check whether we're in the middle of a rst table
