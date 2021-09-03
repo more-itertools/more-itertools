@@ -444,12 +444,12 @@ def iter_except(func, exception, first=None):
 
     Multiple exceptions can be specified as a stopping condition:
 
-        >>> l = [1,2,3,'...',4,5,6]
-        >>> list(iter_except(lambda: 1+l.pop(), (IndexError, TypeError)))
+        >>> l = [1, 2, 3, '...', 4, 5, 6]
+        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
         [7, 6, 5]
-        >>> list(iter_except(lambda: 1+l.pop(), (IndexError, TypeError)))
+        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
         [4, 3, 2]
-        >>> list(iter_except(lambda: 1+l.pop(), (IndexError, TypeError)))
+        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
         []
 
     """
