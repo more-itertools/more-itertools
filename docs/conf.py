@@ -21,6 +21,22 @@ import more_itertools
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
+# -- Preprocess README.rst -----------------------------------------------------
+
+with open('../README.rst', 'r+') as source:
+    readme_file = source.readlines()
+
+# Change absolute links in README.rst to relative ones. This way the online
+# documentation copmiles with relative links, while README.rst on GitHub can
+# have absolute links. See issue #551.
+root_path = 'https://more-itertools.readthedocs.io/en/stable/'
+with open('./_build/README.pprst', 'w') as target:
+    for line in readme_file:
+        # skip lines where the absolute link is specified as an explicit target
+        if ':target: ' + root_path not in line:
+            line = line.replace(root_path, '')
+        target.write(line)
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
