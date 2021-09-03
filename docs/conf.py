@@ -25,15 +25,20 @@ import more_itertools
 
 import re
 
-with open(os.path.abspath('../README.rst'), 'r+') as source:
+with open('../README.rst', 'r+') as source:
     readme_file = source.readlines()
+
+# Make sure build directory exists. This is required for github workflow.
+build_dir = '_build'
+if not os.path.exists(build_dir):
+    os.makedirs(build_dir)
 
 # Change absolute links in README.rst to relative ones. This way the online
 # documentation copmiles with relative links, while README.rst on GitHub can
 # have absolute links. See issue #551.
 root_path = 'https://more-itertools.readthedocs.io/en/stable/'
 in_table = False
-with open(os.path.abspath('./_build/README.pprst'), 'w+') as target:
+with open(os.path.join('.', build_dir, 'README.pprst'), 'w+') as target:
     for line, next_line in more_itertools.pairwise(readme_file + ['']):
 
         # Check whether we're in the middle of a rst table
@@ -95,7 +100,7 @@ release = version
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = [build_dir]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
