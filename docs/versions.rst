@@ -5,6 +5,21 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.9.0
+-----
+
+* New functions
+    * :func:`interleave_evenly` (thanks to mbugert)
+    * :func:`repeat_each` (thanks to FinalSh4re)
+    * :func:`chunked_even` (thanks to valtron)
+    * :func:`map_if` (thanks to sassbalint)
+    * :func:`zip_broadcast` (thanks to kalekundert)
+
+* Changes to existing functions
+    * The type stub for :func:`chunked` was improved (thanks to  PhilMacKay)
+    * The type stubs for :func:`zip_equal` and `zip_offset` were improved (thanks to maffoo)
+    * Building Sphinx docs locally was improved (thanks to MarcinKonowalczyk)
+
 8.8.0
 -----
 
