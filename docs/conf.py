@@ -25,7 +25,7 @@ import more_itertools
 
 import re
 
-with open('../README.rst', 'r+') as source:
+with open(os.path.abspath('../README.rst'), 'r+') as source:
     readme_file = source.readlines()
 
 # Change absolute links in README.rst to relative ones. This way the online
@@ -33,7 +33,7 @@ with open('../README.rst', 'r+') as source:
 # have absolute links. See issue #551.
 root_path = 'https://more-itertools.readthedocs.io/en/stable/'
 in_table = False
-with open('./_build/README.pprst', 'w') as target:
+with open(os.path.abspath('./_build/README.pprst'), 'w') as target:
     for line, next_line in more_itertools.pairwise(readme_file + ['']):
 
         # Check whether we're in the middle of a rst table
