@@ -68,12 +68,14 @@ def unique_justseen(
 ) -> Iterator[_T]: ...
 @overload
 def iter_except(
-    func: Callable[[], _T], exception: Type[BaseException], first: None = ...
+    func: Callable[[], _T],
+    exception: Union[Type[BaseException], Tuple[Type[BaseException], ...]],
+    first: None = ...,
 ) -> Iterator[_T]: ...
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException],
+    exception: Union[Type[BaseException], Tuple[Type[BaseException], ...]],
     first: Callable[[], _U],
 ) -> Iterator[Union[_T, _U]]: ...
 @overload
