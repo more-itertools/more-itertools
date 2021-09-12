@@ -1,4 +1,4 @@
-.. include:: ../README.rst
+.. include:: ./_build/README.pprst
 
 Contents
 ========

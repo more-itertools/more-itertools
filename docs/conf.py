@@ -14,12 +14,36 @@ import sys, os
 
 import sphinx_rtd_theme
 
-import more_itertools
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
+
+import more_itertools
+
+# -- Preprocess README.rst -----------------------------------------------------
+# We include README.rst from the root directory. It has absolute links
+# to readthedocs.io for display on github.com, but those links can be
+# relative when being built for Sphinx.
+
+with open('../README.rst', 'rt') as source:
+    readme_file = source.readlines()
+
+build_dir = '_build'
+os.makedirs(build_dir, exist_ok=True)
+
+rtd_path = 'https://more-itertools.readthedocs.io/en/stable/'
+table_width = 200
+in_table = False
+with open(os.path.join('.', build_dir, 'README.pprst'), 'wt') as target:
+    for line in readme_file:
+        old_len = len(line)
+        if line.startswith('|') and line.endswith('|\n'):  # Inside table
+            line = line.replace(rtd_path, '').rstrip(' |\n')
+            spaces = ' ' * (table_width - len(line) - 1)
+            line = f'{line}{spaces}|\n'
+
+        target.write(line)
 
 # -- General configuration -----------------------------------------------------
 
@@ -67,7 +91,7 @@ release = version
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = [build_dir]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
