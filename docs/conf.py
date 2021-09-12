@@ -22,34 +22,26 @@ sys.path.insert(0, os.path.abspath('..'))
 import more_itertools
 
 # -- Preprocess README.rst -----------------------------------------------------
+# We include README.rst from the root directory. It has absolute links
+# to readthedocs.io for display on github.com, but those links can be
+# relative when being built for Sphinx.
 
-import re
-
-with open('../README.rst', 'r+') as source:
+with open('../README.rst', 'rt') as source:
     readme_file = source.readlines()
 
-# Make sure build directory exists. This is required for github workflow.
 build_dir = '_build'
 os.makedirs(build_dir, exist_ok=True)
 
-# Change absolute links in README.rst to relative ones. This way the online
-# documentation copmiles with relative links, while README.rst on GitHub can
-# have absolute links. See issue #551.
-root_path = 'https://more-itertools.readthedocs.io/en/stable/'
+rtd_path = 'https://more-itertools.readthedocs.io/en/stable/'
+table_width = 200
 in_table = False
-with open(os.path.join('.', build_dir, 'README.pprst'), 'w') as target:
-    for line, next_line in more_itertools.pairwise(readme_file + ['']):
-
-        # Check whether we're in the middle of a rst table
-        if re.match('\+-+\+-+', line):
-            in_table = bool(re.match('\|[^\|]+\|[^\|]+\|', next_line))
-
-        # Skip lines where the absolute link is specified as an explicit target
-        if ':target: ' + root_path not in line:
-            if root_path in line:
-                line = line.replace(root_path, '')
-                if in_table:
-                    line = line[:-2] + ' ' * len(root_path) + line[-2:]
+with open(os.path.join('.', build_dir, 'README.pprst'), 'wt') as target:
+    for line in readme_file:
+        old_len = len(line)
+        if line.startswith('|') and line.endswith('|\n'):  # Inside table
+            line = line.replace(rtd_path, '').rstrip(' |\n')
+            spaces = ' ' * (table_width - len(line) - 1)
+            line = f'{line}{spaces}|\n'
 
         target.write(line)
 
@@ -294,8 +286,3 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
-
-# -- Options for Linkcheck ------------------------------------------------
-
-# Links to ignore during linkcheck, specified as regex patterns
-linkcheck_ignore = [r'^api\.html(#more_itertools\.\w+)?']
