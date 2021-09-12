@@ -14,12 +14,44 @@ import sys, os
 
 import sphinx_rtd_theme
 
-import more_itertools
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
+
+import more_itertools
+
+# -- Preprocess README.rst -----------------------------------------------------
+
+import re
+
+with open('../README.rst', 'r+') as source:
+    readme_file = source.readlines()
+
+# Make sure build directory exists. This is required for github workflow.
+build_dir = '_build'
+os.makedirs(build_dir, exist_ok=True)
+
+# Change absolute links in README.rst to relative ones. This way the online
+# documentation copmiles with relative links, while README.rst on GitHub can
+# have absolute links. See issue #551.
+root_path = 'https://more-itertools.readthedocs.io/en/stable/'
+in_table = False
+with open(os.path.join('.', build_dir, 'README.pprst'), 'w') as target:
+    for line, next_line in more_itertools.pairwise(readme_file + ['']):
+
+        # Check whether we're in the middle of a rst table
+        if re.match('\+-+\+-+', line):
+            in_table = bool(re.match('\|[^\|]+\|[^\|]+\|', next_line))
+
+        # Skip lines where the absolute link is specified as an explicit target
+        if ':target: ' + root_path not in line:
+            if root_path in line:
+                line = line.replace(root_path, '')
+                if in_table:
+                    line = line[:-2] + ' ' * len(root_path) + line[-2:]
+
+        target.write(line)
 
 # -- General configuration -----------------------------------------------------
 
@@ -67,7 +99,7 @@ release = version
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = [build_dir]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -262,3 +294,8 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
+
+# -- Options for Linkcheck ------------------------------------------------
+
+# Links to ignore during linkcheck, specified as regex patterns
+linkcheck_ignore = [r'^api\.html(#more_itertools\.\w+)?']
