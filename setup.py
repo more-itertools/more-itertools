@@ -35,7 +35,6 @@ setup(
     license='MIT',
     packages=['more_itertools'],
     package_data={'more_itertools': ['py.typed', '*.pyi']},
-    include_package_data=True,
     python_requires='>=3.5',
     url='https://github.com/more-itertools/more-itertools',
     classifiers=[
