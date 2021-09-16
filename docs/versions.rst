@@ -6,7 +6,7 @@ Version History
    :noindex:
 
 8.10.0
------
+------
 
 * Changes to existing functions
     * The type stub for :func:`iter_except` was improved (thanks to  MarcinKonowalczyk)
