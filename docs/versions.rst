@@ -5,6 +5,16 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.10.0
+-----
+
+* Changes to existing functions
+    * The type stub for :func:`iter_except` was improved (thanks to  MarcinKonowalczyk)
+
+* Other changes:
+    *  Type stubs now ship with the source release (thanks to saaketp)
+    *  The Sphinx docs were improved (thanks to MarcinKonowalczyk)
+
 8.9.0
 -----
 
