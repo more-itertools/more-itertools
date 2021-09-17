@@ -585,6 +585,71 @@ def one(iterable, too_short=None, too_long=None):
     return first_value
 
 
+def nth_exactly(
+    iterable,
+    n=1,
+    default=None,
+    too_short=ValueError(
+        'Too few items in iterable (expected {expected}, but got {given}).'
+    ),
+    too_long=ValueError(
+        'Too many items in iterable '
+        '(expected exactly {expected} items in iterable, '
+        'but got {after_value} after {nth_value} and perhaps more.'
+    ),
+):
+    """A more generalized version of `one`
+
+    """
+
+    def _raise_or_call(err_or_func, **kwargs):
+        """Helper function that performs correct action
+        for `too_short` and `too_long` aruments.
+
+        """
+        if issubclass(err_or_func, Exception):
+            raise err_or_func
+
+        if isinstance(err_or_func, Exception):
+            err_args = err_or_func.args
+
+            if not err_args:
+                raise err_or_func
+
+            # Raise with the message edited to put arguments in there.
+            msg = err_args[0].format(**kwargs)
+            raise err_or_func.__class__(msg, *err_args[1:])
+
+        if callable(err_or_func):
+            return err_or_func(**kwargs)
+
+        raise TypeError(
+            f'{type(err_or_func)} if not of type Exception or callable.'
+        )
+
+    it = iter(iterable)
+
+    counter = count()
+    consume(zip(it, counter), n - 1)
+
+    try:
+        nth_value = next(it)
+    except StopIteration:
+        _raise_or_call(too_short, expected=n, given=next(counter))
+        return default
+
+    try:
+        after_value = next(it)
+    except StopIteration:
+        pass
+    else:
+        _raise_or_call(
+            too_long, expected=n, nth_value=nth_value, after_value=after_value
+        )
+
+    return nth_value
+
+
 def distinct_permutations(iterable, r=None):
     """Yield successive distinct permutations of the elements in *iterable*.
 
