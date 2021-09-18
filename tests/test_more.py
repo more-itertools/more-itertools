@@ -4691,3 +4691,31 @@ class ZipBroadcastTests(TestCase):
 
     def test_empty(self):
         self.assertEqual(list(mi.zip_broadcast()), [])
+
+
+class UniqueInWindowTests(TestCase):
+    def test_invalid_n(self):
+        with self.assertRaises(ValueError):
+            list(mi.unique_in_window([], 0))
+
+    def test_basic(self):
+        for iterable, n, expected in [
+            (range(9), 10, list(range(9))),
+            (range(20), 10, list(range(20))),
+            ([1, 2, 3, 4, 4, 4], 1, [1, 2, 3, 4]),
+            ([1, 2, 3, 4, 4, 4], 2, [1, 2, 3, 4]),
+            ([1, 2, 3, 4, 4, 4], 3, [1, 2, 3, 4]),
+            ([1, 2, 3, 4, 4, 4], 4, [1, 2, 3, 4]),
+            ([1, 2, 3, 4, 4, 4], 5, [1, 2, 3, 4]),
+        ]:
+            with self.subTest(expected=expected):
+                actual = list(mi.unique_in_window(iterable, n))
+                self.assertEqual(actual, expected)
+
+    def test_key(self):
+        iterable = [0, 1, 3, 4, 5, 6, 7, 8, 9]
+        n = 3
+        key = lambda x: x // 3
+        actual = list(mi.unique_in_window(iterable, n, key=key))
+        expected = [0, 3, 6, 9]
+        self.assertEqual(actual, expected)

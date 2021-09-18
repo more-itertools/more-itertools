@@ -180,6 +180,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: filter_except
 .. autofunction:: map_except
 .. autofunction:: nth_or_last(iterable, n[, default])
+.. autofunction:: unique_in_window
 
 ----
 
