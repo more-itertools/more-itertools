@@ -37,7 +37,10 @@ from .recipes import (
 
 __all__ = [
     'AbortThread',
+    'SequenceView',
+    'UnequalIterablesError',
     'adjacent',
+    'all_unique',
     'always_iterable',
     'always_reversible',
     'bucket',
@@ -47,11 +50,11 @@ __all__ = [
     'circular_shifts',
     'collapse',
     'collate',
+    'combination_index',
     'consecutive_groups',
     'consumer',
-    'countable',
     'count_cycle',
-    'mark_ends',
+    'countable',
     'difference',
     'distinct_combinations',
     'distinct_permutations',
@@ -61,15 +64,15 @@ __all__ = [
     'filter_except',
     'first',
     'groupby_transform',
+    'ichunked',
     'ilen',
-    'interleave_longest',
     'interleave',
     'interleave_evenly',
+    'interleave_longest',
     'intersperse',
+    'is_sorted',
     'islice_extended',
     'iterate',
-    'ichunked',
-    'is_sorted',
     'last',
     'locate',
     'lstrip',
@@ -77,6 +80,7 @@ __all__ = [
     'map_except',
     'map_if',
     'map_reduce',
+    'mark_ends',
     'nth_or_last',
     'nth_permutation',
     'nth_product',
@@ -85,8 +89,9 @@ __all__ = [
     'only',
     'padded',
     'partitions',
-    'set_partitions',
     'peekable',
+    'permutation_index',
+    'product_index',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -95,36 +100,33 @@ __all__ = [
     'run_length',
     'sample',
     'seekable',
-    'SequenceView',
+    'set_partitions',
     'side_effect',
     'sliced',
     'sort_together',
-    'split_at',
     'split_after',
+    'split_at',
     'split_before',
-    'split_when',
     'split_into',
+    'split_when',
     'spy',
     'stagger',
     'strip',
     'substrings',
     'substrings_indexes',
     'time_limited',
+    'unique_in_window',
     'unique_to_each',
     'unzip',
+    'value_chain',
     'windowed',
+    'windowed_complete',
     'with_iter',
-    'UnequalIterablesError',
+    'zip_broadcast',
     'zip_equal',
     'zip_offset',
-    'windowed_complete',
-    'all_unique',
-    'value_chain',
-    'product_index',
-    'combination_index',
-    'permutation_index',
-    'zip_broadcast',
 ]
+
 
 _marker = object()
 
@@ -4052,3 +4054,41 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
             for it, is_it in filter(itemgetter(1), iterables):
                 if next(it, _marker) is not _marker:
                     raise UnequalIterablesError
+
+
+def unique_in_window(iterable, n, key=None):
+    """Yield the items from *iterable* that haven't been seen recently.
+    *n* is the size of the lookback window.
+
+        >>> iterable = [0, 1, 0, 2, 3, 0]
+        >>> n = 3
+        >>> list(unique_in_window(iterable, n))
+        [0, 1, 2, 3, 0]
+
+    The *key* function, if provided, will be used to determine uniqueness:
+
+        >>> list(unique_in_window('abAcda', 3, key=lambda x: x.lower()))
+        ['a', 'b', 'c', 'd', 'a']
+
+    The items in *iterable* must be hashable.
+
+    """
+    if n <= 0:
+        raise ValueError('n must be greater than 0')
+
+    window = deque(maxlen=n)
+    uniques = set()
+    use_key = key is not None
+
+    for item in iterable:
+        k = key(item) if use_key else item
+        if k in uniques:
+            continue
+
+        if len(uniques) == n:
+            uniques.discard(window[0])
+
+        uniques.add(k)
+        window.append(k)
+
+        yield item
