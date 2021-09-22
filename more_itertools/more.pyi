@@ -32,7 +32,6 @@ _W = TypeVar('_W')
 _T_co = TypeVar('_T_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[object]])
 _Raisable = Union[BaseException, 'Type[BaseException]']
-_RaisableOrCallable = Union[BaseException, 'Type[BaseException]', Callable]
 
 @type_check_only
 class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]): ...
@@ -85,12 +84,13 @@ def one(
     too_short: Optional[_Raisable] = ...,
     too_long: Optional[_Raisable] = ...,
 ) -> _T: ...
+def raise_(exception: _Raisable, *args: Any) -> None: ...
 def nth_exactly(
     iterable: Iterable[_T],
     n: int,
     default: _U,
-    too_short: _RaisableOrCallable,
-    too_long: _RaisableOrCallable,
+    too_short: _GenFn,
+    too_long: _GenFn,
 ) -> Union[_T, _U]: ...
 def distinct_permutations(
     iterable: Iterable[_T], r: Optional[int] = ...
