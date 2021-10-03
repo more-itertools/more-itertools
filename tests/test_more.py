@@ -4719,3 +4719,40 @@ class UniqueInWindowTests(TestCase):
         actual = list(mi.unique_in_window(iterable, n, key=key))
         expected = [0, 3, 6, 9]
         self.assertEqual(actual, expected)
+
+
+class StrictlyNTests(TestCase):
+    def test_basic(self):
+        iterable = ['a', 'b', 'c', 'd']
+        n = 4
+        actual = mi.strictly_n(iter(iterable), n)
+        expected = iterable
+        self.assertEqual(actual, expected)
+
+    def test_too_short_default(self):
+        iterable = ['a', 'b', 'c', 'd']
+        n = 5
+        with self.assertRaises(ValueError):
+            mi.strictly_n(iter(iterable), n)
+
+    def test_too_long_default(self):
+        iterable = ['a', 'b', 'c', 'd']
+        n = 3
+        with self.assertRaises(ValueError):
+            mi.strictly_n(iter(iterable), n)
+
+    def test_too_short_custom(self):
+        iterable = ['a', 'b', 'c', 'd']
+        n = 6
+        too_short = lambda items: items + (['?'] * (n - len(items)))
+        actual = mi.strictly_n(iter(iterable), n, too_short=too_short)
+        expected = ['a', 'b', 'c', 'd', '?', '?']
+        self.assertEqual(actual, expected)
+
+    def test_too_long_custom(self):
+        iterable = ['a', 'b', 'c', 'd']
+        n = 2
+        too_long = lambda items: items[-n:]
+        actual = mi.strictly_n(iter(iterable), n, too_long=too_long)
+        expected = ['b', 'c']
+        self.assertEqual(actual, expected)

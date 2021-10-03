@@ -112,6 +112,7 @@ __all__ = [
     'spy',
     'stagger',
     'strip',
+    'strictly_n',
     'substrings',
     'substrings_indexes',
     'time_limited',
@@ -591,41 +592,78 @@ def raise_(exception, *args):
     raise exception(*args)
 
 
-def nth_exactly(
+def strictly_n(
     iterable,
-    n=1,
-    default=None,
-    too_short=lambda expected, given: raise_(
+    n,
+    too_short=lambda items: raise_(
         ValueError,
-        'Too few items in iterable (expected {expected}, but got {given}).',
+        f'Too few items in iterable (got {len(items)}).',
     ),
-    too_long=lambda expected, nth_value, after_value: raise_(
+    too_long=lambda items: raise_(
         ValueError,
-        'Too many items in iterable '
-        '(expected exactly {expected} items in iterable, '
-        'but got {after_value} after {nth_value} and perhaps more.',
+        f'Too many items in iterable (got at least {len(items)})',
     ),
 ):
-    """A more generalized version of `one`"""
+    """Validate that *iterable* has exactly *n* items and return them if
+    it does. If it has fewer than *n* items, call function *too_short*
+    with those items. If it has more than *n* items, call function
+    *too_long* with the first ``n + 1`` items.
+
+        >>> iterable = ['a', 'b', 'c', 'd']
+        >>> n = 4
+        >>> strictly_n(iterable, n)
+        ['a', 'b', 'c', 'd']
+
+    By default, *too_short* and *too_long* are functions that raise
+    ``ValueError``.
+
+        >>> strictly_n(['a', 'b'], 3)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: too few items in iterable (got 2)'
+
+        >>> strictly_n(['a', 'b', 'c'], 2)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        ValueError: too many items in iterable (got at least 3)'
+
+    You can supply your own functions for *too_short* and *too_long*.
+    The *too_short* function should accept a list of the items that were
+    in *iterable*. The *too_long* function should accept a list of the first
+    ``n + 1`` items  that were in *iterable*.
+
+        >>> def too_short(items):
+        ...     average = sum(items) / len(items)
+        ...     return items + [average]
+        >>> strictly_n([5.0, 5.0, 20.0], 4, too_short=too_short)
+        [5.0, 5.0, 20.0, 10.0]
+
+        >>> def too_long(items):
+        ...     average = sum(items) / len(items)
+        ...     return [x + average for x in items[:-1]]
+        >>> strictly_n([5.0, 5.0, 20.0], 2, too_long=too_long)
+        [15.0, 15.0]
+
+    """
     it = iter(iterable)
 
-    counter = count()
-    consume(zip(it, counter), n - 1)
-
+    items = take(n - 1, it)
     try:
         nth_value = next(it)
     except StopIteration:
-        too_short(expected=n, given=next(counter))
-        return default
+        return too_short(items)
+    else:
+        items.append(nth_value)
 
     try:
         after_value = next(it)
     except StopIteration:
         pass
     else:
-        too_long(expected=n, nth_value=nth_value, after_value=after_value)
+        items.append(after_value)
+        return too_long(items)
 
-    return nth_value
+    return items
 
 
 def distinct_permutations(iterable, r=None):
