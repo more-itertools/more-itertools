@@ -587,6 +587,47 @@ def one(iterable, too_short=None, too_long=None):
     return first_value
 
 
+def raise_(exception, *args):
+    raise exception(*args)
+
+
+def nth_exactly(
+    iterable,
+    n=1,
+    default=None,
+    too_short=lambda expected, given: raise_(
+        ValueError,
+        'Too few items in iterable (expected {expected}, but got {given}).',
+    ),
+    too_long=lambda expected, nth_value, after_value: raise_(
+        ValueError,
+        'Too many items in iterable '
+        '(expected exactly {expected} items in iterable, '
+        'but got {after_value} after {nth_value} and perhaps more.',
+    ),
+):
+    """A more generalized version of `one`"""
+    it = iter(iterable)
+
+    counter = count()
+    consume(zip(it, counter), n - 1)
+
+    try:
+        nth_value = next(it)
+    except StopIteration:
+        too_short(expected=n, given=next(counter))
+        return default
+
+    try:
+        after_value = next(it)
+    except StopIteration:
+        pass
+    else:
+        too_long(expected=n, nth_value=nth_value, after_value=after_value)
+
+    return nth_value
+
+
 def distinct_permutations(iterable, r=None):
     """Yield successive distinct permutations of the elements in *iterable*.
 
