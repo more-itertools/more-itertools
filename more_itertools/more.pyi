@@ -88,8 +88,8 @@ def raise_(exception: _Raisable, *args: Any) -> None: ...
 def strictly_n(
     iterable: Iterable[_T],
     n: int,
-    too_short: Optional[_Raisable] = ...,
-    too_long: Optional[_Raisable] = ...,
+    too_short: Optional[_GenFn] = ...,
+    too_long: Optional[_GenFn] = ...,
 ) -> List[_T]: ...
 def distinct_permutations(
     iterable: Iterable[_T], r: Optional[int] = ...

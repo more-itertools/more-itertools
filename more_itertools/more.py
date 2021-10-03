@@ -92,6 +92,7 @@ __all__ = [
     'peekable',
     'permutation_index',
     'product_index',
+    'raise_',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -592,18 +593,7 @@ def raise_(exception, *args):
     raise exception(*args)
 
 
-def strictly_n(
-    iterable,
-    n,
-    too_short=lambda items: raise_(
-        ValueError,
-        f'Too few items in iterable (got {len(items)}).',
-    ),
-    too_long=lambda items: raise_(
-        ValueError,
-        f'Too many items in iterable (got at least {len(items)})',
-    ),
-):
+def strictly_n(iterable, n, too_short=None, too_long=None):
     """Validate that *iterable* has exactly *n* items and return them if
     it does. If it has fewer than *n* items, call function *too_short*
     with those items. If it has more than *n* items, call function
@@ -645,6 +635,18 @@ def strictly_n(
         [15.0, 15.0]
 
     """
+    if too_short is None:
+        too_short = lambda items: raise_(
+            ValueError,
+            f'Too few items in iterable (got {len(items)}).',
+        )
+
+    if too_long is None:
+        too_long = lambda items: raise_(
+            ValueError,
+            f'Too many items in iterable (got at least {len(items)})',
+        )
+
     it = iter(iterable)
 
     items = take(n - 1, it)
