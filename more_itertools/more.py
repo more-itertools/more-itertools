@@ -23,7 +23,7 @@ from math import exp, factorial, floor, log
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
-from sys import getfilesystemencodeerrors, hexversion, maxsize
+from sys import hexversion, maxsize
 from time import monotonic
 
 from .recipes import (
