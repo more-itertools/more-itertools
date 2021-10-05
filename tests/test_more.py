@@ -4683,17 +4683,17 @@ class ZipBroadcastTests(TestCase):
 
     def test_strict(self):
         for objects, zipped in [
-                ([[], [1]], []),
-                ([[1], []], []),
-                ([[1], [2, 3]], [(1, 2)]),
-                ([[1, 2], [3]], [(1, 3)]),
-                ([[1, 2], [3], [4]], [(1, 3, 4)]),
-                ([[1], [2, 3], [4]], [(1, 2, 4)]),
-                ([[1], [2], [3, 4]], [(1, 2, 3)]),
-                ([[1], [2, 3], [4, 5]], [(1, 2, 4)]),
-                ([[1, 2], [3], [4, 5]], [(1, 3, 4)]),
-                ([[1, 2], [3, 4], [5]], [(1, 3, 5)]),
-                (['a', [1, 2], [3, 4, 5]], [('a', 1, 3), ('a', 2, 4)]),
+            ([[], [1]], []),
+            ([[1], []], []),
+            ([[1], [2, 3]], [(1, 2)]),
+            ([[1, 2], [3]], [(1, 3)]),
+            ([[1, 2], [3], [4]], [(1, 3, 4)]),
+            ([[1], [2, 3], [4]], [(1, 2, 4)]),
+            ([[1], [2], [3, 4]], [(1, 2, 3)]),
+            ([[1], [2, 3], [4, 5]], [(1, 2, 4)]),
+            ([[1, 2], [3], [4, 5]], [(1, 3, 4)]),
+            ([[1, 2], [3, 4], [5]], [(1, 3, 5)]),
+            (['a', [1, 2], [3, 4, 5]], [('a', 1, 3), ('a', 2, 4)]),
         ]:
             # Truncate by default
             with self.subTest(objects=objects, strict=False, zipped=zipped):
@@ -4701,7 +4701,7 @@ class ZipBroadcastTests(TestCase):
 
             # Raise an exception for strict=True
             with self.subTest(objects=objects, strict=True):
-                with self.assertRaises(mi.UnequalIterablesError):
+                with self.assertRaises(ValueError):
                     list(mi.zip_broadcast(*objects, strict=True))
 
     def test_empty(self):
