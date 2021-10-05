@@ -4139,6 +4139,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     for values in _zip(*iterables):
         yield tuple(f(values) for f in formatters)
 
+
 def unique_in_window(iterable, n, key=None):
     """Yield the items from *iterable* that haven't been seen recently.
     *n* is the size of the lookback window.
