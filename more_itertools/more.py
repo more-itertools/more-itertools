@@ -4102,40 +4102,42 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     different lengths.
 
     """
-    if not objects:
-        return
+    def is_scalar(obj):
+        if scalar_types and isinstance(obj, scalar_types):
+            return True
+        try:
+            iter(obj)
+        except TypeError:
+            return True
+        else:
+            return False
 
     iterables = []
-    all_scalar = True
+    formatters = []
+
     for obj in objects:
-        # If the object is one of our scalar types, turn it into an iterable
-        # by wrapping it with itertools.repeat
-        if scalar_types and isinstance(obj, scalar_types):
-            iterables.append((repeat(obj), False))
-        # Otherwise, test to see whether the object is iterable.
-        # If it is, collect it. If it's not, treat it as a scalar.
+        if is_scalar(obj):
+            # The double-lambda syntax is necessary to create a closure.
+            formatters.append((lambda x: lambda _: x)(obj))
         else:
-            try:
-                iterables.append((iter(obj), True))
-            except TypeError:
-                iterables.append((repeat(obj), False))
-            else:
-                all_scalar = False
+            formatters.append(itemgetter(len(iterables)))
+            iterables.append(obj)
 
-    # If all the objects were scalar, we just emit them as a tuple.
-    # Otherwise we zip the collected iterable objects.
-    if all_scalar:
-        yield tuple(objects)
+    if not iterables:
+        if not objects:
+            return
+        else:
+            yield tuple(objects)
+            return
+
+    # Avoid deprecation warning.
+    if hexversion >= 0x30A00A6:
+        _zip = partial(zip, strict=strict)
     else:
-        yield from zip(*(it for it, is_it in iterables))
+        _zip = zip_equal if strict else zip
 
-        # For strict mode, we ensure that all the iterable objects have been
-        # exhausted.
-        if strict:
-            for it, is_it in filter(itemgetter(1), iterables):
-                if next(it, _marker) is not _marker:
-                    raise UnequalIterablesError
-
+    for values in _zip(*iterables):
+        yield tuple(f(values) for f in formatters)
 
 def unique_in_window(iterable, n, key=None):
     """Yield the items from *iterable* that haven't been seen recently.
