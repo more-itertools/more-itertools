@@ -71,6 +71,7 @@ These tools yield windows of items from an iterable.
 
 .. autofunction:: pairwise
 .. autofunction:: triplewise
+.. autofunction:: sliding_window
 
 
 Augmenting
