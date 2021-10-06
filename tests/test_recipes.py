@@ -731,3 +731,17 @@ class BeforeAndAfterTests(TestCase):
         before, after = mi.before_and_after(bool, [1, True, 0, False])
         self.assertEqual(list(before), [1, True])
         self.assertEqual(list(after), [0, False])
+
+
+class TriplewiseTests(TestCase):
+    def test_basic(self):
+        for iterable, expected in [
+            ([0], []),
+            ([0, 1], []),
+            ([0, 1, 2], [(0, 1, 2)]),
+            ([0, 1, 2, 3], [(0, 1, 2), (1, 2, 3)]),
+            ([0, 1, 2, 3, 4], [(0, 1, 2), (1, 2, 3), (2, 3, 4)]),
+        ]:
+            with self.subTest(expected=expected):
+                actual = list(mi.triplewise(iterable))
+                self.assertEqual(actual, expected)

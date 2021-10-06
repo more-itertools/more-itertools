@@ -53,6 +53,7 @@ __all__ = [
     'tabulate',
     'tail',
     'take',
+    'triplewise',
     'unique_everseen',
     'unique_justseen',
 ]
@@ -661,3 +662,14 @@ def before_and_after(predicate, it):
         yield from it
 
     return true_iterator(), remainder_iterator()
+
+
+def triplewise(iterable):
+    """Return overlapping triplets from *iterable*.
+
+    >>> list(triplewise('ABCDE'))
+    [('A', 'B', 'C'), ('B', 'C', 'D'), ('C', 'D', 'E')]
+
+    """
+    for (a, _), (b, c) in pairwise(pairwise(iterable)):
+        yield a, b, c
