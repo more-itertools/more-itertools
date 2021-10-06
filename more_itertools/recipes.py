@@ -26,6 +26,7 @@ from random import randrange, sample, choice
 
 __all__ = [
     'all_equal',
+    'before_and_after',
     'consume',
     'convolve',
     'dotproduct',
@@ -628,3 +629,35 @@ def convolve(signal, kernel):
     for x in chain(signal, repeat(0, n - 1)):
         window.append(x)
         yield sum(map(operator.mul, kernel, window))
+
+
+def before_and_after(predicate, it):
+    """A variant of :func:`takewhile` that allows complete access to the
+    remainder of the iterator.
+
+         >>> it = iter('ABCdEfGhI')
+         >>> all_upper, remainder = before_and_after(str.isupper, it)
+         >>> ''.join(all_upper)
+         'ABC'
+         >>> ''.join(remainder) # takewhile() would lose the 'd'
+         'dEfGhI'
+
+     Note that the first iterator must be fully consumed before the second
+     iterator can generate valid results.
+    """
+    it = iter(it)
+    transition = []
+
+    def true_iterator():
+        for elem in it:
+            if predicate(elem):
+                yield elem
+            else:
+                transition.append(elem)
+                return
+
+    def remainder_iterator():
+        yield from transition
+        yield from it
+
+    return true_iterator(), remainder_iterator()

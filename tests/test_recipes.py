@@ -709,3 +709,25 @@ class Convolvetests(TestCase):
         actual = mi.take(5, mi.convolve(signal, kernel))
         expected = [0, 1, 1, 1, 1]
         self.assertEqual(actual, expected)
+
+
+class BeforeAndAfterTests(TestCase):
+    def test_empty(self):
+        before, after = mi.before_and_after(bool, [])
+        self.assertEqual(list(before), [])
+        self.assertEqual(list(after), [])
+
+    def test_never_true(self):
+        before, after = mi.before_and_after(bool, [0, False, None, ''])
+        self.assertEqual(list(before), [])
+        self.assertEqual(list(after), [0, False, None, ''])
+
+    def test_never_false(self):
+        before, after = mi.before_and_after(bool, [1, True, Ellipsis, ' '])
+        self.assertEqual(list(before), [1, True, Ellipsis, ' '])
+        self.assertEqual(list(after), [])
+
+    def test_some_true(self):
+        before, after = mi.before_and_after(bool, [1, True, 0, False])
+        self.assertEqual(list(before), [1, True])
+        self.assertEqual(list(after), [0, False])

@@ -188,6 +188,7 @@ These tools yield certain items from an iterable.
 **Itertools recipes**
 
 .. autofunction:: nth
+.. autofunction:: before_and_after
 .. autofunction:: take
 .. autofunction:: tail
 .. autofunction:: unique_everseen
