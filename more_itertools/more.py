@@ -3583,11 +3583,7 @@ def is_sorted(iterable, key=None, reverse=False, strict=False):
     item. If there are no out-of-order items, the iterable is exhausted.
     """
 
-    compare = (
-        (le if reverse else ge)
-        if strict
-        else (lt if reverse else gt)
-    )
+    compare = (le if reverse else ge) if strict else (lt if reverse else gt)
     it = iterable if key is None else map(key, iterable)
     return not any(starmap(compare, pairwise(it)))
 

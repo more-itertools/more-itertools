@@ -501,7 +501,7 @@ def is_sorted(
     iterable: Iterable[_T],
     key: Optional[Callable[[_T], _U]] = ...,
     reverse: bool = False,
-    strict: bool = False
+    strict: bool = False,
 ) -> bool: ...
 
 class AbortThread(BaseException):

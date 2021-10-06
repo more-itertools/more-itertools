@@ -4208,12 +4208,12 @@ class IsSortedTests(TestCase):
             (
                 ['3', '2', '10', '10', '1'],
                 {'strict': True, 'reverse': True},
-                False
+                False,
             ),
             (
                 ['3', '2', '10', '1'],
                 {'strict': True, 'key': int, 'reverse': True},
-                False
+                False,
             ),
             # We'll do the same weird thing as Python here
             (['nan', 0, 'nan', 0], {'key': float}, True),
@@ -4224,7 +4224,7 @@ class IsSortedTests(TestCase):
             (
                 ['nan', 0, 'nan', 0],
                 {'strict': True, 'key': float, 'reverse': True},
-                True
+                True,
             ),
         ]:
             key = kwargs.get('key', None)
@@ -4232,7 +4232,7 @@ class IsSortedTests(TestCase):
             strict = kwargs.get('strict', False)
 
             with self.subTest(
-                    iterable=iterable, key=key, reverse=reverse, strict=strict
+                iterable=iterable, key=key, reverse=reverse, strict=strict
             ):
                 mi_result = mi.is_sorted(
                     iter(iterable), key=key, reverse=reverse, strict=strict
