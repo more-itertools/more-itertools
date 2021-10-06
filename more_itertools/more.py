@@ -22,7 +22,7 @@ from itertools import (
 from math import exp, factorial, floor, log
 from queue import Empty, Queue
 from random import random, randrange, uniform
-from operator import itemgetter, mul, sub, gt, lt
+from operator import itemgetter, mul, sub, gt, lt, ge, le
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -3561,7 +3561,7 @@ def sample(iterable, k, weights=None):
         return _sample_weighted(iterable, k, weights)
 
 
-def is_sorted(iterable, key=None, reverse=False):
+def is_sorted(iterable, key=None, reverse=False, strict=False):
     """Returns ``True`` if the items of iterable are in sorted order, and
     ``False`` otherwise. *key* and *reverse* have the same meaning that they do
     in the built-in :func:`sorted` function.
@@ -3571,12 +3571,20 @@ def is_sorted(iterable, key=None, reverse=False):
     >>> is_sorted([5, 4, 3, 1, 2], reverse=True)
     False
 
+    If *strict*, tests for strict sorting, that is, returns ``False`` if equal
+    elements are found:
+
+    >>> is_sorted([1, 2, 2])
+    True
+    >>> is_sorted([1, 2, 2], strict=True)
+    False
+
     The function returns ``False`` after encountering the first out-of-order
     item. If there are no out-of-order items, the iterable is exhausted.
     """
 
-    compare = lt if reverse else gt
-    it = iterable if (key is None) else map(key, iterable)
+    compare = (le if reverse else ge) if strict else (lt if reverse else gt)
+    it = iterable if key is None else map(key, iterable)
     return not any(starmap(compare, pairwise(it)))
 
 

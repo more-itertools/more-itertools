@@ -4180,6 +4180,7 @@ class IsSortedTests(TestCase):
     def test_basic(self):
         for iterable, kwargs, expected in [
             ([], {}, True),
+            ([1], {}, True),
             ([1, 2, 3], {}, True),
             ([1, 1, 2, 3], {}, True),
             ([1, 10, 2, 3], {}, False),
@@ -4190,15 +4191,59 @@ class IsSortedTests(TestCase):
             ([1, 10, 2, 3], {'reverse': True}, False),
             (['3', '2', '10', '1'], {'reverse': True}, True),
             (['3', '2', '10', '1'], {'key': int, 'reverse': True}, False),
+            # strict
+            ([], {'strict': True}, True),
+            ([1], {'strict': True}, True),
+            ([1, 1], {'strict': True}, False),
+            ([1, 2, 3], {'strict': True}, True),
+            ([1, 1, 2, 3], {'strict': True}, False),
+            ([1, 10, 2, 3], {'strict': True}, False),
+            (['1', '10', '2', '3'], {'strict': True}, True),
+            (['1', '10', '2', '3', '3'], {'strict': True}, False),
+            (['1', '10', '2', '3'], {'strict': True, 'key': int}, False),
+            ([1, 2, 3], {'strict': True, 'reverse': True}, False),
+            ([1, 1, 2, 3], {'strict': True, 'reverse': True}, False),
+            ([1, 10, 2, 3], {'strict': True, 'reverse': True}, False),
+            (['3', '2', '10', '1'], {'strict': True, 'reverse': True}, True),
+            (
+                ['3', '2', '10', '10', '1'],
+                {'strict': True, 'reverse': True},
+                False,
+            ),
+            (
+                ['3', '2', '10', '1'],
+                {'strict': True, 'key': int, 'reverse': True},
+                False,
+            ),
             # We'll do the same weird thing as Python here
             (['nan', 0, 'nan', 0], {'key': float}, True),
             ([0, 'nan', 0, 'nan'], {'key': float}, True),
             (['nan', 0, 'nan', 0], {'key': float, 'reverse': True}, True),
             ([0, 'nan', 0, 'nan'], {'key': float, 'reverse': True}, True),
+            ([0, 'nan', 0, 'nan'], {'strict': True, 'key': float}, True),
+            (
+                ['nan', 0, 'nan', 0],
+                {'strict': True, 'key': float, 'reverse': True},
+                True,
+            ),
         ]:
-            with self.subTest(args=(iterable, kwargs)):
-                mi_result = mi.is_sorted(iter(iterable), **kwargs)
-                py_result = iterable == sorted(iterable, **kwargs)
+            key = kwargs.get('key', None)
+            reverse = kwargs.get('reverse', False)
+            strict = kwargs.get('strict', False)
+
+            with self.subTest(
+                iterable=iterable, key=key, reverse=reverse, strict=strict
+            ):
+                mi_result = mi.is_sorted(
+                    iter(iterable), key=key, reverse=reverse, strict=strict
+                )
+
+                sorted_iterable = sorted(iterable, key=key, reverse=reverse)
+                if strict:
+                    sorted_iterable = list(mi.unique_justseen(sorted_iterable))
+
+                py_result = iterable == sorted_iterable
+
                 self.assertEqual(mi_result, expected)
                 self.assertEqual(mi_result, py_result)
 
