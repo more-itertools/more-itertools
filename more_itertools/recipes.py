@@ -644,8 +644,8 @@ def before_and_after(predicate, it):
          >>> ''.join(remainder) # takewhile() would lose the 'd'
          'dEfGhI'
 
-     Note that the first iterator must be fully consumed before the second
-     iterator can generate valid results.
+    Note that the first iterator must be fully consumed before the second
+    iterator can generate valid results.
     """
     it = iter(it)
     transition = []
