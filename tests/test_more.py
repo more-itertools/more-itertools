@@ -4697,6 +4697,9 @@ class ZipBroadcastTests(TestCase):
             ([1, [2, 3]], [(1, 2), (1, 3)]),
             # All iterable
             ([[1, 2], [3, 4]], [(1, 3), (2, 4)]),
+            # Infinite
+            ([count(), 1, [2]], [(0, 1, 2)]),
+            ([count(), 1, [2, 3]], [(0, 1, 2), (1, 1, 3)]),
         ]:
             with self.subTest(expected=expected):
                 actual = list(mi.zip_broadcast(*objects))
@@ -4724,15 +4727,27 @@ class ZipBroadcastTests(TestCase):
         )
 
     def test_strict(self):
-        # Truncate by default
-        self.assertEqual(
-            list(mi.zip_broadcast('a', [1, 2], [3, 4, 5])),
-            [('a', 1, 3), ('a', 2, 4)],
-        )
+        for objects, zipped in [
+            ([[], [1]], []),
+            ([[1], []], []),
+            ([[1], [2, 3]], [(1, 2)]),
+            ([[1, 2], [3]], [(1, 3)]),
+            ([[1, 2], [3], [4]], [(1, 3, 4)]),
+            ([[1], [2, 3], [4]], [(1, 2, 4)]),
+            ([[1], [2], [3, 4]], [(1, 2, 3)]),
+            ([[1], [2, 3], [4, 5]], [(1, 2, 4)]),
+            ([[1, 2], [3], [4, 5]], [(1, 3, 4)]),
+            ([[1, 2], [3, 4], [5]], [(1, 3, 5)]),
+            (['a', [1, 2], [3, 4, 5]], [('a', 1, 3), ('a', 2, 4)]),
+        ]:
+            # Truncate by default
+            with self.subTest(objects=objects, strict=False, zipped=zipped):
+                self.assertEqual(list(mi.zip_broadcast(*objects)), zipped)
 
-        # Raise an exception for strict=True
-        with self.assertRaises(mi.UnequalIterablesError):
-            list(mi.zip_broadcast('a', [1, 2], [3, 4, 5], strict=True))
+            # Raise an exception for strict=True
+            with self.subTest(objects=objects, strict=True):
+                with self.assertRaises(ValueError):
+                    list(mi.zip_broadcast(*objects, strict=True))
 
     def test_empty(self):
         self.assertEqual(list(mi.zip_broadcast()), [])
