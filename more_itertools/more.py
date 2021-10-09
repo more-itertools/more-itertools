@@ -1663,6 +1663,26 @@ def _zip_equal_generator(iterables):
         yield combo
 
 
+def _zip_equal(*iterables):
+    # Check whether the iterables are all the same size.
+    try:
+        first_size = len(iterables[0])
+        for i, it in enumerate(iterables[1:], 1):
+            size = len(it)
+            if size != first_size:
+                break
+        else:
+            # If we didn't break out, we can use the built-in zip.
+            return zip(*iterables)
+
+        # If we did break out, there was a mismatch.
+        raise UnequalIterablesError(details=(first_size, i, size))
+    # If any one of the iterables didn't have a length, start reading
+    # them until one runs out.
+    except TypeError:
+        return _zip_equal_generator(iterables)
+
+
 def zip_equal(*iterables):
     """``zip`` the input *iterables* together, but raise
     ``UnequalIterablesError`` if they aren't all the same length.
@@ -1690,23 +1710,8 @@ def zip_equal(*iterables):
             ),
             DeprecationWarning,
         )
-    # Check whether the iterables are all the same size.
-    try:
-        first_size = len(iterables[0])
-        for i, it in enumerate(iterables[1:], 1):
-            size = len(it)
-            if size != first_size:
-                break
-        else:
-            # If we didn't break out, we can use the built-in zip.
-            return zip(*iterables)
 
-        # If we did break out, there was a mismatch.
-        raise UnequalIterablesError(details=(first_size, i, size))
-    # If any one of the iterables didn't have a length, start reading
-    # them until one runs out.
-    except TypeError:
-        return _zip_equal_generator(iterables)
+    return _zip_equal(*iterables)
 
 
 def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
@@ -4106,10 +4111,9 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     [('a', 0, 'x'), ('b', 0, 'y'), ('c', 0, 'z')]
 
     If the *strict* keyword argument is ``True``, then
-    ``ValueError`` (``UnequalIterablesError`` in python<3.10) will be raised if
-    any of the iterables have different lengths.
+    ``UnequalIterablesError`` will be raised if any of the iterables have
+    different lengthss.
     """
-
     def is_scalar(obj):
         if scalar_types and isinstance(obj, scalar_types):
             return True
@@ -4120,32 +4124,35 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         else:
             return False
 
-    iterables = []
-    formatters = []
+    size = len(objects)
+    if not size:
+        return
 
-    for obj in objects:
+    iterables, iterable_positions = [], []
+    scalars, scalar_positions = [], []
+    for i, obj in enumerate(objects):
         if is_scalar(obj):
-            # The double-lambda syntax is necessary to create a closure.
-            formatters.append((lambda x: lambda _: x)(obj))
+            scalars.append(obj)
+            scalar_positions.append(i)
         else:
-            formatters.append(itemgetter(len(iterables)))
-            iterables.append(obj)
+            iterables.append(iter(obj))
+            iterable_positions.append(i)
 
-    if not iterables:
-        if not objects:
-            return
-        else:
-            yield tuple(objects)
-            return
+    if len(scalars) == size:
+        yield tuple(objects)
+        return
 
-    # Avoid deprecation warning.
-    if hexversion >= 0x30A00A6:
-        _zip = partial(zip, strict=strict)
-    else:
-        _zip = zip_equal if strict else zip
+    zipper = _zip_equal if strict else zip
+    for item in zipper(*iterables):
+        new_item = [None] * size
 
-    for values in _zip(*iterables):
-        yield tuple(f(values) for f in formatters)
+        for i, elem in zip(iterable_positions, item):
+            new_item[i] = elem
+
+        for i, elem in zip(scalar_positions, scalars):
+            new_item[i] = elem
+
+        yield tuple(new_item)
 
 
 def unique_in_window(iterable, n, key=None):
