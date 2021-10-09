@@ -1663,6 +1663,26 @@ def _zip_equal_generator(iterables):
         yield combo
 
 
+def _zip_equal(*iterables):
+    # Check whether the iterables are all the same size.
+    try:
+        first_size = len(iterables[0])
+        for i, it in enumerate(iterables[1:], 1):
+            size = len(it)
+            if size != first_size:
+                break
+        else:
+            # If we didn't break out, we can use the built-in zip.
+            return zip(*iterables)
+
+        # If we did break out, there was a mismatch.
+        raise UnequalIterablesError(details=(first_size, i, size))
+    # If any one of the iterables didn't have a length, start reading
+    # them until one runs out.
+    except TypeError:
+        return _zip_equal_generator(iterables)
+
+
 def zip_equal(*iterables):
     """``zip`` the input *iterables* together, but raise
     ``UnequalIterablesError`` if they aren't all the same length.
@@ -1690,23 +1710,8 @@ def zip_equal(*iterables):
             ),
             DeprecationWarning,
         )
-    # Check whether the iterables are all the same size.
-    try:
-        first_size = len(iterables[0])
-        for i, it in enumerate(iterables[1:], 1):
-            size = len(it)
-            if size != first_size:
-                break
-        else:
-            # If we didn't break out, we can use the built-in zip.
-            return zip(*iterables)
 
-        # If we did break out, there was a mismatch.
-        raise UnequalIterablesError(details=(first_size, i, size))
-    # If any one of the iterables didn't have a length, start reading
-    # them until one runs out.
-    except TypeError:
-        return _zip_equal_generator(iterables)
+    return _zip_equal(*iterables)
 
 
 def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
@@ -4107,42 +4112,48 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
 
     If the *strict* keyword argument is ``True``, then
     ``UnequalIterablesError`` will be raised if any of the iterables have
-    different lengths.
-
+    different lengthss.
     """
-    if not objects:
+
+    def is_scalar(obj):
+        if scalar_types and isinstance(obj, scalar_types):
+            return True
+        try:
+            iter(obj)
+        except TypeError:
+            return True
+        else:
+            return False
+
+    size = len(objects)
+    if not size:
         return
 
-    iterables = []
-    all_scalar = True
-    for obj in objects:
-        # If the object is one of our scalar types, turn it into an iterable
-        # by wrapping it with itertools.repeat
-        if scalar_types and isinstance(obj, scalar_types):
-            iterables.append((repeat(obj), False))
-        # Otherwise, test to see whether the object is iterable.
-        # If it is, collect it. If it's not, treat it as a scalar.
+    iterables, iterable_positions = [], []
+    scalars, scalar_positions = [], []
+    for i, obj in enumerate(objects):
+        if is_scalar(obj):
+            scalars.append(obj)
+            scalar_positions.append(i)
         else:
-            try:
-                iterables.append((iter(obj), True))
-            except TypeError:
-                iterables.append((repeat(obj), False))
-            else:
-                all_scalar = False
+            iterables.append(iter(obj))
+            iterable_positions.append(i)
 
-    # If all the objects were scalar, we just emit them as a tuple.
-    # Otherwise we zip the collected iterable objects.
-    if all_scalar:
+    if len(scalars) == size:
         yield tuple(objects)
-    else:
-        yield from zip(*(it for it, is_it in iterables))
+        return
 
-        # For strict mode, we ensure that all the iterable objects have been
-        # exhausted.
-        if strict:
-            for it, is_it in filter(itemgetter(1), iterables):
-                if next(it, _marker) is not _marker:
-                    raise UnequalIterablesError
+    zipper = _zip_equal if strict else zip
+    for item in zipper(*iterables):
+        new_item = [None] * size
+
+        for i, elem in zip(iterable_positions, item):
+            new_item[i] = elem
+
+        for i, elem in zip(scalar_positions, scalars):
+            new_item[i] = elem
+
+        yield tuple(new_item)
 
 
 def unique_in_window(iterable, n, key=None):
