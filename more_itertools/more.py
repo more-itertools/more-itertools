@@ -4114,6 +4114,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     ``UnequalIterablesError`` will be raised if any of the iterables have
     different lengthss.
     """
+
     def is_scalar(obj):
         if scalar_types and isinstance(obj, scalar_types):
             return True
