@@ -184,6 +184,8 @@ These tools yield certain items from an iterable.
 .. autofunction:: map_except
 .. autofunction:: nth_or_last(iterable, n[, default])
 .. autofunction:: unique_in_window
+.. autofunction:: duplicates_everseen
+.. autofunction:: duplicates_justseen
 
 ----
 
