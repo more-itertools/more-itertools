@@ -4199,13 +4199,13 @@ def unique_in_window(iterable, n, key=None):
 def duplicates_everseen(iterable, key=None):
     """Yield duplicate elements after their first appearance.
 
-    >>> list(duplicates_everseen('AAA BB Cc abC'))
-    ['A', 'A', 'B', ' ', ' ', 'C']
-    >>> list(duplicates_everseen('AAA BB Cc abC', str.lower))
-    ['A', 'A', 'B', ' ', 'c', ' ', 'a', 'b', 'C']
+    >>> list(duplicates_everseen('mississippi'))
+    ['s', 'i', 's', 's', 'i', 'p', 'i']
+    >>> list(duplicates_everseen('AaaBbbCccAaa', str.lower))
+    ['a', 'a', 'b', 'b', 'c', 'c', 'A', 'a', 'a']
 
-    Analogous operation to :func:`unique_everseen` (with the same performance
-    considerations).
+    This function is analagous to :func:`unique_everseen` and is subject to
+    the same performance considerations.
 
     """
     seen_set = set()
@@ -4229,12 +4229,12 @@ def duplicates_everseen(iterable, key=None):
 def duplicates_justseen(iterable, key=None):
     """Yields serially-duplicate elements after their first appearance.
 
-    >>> list(duplicates_justseen('AAA BB Cc abC'))
-    ['A', 'A', 'B']
-    >>> list(duplicates_justseen('AAA BB Cc abC', str.lower))
-    ['A', 'A', 'B', 'c']
+    >>> list(duplicates_justseen('mississippi'))
+    ['s', 's', 'p']
+    >>> list(duplicates_justseen('AaaBbbCccAaa', str.lower))
+    ['a', 'a', 'b', 'b', 'c', 'c', 'a', 'a']
 
-    Analogous operation to :func:`unique_justseen`.
+    This function is analagous to :func:`unique_justseen`.
 
     """
     return flatten(
