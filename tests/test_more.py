@@ -4816,3 +4816,140 @@ class StrictlyNTests(TestCase):
         actual = mi.strictly_n(iter(iterable), n, too_long=too_long)
         expected = ['b', 'c']
         self.assertEqual(actual, expected)
+
+
+class DuplicatesEverSeenTests(TestCase):
+    def test_basic(self):
+        for iterable, expected in [
+            ([], []),
+            ([1, 2, 3], []),
+            ([1, 1], [1]),
+            ([1, 2, 1, 2], [1, 2]),
+            ([1, 2, 3, '1'], []),
+        ]:
+            with self.subTest(args=(iterable,)):
+                self.assertEqual(
+                    list(mi.duplicates_everseen(iterable)), expected
+                )
+
+    def test_non_hashable(self):
+        self.assertEqual(list(mi.duplicates_everseen([[1, 2], [3, 4]])), [])
+        self.assertEqual(
+            list(mi.duplicates_everseen([[1, 2], [3, 4], [1, 2]])), [[1, 2]]
+        )
+
+    def test_partially_hashable(self):
+        self.assertEqual(
+            list(mi.duplicates_everseen([[1, 2], [3, 4], (5, 6)])), []
+        )
+        self.assertEqual(
+            list(mi.duplicates_everseen([[1, 2], [3, 4], (5, 6), [1, 2]])),
+            [[1, 2]],
+        )
+        self.assertEqual(
+            list(mi.duplicates_everseen([[1, 2], [3, 4], (5, 6), (5, 6)])),
+            [(5, 6)],
+        )
+
+    def test_key_hashable(self):
+        iterable = 'HEheHEhe'
+        self.assertEqual(list(mi.duplicates_everseen(iterable)), list('HEhe'))
+        self.assertEqual(
+            list(mi.duplicates_everseen(iterable, str.lower)),
+            list('heHEhe'),
+        )
+
+    def test_key_non_hashable(self):
+        iterable = [[1, 2], [3, 0], [5, -2], [5, 6]]
+        self.assertEqual(
+            list(mi.duplicates_everseen(iterable, lambda x: x)), []
+        )
+        self.assertEqual(
+            list(mi.duplicates_everseen(iterable, sum)), [[3, 0], [5, -2]]
+        )
+
+    def test_key_partially_hashable(self):
+        iterable = [[1, 2], (1, 2), [1, 2], [5, 6]]
+        self.assertEqual(
+            list(mi.duplicates_everseen(iterable, lambda x: x)), [[1, 2]]
+        )
+        self.assertEqual(
+            list(mi.duplicates_everseen(iterable, list)), [(1, 2), [1, 2]]
+        )
+
+
+class DuplicatesJustSeenTests(TestCase):
+    def test_basic(self):
+        for iterable, expected in [
+            ([], []),
+            ([1, 2, 3, 3, 2, 2], [3, 2]),
+            ([1, 1], [1]),
+            ([1, 2, 1, 2], []),
+            ([1, 2, 3, '1'], []),
+        ]:
+            with self.subTest(args=(iterable,)):
+                self.assertEqual(
+                    list(mi.duplicates_justseen(iterable)), expected
+                )
+
+    def test_non_hashable(self):
+        self.assertEqual(list(mi.duplicates_justseen([[1, 2], [3, 4]])), [])
+        self.assertEqual(
+            list(
+                mi.duplicates_justseen(
+                    [[1, 2], [3, 4], [3, 4], [3, 4], [1, 2]]
+                )
+            ),
+            [[3, 4], [3, 4]],
+        )
+
+    def test_partially_hashable(self):
+        self.assertEqual(
+            list(mi.duplicates_justseen([[1, 2], [3, 4], (5, 6)])), []
+        )
+        self.assertEqual(
+            list(
+                mi.duplicates_justseen(
+                    [[1, 2], [3, 4], (5, 6), [1, 2], [1, 2]]
+                )
+            ),
+            [[1, 2]],
+        )
+        self.assertEqual(
+            list(
+                mi.duplicates_justseen(
+                    [[1, 2], [3, 4], (5, 6), (5, 6), (5, 6)]
+                )
+            ),
+            [(5, 6), (5, 6)],
+        )
+
+    def test_key_hashable(self):
+        iterable = 'HEheHHHhEheeEe'
+        self.assertEqual(list(mi.duplicates_justseen(iterable)), list('HHe'))
+        self.assertEqual(
+            list(mi.duplicates_justseen(iterable, str.lower)),
+            list('HHheEe'),
+        )
+
+    def test_key_non_hashable(self):
+        iterable = [[1, 2], [3, 0], [5, -2], [5, 6], [1, 2]]
+        self.assertEqual(
+            list(mi.duplicates_justseen(iterable, lambda x: x)), []
+        )
+        self.assertEqual(
+            list(mi.duplicates_justseen(iterable, sum)), [[3, 0], [5, -2]]
+        )
+
+    def test_key_partially_hashable(self):
+        iterable = [[1, 2], (1, 2), [1, 2], [5, 6], [1, 2]]
+        self.assertEqual(
+            list(mi.duplicates_justseen(iterable, lambda x: x)), []
+        )
+        self.assertEqual(
+            list(mi.duplicates_justseen(iterable, list)), [(1, 2), [1, 2]]
+        )
+
+    def test_nested(self):
+        iterable = [[[1, 2], [1, 2]], [5, 6], [5, 6]]
+        self.assertEqual(list(mi.duplicates_justseen(iterable)), [[5, 6]])

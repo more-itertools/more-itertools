@@ -60,6 +60,8 @@ __all__ = [
     'distinct_permutations',
     'distribute',
     'divide',
+    'duplicates_everseen',
+    'duplicates_justseen',
     'exactly_n',
     'filter_except',
     'first',
@@ -4192,3 +4194,52 @@ def unique_in_window(iterable, n, key=None):
         window.append(k)
 
         yield item
+
+
+def duplicates_everseen(iterable, key=None):
+    """Yield duplicate elements after their first appearance.
+
+    >>> list(duplicates_everseen('AAA BB Cc abC'))
+    ['A', 'A', 'B', ' ', ' ', 'C']
+    >>> list(duplicates_everseen('AAA BB Cc abC', str.lower))
+    ['A', 'A', 'B', ' ', 'c', ' ', 'a', 'b', 'C']
+
+    Analogous operation to :func:`unique_everseen` (with the same performance
+    considerations).
+
+    """
+    seen_set = set()
+    seen_list = []
+    use_key = key is not None
+
+    for element in iterable:
+        k = key(element) if use_key else element
+        try:
+            if k not in seen_set:
+                seen_set.add(k)
+            else:
+                yield element
+        except TypeError:
+            if k not in seen_list:
+                seen_list.append(k)
+            else:
+                yield element
+
+
+def duplicates_justseen(iterable, key=None):
+    """Yields serially-duplicate elements after their first appearance.
+
+    >>> list(duplicates_justseen('AAA BB Cc abC'))
+    ['A', 'A', 'B']
+    >>> list(duplicates_justseen('AAA BB Cc abC', str.lower))
+    ['A', 'A', 'B', 'c']
+
+    Analogous operation to :func:`unique_justseen`.
+
+    """
+    return flatten(
+        map(
+            lambda group_tuple: islice_extended(group_tuple[1])[1:],
+            groupby(iterable, key),
+        )
+    )
