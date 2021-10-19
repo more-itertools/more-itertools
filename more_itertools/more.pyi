@@ -571,3 +571,40 @@ def duplicates_everseen(
 def duplicates_justseen(
     iterable: Iterable[_T], key: Optional[Callable[[_T], _U]] = ...
 ) -> Iterator[_T]: ...
+
+class _SupportsLessThan(Protocol):
+    def __lt__(self, __other: Any) -> bool: ...
+
+_SupportsLessThanT = TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)
+
+@overload
+def minmax(
+    iterable_or_value: Iterable[_SupportsLessThanT],
+) -> Tuple[_SupportsLessThanT, _SupportsLessThanT]: ...
+@overload
+def minmax(
+    iterable_or_value: Iterable[_T], key: Callable[[_T], _SupportsLessThan]
+) -> Tuple[_T, _T]: ...
+@overload
+def minmax(
+    iterable_or_value: Iterable[_SupportsLessThanT], default: _U
+) -> Union[_U, Tuple[_SupportsLessThanT, _SupportsLessThanT]]: ...
+@overload
+def minmax(
+    iterable_or_value: Iterable[_T],
+    key: Callable[[_T], _SupportsLessThan],
+    default: _U,
+) -> Union[_U, Tuple[_T, _T]]: ...
+@overload
+def minmax(
+    iterable_or_value: _SupportsLessThanT,
+    __other: _SupportsLessThanT,
+    *others: _SupportsLessThanT
+) -> Tuple[_SupportsLessThanT, _SupportsLessThanT]: ...
+@overload
+def minmax(
+    iterable_or_value: _T,
+    __other: _T,
+    *others: _T,
+    key: Callable[[_T], _SupportsLessThan]
+) -> Tuple[_T, _T]: ...
