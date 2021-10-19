@@ -4264,10 +4264,10 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
 
     If no `default` value is given, raises a `ValueError` for empty iterables:
 
-        >>> minmax([])
+        >>> minmax([]) # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
-        ValueError: `minmax()` argument is an empty iterable. Provide a `default` value to suppress this error.
+        ValueError: ...
 
     Like the builtin functions, it also supports a `key` argument:
 
