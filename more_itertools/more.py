@@ -603,71 +603,68 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
 
         >>> iterable = ['a', 'b', 'c', 'd']
         >>> n = 4
-        >>> strictly_n(iterable, n)
+        >>> list(strictly_n(iterable, n))
         ['a', 'b', 'c', 'd']
 
     By default, *too_short* and *too_long* are functions that raise
     ``ValueError``.
 
-        >>> strictly_n(['a', 'b'], 3)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> list(strictly_n('ab', 3))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: too few items in iterable (got 2)'
+        ValueError: too few items in iterable'
 
-        >>> strictly_n(['a', 'b', 'c'], 2)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        >>> list(strictly_n('abc', 2))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: too many items in iterable (got at least 3)'
+        ValueError: too many items in iterable'
 
-    You can supply your own functions for *too_short* and *too_long*.
-    The *too_short* function should accept a list of the items that were
-    in *iterable*. The *too_long* function should accept a list of the first
-    ``n + 1`` items  that were in *iterable*.
+    You can instead supply functions (that don't take any arguments) that
+    do something else:
 
-        >>> def too_short(items):
-        ...     average = sum(items) / len(items)
-        ...     return items + [average]
-        >>> strictly_n([5.0, 5.0, 20.0], 4, too_short=too_short)
-        [5.0, 5.0, 20.0, 10.0]
+        >>> def too_short():
+        ...     raise RuntimeError
+        >>> it = strictly_n('abcd', 6, too_short=too_short)
+        >>> list(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        RuntimeError
 
-        >>> def too_long(items):
-        ...     average = sum(items) / len(items)
-        ...     return [x + average for x in items[:-1]]
-        >>> strictly_n([5.0, 5.0, 20.0], 2, too_long=too_long)
-        [15.0, 15.0]
+        >>> def too_long():
+        ...     print('The boss is going to hear about this')
+        >>> it = strictly_n('abcdef', 4, too_long=too_long)
+        >>> list(it)
+        The boss is going to hear about this
+        ['a', 'b', 'c', 'd']
 
     """
     if too_short is None:
-        too_short = lambda items: raise_(
+        too_short = lambda: raise_(
             ValueError,
-            f'Too few items in iterable (got {len(items)}).',
+            'Too few items in iterable',
         )
 
     if too_long is None:
-        too_long = lambda items: raise_(
+        too_long = lambda: raise_(
             ValueError,
-            f'Too many items in iterable (got at least {len(items)})',
+            'Too many items in iterable',
         )
 
     it = iter(iterable)
+    for i in range(n):
+        try:
+            item = next(it)
+        except StopIteration:
+            too_short()
+        else:
+            yield item
 
-    items = take(n - 1, it)
     try:
-        nth_value = next(it)
-    except StopIteration:
-        return too_short(items)
-    else:
-        items.append(nth_value)
-
-    try:
-        after_value = next(it)
+        next(it)
     except StopIteration:
         pass
     else:
-        items.append(after_value)
-        return too_long(items)
-
-    return items
+        too_long()
 
 
 def distinct_permutations(iterable, r=None):

@@ -4785,37 +4785,56 @@ class StrictlyNTests(TestCase):
     def test_basic(self):
         iterable = ['a', 'b', 'c', 'd']
         n = 4
-        actual = mi.strictly_n(iter(iterable), n)
+        actual = list(mi.strictly_n(iter(iterable), n))
         expected = iterable
         self.assertEqual(actual, expected)
 
     def test_too_short_default(self):
         iterable = ['a', 'b', 'c', 'd']
         n = 5
-        with self.assertRaises(ValueError):
-            mi.strictly_n(iter(iterable), n)
+        with self.assertRaises(ValueError) as exc:
+            list(mi.strictly_n(iter(iterable), n))
+
+        self.assertEqual('Too few items in iterable', exc.exception.args[0])
 
     def test_too_long_default(self):
         iterable = ['a', 'b', 'c', 'd']
         n = 3
-        with self.assertRaises(ValueError):
-            mi.strictly_n(iter(iterable), n)
+        with self.assertRaises(ValueError) as cm:
+            list(mi.strictly_n(iter(iterable), n))
+
+        self.assertEqual(
+            'Too many items in iterable',
+            cm.exception.args[0],
+        )
 
     def test_too_short_custom(self):
+        def too_short():
+            raise RuntimeError
+
         iterable = ['a', 'b', 'c', 'd']
         n = 6
-        too_short = lambda items: items + (['?'] * (n - len(items)))
-        actual = mi.strictly_n(iter(iterable), n, too_short=too_short)
-        expected = ['a', 'b', 'c', 'd', '?', '?']
+
+        actual = []
+        with self.assertRaises(RuntimeError):
+            for item in mi.strictly_n(iter(iterable), n, too_short=too_short):
+                actual.append(item)
+
+        expected = ['a', 'b', 'c', 'd']
         self.assertEqual(actual, expected)
 
     def test_too_long_custom(self):
+        import logging
+
         iterable = ['a', 'b', 'c', 'd']
         n = 2
-        too_long = lambda items: items[-n:]
-        actual = mi.strictly_n(iter(iterable), n, too_long=too_long)
-        expected = ['b', 'c']
-        self.assertEqual(actual, expected)
+        too_long = lambda: logging.warning('Picked the first %s items', n)
+
+        with self.assertLogs(level='WARNING') as cm:
+            actual = list(mi.strictly_n(iter(iterable), n, too_long=too_long))
+
+        self.assertEqual(actual, ['a', 'b'])
+        self.assertIn('Picked the first 2 items', cm.output[0])
 
 
 class DuplicatesEverSeenTests(TestCase):
