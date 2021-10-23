@@ -4809,19 +4809,20 @@ class StrictlyNTests(TestCase):
         )
 
     def test_too_short_custom(self):
+        call_count = 0
+
         def too_short():
-            raise RuntimeError
+            nonlocal call_count
+            call_count += 1
 
         iterable = ['a', 'b', 'c', 'd']
         n = 6
-
         actual = []
-        with self.assertRaises(RuntimeError):
-            for item in mi.strictly_n(iter(iterable), n, too_short=too_short):
-                actual.append(item)
-
+        for item in mi.strictly_n(iter(iterable), n, too_short=too_short):
+            actual.append(item)
         expected = ['a', 'b', 'c', 'd']
         self.assertEqual(actual, expected)
+        self.assertEqual(call_count, 1)
 
     def test_too_long_custom(self):
         import logging

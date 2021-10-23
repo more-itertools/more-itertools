@@ -656,6 +656,7 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
             item = next(it)
         except StopIteration:
             too_short()
+            return
         else:
             yield item
 
