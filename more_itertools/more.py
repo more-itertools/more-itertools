@@ -621,7 +621,7 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
 
     You can instead supply functions that do something else.
     *too_short* will be called with the number of items in *iterable*.
-    *too_long will be called with ``n + 1``.
+    *too_long* will be called with `n + 1`.
 
         >>> def too_short(item_count):
         ...     raise RuntimeError
