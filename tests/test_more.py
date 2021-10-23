@@ -603,6 +603,60 @@ class IlenTests(TestCase):
         self.assertEqual(mi.ilen(list(range(6))), 6)
 
 
+class MinMaxTests(TestCase):
+    def test_basic(self):
+        for iterable, expected in (
+            # easy case
+            ([0, 1, 2, 3], (0, 3)),
+            # min and max are not in the extremes + we have `int`s and `float`s
+            ([3, 5.5, -1, 2], (-1, 5.5)),
+            # unordered collection
+            ({3, 5.5, -1, 2}, (-1, 5.5)),
+            # with repetitions
+            ([3, 5.5, float('-Inf'), 5.5], (float('-Inf'), 5.5)),
+            # other collections
+            ('banana', ('a', 'n')),
+            ({0: 1, 2: 100, 1: 10}, (0, 2)),
+            (range(3, 14), (3, 13)),
+        ):
+            with self.subTest(iterable=iterable, expected=expected):
+                # check for expected results
+                self.assertTupleEqual(mi.minmax(iterable), expected)
+                # check for equality with built-in `min` and `max`
+                self.assertTupleEqual(
+                    mi.minmax(iterable), (min(iterable), max(iterable))
+                )
+
+    def test_unpacked(self):
+        self.assertTupleEqual(mi.minmax(2, 3, 1), (1, 3))
+        self.assertTupleEqual(mi.minmax(12, 3, 4, key=str), (12, 4))
+
+    def test_iterables(self):
+        self.assertTupleEqual(mi.minmax(x for x in [0, 1, 2, 3]), (0, 3))
+        self.assertTupleEqual(
+            mi.minmax(map(str, [3, 5.5, 'a', 2])), ('2', 'a')
+        )
+        self.assertTupleEqual(
+            mi.minmax(filter(None, [0, 3, '', None, 10])), (3, 10)
+        )
+
+    def test_key(self):
+        self.assertTupleEqual(
+            mi.minmax({(), (1, 4, 2), 'abcde', range(4)}, key=len),
+            ((), 'abcde'),
+        )
+        self.assertTupleEqual(
+            mi.minmax((x for x in [10, 3, 25]), key=str), (10, 3)
+        )
+
+    def test_default(self):
+        with self.assertRaises(ValueError):
+            mi.minmax([])
+
+        self.assertIs(mi.minmax([], default=None), None)
+        self.assertListEqual(mi.minmax([], default=[1, 'a']), [1, 'a'])
+
+
 class WithIterTests(TestCase):
     def test_with_iter(self):
         s = StringIO('One fish\nTwo fish')
