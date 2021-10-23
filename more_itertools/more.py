@@ -612,17 +612,18 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
         >>> list(strictly_n('ab', 3))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: too few items in iterable'
+        ValueError: too few items in iterable (got 2)
 
         >>> list(strictly_n('abc', 2))  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: too many items in iterable'
+        ValueError: too many items in iterable (got at least 3)
 
-    You can instead supply functions (that don't take any arguments) that
-    do something else:
+    You can instead supply functions that do something else.
+    *too_short* will be called with the number of items in *iterable*.
+    *too_long will be called with ``n + 1``.
 
-        >>> def too_short():
+        >>> def too_short(item_count):
         ...     raise RuntimeError
         >>> it = strictly_n('abcd', 6, too_short=too_short)
         >>> list(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
@@ -630,7 +631,7 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
         ...
         RuntimeError
 
-        >>> def too_long():
+        >>> def too_long(item_count):
         ...     print('The boss is going to hear about this')
         >>> it = strictly_n('abcdef', 4, too_long=too_long)
         >>> list(it)
@@ -639,15 +640,15 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
 
     """
     if too_short is None:
-        too_short = lambda: raise_(
+        too_short = lambda item_count: raise_(
             ValueError,
-            'Too few items in iterable',
+            f'Too few items in iterable (got {item_count})',
         )
 
     if too_long is None:
-        too_long = lambda: raise_(
+        too_long = lambda item_count: raise_(
             ValueError,
-            'Too many items in iterable',
+            f'Too many items in iterable (got at least {item_count})',
         )
 
     it = iter(iterable)
@@ -655,7 +656,7 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
         try:
             item = next(it)
         except StopIteration:
-            too_short()
+            too_short(i)
             return
         else:
             yield item
@@ -665,7 +666,7 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
     except StopIteration:
         pass
     else:
-        too_long()
+        too_long(n + 1)
 
 
 def distinct_permutations(iterable, r=None):

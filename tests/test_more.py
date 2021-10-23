@@ -4795,7 +4795,9 @@ class StrictlyNTests(TestCase):
         with self.assertRaises(ValueError) as exc:
             list(mi.strictly_n(iter(iterable), n))
 
-        self.assertEqual('Too few items in iterable', exc.exception.args[0])
+        self.assertEqual(
+            'Too few items in iterable (got 4)', exc.exception.args[0]
+        )
 
     def test_too_long_default(self):
         iterable = ['a', 'b', 'c', 'd']
@@ -4804,14 +4806,14 @@ class StrictlyNTests(TestCase):
             list(mi.strictly_n(iter(iterable), n))
 
         self.assertEqual(
-            'Too many items in iterable',
+            'Too many items in iterable (got at least 4)',
             cm.exception.args[0],
         )
 
     def test_too_short_custom(self):
         call_count = 0
 
-        def too_short():
+        def too_short(item_count):
             nonlocal call_count
             call_count += 1
 
@@ -4829,7 +4831,9 @@ class StrictlyNTests(TestCase):
 
         iterable = ['a', 'b', 'c', 'd']
         n = 2
-        too_long = lambda: logging.warning('Picked the first %s items', n)
+        too_long = lambda item_count: logging.warning(
+            'Picked the first %s items', n
+        )
 
         with self.assertLogs(level='WARNING') as cm:
             actual = list(mi.strictly_n(iter(iterable), n, too_long=too_long))
