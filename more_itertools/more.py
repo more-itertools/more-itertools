@@ -83,6 +83,7 @@ __all__ = [
     'map_if',
     'map_reduce',
     'mark_ends',
+    'minmax',
     'nth_or_last',
     'nth_permutation',
     'nth_product',
@@ -4242,3 +4243,92 @@ def duplicates_justseen(iterable, key=None):
             groupby(iterable, key),
         )
     )
+
+
+def minmax(iterable_or_value, *others, key=None, default=_marker):
+    """Computes the minimum and maximum values in one-pass using only
+    ``1.5*len(iterable)`` comparisons. [Recipe from Raymond\
+        Hettinger](http://code.activestate.com/recipes/577916/).
+
+    This function calculates the minimum (:py:func:`min`) and maximum
+    (:py:func:`max`) of an `iterable`:
+
+        >>> minmax([3, 1, 5])
+        (1, 5)
+
+    If the iterable is empty, `default` is returned:
+
+        >>> minmax([], default=(0, 0))
+        (0, 0)
+
+    If no `default` value is given, raises a `ValueError` for empty iterables:
+
+        >>> minmax([]) # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        ValueError: ...
+
+    Like the builtin functions, it also supports a `key` argument:
+
+        >>> import operator
+        >>> minmax([(3, 5), (5, 1), (10, 2)], key=operator.itemgetter(1))
+        ((5, 1), (3, 5))
+        >>> minmax([5, 30], key=str)
+        (30, 5)
+
+    Also like the builtin functions, it can also be called with multiple
+    arguments:
+
+        >>> minmax(2, 1, 3)
+        (1, 3)
+        >>> minmax(12, 3, 4, key=str)
+        (12, 4)
+
+    This function is only faster if:
+    - A `key`-argument is given or
+    - Comparisons are costly or
+    - `iterable` is a generator.
+    In other cases using both :py:func:`min` and :py:func:`max` should be
+    preferred.
+    """
+    iterable = (iterable_or_value, *others) if others else iterable_or_value
+
+    it = iter(iterable)
+
+    try:
+        lo = hi = next(it)
+    except StopIteration as e:
+        if default is _marker:
+            raise ValueError(
+                '`minmax()` argument is an empty iterable. '
+                'Provide a `default` value to suppress this error.'
+            ) from e
+        return default
+
+    # Different branches depending on the presence of key. This saves a lot
+    # of unimportant copies which would slow the "key=None" branch
+    # significantly down.
+    if key is None:
+        for x, y in zip_longest(it, it, fillvalue=lo):
+            if y < x:
+                x, y = y, x
+            if x < lo:
+                lo = x
+            if hi < y:
+                hi = y
+
+    else:
+        lo_key = hi_key = key(lo)
+
+        for x, y in zip_longest(it, it, fillvalue=lo):
+
+            x_key, y_key = key(x), key(y)
+
+            if y_key < x_key:
+                x, y, x_key, y_key = y, x, y_key, x_key
+            if x_key < lo_key:
+                lo, lo_key = x, x_key
+            if hi_key < y_key:
+                hi, hi_key = y, y_key
+
+    return lo, hi
