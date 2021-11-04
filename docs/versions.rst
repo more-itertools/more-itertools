@@ -5,6 +5,21 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.11.0
+------
+
+* New functions
+    * The :func:`before_and_after`, :func:`sliding_window`, and :func:`triplewise` recipes from the Python 3.10 docs were added
+    * :func:`duplicates_everseen` and :func:`duplicates_justseen` (thanks to OrBin and DavidPratt512)
+    * :func:`minmax` (thanks to Ricocotam, MSeifert04, and ruancomelli)
+    * :func:`strictly_n` (thanks to hwalinga and NotWearingPants)
+    * :func:`unique_in_window`
+
+* Changes to existing functions
+    * :func:`groupby_transform` had its type stub improved (thanks to mjk4 and ruancomelli)
+    * :func:`is_sorted` now accepts a ``strict`` parameter (thanks to Dutcho and ruancomelli)
+    * :func:`zip_broadcast` was updated to fix a bug (thanks to kalekundert)
+
 8.10.0
 ------
 
