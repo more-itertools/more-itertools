@@ -10,7 +10,7 @@ Version History
 
 * Bug fixes
     * Some documentation issues were fixed (thanks to Masynchin, spookylukey, astrojuanlu, and stephengmatthews)
-    * Python 3.5 was dropped from ``setup.py`` (thanks to mattbonnell)
+    * Python 3.5 support was temporarily restored (thanks to mattbonnell)
 
 8.11.0
 ------
