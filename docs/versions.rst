@@ -5,6 +5,13 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.12.0
+------
+
+* Bug fixes
+    * Some documentation issues were fixed (thanks to Masynchin, spookylukey, astrojuanlu, and stephengmatthews)
+    * Python 3.5 support was temporarily restored (thanks to mattbonnell)
+
 8.11.0
 ------
 

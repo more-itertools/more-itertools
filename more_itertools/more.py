@@ -643,13 +643,13 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
     if too_short is None:
         too_short = lambda item_count: raise_(
             ValueError,
-            f'Too few items in iterable (got {item_count})',
+            'Too few items in iterable (got {})'.format(item_count),
         )
 
     if too_long is None:
         too_long = lambda item_count: raise_(
             ValueError,
-            f'Too many items in iterable (got at least {item_count})',
+            'Too many items in iterable (got at least {})'.format(item_count),
         )
 
     it = iter(iterable)
