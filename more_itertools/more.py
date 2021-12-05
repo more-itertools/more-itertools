@@ -3326,6 +3326,34 @@ def only(iterable, default=None, too_long=None):
 
     return first_value
 
+class _IChunk:
+    def __init__(self, iterable, n, prev_chunk):
+        if prev_chunk:
+            def it_slice():
+                prev_chunk.fillCache()
+                yield from islice(iterable, n)
+            it_slice = it_slice()
+        else:
+            it_slice = islice(iterable, n)
+        self._it = it_slice
+        self._cache = deque()
+        self._prev_chunk = prev_chunk
+
+    def fillCache(self):
+        self._cache.extend(self._it)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            return next(self._it)
+        except StopIteration:
+            if self._cache:
+                return self._cache.popleft()
+            else:
+                raise
+
 
 def ichunked(iterable, n):
     """Break *iterable* into sub-iterables with *n* elements each.
@@ -3348,20 +3376,25 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-    source = iter(iterable)
 
+    # Requirements:
+    # - consume(next(ichunked(gen, 5))) should not put full batch in memory
+    # - should only yield math.ceil(count(1 for _ in iterable)/n) times
+    # - should cache if ichunks operated on out of order
+    source = peekable(iter(iterable))
+    prev_chunk = None
+    ichunk_marker = object()
     while True:
         # Check to see whether we're at the end of the source iterable
-        item = next(source, _marker)
-        if item is _marker:
+        item = source.peek(ichunk_marker)
+        if item is ichunk_marker:
             return
 
-        # Clone the source and yield an n-length slice
-        source, it = tee(chain([item], source))
-        yield islice(it, n)
+        prev_chunk = _IChunk(source, n, prev_chunk)
+        yield prev_chunk
 
         # Advance the source iterable
-        consume(source, n)
+        prev_chunk.fillCache()
 
 
 def distinct_combinations(iterable, r):
