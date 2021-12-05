@@ -3326,6 +3326,7 @@ def only(iterable, default=None, too_long=None):
 
     return first_value
 
+
 class _IChunk:
     def __init__(self, iterable, n):
         self._it = islice(iterable, n)
