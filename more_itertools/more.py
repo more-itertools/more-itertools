@@ -3332,7 +3332,7 @@ class _IChunk:
         self._it = islice(iterable, n)
         self._cache = deque()
 
-    def fillCache(self):
+    def fill_cache(self):
         self._cache.extend(self._it)
 
     def __iter__(self):
@@ -3381,7 +3381,7 @@ def ichunked(iterable, n):
         yield chunk
 
         # Advance the source iterable and fill previous chunk's cache
-        chunk.fillCache()
+        chunk.fill_cache()
 
 
 def distinct_combinations(iterable, r):
