@@ -29,6 +29,7 @@ from string import ascii_letters
 from sys import version_info, getsizeof
 from time import sleep
 from traceback import format_exc
+import tracemalloc
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
@@ -4042,15 +4043,16 @@ class IchunkedTests(TestCase):
         iterated over in order."""
         def big_string_iterator():
             while True:
-                yield 'X'*5000 # Must be larger than 4096 to get around interning
+                # Must be larger than 4096 to get around str interning
+                yield 'X' * 5000
 
-        import tracemalloc
         ichunks = mi.ichunked(big_string_iterator(), 50)
         ichunk = next(ichunks)
         tracemalloc.start()
         mi.consume(ichunk)
         curr_mem, peak_mem = tracemalloc.get_traced_memory()
-        self.assertLess(peak_mem, getsizeof('X'*5000)*2)
+        tracemalloc.stop()
+        self.assertLess(peak_mem, getsizeof('X' * 5000) * 2)
 
 
 class DistinctCombinationsTests(TestCase):

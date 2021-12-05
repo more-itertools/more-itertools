@@ -3327,17 +3327,9 @@ def only(iterable, default=None, too_long=None):
     return first_value
 
 class _IChunk:
-    def __init__(self, iterable, n, prev_chunk):
-        if prev_chunk:
-            def it_slice():
-                prev_chunk.fillCache()
-                yield from islice(iterable, n)
-            it_slice = it_slice()
-        else:
-            it_slice = islice(iterable, n)
-        self._it = it_slice
+    def __init__(self, iterable, n):
+        self._it = islice(iterable, n)
         self._cache = deque()
-        self._prev_chunk = prev_chunk
 
     def fillCache(self):
         self._cache.extend(self._it)
@@ -3376,13 +3368,7 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-
-    # Requirements:
-    # - consume(next(ichunked(gen, 5))) should not put full batch in memory
-    # - should only yield math.ceil(count(1 for _ in iterable)/n) times
-    # - should cache if ichunks operated on out of order
     source = peekable(iter(iterable))
-    prev_chunk = None
     ichunk_marker = object()
     while True:
         # Check to see whether we're at the end of the source iterable
@@ -3390,11 +3376,11 @@ def ichunked(iterable, n):
         if item is ichunk_marker:
             return
 
-        prev_chunk = _IChunk(source, n, prev_chunk)
-        yield prev_chunk
+        chunk = _IChunk(source, n)
+        yield chunk
 
-        # Advance the source iterable
-        prev_chunk.fillCache()
+        # Advance the source iterable and fill previous chunk's cache
+        chunk.fillCache()
 
 
 def distinct_combinations(iterable, r):
