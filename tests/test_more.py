@@ -26,7 +26,7 @@ from pickle import loads, dumps
 from random import seed, Random
 from statistics import mean
 from string import ascii_letters
-from sys import version_info
+from sys import version_info, getsizeof
 from time import sleep
 from traceback import format_exc
 from unittest import skipIf, TestCase
@@ -4036,6 +4036,21 @@ class IchunkedTests(TestCase):
         chunk = next(it)
         self.assertEqual(next(chunk), 0)
         self.assertRaises(RuntimeError, next, it)
+
+    def test_memory_in_order(self):
+        """Test that only one item is kept in memory at a time if chunks are
+        iterated over in order."""
+        def big_string_iterator():
+            while True:
+                yield 'X'*5000 # Must be larger than 4096 to get around interning
+
+        import tracemalloc
+        ichunks = mi.ichunked(big_string_iterator(), 50)
+        ichunk = next(ichunks)
+        tracemalloc.start()
+        mi.consume(ichunk)
+        curr_mem, peak_mem = tracemalloc.get_traced_memory()
+        self.assertLess(peak_mem, getsizeof('X'*5000)*2)
 
 
 class DistinctCombinationsTests(TestCase):
