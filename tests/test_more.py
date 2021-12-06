@@ -4045,6 +4045,7 @@ class IchunkedTests(TestCase):
         """Test that only one item is kept in memory at a time if chunks are
         iterated over in order."""
         print("python_implementation=", python_implementation())
+
         def big_string_iterator():
             while True:
                 # Must be larger than 4096 to get around str interning
