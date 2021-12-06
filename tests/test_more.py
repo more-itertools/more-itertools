@@ -4039,11 +4039,12 @@ class IchunkedTests(TestCase):
         self.assertEqual(next(chunk), 0)
         self.assertRaises(RuntimeError, next, it)
 
-    @skipIf('PyPy' in python_implementation(),
+    @skipIf('PyPy' == python_implementation(),
             'tracemalloc not implemented in pypy')
     def test_memory_in_order(self):
         """Test that only one item is kept in memory at a time if chunks are
         iterated over in order."""
+        print(f"{python_implementation()=}")
         def big_string_iterator():
             while True:
                 # Must be larger than 4096 to get around str interning
