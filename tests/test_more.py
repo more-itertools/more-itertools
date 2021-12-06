@@ -23,10 +23,11 @@ from itertools import (
 )
 from operator import add, mul, itemgetter
 from pickle import loads, dumps
+from platform import python_implementation
 from random import seed, Random
 from statistics import mean
 from string import ascii_letters
-from sys import version, version_info, getsizeof
+from sys import version_info, getsizeof
 from time import sleep
 from traceback import format_exc
 import tracemalloc
@@ -4038,7 +4039,8 @@ class IchunkedTests(TestCase):
         self.assertEqual(next(chunk), 0)
         self.assertRaises(RuntimeError, next, it)
 
-    @skipIf('PyPy' in version, 'tracemalloc not implemented in pypy')
+    @skipIf('PyPy' in python_implementation(),
+            'tracemalloc not implemented in pypy')
     def test_memory_in_order(self):
         """Test that only one item is kept in memory at a time if chunks are
         iterated over in order."""
