@@ -30,7 +30,6 @@ from string import ascii_letters
 from sys import version_info, getsizeof
 from time import sleep
 from traceback import format_exc
-import tracemalloc
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
@@ -4044,7 +4043,7 @@ class IchunkedTests(TestCase):
     def test_memory_in_order(self):
         """Test that only one item is kept in memory at a time if chunks are
         iterated over in order."""
-        print("python_implementation=", python_implementation())
+        import tracemalloc
 
         def big_string_iterator():
             while True:
