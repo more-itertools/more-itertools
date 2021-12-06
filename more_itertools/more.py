@@ -3327,6 +3327,27 @@ def only(iterable, default=None, too_long=None):
     return first_value
 
 
+class _IChunk:
+    def __init__(self, iterable, n):
+        self._it = islice(iterable, n)
+        self._cache = deque()
+
+    def fill_cache(self):
+        self._cache.extend(self._it)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            return next(self._it)
+        except StopIteration:
+            if self._cache:
+                return self._cache.popleft()
+            else:
+                raise
+
+
 def ichunked(iterable, n):
     """Break *iterable* into sub-iterables with *n* elements each.
     :func:`ichunked` is like :func:`chunked`, but it yields iterables
@@ -3348,20 +3369,19 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-    source = iter(iterable)
-
+    source = peekable(iter(iterable))
+    ichunk_marker = object()
     while True:
         # Check to see whether we're at the end of the source iterable
-        item = next(source, _marker)
-        if item is _marker:
+        item = source.peek(ichunk_marker)
+        if item is ichunk_marker:
             return
 
-        # Clone the source and yield an n-length slice
-        source, it = tee(chain([item], source))
-        yield islice(it, n)
+        chunk = _IChunk(source, n)
+        yield chunk
 
-        # Advance the source iterable
-        consume(source, n)
+        # Advance the source iterable and fill previous chunk's cache
+        chunk.fill_cache()
 
 
 def distinct_combinations(iterable, r):
