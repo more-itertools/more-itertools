@@ -1,3 +1,47 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "more-itertools"
+authors = [{name = "Erik Rose", email = "erikrose@grinchcentral.com"}]
+readme = "README.rst"
+requires-python = ">=3.5"
+license = {file = "LICENSE"}
+keywords = [
+    "itertools",
+    "iterator",
+    "iteration",
+    "filter",
+    "peek",
+    "peekable",
+    "collate",
+    "chunk",
+    "chunked",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Libraries",
+]
+dynamic = ["version", "description"]
+
+[project.urls]
+Homepage = "https://github.com/more-itertools/more-itertools"
+
+[tool.flit.module]
+name = "more_itertools"
+
 [tool.black]
 line-length = 79
 target-version = ['py35']

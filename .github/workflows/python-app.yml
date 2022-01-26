@@ -48,8 +48,8 @@ jobs:
     - name: Build packages
       if: "matrix.python-version == '3.6'"
       run: |
-        pip install -U twine wheel
-        python setup.py sdist bdist_wheel
+        pip install -U flit twine
+        flit build --setup-py
         twine check dist/*
     - name: Upload packages
       if: "matrix.python-version == '3.6'"

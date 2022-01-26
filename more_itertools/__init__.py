@@ -1,3 +1,5 @@
+"""More routines for operating on iterables, beyond itertools"""
+
 from .more import *  # noqa
 from .recipes import *  # noqa
 

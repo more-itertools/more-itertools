@@ -198,3 +198,9 @@ Development
 and `@bbayles <https://github.com/bbayles>`_, with help from `many others <https://github.com/more-itertools/more-itertools/graphs/contributors>`_.
 If you have a problem or suggestion, please file a bug or pull request in this
 repository. Thanks for contributing!
+
+
+Version History
+===============
+
+The version history can be found in `documentation <https://more-itertools.readthedocs.io/en/stable/versions.html>`_.
