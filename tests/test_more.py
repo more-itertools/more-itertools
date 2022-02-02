@@ -3655,8 +3655,8 @@ class RlocateTests(TestCase):
             self.assertEqual(actual, expected)
 
     def test_efficient_reversal(self):
-        iterable = range(9 ** 9)  # Is efficiently reversible
-        target = 9 ** 9 - 2
+        iterable = range(9**9)  # Is efficiently reversible
+        target = 9**9 - 2
         pred = lambda x: x == target  # Find-able from the right
         actual = next(mi.rlocate(iterable, pred))
         self.assertEqual(actual, target)
