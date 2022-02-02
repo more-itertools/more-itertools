@@ -2684,7 +2684,7 @@ def difference(iterable, func=sub, *, initial=None):
     if initial is not None:
         first = []
 
-    return chain(first, starmap(func, zip(b, a)))
+    return chain(first, map(func, b, a))
 
 
 class SequenceView(Sequence):
