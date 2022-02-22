@@ -1826,7 +1826,7 @@ def unzip(iterable):
     of the zipped *iterable*.
 
     The ``i``-th iterable contains the ``i``-th element from each element
-    of the zipped iterable. The first element is used to to determine the
+    of the zipped iterable. The first element is used to determine the
     length of the remaining elements.
 
         >>> iterable = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
