@@ -39,7 +39,6 @@ def repeatfunc(
     func: Callable[..., _U], times: Optional[int] = ..., *args: Any
 ) -> Iterator[_U]: ...
 def pairwise(iterable: Iterable[_T]) -> Iterator[Tuple[_T, _T]]: ...
-
 @overload
 def grouper(
     iterable: Iterable[_T],
@@ -54,7 +53,6 @@ def grouper(  # Deprecated interface
     incomplete: str = ...,
     fillvalue: _U = ...,
 ) -> Iterator[Tuple[Union[_T, _U], ...]]: ...
-
 def roundrobin(*iterables: Iterable[_T]) -> Iterator[_T]: ...
 def partition(
     pred: Optional[Callable[[_T], object]], iterable: Iterable[_T]
