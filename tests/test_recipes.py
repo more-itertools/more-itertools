@@ -806,3 +806,32 @@ class SlidingWindowTests(TestCase):
             with self.subTest(expected=expected):
                 actual = list(mi.sliding_window(iterable, n))
                 self.assertEqual(actual, expected)
+
+
+class SubslicesTests(TestCase):
+    def test_basic(self):
+        for iterable, expected in [
+            ([], []),
+            ([1], [[1]]),
+            ([1, 2], [[1], [1, 2], [2]]),
+            (iter([1, 2]), [[1], [1, 2], [2]]),
+            ([2, 1], [[2], [2, 1], [1]]),
+            (
+                'ABCD',
+                [
+                    ['A'],
+                    ['A', 'B'],
+                    ['A', 'B', 'C'],
+                    ['A', 'B', 'C', 'D'],
+                    ['B'],
+                    ['B', 'C'],
+                    ['B', 'C', 'D'],
+                    ['C'],
+                    ['C', 'D'],
+                    ['D'],
+                ],
+            ),
+        ]:
+            with self.subTest(expected=expected):
+                actual = list(mi.subslices(iterable))
+                self.assertEqual(actual, expected)
