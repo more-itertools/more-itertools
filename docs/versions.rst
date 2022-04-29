@@ -5,6 +5,21 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.13.0
+------
+
+* New functions
+    * The :func:`subslices` recipe from the `itertools` docs was added (thanks to rhettinger)
+
+* Changes to existing functions
+    * The :func:`ichunked` function is now more efficient (thanks to hjtran0 and seanmacavaney)
+    * The :func:`difference` function is now more efficient (thanks to Masynchin)
+    * The :func:`grouper` recipe now has more features, mirroring the one in the `itertools` docs (thanks to rhettinger)
+
+* Other changes
+    * Some documentation issues were fixed (thanks to medvied and Freed-Wu)
+    * The `more_itertools` package is now built with `flit` (thanks to mgorny)
+
 8.12.0
 ------
 
