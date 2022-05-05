@@ -500,8 +500,7 @@ def ilen(iterable):
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
 
-    >>> from itertools import islice
-    >>> list(islice(iterate(lambda x: 2*x, 1), 10))
+    >>> take(10, iterate(lambda x: 2*x, 1))
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
     """
@@ -1567,12 +1566,12 @@ def repeat_each(iterable, n=2):
 def repeat_last(iterable, default=None):
     """After the *iterable* is exhausted, keep yielding its last element.
 
-        >>> list(islice(repeat_last(range(3)), 5))
+        >>> take(5, repeat_last(range(3)))
         [0, 1, 2, 2, 2]
 
     If the iterable is empty, yield *default* forever::
 
-        >>> list(islice(repeat_last(range(0), 42), 5))
+        >>> take(5, repeat_last(range(0), 42))
         [42, 42, 42, 42, 42]
 
     """
