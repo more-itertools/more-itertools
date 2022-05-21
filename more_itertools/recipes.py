@@ -23,6 +23,7 @@ from itertools import (
     tee,
     zip_longest,
 )
+from math import comb
 from random import randrange, sample, choice
 
 __all__ = [
@@ -645,14 +646,7 @@ def nth_combination(iterable, r, index):
     """
     pool = tuple(iterable)
     n = len(pool)
-    if (r < 0) or (r > n):
-        raise ValueError
-
-    c = 1
-    k = min(r, n - r)
-    for i in range(1, k + 1):
-        c = c * (n - k + i) // i
-
+    c = comb(n, r)
     if index < 0:
         index += c
 
