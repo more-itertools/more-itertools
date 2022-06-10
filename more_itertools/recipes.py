@@ -20,6 +20,7 @@ from itertools import (
     islice,
     repeat,
     starmap,
+    takewhile,
     tee,
     zip_longest,
 )
@@ -347,6 +348,11 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
     >>> list(grouper('ABCDEFG', 3, incomplete='ignore', fillvalue='x'))
     [('A', 'B', 'C'), ('D', 'E', 'F')]
 
+    When *incomplete* is `'allow'`, the last group will be emitted as incompleted.
+
+    >>> list(map(tuple, grouper('ABCDEFG', 3, incomplete='allow')))
+    [('A', 'B', 'C'), ('D', 'E', 'F'), ('G',)]
+
     When *incomplete* is `'strict'`, a subclass of `ValueError` will be raised.
 
     >>> it = grouper('ABCDEFG', 3, incomplete='strict')
@@ -368,6 +374,11 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
         return _zip_equal(*args)
     if incomplete == 'ignore':
         return zip(*args)
+    if incomplete == 'allow':
+        return (
+            takewhile(lambda x: x is not _marker, group)
+            for group in zip_longest(*args, fillvalue=_marker)
+        )
     else:
         raise ValueError('Expected fill, strict, or ignore')
 

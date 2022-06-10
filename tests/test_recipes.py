@@ -307,6 +307,22 @@ class GrouperTests(TestCase):
                 actual = [''.join(x) for x in it]
                 self.assertEqual(actual, expected)
 
+    def test_allow(self):
+        seq = 'ABCDEF'
+        for n, expected in [
+            (1, ['A', 'B', 'C', 'D', 'E', 'F']),
+            (2, ['AB', 'CD', 'EF']),
+            (3, ['ABC', 'DEF']),
+            (4, ['ABCD', 'EF']),
+            (5, ['ABCDE', 'F']),
+            (6, ['ABCDEF']),
+            (7, ['ABCDEF']),
+        ]:
+            with self.subTest(n=n):
+                it = mi.grouper(iter(seq), n, incomplete='allow')
+                actual = [''.join(x) for x in it]
+                self.assertEqual(actual, expected)
+
     def test_strict(self):
         seq = 'ABCDEF'
         for n, expected in [
