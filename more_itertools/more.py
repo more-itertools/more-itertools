@@ -3636,9 +3636,9 @@ class callback_iter:
         self._aborted = False
         self._future = None
         self._wait_seconds = wait_seconds
-        self._executor = __import__('concurrent').futures.ThreadPoolExecutor(
-            max_workers=1
-        )
+        self._executor = __import__(
+            'concurrent.futures'
+        ).futures.ThreadPoolExecutor(max_workers=1)
         self._iterator = self._reader()
 
     def __enter__(self):
