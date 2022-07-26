@@ -11,6 +11,7 @@ import operator
 import warnings
 
 from collections import deque
+from contextlib import suppress
 from itertools import (
     chain,
     combinations,
@@ -528,13 +529,11 @@ def iter_except(func, exception, first=None):
         []
 
     """
-    try:
+    with suppress(exception):
         if first is not None:
             yield first()
         while 1:
             yield func()
-    except exception:
-        pass
 
 
 def first_true(iterable, default=None, pred=None):

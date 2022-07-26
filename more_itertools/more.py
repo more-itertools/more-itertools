@@ -2,6 +2,7 @@ import warnings
 
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
+from contextlib import suppress
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, reduce, wraps
 from heapq import merge, heapify, heapreplace, heappop
@@ -3056,11 +3057,9 @@ def rlocate(iterable, pred=bool, window_size=None):
 
     """
     if window_size is None:
-        try:
+        with suppress(TypeError):
             len_iter = len(iterable)
             return (len_iter - i - 1 for i in locate(reversed(iterable), pred))
-        except TypeError:
-            pass
 
     return reversed(list(locate(iterable, pred, window_size)))
 
