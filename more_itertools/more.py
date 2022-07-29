@@ -3636,6 +3636,7 @@ class callback_iter:
         self._aborted = False
         self._future = None
         self._wait_seconds = wait_seconds
+        # Lazily import concurrent.future
         self._executor = __import__(
             'concurrent.futures'
         ).futures.ThreadPoolExecutor(max_workers=1)
