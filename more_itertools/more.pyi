@@ -662,7 +662,6 @@ def minmax(
     *others: _T,
     key: Callable[[_T], _SupportsLessThan]
 ) -> Tuple[_T, _T]: ...
-
 def longest_common_prefix(
-    iterables: Iterable[Iterable[_T]]
+    iterables: Iterable[Iterable[_T]],
 ) -> Iterator[_T]: ...
