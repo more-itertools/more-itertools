@@ -190,6 +190,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: unique_in_window
 .. autofunction:: duplicates_everseen
 .. autofunction:: duplicates_justseen
+.. autofunction:: longest_common_prefix
 
 ----
 
