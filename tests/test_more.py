@@ -5054,3 +5054,50 @@ class DuplicatesJustSeenTests(TestCase):
     def test_nested(self):
         iterable = [[[1, 2], [1, 2]], [5, 6], [5, 6]]
         self.assertEqual(list(mi.duplicates_justseen(iterable)), [[5, 6]])
+
+
+class LongestCommonPrefixTests(TestCase):
+    def test_basic(self):
+        iterables = [[1, 2], [1, 2, 3], [1, 2, 4]]
+        self.assertEqual(list(mi.longest_common_prefix(iterables)), [1, 2])
+
+    def test_iterators(self):
+        iterables = iter([iter([1, 2]), iter([1, 2, 3]), iter([1, 2, 4])])
+        self.assertEqual(list(mi.longest_common_prefix(iterables)), [1, 2])
+
+    def test_no_iterables(self):
+        iterables = []
+        self.assertEqual(list(mi.longest_common_prefix(iterables)), [])
+
+    def test_empty_iterables_only(self):
+        iterables = [[], [], []]
+        self.assertEqual(list(mi.longest_common_prefix(iterables)), [])
+
+    def test_includes_empty_iterables(self):
+        iterables = [[1, 2], [1, 2, 3], [1, 2, 4], []]
+        self.assertEqual(list(mi.longest_common_prefix(iterables)), [])
+
+    def test_non_hashable(self):
+        # See https://github.com/more-itertools/more-itertools/issues/603
+        iterables = [[[1], [2]], [[1], [2], [3]], [[1], [2], [4]]]
+        self.assertEqual(list(mi.longest_common_prefix(iterables)), [[1], [2]])
+
+    def test_prefix_contains_elements_of_the_first_iterable(self):
+        iterables = [[[1], [2]], [[1], [2], [3]], [[1], [2], [4]]]
+        prefix = list(mi.longest_common_prefix(iterables))
+        self.assertIs(prefix[0], iterables[0][0])
+        self.assertIs(prefix[1], iterables[0][1])
+        self.assertIsNot(prefix[0], iterables[1][0])
+        self.assertIsNot(prefix[1], iterables[1][1])
+        self.assertIsNot(prefix[0], iterables[2][0])
+        self.assertIsNot(prefix[1], iterables[2][1])
+
+    def test_infinite_iterables(self):
+        prefix = mi.longest_common_prefix([count(), count()])
+        self.assertEqual(next(prefix), 0)
+        self.assertEqual(next(prefix), 1)
+        self.assertEqual(next(prefix), 2)
+
+    def test_contains_infinite_iterables(self):
+        iterables = [[0, 1, 2], count()]
+        self.assertEqual(list(mi.longest_common_prefix(iterables)), [0, 1, 2])

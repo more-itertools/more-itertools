@@ -35,6 +35,7 @@ from .recipes import (
     powerset,
     take,
     unique_everseen,
+    all_equal,
 )
 
 __all__ = [
@@ -79,6 +80,7 @@ __all__ = [
     'iterate',
     'last',
     'locate',
+    'longest_common_prefix',
     'lstrip',
     'make_decorator',
     'map_except',
@@ -2334,6 +2336,16 @@ def locate(iterable, pred=bool, window_size=None):
 
     it = windowed(iterable, window_size, fillvalue=_marker)
     return compress(count(), starmap(pred, it))
+
+
+def longest_common_prefix(iterables):
+    """Yield elements of the longest common prefix amongst given *iterables*.
+
+    >>> ''.join(longest_common_prefix(['abcd', 'abc', 'abf']))
+    'ab'
+
+    """
+    return (c[0] for c in takewhile(all_equal, zip(*iterables)))
 
 
 def lstrip(iterable, pred):
