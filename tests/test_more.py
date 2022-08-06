@@ -5101,3 +5101,39 @@ class LongestCommonPrefixTests(TestCase):
     def test_contains_infinite_iterables(self):
         iterables = [[0, 1, 2], count()]
         self.assertEqual(list(mi.longest_common_prefix(iterables)), [0, 1, 2])
+
+
+class IequalsTests(TestCase):
+    def test_basic(self):
+        self.assertTrue(mi.iequals("abc", iter("abc")))
+        self.assertTrue(mi.iequals(range(3), [0, 1, 2]))
+        self.assertFalse(mi.iequals("abc", [0, 1, 2]))
+
+    def test_no_iterables(self):
+        self.assertTrue(mi.iequals())
+
+    def test_one_iterable(self):
+        self.assertTrue(mi.iequals("abc"))
+
+    def test_more_than_two_iterable(self):
+        self.assertTrue(mi.iequals("abc", iter("abc"), ['a', 'b', 'c']))
+        self.assertFalse(mi.iequals("abc", iter("abc"), ['a', 'b', 'd']))
+
+    def test_order_matters(self):
+        self.assertFalse(mi.iequals("abc", "acb"))
+
+    def test_not_equal_lengths(self):
+        self.assertFalse(mi.iequals("abc", "ab"))
+        self.assertFalse(mi.iequals("abc", "bc"))
+        self.assertFalse(mi.iequals("aaa", "aaaa"))
+
+    def test_empty_iterables(self):
+        self.assertTrue(mi.iequals([], ""))
+
+    def test_none_is_not_a_sentinel(self):
+        # See https://stackoverflow.com/a/900444
+        self.assertFalse(mi.iequals([1, 2], [1, 2, None]))
+        self.assertFalse(mi.iequals([1, 2], [None, 1, 2]))
+
+    def test_not_identical_but_equal(self):
+        self.assertTrue([1, True], [1.0, complex(1, 0)])

@@ -70,6 +70,7 @@ __all__ = [
     'first',
     'groupby_transform',
     'ichunked',
+    'iequals',
     'ilen',
     'interleave',
     'interleave_evenly',
@@ -3354,6 +3355,26 @@ def ichunked(iterable, n):
 
         # Advance the source iterable and fill previous chunk's cache
         chunk.fill_cache()
+
+
+def iequals(*iterables):
+    """Return ``True`` if all given *iterables* are equal to each other,
+    which means that they contain the same elements in the same order.
+
+    The function is useful for comparing iterables of different data types
+    or iterables that do not support equality checks.
+
+    >>> iequals("abc", ['a', 'b', 'c'], ('a', 'b', 'c'), iter("abc"))
+    True
+
+    >>> iequals("abc", "acb")
+    False
+
+    Not to be confused with :func:`all_equals`, which checks whether all
+    elements of iterable are equal to each other.
+
+    """
+    return all(map(all_equal, zip_longest(*iterables, fillvalue=object())))
 
 
 def distinct_combinations(iterable, r):

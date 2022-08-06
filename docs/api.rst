@@ -153,6 +153,7 @@ These tools return summarized or aggregated data from an iterable.
 .. function:: minmax(iterable, *[, key, default])
 .. autofunction:: minmax(arg1, arg2, *args[, key])
   :noindex:
+.. autofunction:: iequals
 
 ----
 
