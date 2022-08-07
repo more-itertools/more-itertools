@@ -77,7 +77,6 @@ class TailTests(TestCase):
 
     def test_sized_equal(self):
         """Length of sized iterable is less than requested tail"""
-        tail = list(mi.tail(7, 'ABCDEFG'))
         self.assertEqual(list(mi.tail(7, 'ABCDEFG')), list('ABCDEFG'))
 
     def test_sized_less(self):
