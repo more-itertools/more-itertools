@@ -141,14 +141,14 @@ __all__ = [
 def chunked(iterable, n, strict=False):
     """Break *iterable* into lists of length *n*:
 
-        >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
-        [[1, 2, 3], [4, 5, 6]]
+    >>> list(chunked([1, 2, 3, 4, 5, 6], 3))
+    [[1, 2, 3], [4, 5, 6]]
 
     By the default, the last yielded list will have fewer than *n* elements
     if the length of *iterable* is not divisible by *n*:
 
-        >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
-        [[1, 2, 3], [4, 5, 6], [7, 8]]
+    >>> list(chunked([1, 2, 3, 4, 5, 6, 7, 8], 3))
+    [[1, 2, 3], [4, 5, 6], [7, 8]]
 
     To use a fill-in value instead, see the :func:`grouper` recipe.
 
@@ -177,10 +177,10 @@ def first(iterable, default=_marker):
     """Return the first item of *iterable*, or *default* if *iterable* is
     empty.
 
-        >>> first([0, 1, 2, 3])
-        0
-        >>> first([], 'some default')
-        'some default'
+    >>> first([0, 1, 2, 3])
+    0
+    >>> first([], 'some default')
+    'some default'
 
     If *default* is not provided and there are no items in the iterable,
     raise ``ValueError``.
@@ -205,10 +205,10 @@ def last(iterable, default=_marker):
     """Return the last item of *iterable*, or *default* if *iterable* is
     empty.
 
-        >>> last([0, 1, 2, 3])
-        3
-        >>> last([], 'some default')
-        'some default'
+    >>> last([0, 1, 2, 3])
+    3
+    >>> last([], 'some default')
+    'some default'
 
     If *default* is not provided and there are no items in the iterable,
     raise ``ValueError``.
@@ -234,12 +234,12 @@ def nth_or_last(iterable, n, default=_marker):
     """Return the nth or the last item of *iterable*,
     or *default* if *iterable* is empty.
 
-        >>> nth_or_last([0, 1, 2, 3], 2)
-        2
-        >>> nth_or_last([0, 1], 2)
-        1
-        >>> nth_or_last([], 0, 'some default')
-        'some default'
+    >>> nth_or_last([0, 1, 2, 3], 2)
+    2
+    >>> nth_or_last([0, 1], 2)
+    1
+    >>> nth_or_last([], 0, 'some default')
+    'some default'
 
     If *default* is not provided and there are no items in the iterable,
     raise ``ValueError``.
@@ -253,42 +253,42 @@ class peekable:
     Call :meth:`peek` on the result to get the value that will be returned
     by :func:`next`. This won't advance the iterator:
 
-        >>> p = peekable(['a', 'b'])
-        >>> p.peek()
-        'a'
-        >>> next(p)
-        'a'
+    >>> p = peekable(['a', 'b'])
+    >>> p.peek()
+    'a'
+    >>> next(p)
+    'a'
 
     Pass :meth:`peek` a default value to return that instead of raising
     ``StopIteration`` when the iterator is exhausted.
 
-        >>> p = peekable([])
-        >>> p.peek('hi')
-        'hi'
+    >>> p = peekable([])
+    >>> p.peek('hi')
+    'hi'
 
     peekables also offer a :meth:`prepend` method, which "inserts" items
     at the head of the iterable:
 
-        >>> p = peekable([1, 2, 3])
-        >>> p.prepend(10, 11, 12)
-        >>> next(p)
-        10
-        >>> p.peek()
-        11
-        >>> list(p)
-        [11, 12, 1, 2, 3]
+    >>> p = peekable([1, 2, 3])
+    >>> p.prepend(10, 11, 12)
+    >>> next(p)
+    10
+    >>> p.peek()
+    11
+    >>> list(p)
+    [11, 12, 1, 2, 3]
 
     peekables can be indexed. Index 0 is the item that will be returned by
     :func:`next`, index 1 is the item after that, and so on:
     The values up to the given index will be cached.
 
-        >>> p = peekable(['a', 'b', 'c', 'd'])
-        >>> p[0]
-        'a'
-        >>> p[1]
-        'b'
-        >>> next(p)
-        'a'
+    >>> p = peekable(['a', 'b', 'c', 'd'])
+    >>> p[0]
+    'a'
+    >>> p[1]
+    'b'
+    >>> next(p)
+    'a'
 
     Negative indexes are supported, but be aware that they will cache the
     remaining items in the source iterator, which may require significant
@@ -296,13 +296,13 @@ class peekable:
 
     To check whether a peekable is exhausted, check its truth value:
 
-        >>> p = peekable(['a', 'b'])
-        >>> if p:  # peekable has items
-        ...     list(p)
-        ['a', 'b']
-        >>> if not p:  # peekable is exhausted
-        ...     list(p)
-        []
+    >>> p = peekable(['a', 'b'])
+    >>> if p:  # peekable has items
+    ...     list(p)
+    ['a', 'b']
+    >>> if not p:  # peekable is exhausted
+    ...     list(p)
+    []
 
     """
 
@@ -341,28 +341,28 @@ class peekable:
         ``self.peek()``. The items will be returned in
         first in, first out order::
 
-            >>> p = peekable([1, 2, 3])
-            >>> p.prepend(10, 11, 12)
-            >>> next(p)
-            10
-            >>> list(p)
-            [11, 12, 1, 2, 3]
+        >>> p = peekable([1, 2, 3])
+        >>> p.prepend(10, 11, 12)
+        >>> next(p)
+        10
+        >>> list(p)
+        [11, 12, 1, 2, 3]
 
         It is possible, by prepending items, to "resurrect" a peekable that
         previously raised ``StopIteration``.
 
-            >>> p = peekable([])
-            >>> next(p)
-            Traceback (most recent call last):
-              ...
-            StopIteration
-            >>> p.prepend(1)
-            >>> next(p)
-            1
-            >>> next(p)
-            Traceback (most recent call last):
-              ...
-            StopIteration
+        >>> p = peekable([])
+        >>> next(p)
+        Traceback (most recent call last):
+          ...
+        StopIteration
+        >>> p.prepend(1)
+        >>> next(p)
+        1
+        >>> next(p)
+        Traceback (most recent call last):
+          ...
+        StopIteration
 
         """
         self._cache.extendleft(reversed(items))
@@ -416,8 +416,8 @@ def collate(*iterables, **kwargs):
     """Return a sorted merge of the items from each of several already-sorted
     *iterables*.
 
-        >>> list(collate('ACDZ', 'AZ', 'JKL'))
-        ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
+    >>> list(collate('ACDZ', 'AZ', 'JKL'))
+    ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
 
     Works lazily, keeping only the next value from each iterable in memory. Use
     :func:`collate` to, for example, perform a n-way mergesort of items that
@@ -426,16 +426,16 @@ def collate(*iterables, **kwargs):
     If a *key* function is specified, the iterables will be sorted according
     to its result:
 
-        >>> key = lambda s: int(s)  # Sort by numeric value, not by string
-        >>> list(collate(['1', '10'], ['2', '11'], key=key))
-        ['1', '2', '10', '11']
+    >>> key = lambda s: int(s)  # Sort by numeric value, not by string
+    >>> list(collate(['1', '10'], ['2', '11'], key=key))
+    ['1', '2', '10', '11']
 
 
     If the *iterables* are sorted in descending order, set *reverse* to
     ``True``:
 
-        >>> list(collate([5, 3, 1], [4, 2, 0], reverse=True))
-        [5, 4, 3, 2, 1, 0]
+    >>> list(collate([5, 3, 1], [4, 2, 0], reverse=True))
+    [5, 4, 3, 2, 1, 0]
 
     If the elements of the passed-in iterables are out of order, you might get
     unexpected results.
@@ -455,18 +455,18 @@ def consumer(func):
     to its first yield point so you don't have to call ``next()`` on it
     manually.
 
-        >>> @consumer
-        ... def tally():
-        ...     i = 0
-        ...     while True:
-        ...         print('Thing number %s is %s.' % (i, (yield)))
-        ...         i += 1
-        ...
-        >>> t = tally()
-        >>> t.send('red')
-        Thing number 0 is red.
-        >>> t.send('fish')
-        Thing number 1 is fish.
+    >>> @consumer
+    ... def tally():
+    ...     i = 0
+    ...     while True:
+    ...         print('Thing number %s is %s.' % (i, (yield)))
+    ...         i += 1
+    ...
+    >>> t = tally()
+    >>> t.send('red')
+    Thing number 0 is red.
+    >>> t.send('fish')
+    Thing number 1 is fish.
 
     Without the decorator, you would have to call ``next(t)`` before
     ``t.send()`` could be used.
@@ -485,8 +485,8 @@ def consumer(func):
 def ilen(iterable):
     """Return the number of items in *iterable*.
 
-        >>> ilen(x for x in range(1000000) if x % 3 == 0)
-        333334
+    >>> ilen(x for x in range(1000000) if x % 3 == 0)
+    333334
 
     This consumes the iterable, so handle with care.
 
@@ -539,32 +539,32 @@ def one(iterable, too_short=None, too_long=None):
     If *iterable* is empty, ``ValueError`` will be raised. You may specify a
     different exception with the *too_short* keyword:
 
-        >>> it = []
-        >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        ValueError: too many items in iterable (expected 1)'
-        >>> too_short = IndexError('too few items')
-        >>> one(it, too_short=too_short)  # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        IndexError: too few items
+    >>> it = []
+    >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    ValueError: too many items in iterable (expected 1)'
+    >>> too_short = IndexError('too few items')
+    >>> one(it, too_short=too_short)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    IndexError: too few items
 
     Similarly, if *iterable* contains more than one item, ``ValueError`` will
     be raised. You may specify a different exception with the *too_long*
     keyword:
 
-        >>> it = ['too', 'many']
-        >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        ValueError: Expected exactly one item in iterable, but got 'too',
-        'many', and perhaps more.
-        >>> too_long = RuntimeError
-        >>> one(it, too_long=too_long)  # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        RuntimeError
+    >>> it = ['too', 'many']
+    >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    ValueError: Expected exactly one item in iterable, but got 'too',
+    'many', and perhaps more.
+    >>> too_long = RuntimeError
+    >>> one(it, too_long=too_long)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    RuntimeError
 
     Note that :func:`one` attempts to advance *iterable* twice to ensure there
     is only one item. See :func:`spy` or :func:`peekable` to check iterable
@@ -604,42 +604,42 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
     with those items. If it has more than *n* items, call function
     *too_long* with the first ``n + 1`` items.
 
-        >>> iterable = ['a', 'b', 'c', 'd']
-        >>> n = 4
-        >>> list(strictly_n(iterable, n))
-        ['a', 'b', 'c', 'd']
+    >>> iterable = ['a', 'b', 'c', 'd']
+    >>> n = 4
+    >>> list(strictly_n(iterable, n))
+    ['a', 'b', 'c', 'd']
 
     By default, *too_short* and *too_long* are functions that raise
     ``ValueError``.
 
-        >>> list(strictly_n('ab', 3))  # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        ValueError: too few items in iterable (got 2)
+    >>> list(strictly_n('ab', 3))  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    ValueError: too few items in iterable (got 2)
 
-        >>> list(strictly_n('abc', 2))  # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        ValueError: too many items in iterable (got at least 3)
+    >>> list(strictly_n('abc', 2))  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    ValueError: too many items in iterable (got at least 3)
 
     You can instead supply functions that do something else.
     *too_short* will be called with the number of items in *iterable*.
     *too_long* will be called with `n + 1`.
 
-        >>> def too_short(item_count):
-        ...     raise RuntimeError
-        >>> it = strictly_n('abcd', 6, too_short=too_short)
-        >>> list(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        RuntimeError
+    >>> def too_short(item_count):
+    ...     raise RuntimeError
+    >>> it = strictly_n('abcd', 6, too_short=too_short)
+    >>> list(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    RuntimeError
 
-        >>> def too_long(item_count):
-        ...     print('The boss is going to hear about this')
-        >>> it = strictly_n('abcdef', 4, too_long=too_long)
-        >>> list(it)
-        The boss is going to hear about this
-        ['a', 'b', 'c', 'd']
+    >>> def too_long(item_count):
+    ...     print('The boss is going to hear about this')
+    >>> it = strictly_n('abcdef', 4, too_long=too_long)
+    >>> list(it)
+    The boss is going to hear about this
+    ['a', 'b', 'c', 'd']
 
     """
     if too_short is None:
@@ -675,8 +675,8 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
 def distinct_permutations(iterable, r=None):
     """Yield successive distinct permutations of the elements in *iterable*.
 
-        >>> sorted(distinct_permutations([1, 0, 1]))
-        [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
+    >>> sorted(distinct_permutations([1, 0, 1]))
+    [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
 
     Equivalent to ``set(permutations(iterable))``, except duplicates are not
     generated and thrown away. For larger input sequences this is much more
@@ -690,10 +690,10 @@ def distinct_permutations(iterable, r=None):
 
     If *r* is given, only the *r*-length permutations are yielded.
 
-        >>> sorted(distinct_permutations([1, 0, 1], r=2))
-        [(0, 1), (1, 0), (1, 1)]
-        >>> sorted(distinct_permutations(range(3), r=2))
-        [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
+    >>> sorted(distinct_permutations([1, 0, 1], r=2))
+    [(0, 1), (1, 0), (1, 1)]
+    >>> sorted(distinct_permutations(range(3), r=2))
+    [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
 
     """
     # Algorithm: https://w.wiki/Qai
@@ -776,11 +776,11 @@ def intersperse(e, iterable, n=1):
     """Intersperse filler element *e* among the items in *iterable*, leaving
     *n* items between each filler element.
 
-        >>> list(intersperse('!', [1, 2, 3, 4, 5]))
-        [1, '!', 2, '!', 3, '!', 4, '!', 5]
+    >>> list(intersperse('!', [1, 2, 3, 4, 5]))
+    [1, '!', 2, '!', 3, '!', 4, '!', 5]
 
-        >>> list(intersperse(None, [1, 2, 3, 4, 5], n=2))
-        [1, 2, None, 3, 4, None, 5]
+    >>> list(intersperse(None, [1, 2, 3, 4, 5], n=2))
+    [1, 2, None, 3, 4, None, 5]
 
     """
     if n == 0:
@@ -813,14 +813,14 @@ def unique_to_each(*iterables):
     associated with ``pkg_2`` or ``pkg_3``. Similarly, ``C`` is only needed for
     ``pkg_2``, and ``D`` is only needed for ``pkg_3``::
 
-        >>> unique_to_each({'A', 'B'}, {'B', 'C'}, {'B', 'D'})
-        [['A'], ['C'], ['D']]
+    >>> unique_to_each({'A', 'B'}, {'B', 'C'}, {'B', 'D'})
+    [['A'], ['C'], ['D']]
 
     If there are duplicates in one input iterable that aren't in the others
     they will be duplicated in the output. Input order is preserved::
 
-        >>> unique_to_each("mississippi", "missouri")
-        [['p', 'p'], ['o', 'u', 'r']]
+    >>> unique_to_each("mississippi", "missouri")
+    [['p', 'p'], ['o', 'u', 'r']]
 
     It is assumed that the elements of each iterable are hashable.
 
@@ -834,29 +834,29 @@ def unique_to_each(*iterables):
 def windowed(seq, n, fillvalue=None, step=1):
     """Return a sliding window of width *n* over the given iterable.
 
-        >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
-        >>> list(all_windows)
-        [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
+    >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
+    >>> list(all_windows)
+    [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
 
     When the window is larger than the iterable, *fillvalue* is used in place
     of missing values:
 
-        >>> list(windowed([1, 2, 3], 4))
-        [(1, 2, 3, None)]
+    >>> list(windowed([1, 2, 3], 4))
+    [(1, 2, 3, None)]
 
     Each window will advance in increments of *step*:
 
-        >>> list(windowed([1, 2, 3, 4, 5, 6], 3, fillvalue='!', step=2))
-        [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
+    >>> list(windowed([1, 2, 3, 4, 5, 6], 3, fillvalue='!', step=2))
+    [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
 
     To slide into the iterable's items, use :func:`chain` to add filler items
     to the left:
 
-        >>> iterable = [1, 2, 3, 4]
-        >>> n = 3
-        >>> padding = [None] * (n - 1)
-        >>> list(windowed(chain(padding, iterable), 3))
-        [(None, None, 1), (None, 1, 2), (1, 2, 3), (2, 3, 4)]
+    >>> iterable = [1, 2, 3, 4]
+    >>> n = 3
+    >>> padding = [None] * (n - 1)
+    >>> list(windowed(chain(padding, iterable), 3))
+    [(None, None, 1), (None, 1, 2), (1, 2, 3), (2, 3, 4)]
     """
     if n < 0:
         raise ValueError('n must be >= 0')
@@ -885,13 +885,13 @@ def windowed(seq, n, fillvalue=None, step=1):
 def substrings(iterable):
     """Yield all of the substrings of *iterable*.
 
-        >>> [''.join(s) for s in substrings('more')]
-        ['m', 'o', 'r', 'e', 'mo', 'or', 're', 'mor', 'ore', 'more']
+    >>> [''.join(s) for s in substrings('more')]
+    ['m', 'o', 'r', 'e', 'mo', 'or', 're', 'mor', 'ore', 'more']
 
     Note that non-string iterables can also be subdivided.
 
-        >>> list(substrings([0, 1, 2]))
-        [(0,), (1,), (2,), (0, 1), (1, 2), (0, 1, 2)]
+    >>> list(substrings([0, 1, 2]))
+    [(0,), (1,), (2,), (0, 1), (1, 2), (0, 1, 2)]
 
     """
     # The length-1 substrings
@@ -946,17 +946,17 @@ class bucket:
     """Wrap *iterable* and return an object that buckets it iterable into
     child iterables based on a *key* function.
 
-        >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
-        >>> s = bucket(iterable, key=lambda x: x[0])  # Bucket by 1st character
-        >>> sorted(list(s))  # Get the keys
-        ['a', 'b', 'c']
-        >>> a_iterable = s['a']
-        >>> next(a_iterable)
-        'a1'
-        >>> next(a_iterable)
-        'a2'
-        >>> list(s['b'])
-        ['b1', 'b2', 'b3']
+    >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
+    >>> s = bucket(iterable, key=lambda x: x[0])  # Bucket by 1st character
+    >>> sorted(list(s))  # Get the keys
+    ['a', 'b', 'c']
+    >>> a_iterable = s['a']
+    >>> next(a_iterable)
+    'a1'
+    >>> next(a_iterable)
+    'a2'
+    >>> list(s['b'])
+    ['b1', 'b2', 'b3']
 
     The original iterable will be advanced and its items will be cached until
     they are used by the child iterables. This may require significant storage.
@@ -966,15 +966,15 @@ class bucket:
     If you specify a *validator* function, selected buckets will instead be
     checked against it.
 
-        >>> from itertools import count
-        >>> it = count(1, 2)  # Infinite sequence of odd numbers
-        >>> key = lambda x: x % 10  # Bucket by last digit
-        >>> validator = lambda x: x in {1, 3, 5, 7, 9}  # Odd digits only
-        >>> s = bucket(it, key=key, validator=validator)
-        >>> 2 in s
-        False
-        >>> list(s[2])
-        []
+    >>> from itertools import count
+    >>> it = count(1, 2)  # Infinite sequence of odd numbers
+    >>> key = lambda x: x % 10  # Bucket by last digit
+    >>> validator = lambda x: x in {1, 3, 5, 7, 9}  # Odd digits only
+    >>> s = bucket(it, key=key, validator=validator)
+    >>> 2 in s
+    False
+    >>> list(s[2])
+    []
 
     """
 
@@ -1046,33 +1046,33 @@ def spy(iterable, n=1):
 
     There is one item in the list by default:
 
-        >>> iterable = 'abcdefg'
-        >>> head, iterable = spy(iterable)
-        >>> head
-        ['a']
-        >>> list(iterable)
-        ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    >>> iterable = 'abcdefg'
+    >>> head, iterable = spy(iterable)
+    >>> head
+    ['a']
+    >>> list(iterable)
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 
     You may use unpacking to retrieve items instead of lists:
 
-        >>> (head,), iterable = spy('abcdefg')
-        >>> head
-        'a'
-        >>> (first, second), iterable = spy('abcdefg', 2)
-        >>> first
-        'a'
-        >>> second
-        'b'
+    >>> (head,), iterable = spy('abcdefg')
+    >>> head
+    'a'
+    >>> (first, second), iterable = spy('abcdefg', 2)
+    >>> first
+    'a'
+    >>> second
+    'b'
 
     The number of items requested can be larger than the number of items in
     the iterable:
 
-        >>> iterable = [1, 2, 3, 4, 5]
-        >>> head, iterable = spy(iterable, 10)
-        >>> head
-        [1, 2, 3, 4, 5]
-        >>> list(iterable)
-        [1, 2, 3, 4, 5]
+    >>> iterable = [1, 2, 3, 4, 5]
+    >>> head, iterable = spy(iterable, 10)
+    >>> head
+    [1, 2, 3, 4, 5]
+    >>> list(iterable)
+    [1, 2, 3, 4, 5]
 
     """
     it = iter(iterable)
@@ -1085,8 +1085,8 @@ def interleave(*iterables):
     """Return a new iterable yielding from each iterable in turn,
     until the shortest is exhausted.
 
-        >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
-        [1, 4, 6, 2, 5, 7]
+    >>> list(interleave([1, 2, 3], [4, 5], [6, 7, 8]))
+    [1, 4, 6, 2, 5, 7]
 
     For a version that doesn't terminate after the shortest iterable is
     exhausted, see :func:`interleave_longest`.
@@ -1099,8 +1099,8 @@ def interleave_longest(*iterables):
     """Return a new iterable yielding from each iterable in turn,
     skipping any that are exhausted.
 
-        >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
-        [1, 4, 6, 2, 5, 7, 3, 8]
+    >>> list(interleave_longest([1, 2, 3], [4, 5], [6, 7, 8]))
+    [1, 4, 6, 2, 5, 7, 3, 8]
 
     This function produces the same output as :func:`roundrobin`, but may
     perform better for some inputs (in particular when the number of iterables
@@ -1181,18 +1181,18 @@ def collapse(iterable, base_type=None, levels=None):
     """Flatten an iterable with multiple levels of nesting (e.g., a list of
     lists of tuples) into non-iterable types.
 
-        >>> iterable = [(1, 2), ([3, 4], [[5], [6]])]
-        >>> list(collapse(iterable))
-        [1, 2, 3, 4, 5, 6]
+    >>> iterable = [(1, 2), ([3, 4], [[5], [6]])]
+    >>> list(collapse(iterable))
+    [1, 2, 3, 4, 5, 6]
 
     Binary and text strings are not considered iterable and
     will not be collapsed.
 
     To avoid collapsing other types, specify *base_type*:
 
-        >>> iterable = ['ab', ('cd', 'ef'), ['gh', 'ij']]
-        >>> list(collapse(iterable, base_type=tuple))
-        ['ab', ('cd', 'ef'), 'gh', 'ij']
+    >>> iterable = ['ab', ('cd', 'ef'), ['gh', 'ij']]
+    >>> list(collapse(iterable, base_type=tuple))
+    ['ab', ('cd', 'ef'), 'gh', 'ij']
 
     Specify *levels* to stop flattening after a certain level:
 
@@ -1240,33 +1240,33 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
 
     Emitting a status message:
 
-        >>> from more_itertools import consume
-        >>> func = lambda item: print('Received {}'.format(item))
-        >>> consume(side_effect(func, range(2)))
-        Received 0
-        Received 1
+    >>> from more_itertools import consume
+    >>> func = lambda item: print('Received {}'.format(item))
+    >>> consume(side_effect(func, range(2)))
+    Received 0
+    Received 1
 
     Operating on chunks of items:
 
-        >>> pair_sums = []
-        >>> func = lambda chunk: pair_sums.append(sum(chunk))
-        >>> list(side_effect(func, [0, 1, 2, 3, 4, 5], 2))
-        [0, 1, 2, 3, 4, 5]
-        >>> list(pair_sums)
-        [1, 5, 9]
+    >>> pair_sums = []
+    >>> func = lambda chunk: pair_sums.append(sum(chunk))
+    >>> list(side_effect(func, [0, 1, 2, 3, 4, 5], 2))
+    [0, 1, 2, 3, 4, 5]
+    >>> list(pair_sums)
+    [1, 5, 9]
 
     Writing to a file-like object:
 
-        >>> from io import StringIO
-        >>> from more_itertools import consume
-        >>> f = StringIO()
-        >>> func = lambda x: print(x, file=f)
-        >>> before = lambda: print(u'HEADER', file=f)
-        >>> after = f.close
-        >>> it = [u'a', u'b', u'c']
-        >>> consume(side_effect(func, it, before=before, after=after))
-        >>> f.closed
-        True
+    >>> from io import StringIO
+    >>> from more_itertools import consume
+    >>> f = StringIO()
+    >>> func = lambda x: print(x, file=f)
+    >>> before = lambda: print(u'HEADER', file=f)
+    >>> after = f.close
+    >>> it = [u'a', u'b', u'c']
+    >>> consume(side_effect(func, it, before=before, after=after))
+    >>> f.closed
+    True
 
     """
     try:
@@ -1324,23 +1324,23 @@ def split_at(iterable, pred, maxsplit=-1, keep_separator=False):
     """Yield lists of items from *iterable*, where each list is delimited by
     an item where callable *pred* returns ``True``.
 
-        >>> list(split_at('abcdcba', lambda x: x == 'b'))
-        [['a'], ['c', 'd', 'c'], ['a']]
+    >>> list(split_at('abcdcba', lambda x: x == 'b'))
+    [['a'], ['c', 'd', 'c'], ['a']]
 
-        >>> list(split_at(range(10), lambda n: n % 2 == 1))
-        [[0], [2], [4], [6], [8], []]
+    >>> list(split_at(range(10), lambda n: n % 2 == 1))
+    [[0], [2], [4], [6], [8], []]
 
     At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
     then there is no limit on the number of splits:
 
-        >>> list(split_at(range(10), lambda n: n % 2 == 1, maxsplit=2))
-        [[0], [2], [4, 5, 6, 7, 8, 9]]
+    >>> list(split_at(range(10), lambda n: n % 2 == 1, maxsplit=2))
+    [[0], [2], [4, 5, 6, 7, 8, 9]]
 
     By default, the delimiting items are not included in the output.
     The include them, set *keep_separator* to ``True``.
 
-        >>> list(split_at('abcdcba', lambda x: x == 'b', keep_separator=True))
-        [['a'], ['b'], ['c', 'd', 'c'], ['b'], ['a']]
+    >>> list(split_at('abcdcba', lambda x: x == 'b', keep_separator=True))
+    [['a'], ['b'], ['c', 'd', 'c'], ['b'], ['a']]
 
     """
     if maxsplit == 0:
@@ -1368,17 +1368,17 @@ def split_before(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list ends just before
     an item for which callable *pred* returns ``True``:
 
-        >>> list(split_before('OneTwo', lambda s: s.isupper()))
-        [['O', 'n', 'e'], ['T', 'w', 'o']]
+    >>> list(split_before('OneTwo', lambda s: s.isupper()))
+    [['O', 'n', 'e'], ['T', 'w', 'o']]
 
-        >>> list(split_before(range(10), lambda n: n % 3 == 0))
-        [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
+    >>> list(split_before(range(10), lambda n: n % 3 == 0))
+    [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
 
     At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
     then there is no limit on the number of splits:
 
-        >>> list(split_before(range(10), lambda n: n % 3 == 0, maxsplit=2))
-        [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9]]
+    >>> list(split_before(range(10), lambda n: n % 3 == 0, maxsplit=2))
+    [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9]]
     """
     if maxsplit == 0:
         yield list(iterable)
@@ -1403,17 +1403,17 @@ def split_after(iterable, pred, maxsplit=-1):
     """Yield lists of items from *iterable*, where each list ends with an
     item where callable *pred* returns ``True``:
 
-        >>> list(split_after('one1two2', lambda s: s.isdigit()))
-        [['o', 'n', 'e', '1'], ['t', 'w', 'o', '2']]
+    >>> list(split_after('one1two2', lambda s: s.isdigit()))
+    [['o', 'n', 'e', '1'], ['t', 'w', 'o', '2']]
 
-        >>> list(split_after(range(10), lambda n: n % 3 == 0))
-        [[0], [1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    >>> list(split_after(range(10), lambda n: n % 3 == 0))
+    [[0], [1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
     At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
     then there is no limit on the number of splits:
 
-        >>> list(split_after(range(10), lambda n: n % 3 == 0, maxsplit=2))
-        [[0], [1, 2, 3], [4, 5, 6, 7, 8, 9]]
+    >>> list(split_after(range(10), lambda n: n % 3 == 0, maxsplit=2))
+    [[0], [1, 2, 3], [4, 5, 6, 7, 8, 9]]
 
     """
     if maxsplit == 0:
@@ -1443,15 +1443,15 @@ def split_when(iterable, pred, maxsplit=-1):
     For example, to find runs of increasing numbers, split the iterable when
     element ``i`` is larger than element ``i + 1``:
 
-        >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2], lambda x, y: x > y))
-        [[1, 2, 3, 3], [2, 5], [2, 4], [2]]
+    >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2], lambda x, y: x > y))
+    [[1, 2, 3, 3], [2, 5], [2, 4], [2]]
 
     At most *maxsplit* splits are done. If *maxsplit* is not specified or -1,
     then there is no limit on the number of splits:
 
-        >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2],
-        ...                 lambda x, y: x > y, maxsplit=2))
-        [[1, 2, 3, 3], [2, 5], [2, 4, 2]]
+    >>> list(split_when([1, 2, 3, 3, 2, 5, 2, 4, 2],
+    ...                 lambda x, y: x > y, maxsplit=2))
+    [[1, 2, 3, 3], [2, 5], [2, 4, 2]]
 
     """
     if maxsplit == 0:
@@ -1484,28 +1484,28 @@ def split_into(iterable, sizes):
     """Yield a list of sequential items from *iterable* of length 'n' for each
     integer 'n' in *sizes*.
 
-        >>> list(split_into([1,2,3,4,5,6], [1,2,3]))
-        [[1], [2, 3], [4, 5, 6]]
+    >>> list(split_into([1,2,3,4,5,6], [1,2,3]))
+    [[1], [2, 3], [4, 5, 6]]
 
     If the sum of *sizes* is smaller than the length of *iterable*, then the
     remaining items of *iterable* will not be returned.
 
-        >>> list(split_into([1,2,3,4,5,6], [2,3]))
-        [[1, 2], [3, 4, 5]]
+    >>> list(split_into([1,2,3,4,5,6], [2,3]))
+    [[1, 2], [3, 4, 5]]
 
     If the sum of *sizes* is larger than the length of *iterable*, fewer items
     will be returned in the iteration that overruns *iterable* and further
     lists will be empty:
 
-        >>> list(split_into([1,2,3,4], [1,2,3,4]))
-        [[1], [2, 3], [4], []]
+    >>> list(split_into([1,2,3,4], [1,2,3,4]))
+    [[1], [2, 3], [4], []]
 
     When a ``None`` object is encountered in *sizes*, the returned list will
     contain items up to the end of *iterable* the same way that itertools.slice
     does:
 
-        >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
-        [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
+    >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
+    [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
 
     :func:`split_into` can be useful for grouping a series of items where the
     sizes of the groups are not uniform. An example would be where in a row
@@ -1529,14 +1529,14 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
     """Yield the elements from *iterable*, followed by *fillvalue*, such that
     at least *n* items are emitted.
 
-        >>> list(padded([1, 2, 3], '?', 5))
-        [1, 2, 3, '?', '?']
+    >>> list(padded([1, 2, 3], '?', 5))
+    [1, 2, 3, '?', '?']
 
     If *next_multiple* is ``True``, *fillvalue* will be emitted until the
     number of items emitted is a multiple of *n*::
 
-        >>> list(padded([1, 2, 3, 4], n=3, next_multiple=True))
-        [1, 2, 3, 4, None, None]
+    >>> list(padded([1, 2, 3, 4], n=3, next_multiple=True))
+    [1, 2, 3, 4, None, None]
 
     If *n* is ``None``, *fillvalue* will be emitted indefinitely.
 
@@ -1569,13 +1569,13 @@ def repeat_each(iterable, n=2):
 def repeat_last(iterable, default=None):
     """After the *iterable* is exhausted, keep yielding its last element.
 
-        >>> list(islice(repeat_last(range(3)), 5))
-        [0, 1, 2, 2, 2]
+    >>> list(islice(repeat_last(range(3)), 5))
+    [0, 1, 2, 2, 2]
 
     If the iterable is empty, yield *default* forever::
 
-        >>> list(islice(repeat_last(range(0), 42), 5))
-        [42, 42, 42, 42, 42]
+    >>> list(islice(repeat_last(range(0), 42), 5))
+    [42, 42, 42, 42, 42]
 
     """
     item = _marker
@@ -1588,25 +1588,25 @@ def repeat_last(iterable, default=None):
 def distribute(n, iterable):
     """Distribute the items from *iterable* among *n* smaller iterables.
 
-        >>> group_1, group_2 = distribute(2, [1, 2, 3, 4, 5, 6])
-        >>> list(group_1)
-        [1, 3, 5]
-        >>> list(group_2)
-        [2, 4, 6]
+    >>> group_1, group_2 = distribute(2, [1, 2, 3, 4, 5, 6])
+    >>> list(group_1)
+    [1, 3, 5]
+    >>> list(group_2)
+    [2, 4, 6]
 
     If the length of *iterable* is not evenly divisible by *n*, then the
     length of the returned iterables will not be identical:
 
-        >>> children = distribute(3, [1, 2, 3, 4, 5, 6, 7])
-        >>> [list(c) for c in children]
-        [[1, 4, 7], [2, 5], [3, 6]]
+    >>> children = distribute(3, [1, 2, 3, 4, 5, 6, 7])
+    >>> [list(c) for c in children]
+    [[1, 4, 7], [2, 5], [3, 6]]
 
     If the length of *iterable* is smaller than *n*, then the last returned
     iterables will be empty:
 
-        >>> children = distribute(5, [1, 2, 3])
-        >>> [list(c) for c in children]
-        [[1], [2], [3], [], []]
+    >>> children = distribute(5, [1, 2, 3])
+    >>> [list(c) for c in children]
+    [[1], [2], [3], [], []]
 
     This function uses :func:`itertools.tee` and may require significant
     storage. If you need the order items in the smaller iterables to match the
@@ -1625,17 +1625,17 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     The amount by which the `i`-th item in each tuple is offset is given by
     the `i`-th item in *offsets*.
 
-        >>> list(stagger([0, 1, 2, 3]))
-        [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
-        >>> list(stagger(range(8), offsets=(0, 2, 4)))
-        [(0, 2, 4), (1, 3, 5), (2, 4, 6), (3, 5, 7)]
+    >>> list(stagger([0, 1, 2, 3]))
+    [(None, 0, 1), (0, 1, 2), (1, 2, 3)]
+    >>> list(stagger(range(8), offsets=(0, 2, 4)))
+    [(0, 2, 4), (1, 3, 5), (2, 4, 6), (3, 5, 7)]
 
     By default, the sequence will end when the final element of a tuple is the
     last item in the iterable. To continue until the first element of a tuple
     is the last item in the iterable, set *longest* to ``True``::
 
-        >>> list(stagger([0, 1, 2, 3], longest=True))
-        [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
+    >>> list(stagger([0, 1, 2, 3], longest=True))
+    [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
 
     By default, ``None`` will be used to replace offsets beyond the end of the
     sequence. Specify *fillvalue* to use some other value.
@@ -1652,18 +1652,18 @@ def zip_equal(*iterables):
     """``zip`` the input *iterables* together, but raise
     ``UnequalIterablesError`` if they aren't all the same length.
 
-        >>> it_1 = range(3)
-        >>> it_2 = iter('abc')
-        >>> list(zip_equal(it_1, it_2))
-        [(0, 'a'), (1, 'b'), (2, 'c')]
+    >>> it_1 = range(3)
+    >>> it_2 = iter('abc')
+    >>> list(zip_equal(it_1, it_2))
+    [(0, 'a'), (1, 'b'), (2, 'c')]
 
-        >>> it_1 = range(3)
-        >>> it_2 = iter('abcd')
-        >>> list(zip_equal(it_1, it_2)) # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        more_itertools.more.UnequalIterablesError: Iterables have different
-        lengths
+    >>> it_1 = range(3)
+    >>> it_2 = iter('abcd')
+    >>> list(zip_equal(it_1, it_2)) # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    more_itertools.more.UnequalIterablesError: Iterables have different
+    lengths
 
     """
     if hexversion >= 0x30A00A6:
@@ -1683,8 +1683,8 @@ def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     """``zip`` the input *iterables* together, but offset the `i`-th iterable
     by the `i`-th item in *offsets*.
 
-        >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1)))
-        [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e')]
+    >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1)))
+    [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e')]
 
     This can be used as a lightweight alternative to SciPy or pandas to analyze
     data sets in which some series have a lead or lag relationship.
@@ -1693,8 +1693,8 @@ def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     To continue until the longest iterable is exhausted, set *longest* to
     ``True``.
 
-        >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1), longest=True))
-        [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e'), (None, 'f')]
+    >>> list(zip_offset('0123', 'abcdef', offsets=(0, 1), longest=True))
+    [('0', 'b'), ('1', 'c'), ('2', 'd'), ('3', 'e'), (None, 'f')]
 
     By default, ``None`` will be used to replace offsets beyond the end of the
     sequence. Specify *fillvalue* to use some other value.
@@ -1729,33 +1729,33 @@ def sort_together(iterables, key_list=(0,), key=None, reverse=False):
 
     By default, all iterables are sorted using the ``0``-th iterable::
 
-        >>> iterables = [(4, 3, 2, 1), ('a', 'b', 'c', 'd')]
-        >>> sort_together(iterables)
-        [(1, 2, 3, 4), ('d', 'c', 'b', 'a')]
+    >>> iterables = [(4, 3, 2, 1), ('a', 'b', 'c', 'd')]
+    >>> sort_together(iterables)
+    [(1, 2, 3, 4), ('d', 'c', 'b', 'a')]
 
     Set a different key list to sort according to another iterable.
     Specifying multiple keys dictates how ties are broken::
 
-        >>> iterables = [(3, 1, 2), (0, 1, 0), ('c', 'b', 'a')]
-        >>> sort_together(iterables, key_list=(1, 2))
-        [(2, 3, 1), (0, 0, 1), ('a', 'c', 'b')]
+    >>> iterables = [(3, 1, 2), (0, 1, 0), ('c', 'b', 'a')]
+    >>> sort_together(iterables, key_list=(1, 2))
+    [(2, 3, 1), (0, 0, 1), ('a', 'c', 'b')]
 
     To sort by a function of the elements of the iterable, pass a *key*
     function. Its arguments are the elements of the iterables corresponding to
     the key list::
 
-        >>> names = ('a', 'b', 'c')
-        >>> lengths = (1, 2, 3)
-        >>> widths = (5, 2, 1)
-        >>> def area(length, width):
-        ...     return length * width
-        >>> sort_together([names, lengths, widths], key_list=(1, 2), key=area)
-        [('c', 'b', 'a'), (3, 2, 1), (1, 2, 5)]
+    >>> names = ('a', 'b', 'c')
+    >>> lengths = (1, 2, 3)
+    >>> widths = (5, 2, 1)
+    >>> def area(length, width):
+    ...     return length * width
+    >>> sort_together([names, lengths, widths], key_list=(1, 2), key=area)
+    [('c', 'b', 'a'), (3, 2, 1), (1, 2, 5)]
 
     Set *reverse* to ``True`` to sort in descending order.
 
-        >>> sort_together([(1, 2, 3), ('c', 'b', 'a')], reverse=True)
-        [(3, 2, 1), ('a', 'b', 'c')]
+    >>> sort_together([(1, 2, 3), ('c', 'b', 'a')], reverse=True)
+    [(3, 2, 1), ('a', 'b', 'c')]
 
     """
     if key is None:
@@ -1792,12 +1792,12 @@ def unzip(iterable):
     of the zipped iterable. The first element is used to determine the
     length of the remaining elements.
 
-        >>> iterable = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
-        >>> letters, numbers = unzip(iterable)
-        >>> list(letters)
-        ['a', 'b', 'c', 'd']
-        >>> list(numbers)
-        [1, 2, 3, 4]
+    >>> iterable = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+    >>> letters, numbers = unzip(iterable)
+    >>> list(letters)
+    ['a', 'b', 'c', 'd']
+    >>> list(numbers)
+    [1, 2, 3, 4]
 
     This is similar to using ``zip(*iterable)``, but it avoids reading
     *iterable* into memory. Note, however, that this function uses
@@ -1837,25 +1837,25 @@ def divide(n, iterable):
     """Divide the elements from *iterable* into *n* parts, maintaining
     order.
 
-        >>> group_1, group_2 = divide(2, [1, 2, 3, 4, 5, 6])
-        >>> list(group_1)
-        [1, 2, 3]
-        >>> list(group_2)
-        [4, 5, 6]
+    >>> group_1, group_2 = divide(2, [1, 2, 3, 4, 5, 6])
+    >>> list(group_1)
+    [1, 2, 3]
+    >>> list(group_2)
+    [4, 5, 6]
 
     If the length of *iterable* is not evenly divisible by *n*, then the
     length of the returned iterables will not be identical:
 
-        >>> children = divide(3, [1, 2, 3, 4, 5, 6, 7])
-        >>> [list(c) for c in children]
-        [[1, 2, 3], [4, 5], [6, 7]]
+    >>> children = divide(3, [1, 2, 3, 4, 5, 6, 7])
+    >>> [list(c) for c in children]
+    [[1, 2, 3], [4, 5], [6, 7]]
 
     If the length of the iterable is smaller than n, then the last returned
     iterables will be empty:
 
-        >>> children = divide(5, [1, 2, 3])
-        >>> [list(c) for c in children]
-        [[1], [2], [3], [], []]
+    >>> children = divide(5, [1, 2, 3])
+    >>> [list(c) for c in children]
+    [[1], [2], [3], [], []]
 
     This function will exhaust the iterable before returning and may require
     significant storage. If order is not important, see :func:`distribute`,
@@ -1887,43 +1887,43 @@ def divide(n, iterable):
 def always_iterable(obj, base_type=(str, bytes)):
     """If *obj* is iterable, return an iterator over its items::
 
-        >>> obj = (1, 2, 3)
-        >>> list(always_iterable(obj))
-        [1, 2, 3]
+    >>> obj = (1, 2, 3)
+    >>> list(always_iterable(obj))
+    [1, 2, 3]
 
     If *obj* is not iterable, return a one-item iterable containing *obj*::
 
-        >>> obj = 1
-        >>> list(always_iterable(obj))
-        [1]
+    >>> obj = 1
+    >>> list(always_iterable(obj))
+    [1]
 
     If *obj* is ``None``, return an empty iterable:
 
-        >>> obj = None
-        >>> list(always_iterable(None))
-        []
+    >>> obj = None
+    >>> list(always_iterable(None))
+    []
 
     By default, binary and text strings are not considered iterable::
 
-        >>> obj = 'foo'
-        >>> list(always_iterable(obj))
-        ['foo']
+    >>> obj = 'foo'
+    >>> list(always_iterable(obj))
+    ['foo']
 
     If *base_type* is set, objects for which ``isinstance(obj, base_type)``
     returns ``True`` won't be considered iterable.
 
-        >>> obj = {'a': 1}
-        >>> list(always_iterable(obj))  # Iterate over the dict's keys
-        ['a']
-        >>> list(always_iterable(obj, base_type=dict))  # Treat dicts as a unit
-        [{'a': 1}]
+    >>> obj = {'a': 1}
+    >>> list(always_iterable(obj))  # Iterate over the dict's keys
+    ['a']
+    >>> list(always_iterable(obj, base_type=dict))  # Treat dicts as a unit
+    [{'a': 1}]
 
     Set *base_type* to ``None`` to avoid any special handling and treat objects
     Python considers iterable as iterable:
 
-        >>> obj = 'foo'
-        >>> list(always_iterable(obj, base_type=None))
-        ['f', 'o', 'o']
+    >>> obj = 'foo'
+    >>> list(always_iterable(obj, base_type=None))
+    ['f', 'o', 'o']
     """
     if obj is None:
         return iter(())
@@ -1944,14 +1944,14 @@ def adjacent(predicate, iterable, distance=1):
 
     For example, to find whether items are adjacent to a ``3``::
 
-        >>> list(adjacent(lambda x: x == 3, range(6)))
-        [(False, 0), (False, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
+    >>> list(adjacent(lambda x: x == 3, range(6)))
+    [(False, 0), (False, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
 
     Set *distance* to change what counts as adjacent. For example, to find
     whether items are two places away from a ``3``:
 
-        >>> list(adjacent(lambda x: x == 3, range(6), distance=2))
-        [(False, 0), (True, 1), (True, 2), (True, 3), (True, 4), (True, 5)]
+    >>> list(adjacent(lambda x: x == 3, range(6), distance=2))
+    [(False, 0), (True, 1), (True, 2), (True, 3), (True, 4), (True, 5)]
 
     This is useful for contextualizing the results of a search function.
     For example, a code comparison tool might want to identify lines that
@@ -1999,13 +1999,13 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
     and pass a *keyfunc* that extracts the first element and a *valuefunc*
     that extracts the second element::
 
-        >>> from operator import itemgetter
-        >>> keys = [0, 0, 1, 1, 1, 2, 2, 2, 3]
-        >>> values = 'abcdefghi'
-        >>> iterable = zip(keys, values)
-        >>> grouper = groupby_transform(iterable, itemgetter(0), itemgetter(1))
-        >>> [(k, ''.join(g)) for k, g in grouper]
-        [(0, 'ab'), (1, 'cde'), (2, 'fgh'), (3, 'i')]
+    >>> from operator import itemgetter
+    >>> keys = [0, 0, 1, 1, 1, 2, 2, 2, 3]
+    >>> values = 'abcdefghi'
+    >>> iterable = zip(keys, values)
+    >>> grouper = groupby_transform(iterable, itemgetter(0), itemgetter(1))
+    >>> [(k, ''.join(g)) for k, g in grouper]
+    [(0, 'ab'), (1, 'cde'), (2, 'fgh'), (3, 'i')]
 
     Note that the order of items in the iterable is significant.
     Only adjacent items are grouped together, so if you don't want any
@@ -2028,32 +2028,32 @@ class numeric_range(abc.Sequence, abc.Hashable):
     With only *stop* specified, *start* defaults to ``0`` and *step*
     defaults to ``1``. The output items will match the type of *stop*:
 
-        >>> list(numeric_range(3.5))
-        [0.0, 1.0, 2.0, 3.0]
+    >>> list(numeric_range(3.5))
+    [0.0, 1.0, 2.0, 3.0]
 
     With only *start* and *stop* specified, *step* defaults to ``1``. The
     output items will match the type of *start*:
 
-        >>> from decimal import Decimal
-        >>> start = Decimal('2.1')
-        >>> stop = Decimal('5.1')
-        >>> list(numeric_range(start, stop))
-        [Decimal('2.1'), Decimal('3.1'), Decimal('4.1')]
+    >>> from decimal import Decimal
+    >>> start = Decimal('2.1')
+    >>> stop = Decimal('5.1')
+    >>> list(numeric_range(start, stop))
+    [Decimal('2.1'), Decimal('3.1'), Decimal('4.1')]
 
     With *start*, *stop*, and *step*  specified the output items will match
     the type of ``start + step``:
 
-        >>> from fractions import Fraction
-        >>> start = Fraction(1, 2)  # Start at 1/2
-        >>> stop = Fraction(5, 2)  # End at 5/2
-        >>> step = Fraction(1, 2)  # Count by 1/2
-        >>> list(numeric_range(start, stop, step))
-        [Fraction(1, 2), Fraction(1, 1), Fraction(3, 2), Fraction(2, 1)]
+    >>> from fractions import Fraction
+    >>> start = Fraction(1, 2)  # Start at 1/2
+    >>> stop = Fraction(5, 2)  # End at 5/2
+    >>> step = Fraction(1, 2)  # Count by 1/2
+    >>> list(numeric_range(start, stop, step))
+    [Fraction(1, 2), Fraction(1, 1), Fraction(3, 2), Fraction(2, 1)]
 
     If *step* is zero, ``ValueError`` is raised. Negative steps are supported:
 
-        >>> list(numeric_range(3, -1, -1.0))
-        [3.0, 2.0, 1.0, 0.0]
+    >>> list(numeric_range(3, -1, -1.0))
+    [3.0, 2.0, 1.0, 0.0]
 
     Be aware of the limitations of floating point numbers; the representation
     of the yielded numbers may be surprising.
@@ -2061,15 +2061,15 @@ class numeric_range(abc.Sequence, abc.Hashable):
     ``datetime.datetime`` objects can be used for *start* and *stop*, if *step*
     is a ``datetime.timedelta`` object:
 
-        >>> import datetime
-        >>> start = datetime.datetime(2019, 1, 1)
-        >>> stop = datetime.datetime(2019, 1, 3)
-        >>> step = datetime.timedelta(days=1)
-        >>> items = iter(numeric_range(start, stop, step))
-        >>> next(items)
-        datetime.datetime(2019, 1, 1, 0, 0)
-        >>> next(items)
-        datetime.datetime(2019, 1, 2, 0, 0)
+    >>> import datetime
+    >>> start = datetime.datetime(2019, 1, 1)
+    >>> stop = datetime.datetime(2019, 1, 3)
+    >>> step = datetime.timedelta(days=1)
+    >>> items = iter(numeric_range(start, stop, step))
+    >>> next(items)
+    datetime.datetime(2019, 1, 1, 0, 0)
+    >>> next(items)
+    datetime.datetime(2019, 1, 2, 0, 0)
 
     """
 
@@ -2297,36 +2297,36 @@ def locate(iterable, pred=bool, window_size=None):
 
     *pred* defaults to :func:`bool`, which will select truthy items:
 
-        >>> list(locate([0, 1, 1, 0, 1, 0, 0]))
-        [1, 2, 4]
+    >>> list(locate([0, 1, 1, 0, 1, 0, 0]))
+    [1, 2, 4]
 
     Set *pred* to a custom function to, e.g., find the indexes for a particular
     item.
 
-        >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
-        [1, 3]
+    >>> list(locate(['a', 'b', 'c', 'b'], lambda x: x == 'b'))
+    [1, 3]
 
     If *window_size* is given, then the *pred* function will be called with
     that many items. This enables searching for sub-sequences:
 
-        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
-        >>> pred = lambda *args: args == (1, 2, 3)
-        >>> list(locate(iterable, pred=pred, window_size=3))
-        [1, 5, 9]
+    >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+    >>> pred = lambda *args: args == (1, 2, 3)
+    >>> list(locate(iterable, pred=pred, window_size=3))
+    [1, 5, 9]
 
     Use with :func:`seekable` to find indexes and then retrieve the associated
     items:
 
-        >>> from itertools import count
-        >>> from more_itertools import seekable
-        >>> source = (3 * n + 1 if (n % 2) else n // 2 for n in count())
-        >>> it = seekable(source)
-        >>> pred = lambda x: x > 100
-        >>> indexes = locate(it, pred=pred)
-        >>> i = next(indexes)
-        >>> it.seek(i)
-        >>> next(it)
-        106
+    >>> from itertools import count
+    >>> from more_itertools import seekable
+    >>> source = (3 * n + 1 if (n % 2) else n // 2 for n in count())
+    >>> it = seekable(source)
+    >>> pred = lambda x: x > 100
+    >>> indexes = locate(it, pred=pred)
+    >>> i = next(indexes)
+    >>> it.seek(i)
+    >>> next(it)
+    106
 
     """
     if window_size is None:
@@ -2355,10 +2355,10 @@ def lstrip(iterable, pred):
 
     For example, to remove a set of items from the start of an iterable:
 
-        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
-        >>> pred = lambda x: x in {None, False, ''}
-        >>> list(lstrip(iterable, pred))
-        [1, 2, None, 3, False, None]
+    >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+    >>> pred = lambda x: x in {None, False, ''}
+    >>> list(lstrip(iterable, pred))
+    [1, 2, None, 3, False, None]
 
     This function is analogous to to :func:`str.lstrip`, and is essentially
     an wrapper for :func:`itertools.dropwhile`.
@@ -2373,10 +2373,10 @@ def rstrip(iterable, pred):
 
     For example, to remove a set of items from the end of an iterable:
 
-        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
-        >>> pred = lambda x: x in {None, False, ''}
-        >>> list(rstrip(iterable, pred))
-        [None, False, None, 1, 2, None, 3]
+    >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+    >>> pred = lambda x: x in {None, False, ''}
+    >>> list(rstrip(iterable, pred))
+    [None, False, None, 1, 2, None, 3]
 
     This function is analogous to :func:`str.rstrip`.
 
@@ -2399,10 +2399,10 @@ def strip(iterable, pred):
 
     For example, to remove a set of items from both ends of an iterable:
 
-        >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
-        >>> pred = lambda x: x in {None, False, ''}
-        >>> list(strip(iterable, pred))
-        [1, 2, None, 3]
+    >>> iterable = (None, False, None, 1, 2, None, 3, False, None)
+    >>> pred = lambda x: x in {None, False, ''}
+    >>> list(strip(iterable, pred))
+    [1, 2, None, 3]
 
     This function is analogous to :func:`str.strip`.
 
@@ -2414,25 +2414,25 @@ class islice_extended:
     """An extension of :func:`itertools.islice` that supports negative values
     for *stop*, *start*, and *step*.
 
-        >>> iterable = iter('abcdefgh')
-        >>> list(islice_extended(iterable, -4, -1))
-        ['e', 'f', 'g']
+    >>> iterable = iter('abcdefgh')
+    >>> list(islice_extended(iterable, -4, -1))
+    ['e', 'f', 'g']
 
     Slices with negative values require some caching of *iterable*, but this
     function takes care to minimize the amount of memory required.
 
     For example, you can use a negative step with an infinite iterator:
 
-        >>> from itertools import count
-        >>> list(islice_extended(count(), 110, 99, -2))
-        [110, 108, 106, 104, 102, 100]
+    >>> from itertools import count
+    >>> list(islice_extended(count(), 110, 99, -2))
+    [110, 108, 106, 104, 102, 100]
 
     You can also use slice notation directly:
 
-        >>> iterable = map(str, count())
-        >>> it = islice_extended(iterable)[10:20:2]
-        >>> list(it)
-        ['10', '12', '14', '16', '18']
+    >>> iterable = map(str, count())
+    >>> it = islice_extended(iterable)[10:20:2]
+    >>> list(it)
+    ['10', '12', '14', '16', '18']
 
     """
 
@@ -2556,8 +2556,8 @@ def always_reversible(iterable):
     """An extension of :func:`reversed` that supports all iterables, not
     just those which implement the ``Reversible`` or ``Sequence`` protocols.
 
-        >>> print(*always_reversible(x for x in range(3)))
-        2 1 0
+    >>> print(*always_reversible(x for x in range(3)))
+    2 1 0
 
     If the iterable is already reversible, this function returns the
     result of :func:`reversed()`. If the iterable is not reversible,
@@ -2578,38 +2578,38 @@ def consecutive_groups(iterable, ordering=lambda x: x):
     By default, the ordering function is the identity function. This is
     suitable for finding runs of numbers:
 
-        >>> iterable = [1, 10, 11, 12, 20, 30, 31, 32, 33, 40]
-        >>> for group in consecutive_groups(iterable):
-        ...     print(list(group))
-        [1]
-        [10, 11, 12]
-        [20]
-        [30, 31, 32, 33]
-        [40]
+    >>> iterable = [1, 10, 11, 12, 20, 30, 31, 32, 33, 40]
+    >>> for group in consecutive_groups(iterable):
+    ...     print(list(group))
+    [1]
+    [10, 11, 12]
+    [20]
+    [30, 31, 32, 33]
+    [40]
 
     For finding runs of adjacent letters, try using the :meth:`index` method
     of a string of letters:
 
-        >>> from string import ascii_lowercase
-        >>> iterable = 'abcdfgilmnop'
-        >>> ordering = ascii_lowercase.index
-        >>> for group in consecutive_groups(iterable, ordering):
-        ...     print(list(group))
-        ['a', 'b', 'c', 'd']
-        ['f', 'g']
-        ['i']
-        ['l', 'm', 'n', 'o', 'p']
+    >>> from string import ascii_lowercase
+    >>> iterable = 'abcdfgilmnop'
+    >>> ordering = ascii_lowercase.index
+    >>> for group in consecutive_groups(iterable, ordering):
+    ...     print(list(group))
+    ['a', 'b', 'c', 'd']
+    ['f', 'g']
+    ['i']
+    ['l', 'm', 'n', 'o', 'p']
 
     Each group of consecutive items is an iterator that shares it source with
     *iterable*. When an an output group is advanced, the previous group is
     no longer available unless its elements are copied (e.g., into a ``list``).
 
-        >>> iterable = [1, 2, 11, 12, 21, 22]
-        >>> saved_groups = []
-        >>> for group in consecutive_groups(iterable):
-        ...     saved_groups.append(list(group))  # Copy group elements
-        >>> saved_groups
-        [[1, 2], [11, 12], [21, 22]]
+    >>> iterable = [1, 2, 11, 12, 21, 22]
+    >>> saved_groups = []
+    >>> for group in consecutive_groups(iterable):
+    ...     saved_groups.append(list(group))  # Copy group elements
+    >>> saved_groups
+    [[1, 2], [11, 12], [21, 22]]
 
     """
     for k, g in groupby(
@@ -2623,10 +2623,10 @@ def difference(iterable, func=sub, *, initial=None):
     it will compute the first difference of *iterable* using
     :func:`operator.sub`:
 
-        >>> from itertools import accumulate
-        >>> iterable = accumulate([0, 1, 2, 3, 4])  # produces 0, 1, 3, 6, 10
-        >>> list(difference(iterable))
-        [0, 1, 2, 3, 4]
+    >>> from itertools import accumulate
+    >>> iterable = accumulate([0, 1, 2, 3, 4])  # produces 0, 1, 3, 6, 10
+    >>> list(difference(iterable))
+    [0, 1, 2, 3, 4]
 
     *func* defaults to :func:`operator.sub`, but other functions can be
     specified. They will be applied as follows::
@@ -2635,17 +2635,17 @@ def difference(iterable, func=sub, *, initial=None):
 
     For example, to do progressive division:
 
-        >>> iterable = [1, 2, 6, 24, 120]
-        >>> func = lambda x, y: x // y
-        >>> list(difference(iterable, func))
-        [1, 2, 3, 4, 5]
+    >>> iterable = [1, 2, 6, 24, 120]
+    >>> func = lambda x, y: x // y
+    >>> list(difference(iterable, func))
+    [1, 2, 3, 4, 5]
 
     If the *initial* keyword is set, the first element will be skipped when
     computing successive differences.
 
-        >>> it = [10, 11, 13, 16]  # from accumulate([1, 2, 3], initial=10)
-        >>> list(difference(it, initial=10))
-        [1, 2, 3]
+    >>> it = [10, 11, 13, 16]  # from accumulate([1, 2, 3], initial=10)
+    >>> list(difference(it, initial=10))
+    [1, 2, 3]
 
     """
     a, b = tee(iterable)
@@ -2667,23 +2667,23 @@ class SequenceView(Sequence):
     "dictionary view" types. They provide a dynamic view of a sequence's items,
     meaning that when the sequence updates, so does the view.
 
-        >>> seq = ['0', '1', '2']
-        >>> view = SequenceView(seq)
-        >>> view
-        SequenceView(['0', '1', '2'])
-        >>> seq.append('3')
-        >>> view
-        SequenceView(['0', '1', '2', '3'])
+    >>> seq = ['0', '1', '2']
+    >>> view = SequenceView(seq)
+    >>> view
+    SequenceView(['0', '1', '2'])
+    >>> seq.append('3')
+    >>> view
+    SequenceView(['0', '1', '2', '3'])
 
     Sequence views support indexing, slicing, and length queries. They act
     like the underlying sequence, except they don't allow assignment:
 
-        >>> view[1]
-        '1'
-        >>> view[1:-1]
-        ['1', '2']
-        >>> len(view)
-        4
+    >>> view[1]
+    '1'
+    >>> view[1:-1]
+    ['1', '2']
+    >>> len(view)
+    4
 
     Sequence views are useful as an alternative to copying, as they don't
     require (much) extra storage.
@@ -2715,79 +2715,79 @@ class seekable:
 
     To "reset" an iterator, seek to ``0``:
 
-        >>> from itertools import count
-        >>> it = seekable((str(n) for n in count()))
-        >>> next(it), next(it), next(it)
-        ('0', '1', '2')
-        >>> it.seek(0)
-        >>> next(it), next(it), next(it)
-        ('0', '1', '2')
-        >>> next(it)
-        '3'
+    >>> from itertools import count
+    >>> it = seekable((str(n) for n in count()))
+    >>> next(it), next(it), next(it)
+    ('0', '1', '2')
+    >>> it.seek(0)
+    >>> next(it), next(it), next(it)
+    ('0', '1', '2')
+    >>> next(it)
+    '3'
 
     You can also seek forward:
 
-        >>> it = seekable((str(n) for n in range(20)))
-        >>> it.seek(10)
-        >>> next(it)
-        '10'
-        >>> it.seek(20)  # Seeking past the end of the source isn't a problem
-        >>> list(it)
-        []
-        >>> it.seek(0)  # Resetting works even after hitting the end
-        >>> next(it), next(it), next(it)
-        ('0', '1', '2')
+    >>> it = seekable((str(n) for n in range(20)))
+    >>> it.seek(10)
+    >>> next(it)
+    '10'
+    >>> it.seek(20)  # Seeking past the end of the source isn't a problem
+    >>> list(it)
+    []
+    >>> it.seek(0)  # Resetting works even after hitting the end
+    >>> next(it), next(it), next(it)
+    ('0', '1', '2')
 
     Call :meth:`peek` to look ahead one item without advancing the iterator:
 
-        >>> it = seekable('1234')
-        >>> it.peek()
-        '1'
-        >>> list(it)
-        ['1', '2', '3', '4']
-        >>> it.peek(default='empty')
-        'empty'
+    >>> it = seekable('1234')
+    >>> it.peek()
+    '1'
+    >>> list(it)
+    ['1', '2', '3', '4']
+    >>> it.peek(default='empty')
+    'empty'
 
     Before the iterator is at its end, calling :func:`bool` on it will return
     ``True``. After it will return ``False``:
 
-        >>> it = seekable('5678')
-        >>> bool(it)
-        True
-        >>> list(it)
-        ['5', '6', '7', '8']
-        >>> bool(it)
-        False
+    >>> it = seekable('5678')
+    >>> bool(it)
+    True
+    >>> list(it)
+    ['5', '6', '7', '8']
+    >>> bool(it)
+    False
 
     You may view the contents of the cache with the :meth:`elements` method.
     That returns a :class:`SequenceView`, a view that updates automatically:
 
-        >>> it = seekable((str(n) for n in range(10)))
-        >>> next(it), next(it), next(it)
-        ('0', '1', '2')
-        >>> elements = it.elements()
-        >>> elements
-        SequenceView(['0', '1', '2'])
-        >>> next(it)
-        '3'
-        >>> elements
-        SequenceView(['0', '1', '2', '3'])
+    >>> it = seekable((str(n) for n in range(10)))
+    >>> next(it), next(it), next(it)
+    ('0', '1', '2')
+    >>> elements = it.elements()
+    >>> elements
+    SequenceView(['0', '1', '2'])
+    >>> next(it)
+    '3'
+    >>> elements
+    SequenceView(['0', '1', '2', '3'])
 
     By default, the cache grows as the source iterable progresses, so beware of
     wrapping very large or infinite iterables. Supply *maxlen* to limit the
     size of the cache (this of course limits how far back you can seek).
 
-        >>> from itertools import count
-        >>> it = seekable((str(n) for n in count()), maxlen=2)
-        >>> next(it), next(it), next(it), next(it)
-        ('0', '1', '2', '3')
-        >>> list(it.elements())
-        ['2', '3']
-        >>> it.seek(0)
-        >>> next(it), next(it), next(it), next(it)
-        ('2', '3', '4', '5')
-        >>> next(it)
-        '6'
+    >>> from itertools import count
+    >>> it = seekable((str(n) for n in count()), maxlen=2)
+    >>> next(it), next(it), next(it), next(it)
+    ('0', '1', '2', '3')
+    >>> list(it.elements())
+    ['2', '3']
+    >>> it.seek(0)
+    >>> next(it), next(it), next(it), next(it)
+    ('2', '3', '4', '5')
+    >>> next(it)
+    '6'
 
     """
 
@@ -2851,17 +2851,17 @@ class run_length:
     It yields groups of repeated items with the count of how many times they
     were repeated:
 
-        >>> uncompressed = 'abbcccdddd'
-        >>> list(run_length.encode(uncompressed))
-        [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+    >>> uncompressed = 'abbcccdddd'
+    >>> list(run_length.encode(uncompressed))
+    [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
 
     :func:`run_length.decode` decompresses an iterable that was previously
     compressed with run-length encoding. It yields the items of the
     decompressed iterable:
 
-        >>> compressed = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
-        >>> list(run_length.decode(compressed))
-        ['a', 'b', 'b', 'c', 'c', 'c', 'd', 'd', 'd', 'd']
+    >>> compressed = [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+    >>> list(run_length.decode(compressed))
+    ['a', 'b', 'b', 'c', 'c', 'c', 'd', 'd', 'd', 'd']
 
     """
 
@@ -2878,12 +2878,12 @@ def exactly_n(iterable, n, predicate=bool):
     """Return ``True`` if exactly ``n`` items in the iterable are ``True``
     according to the *predicate* function.
 
-        >>> exactly_n([True, True, False], 2)
-        True
-        >>> exactly_n([True, True, False], 1)
-        False
-        >>> exactly_n([0, 1, 2, 3, 4, 5], 3, lambda x: x < 3)
-        True
+    >>> exactly_n([True, True, False], 2)
+    True
+    >>> exactly_n([True, True, False], 1)
+    False
+    >>> exactly_n([0, 1, 2, 3, 4, 5], 3, lambda x: x < 3)
+    True
 
     The iterable will be advanced until ``n + 1`` truthy items are encountered,
     so avoid calling it on infinite iterables.
@@ -2913,41 +2913,41 @@ def make_decorator(wrapping_func, result_index=0):
 
     For example, to produce a decorator version of :func:`chunked`:
 
-        >>> from more_itertools import chunked
-        >>> chunker = make_decorator(chunked, result_index=0)
-        >>> @chunker(3)
-        ... def iter_range(n):
-        ...     return iter(range(n))
-        ...
-        >>> list(iter_range(9))
-        [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+    >>> from more_itertools import chunked
+    >>> chunker = make_decorator(chunked, result_index=0)
+    >>> @chunker(3)
+    ... def iter_range(n):
+    ...     return iter(range(n))
+    ...
+    >>> list(iter_range(9))
+    [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 
     To only allow truthy items to be returned:
 
-        >>> truth_serum = make_decorator(filter, result_index=1)
-        >>> @truth_serum(bool)
-        ... def boolean_test():
-        ...     return [0, 1, '', ' ', False, True]
-        ...
-        >>> list(boolean_test())
-        [1, ' ', True]
+    >>> truth_serum = make_decorator(filter, result_index=1)
+    >>> @truth_serum(bool)
+    ... def boolean_test():
+    ...     return [0, 1, '', ' ', False, True]
+    ...
+    >>> list(boolean_test())
+    [1, ' ', True]
 
     The :func:`peekable` and :func:`seekable` wrappers make for practical
     decorators:
 
-        >>> from more_itertools import peekable
-        >>> peekable_function = make_decorator(peekable)
-        >>> @peekable_function()
-        ... def str_range(*args):
-        ...     return (str(x) for x in range(*args))
-        ...
-        >>> it = str_range(1, 20, 2)
-        >>> next(it), next(it), next(it)
-        ('1', '3', '5')
-        >>> it.peek()
-        '7'
-        >>> next(it)
-        '7'
+    >>> from more_itertools import peekable
+    >>> peekable_function = make_decorator(peekable)
+    >>> @peekable_function()
+    ... def str_range(*args):
+    ...     return (str(x) for x in range(*args))
+    ...
+    >>> it = str_range(1, 20, 2)
+    >>> next(it), next(it), next(it)
+    ('1', '3', '5')
+    >>> it.peek()
+    '7'
+    >>> next(it)
+    '7'
 
     """
     # See https://sites.google.com/site/bbayles/index/decorator_factory for
@@ -2975,40 +2975,40 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     *valuefunc* defaults to the identity function if it is unspecified.
     If *reducefunc* is unspecified, no summarization takes place:
 
-        >>> keyfunc = lambda x: x.upper()
-        >>> result = map_reduce('abbccc', keyfunc)
-        >>> sorted(result.items())
-        [('A', ['a']), ('B', ['b', 'b']), ('C', ['c', 'c', 'c'])]
+    >>> keyfunc = lambda x: x.upper()
+    >>> result = map_reduce('abbccc', keyfunc)
+    >>> sorted(result.items())
+    [('A', ['a']), ('B', ['b', 'b']), ('C', ['c', 'c', 'c'])]
 
     Specifying *valuefunc* transforms the categorized items:
 
-        >>> keyfunc = lambda x: x.upper()
-        >>> valuefunc = lambda x: 1
-        >>> result = map_reduce('abbccc', keyfunc, valuefunc)
-        >>> sorted(result.items())
-        [('A', [1]), ('B', [1, 1]), ('C', [1, 1, 1])]
+    >>> keyfunc = lambda x: x.upper()
+    >>> valuefunc = lambda x: 1
+    >>> result = map_reduce('abbccc', keyfunc, valuefunc)
+    >>> sorted(result.items())
+    [('A', [1]), ('B', [1, 1]), ('C', [1, 1, 1])]
 
     Specifying *reducefunc* summarizes the categorized items:
 
-        >>> keyfunc = lambda x: x.upper()
-        >>> valuefunc = lambda x: 1
-        >>> reducefunc = sum
-        >>> result = map_reduce('abbccc', keyfunc, valuefunc, reducefunc)
-        >>> sorted(result.items())
-        [('A', 1), ('B', 2), ('C', 3)]
+    >>> keyfunc = lambda x: x.upper()
+    >>> valuefunc = lambda x: 1
+    >>> reducefunc = sum
+    >>> result = map_reduce('abbccc', keyfunc, valuefunc, reducefunc)
+    >>> sorted(result.items())
+    [('A', 1), ('B', 2), ('C', 3)]
 
     You may want to filter the input iterable before applying the map/reduce
     procedure:
 
-        >>> all_items = range(30)
-        >>> items = [x for x in all_items if 10 <= x <= 20]  # Filter
-        >>> keyfunc = lambda x: x % 2  # Evens map to 0; odds to 1
-        >>> categories = map_reduce(items, keyfunc=keyfunc)
-        >>> sorted(categories.items())
-        [(0, [10, 12, 14, 16, 18, 20]), (1, [11, 13, 15, 17, 19])]
-        >>> summaries = map_reduce(items, keyfunc=keyfunc, reducefunc=sum)
-        >>> sorted(summaries.items())
-        [(0, 90), (1, 75)]
+    >>> all_items = range(30)
+    >>> items = [x for x in all_items if 10 <= x <= 20]  # Filter
+    >>> keyfunc = lambda x: x % 2  # Evens map to 0; odds to 1
+    >>> categories = map_reduce(items, keyfunc=keyfunc)
+    >>> sorted(categories.items())
+    [(0, [10, 12, 14, 16, 18, 20]), (1, [11, 13, 15, 17, 19])]
+    >>> summaries = map_reduce(items, keyfunc=keyfunc, reducefunc=sum)
+    >>> sorted(summaries.items())
+    [(0, 90), (1, 75)]
 
     Note that all items in the iterable are gathered into a list before the
     summarization step, which may require significant storage.
@@ -3040,24 +3040,24 @@ def rlocate(iterable, pred=bool, window_size=None):
 
     *pred* defaults to :func:`bool`, which will select truthy items:
 
-        >>> list(rlocate([0, 1, 1, 0, 1, 0, 0]))  # Truthy at 1, 2, and 4
-        [4, 2, 1]
+    >>> list(rlocate([0, 1, 1, 0, 1, 0, 0]))  # Truthy at 1, 2, and 4
+    [4, 2, 1]
 
     Set *pred* to a custom function to, e.g., find the indexes for a particular
     item:
 
-        >>> iterable = iter('abcb')
-        >>> pred = lambda x: x == 'b'
-        >>> list(rlocate(iterable, pred))
-        [3, 1]
+    >>> iterable = iter('abcb')
+    >>> pred = lambda x: x == 'b'
+    >>> list(rlocate(iterable, pred))
+    [3, 1]
 
     If *window_size* is given, then the *pred* function will be called with
     that many items. This enables searching for sub-sequences:
 
-        >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
-        >>> pred = lambda *args: args == (1, 2, 3)
-        >>> list(rlocate(iterable, pred=pred, window_size=3))
-        [9, 5, 1]
+    >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
+    >>> pred = lambda *args: args == (1, 2, 3)
+    >>> list(rlocate(iterable, pred=pred, window_size=3))
+    [9, 5, 1]
 
     Beware, this function won't return anything for infinite iterables.
     If *iterable* is reversible, ``rlocate`` will reverse it and search from
@@ -3081,29 +3081,29 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
     """Yield the items from *iterable*, replacing the items for which *pred*
     returns ``True`` with the items from the iterable *substitutes*.
 
-        >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1]
-        >>> pred = lambda x: x == 0
-        >>> substitutes = (2, 3)
-        >>> list(replace(iterable, pred, substitutes))
-        [1, 1, 2, 3, 1, 1, 2, 3, 1, 1]
+    >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1]
+    >>> pred = lambda x: x == 0
+    >>> substitutes = (2, 3)
+    >>> list(replace(iterable, pred, substitutes))
+    [1, 1, 2, 3, 1, 1, 2, 3, 1, 1]
 
     If *count* is given, the number of replacements will be limited:
 
-        >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1, 0]
-        >>> pred = lambda x: x == 0
-        >>> substitutes = [None]
-        >>> list(replace(iterable, pred, substitutes, count=2))
-        [1, 1, None, 1, 1, None, 1, 1, 0]
+    >>> iterable = [1, 1, 0, 1, 1, 0, 1, 1, 0]
+    >>> pred = lambda x: x == 0
+    >>> substitutes = [None]
+    >>> list(replace(iterable, pred, substitutes, count=2))
+    [1, 1, None, 1, 1, None, 1, 1, 0]
 
     Use *window_size* to control the number of items passed as arguments to
     *pred*. This allows for locating and replacing subsequences.
 
-        >>> iterable = [0, 1, 2, 5, 0, 1, 2, 5]
-        >>> window_size = 3
-        >>> pred = lambda *args: args == (0, 1, 2)  # 3 items passed to pred
-        >>> substitutes = [3, 4] # Splice in these items
-        >>> list(replace(iterable, pred, substitutes, window_size=window_size))
-        [3, 4, 5, 3, 4, 5]
+    >>> iterable = [0, 1, 2, 5, 0, 1, 2, 5]
+    >>> window_size = 3
+    >>> pred = lambda *args: args == (0, 1, 2)  # 3 items passed to pred
+    >>> substitutes = [3, 4] # Splice in these items
+    >>> list(replace(iterable, pred, substitutes, window_size=window_size))
+    [3, 4, 5, 3, 4, 5]
 
     """
     if window_size < 1:
@@ -3380,8 +3380,8 @@ def iequals(*iterables):
 def distinct_combinations(iterable, r):
     """Yield the distinct combinations of *r* items taken from *iterable*.
 
-        >>> list(distinct_combinations([0, 0, 1], 2))
-        [(0, 0), (0, 1)]
+    >>> list(distinct_combinations([0, 0, 1], 2))
+    [(0, 0), (0, 1)]
 
     Equivalent to ``set(combinations(iterable))``, except duplicates are not
     generated and thrown away. For larger input sequences this is much more
@@ -3784,15 +3784,15 @@ def all_unique(iterable, key=None):
     Returns ``True`` if all the elements of *iterable* are unique (no two
     elements are equal).
 
-        >>> all_unique('ABCB')
-        False
+    >>> all_unique('ABCB')
+    False
 
     If a *key* function is specified, it will be used to make comparisons.
 
-        >>> all_unique('ABCb')
-        True
-        >>> all_unique('ABCb', str.lower)
-        False
+    >>> all_unique('ABCb')
+    True
+    >>> all_unique('ABCb', str.lower)
+    False
 
     The function returns as soon as the first non-unique element is
     encountered. Iterables with a mix of hashable and unhashable items can
@@ -3821,8 +3821,8 @@ def nth_product(index, *args):
     :func:`nth_product` computes the product at sort position *index* without
     computing the previous products.
 
-        >>> nth_product(8, range(2), range(2), range(2), range(2))
-        (1, 0, 0, 0)
+    >>> nth_product(8, range(2), range(2), range(2), range(2))
+    (1, 0, 0, 0)
 
     ``IndexError`` will be raised if the given *index* is invalid.
     """
@@ -3853,8 +3853,8 @@ def nth_permutation(iterable, r, index):
     computes the subsequence at sort position *index* directly, without
     computing the previous subsequences.
 
-        >>> nth_permutation('ghijk', 2, 5)
-        ('h', 'i')
+    >>> nth_permutation('ghijk', 2, 5)
+    ('h', 'i')
 
     ``ValueError`` will be raised If *r* is negative or greater than the length
     of *iterable*.
@@ -3896,14 +3896,14 @@ def value_chain(*args):
     they were passed. If an argument itself is iterable then iterate over its
     values.
 
-        >>> list(value_chain(1, 2, 3, [4, 5, 6]))
-        [1, 2, 3, 4, 5, 6]
+    >>> list(value_chain(1, 2, 3, [4, 5, 6]))
+    [1, 2, 3, 4, 5, 6]
 
     Binary and text strings are not considered iterable and are emitted
     as-is:
 
-        >>> list(value_chain('12', '34', ['56', '78']))
-        ['12', '34', '56', '78']
+    >>> list(value_chain('12', '34', ['56', '78']))
+    ['12', '34', '56', '78']
 
 
     Multiple levels of nesting are not flattened.
@@ -3926,8 +3926,8 @@ def product_index(element, *args):
     :func:`product_index` computes the first index of *element* without
     computing the previous products.
 
-        >>> product_index([8, 2], range(10), range(5))
-        42
+    >>> product_index([8, 2], range(10), range(5))
+    42
 
     ``ValueError`` will be raised if the given *element* isn't in the product
     of *args*.
@@ -3951,8 +3951,8 @@ def combination_index(element, iterable):
     lexicographically. :func:`combination_index` computes the index of the
     first *element*, without computing the previous combinations.
 
-        >>> combination_index('adf', 'abcdefg')
-        10
+    >>> combination_index('adf', 'abcdefg')
+    10
 
     ``ValueError`` will be raised if the given *element* isn't one of the
     combinations of *iterable*.
@@ -3995,8 +3995,8 @@ def permutation_index(element, iterable):
     computes the index of the first *element* directly, without computing
     the previous permutations.
 
-        >>> permutation_index([1, 3, 2], range(5))
-        19
+    >>> permutation_index([1, 3, 2], range(5))
+    19
 
     ``ValueError`` will be raised if the given *element* isn't one of the
     permutations of *iterable*.
@@ -4017,16 +4017,16 @@ class countable:
     The ``items_seen`` attribute starts at ``0`` and increments as the iterable
     is consumed:
 
-        >>> iterable = map(str, range(10))
-        >>> it = countable(iterable)
-        >>> it.items_seen
-        0
-        >>> next(it), next(it)
-        ('0', '1')
-        >>> list(it)
-        ['2', '3', '4', '5', '6', '7', '8', '9']
-        >>> it.items_seen
-        10
+    >>> iterable = map(str, range(10))
+    >>> it = countable(iterable)
+    >>> it.items_seen
+    0
+    >>> next(it), next(it)
+    ('0', '1')
+    >>> list(it)
+    ['2', '3', '4', '5', '6', '7', '8', '9']
+    >>> it.items_seen
+    10
     """
 
     def __init__(self, iterable):
@@ -4178,15 +4178,15 @@ def unique_in_window(iterable, n, key=None):
     """Yield the items from *iterable* that haven't been seen recently.
     *n* is the size of the lookback window.
 
-        >>> iterable = [0, 1, 0, 2, 3, 0]
-        >>> n = 3
-        >>> list(unique_in_window(iterable, n))
-        [0, 1, 2, 3, 0]
+    >>> iterable = [0, 1, 0, 2, 3, 0]
+    >>> n = 3
+    >>> list(unique_in_window(iterable, n))
+    [0, 1, 2, 3, 0]
 
     The *key* function, if provided, will be used to determine uniqueness:
 
-        >>> list(unique_in_window('abAcda', 3, key=lambda x: x.lower()))
-        ['a', 'b', 'c', 'd', 'a']
+    >>> list(unique_in_window('abAcda', 3, key=lambda x: x.lower()))
+    ['a', 'b', 'c', 'd', 'a']
 
     The items in *iterable* must be hashable.
 
@@ -4265,23 +4265,23 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
     """Returns both the smallest and largest items in an iterable
     or the largest of two or more arguments.
 
-        >>> minmax([3, 1, 5])
-        (1, 5)
+    >>> minmax([3, 1, 5])
+    (1, 5)
 
-        >>> minmax(4, 2, 6)
-        (2, 6)
+    >>> minmax(4, 2, 6)
+    (2, 6)
 
     If a *key* function is provided, it will be used to transform the input
     items for comparison.
 
-        >>> minmax([5, 30], key=str)  # '30' sorts before '5'
-        (30, 5)
+    >>> minmax([5, 30], key=str)  # '30' sorts before '5'
+    (30, 5)
 
     If a *default* value is provided, it will be returned if there are no
     input items.
 
-        >>> minmax([], default=(0, 0))
-        (0, 0)
+    >>> minmax([], default=(0, 0))
+    (0, 0)
 
     Otherwise ``ValueError`` is raised.
 
