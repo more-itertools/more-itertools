@@ -11,7 +11,7 @@ import operator
 import warnings
 
 from collections import deque
-from collections.abc import Sized
+from collections.abc import Collection
 from itertools import (
     chain,
     combinations,
@@ -107,7 +107,7 @@ def tail(n, iterable):
     ['E', 'F', 'G']
 
     """
-    if isinstance(iterable, Sized):
+    if isinstance(iterable, Collection):
         yield from islice(iterable, max(0, len(iterable) - n), None)
     else:
         yield from iter(deque(iterable, maxlen=n))
