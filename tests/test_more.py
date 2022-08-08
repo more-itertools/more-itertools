@@ -3218,7 +3218,7 @@ class StripFunctionTests(TestCase):
 class IsliceExtendedTests(TestCase):
     def test_all(self):
         iterable = ['0', '1', '2', '3', '4', '5']
-        indexes = [-10, -6, -5, -4, -2, -1, 0, 1, 2, 4, 5, 6, 10, None]
+        indexes = [*range(-4, 10), None]
         steps = [1, 2, 3, 4, -1, -2, -3, -4]
         for slice_args in product(indexes, indexes, steps):
             with self.subTest(slice_args=slice_args):
