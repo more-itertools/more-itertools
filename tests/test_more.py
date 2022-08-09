@@ -3216,13 +3216,23 @@ class StripFunctionTests(TestCase):
 
 
 class IsliceExtendedTests(TestCase):
-    def test_all(self):
+    def test_all_sequence(self):
         iterable = ['0', '1', '2', '3', '4', '5']
         indexes = [*range(-4, 10), None]
         steps = [1, 2, 3, 4, -1, -2, -3, -4]
         for slice_args in product(indexes, indexes, steps):
             with self.subTest(slice_args=slice_args):
                 actual = list(mi.islice_extended(iterable, *slice_args))
+                expected = iterable[slice(*slice_args)]
+                self.assertEqual(actual, expected, slice_args)
+
+    def test_all_iterator(self):
+        iterable = ['0', '1', '2', '3', '4', '5']
+        indexes = [*range(-4, 10), None]
+        steps = [1, 2, 3, 4, -1, -2, -3, -4]
+        for slice_args in product(indexes, indexes, steps):
+            with self.subTest(slice_args=slice_args):
+                actual = list(mi.islice_extended(iter(iterable), *slice_args))
                 expected = iterable[slice(*slice_args)]
                 self.assertEqual(actual, expected, slice_args)
 

@@ -1,7 +1,7 @@
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
-from collections.abc import Sequence
+from collections.abc import Sequence, Sized
 from functools import partial, reduce, wraps
 from heapq import merge, heapify, heapreplace, heappop
 from itertools import (
@@ -2466,7 +2466,18 @@ def _islice_helper(it, s):
     if step > 0:
         start = 0 if (start is None) else start
 
-        if start < 0:
+        if start >= 0 and (stop is None or stop >= 0):
+            # When both start and stop are positive we have the normal case
+            yield from islice(it, start, stop, step)
+        elif isinstance(it, Sized):
+            # If start or stop is negative, but the length is known, we
+            # can adjust start and stop to be positive and reduce this case
+            # to the previous one.
+            length = len(it)
+            start = start if start >= 0 else max(0, length + start)
+            stop = stop if stop >= 0 else max(0, length + stop)
+            yield from islice(it, start, stop, step)
+        elif start < 0:
             # Consume all but the last -start items
             cache = deque(enumerate(it, 1), maxlen=-start)
             len_iter = cache[-1][0] if cache else 0
@@ -2489,7 +2500,7 @@ def _islice_helper(it, s):
 
             for index, item in islice(cache, 0, n, step):
                 yield item
-        elif (stop is not None) and (stop < 0):
+        else:
             # Advance to the start position
             next(islice(it, start, start), None)
 
@@ -2502,9 +2513,6 @@ def _islice_helper(it, s):
                 if index % step == 0:
                     yield cached_item
                 cache.append(item)
-        else:
-            # When both start and stop are positive we have the normal case
-            yield from islice(it, start, stop, step)
     else:
         start = -1 if (start is None) else start
 
