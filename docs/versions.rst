@@ -5,6 +5,21 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+8.14.0
+------
+
+* New functions
+    * :func:`longest_common_prefix` (thanks to nanouasyn)
+    * :func:`iequals` (thanks to nanouasyn)
+
+* Changes to existing functions
+    * `concurrent.futures.ThreadPoolExecutor` is now imported lazily in :func:`callback_iter`.
+    * :func:`tail` is now optimized for iterables with a fixed length.
+
+* Other changes
+    * Some documentation issues were fixed (thanks to pochmann and timgates42)
+    * This library is now marked for Python 3.10 compatibility in PyPI (thanks to chayim)
+
 8.13.0
 ------
 
