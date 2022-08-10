@@ -2437,10 +2437,11 @@ class islice_extended:
     """
 
     def __init__(self, iterable, *args):
+        it = iter(iterable)
         if args:
             self._iterable = _islice_helper(iterable, slice(*args))
         else:
-            self._iterable = iter(iterable)
+            self._iterable = it
 
     def __iter__(self):
         return self
@@ -2456,17 +2457,19 @@ class islice_extended:
 
 
 def _islice_helper(iterable, s):
-    start, stop, step = s.start, s.stop, s.step
-    if step == 0:
+    start = s.start
+    stop = s.stop
+    if s.step == 0:
         raise ValueError('step argument must be a non-zero integer or None.')
-    step = step or 1
+    step = s.step or 1
+    it = iter(iterable)
 
     if step > 0:
-        start = 0 if start is None else start
+        start = 0 if (start is None) else start
 
         if start >= 0 and (stop is None or stop >= 0):
             # When both start and stop are positive we have the normal case
-            yield from islice(iterable, start, stop, step)
+            yield from islice(it, start, stop, step)
         elif isinstance(iterable, Sized):
             # If start or stop is negative, but the length is known, we
             # can adjust start and stop to be positive and reduce this case
@@ -2476,10 +2479,10 @@ def _islice_helper(iterable, s):
                 start = max(0, length + start)
             if stop is not None and stop < 0:
                 stop = max(0, length + stop)
-            yield from islice(iterable, start, stop, step)
+            yield from islice(it, start, stop, step)
         elif start < 0:
             # Consume all but the last -start items
-            cache = deque(enumerate(iterable, 1), maxlen=-start)
+            cache = deque(enumerate(it, 1), maxlen=-start)
             len_iter = cache[-1][0] if cache else 0
 
             # Adjust start to be positive
@@ -2501,26 +2504,25 @@ def _islice_helper(iterable, s):
             for index, item in islice(cache, 0, n, step):
                 yield item
         else:
-            iterator = iter(iterable)
             # Advance to the start position
-            next(islice(iterator, start, start), None)
+            next(islice(it, start, start), None)
 
             # When stop is negative, we have to carry -stop items while
             # iterating
-            cache = deque(islice(iterator, -stop), maxlen=-stop)
+            cache = deque(islice(it, -stop), maxlen=-stop)
 
-            for index, item in enumerate(iterator):
+            for index, item in enumerate(it):
                 cached_item = cache.popleft()
                 if index % step == 0:
                     yield cached_item
                 cache.append(item)
     else:
-        start = -1 if start is None else start
+        start = -1 if (start is None) else start
 
         if start >= 0 and (stop is None or stop >= 0):
             # When both start and stop are positive, we can just use islice.
             stop = -1 if stop is None else stop
-            yield from list(islice(iterable, stop + 1, start + 1))[::step]
+            yield from list(islice(it, stop + 1, start + 1))[::step]
         elif isinstance(iterable, Sized):
             # If start or stop is negative, but the length of iterable is
             # known, we can adjust start and stop and use islice again.
@@ -2535,11 +2537,11 @@ def _islice_helper(iterable, s):
                 j = start + 1
             else:
                 j = max(0, length + start + 1)
-            yield from list(islice(iterable, i, j))[::step]
-        elif stop is not None and stop < 0:
+            yield from list(islice(it, i, j))[::step]
+        elif (stop is not None) and (stop < 0):
             # Consume all but the last items
             n = -stop - 1
-            cache = deque(enumerate(iterable, 1), maxlen=n)
+            cache = deque(enumerate(it, 1), maxlen=n)
             len_iter = cache[-1][0] if cache else 0
 
             # If start and stop are both negative they are comparable and
@@ -2553,11 +2555,10 @@ def _islice_helper(iterable, s):
             for index, item in list(cache)[i:j:step]:
                 yield item
         else:
-            iterator = iter(iterable)
             # Advance to the stop position
             if stop is not None:
                 m = stop + 1
-                next(islice(iterator, m, m), None)
+                next(islice(it, m, m), None)
 
             # stop is positive, so if start is negative they are not comparable
             # and we need the rest of the items.
@@ -2576,7 +2577,7 @@ def _islice_helper(iterable, s):
                 if n <= 0:
                     return
 
-            cache = list(islice(iterator, n))
+            cache = list(islice(it, n))
 
             yield from cache[i::step]
 
