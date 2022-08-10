@@ -38,8 +38,8 @@ Python iterables.
 |                        | `windowed_complete <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.windowed_complete>`_,                                                           |
 |                        | `pairwise <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.pairwise>`_,                                                                             |
 |                        | `triplewise <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.triplewise>`_,                                                                         |
-|                        | `sliding_window <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sliding_window>`_                                                                  |
-|                        | `subslices <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.subslices>`_,                                                                           |
+|                        | `sliding_window <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sliding_window>`_,                                                                 |
+|                        | `subslices <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.subslices>`_                                                                            |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Augmenting             | `count_cycle <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.count_cycle>`_,                                                                       |
 |                        | `intersperse <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.intersperse>`_,                                                                       |
@@ -79,7 +79,7 @@ Python iterables.
 |                        | `all_unique <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.all_unique>`_,                                                                         |
 |                        | `minmax <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.minmax>`_,                                                                                 |
 |                        | `first_true <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.first_true>`_,                                                                         |
-|                        | `quantify <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.quantify>`_                                                                              |
+|                        | `quantify <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.quantify>`_,                                                                             |
 |                        | `iequals <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.iequals>`_                                                                                |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Selecting              | `islice_extended <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.islice_extended>`_,                                                               |
@@ -102,7 +102,7 @@ Python iterables.
 |                        | `unique_everseen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertoo ls.unique_everseen>`_,                                                              |
 |                        | `unique_justseen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.unique_justseen>`_,                                                               |
 |                        | `duplicates_everseen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.duplicates_everseen>`_,                                                       |
-|                        | `duplicates_justseen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.duplicates_justseen>`_                                                        |
+|                        | `duplicates_justseen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.duplicates_justseen>`_,                                                       |
 |                        | `longest_common_prefix <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.longest_common_prefix>`_                                                    |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Combinatorics          | `distinct_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_permutations>`_,                                                   |
