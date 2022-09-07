@@ -287,3 +287,4 @@ Others
 .. autofunction:: consume
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc
+.. autofunction:: polynomial_from_roots

@@ -6,6 +6,7 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Sequence,
     Tuple,
     TypeVar,
     Union,
@@ -109,3 +110,4 @@ def sliding_window(
     iterable: Iterable[_T], n: int
 ) -> Iterator[Tuple[_T, ...]]: ...
 def subslices(iterable: Iterable[_T]) -> Iterator[List[_T]]: ...
+def polynomial_from_roots(roots: Sequence[int]) -> List[int]: ...

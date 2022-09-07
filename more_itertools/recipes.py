@@ -24,6 +24,7 @@ from itertools import (
     tee,
     zip_longest,
 )
+from math import prod
 from random import randrange, sample, choice
 
 __all__ = [
@@ -43,6 +44,7 @@ __all__ = [
     'pad_none',
     'pairwise',
     'partition',
+    'polynomial_from_roots',
     'powerset',
     'prepend',
     'quantify',
@@ -790,3 +792,16 @@ def subslices(iterable):
     seq = list(iterable)
     slices = starmap(slice, combinations(range(len(seq) + 1), 2))
     return map(operator.getitem, repeat(seq), slices)
+
+
+def polynomial_from_roots(roots):
+    """Compute a polynomial's coefficients from its roots.
+
+    >>> roots = [5, -4, 3]  # (x - 5) * (x + 4) * (x - 3)
+    >>> polynomial_from_roots(roots)  # x^3 - 4 * x^2 - 17 * x + 60
+    [1, -4, -17, 60]
+    """
+    roots = list(map(operator.neg, roots))
+    return [
+        sum(map(prod, combinations(roots, k))) for k in range(len(roots) + 1)
+    ]
