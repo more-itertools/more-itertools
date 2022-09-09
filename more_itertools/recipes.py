@@ -7,11 +7,13 @@ Some backward-compatible usability improvements have been made.
 .. [1] http://docs.python.org/library/itertools.html#recipes
 
 """
+import math
 import operator
 import warnings
 
 from collections import deque
 from collections.abc import Sized
+from functools import reduce
 from itertools import (
     chain,
     combinations,
@@ -24,7 +26,6 @@ from itertools import (
     tee,
     zip_longest,
 )
-from math import prod
 from random import randrange, sample, choice
 
 __all__ = [
@@ -801,6 +802,8 @@ def polynomial_from_roots(roots):
     >>> polynomial_from_roots(roots)  # x^3 - 4 * x^2 - 17 * x + 60
     [1, -4, -17, 60]
     """
+    # Use math.prod for Python 3.8+,
+    prod = getattr(math, 'prod', lambda x: reduce(operator.mul, x, 1))
     roots = list(map(operator.neg, roots))
     return [
         sum(map(prod, combinations(roots, k))) for k in range(len(roots) + 1)
