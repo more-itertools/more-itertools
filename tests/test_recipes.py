@@ -843,3 +843,16 @@ class SubslicesTests(TestCase):
             with self.subTest(expected=expected):
                 actual = list(mi.subslices(iterable))
                 self.assertEqual(actual, expected)
+
+
+class PolynomialFromRootsTests(TestCase):
+    def test_basic(self):
+        for roots, expected in [
+            ((2, 1, -1), [1, -2, -1, 2]),
+            ((2, 3), [1, -5, 6]),
+            ((1, 2, 3), [1, -6, 11, -6]),
+            ((2, 4, 1), [1, -7, 14, -8]),
+        ]:
+            with self.subTest(roots=roots):
+                actual = mi.polynomial_from_roots(roots)
+                self.assertEqual(actual, expected)
