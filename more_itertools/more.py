@@ -46,6 +46,7 @@ __all__ = [
     'all_unique',
     'always_iterable',
     'always_reversible',
+    'batched',
     'bucket',
     'callback_iter',
     'chunked',
@@ -4331,3 +4332,38 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
                 hi, hi_key = y, y_key
 
     return lo, hi
+
+
+def batched(iterable, size, get_len=len, strict=True):
+    """Yield batches of items from *iterable* with a combined size limited by
+    *size*.
+
+    >>> iterable = [b'12345', b'123', b'12345678', b'1', b'1', b'12', b'1']
+    >>> list(batched(iterable, 10))
+    [(b'12345', b'123'), (b'12345678', b'1', b'1'), (b'12', b'1')]
+
+    If a *get_len* function is supplied, use that instead of :func:`len` to
+    determine item size.
+
+    If *strict* is ``True``, raise ``ValueError`` if any single item is bigger
+    than *size*. Otherwise, allow single items to exceed *size*.
+    """
+    if size <= 0:
+        raise ValueError('maximum size must be greater than zero')
+
+    batch = []
+    batch_size = 0
+    for item in iterable:
+        if strict and get_len(item) > size:
+            raise ValueError('item size exceeds maximum size')
+
+        if batch_size and get_len(item) + batch_size > size:
+            yield tuple(batch)
+            batch.clear()
+            batch_size = 0
+
+        batch.append(item)
+        batch_size += get_len(item)
+
+    if batch:
+        yield tuple(batch)
