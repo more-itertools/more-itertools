@@ -17,6 +17,7 @@ from functools import reduce
 from itertools import (
     chain,
     combinations,
+    compress,
     count,
     cycle,
     groupby,
@@ -55,6 +56,7 @@ __all__ = [
     'random_product',
     'repeatfunc',
     'roundrobin',
+    'sieve',
     'sliding_window',
     'subslices',
     'tabulate',
@@ -808,3 +810,19 @@ def polynomial_from_roots(roots):
     return [
         sum(map(prod, combinations(roots, k))) for k in range(len(roots) + 1)
     ]
+
+
+def sieve(n):
+    """Yield the primes less than n.
+
+    >>> list(sieve(30))
+    [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    """
+    isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
+    limit = isqrt(n) + 1
+    data = bytearray([1]) * n
+    data[:2] = 0, 0
+    for p in compress(count(), islice(data, limit)):
+        data[p + p : n : p] = bytearray(len(range(p + p, n, p)))
+
+    return compress(count(), data)
