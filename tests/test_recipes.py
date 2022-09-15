@@ -856,3 +856,50 @@ class PolynomialFromRootsTests(TestCase):
             with self.subTest(roots=roots):
                 actual = mi.polynomial_from_roots(roots)
                 self.assertEqual(actual, expected)
+
+
+class SieveTests(TestCase):
+    def test_basic(self):
+        self.assertEqual(
+            list(mi.sieve(67)),
+            [
+                2,
+                3,
+                5,
+                7,
+                11,
+                13,
+                17,
+                19,
+                23,
+                29,
+                31,
+                37,
+                41,
+                43,
+                47,
+                53,
+                59,
+                61,
+            ],
+        )
+        self.assertEqual(list(mi.sieve(68))[-1], 67)
+
+    def test_prime_counts(self):
+        for n, expected in (
+            (100, 25),
+            (1_000, 168),
+            (10_000, 1229),
+            (100_000, 9592),
+            (1_000_000, 78498),
+        ):
+            with self.subTest(n=n):
+                self.assertEqual(mi.ilen(mi.sieve(n)), expected)
+
+    def test_small_numbers(self):
+        with self.assertRaises(ValueError):
+            list(mi.sieve(-1))
+
+        for n in (0, 1, 2):
+            with self.subTest(n=n):
+                self.assertEqual(list(mi.sieve(n)), [])

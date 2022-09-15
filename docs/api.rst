@@ -288,3 +288,4 @@ Others
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc
 .. autofunction:: polynomial_from_roots
+.. autofunction:: sieve
