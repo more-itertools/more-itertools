@@ -4354,16 +4354,17 @@ def batched(iterable, size, get_len=len, strict=True):
     batch = []
     batch_size = 0
     for item in iterable:
-        if strict and get_len(item) > size:
+        item_len = get_len(item)
+        if strict and item_len > size:
             raise ValueError('item size exceeds maximum size')
 
-        if batch_size and get_len(item) + batch_size > size:
+        if batch_size and item_len + batch_size > size:
             yield tuple(batch)
             batch.clear()
             batch_size = 0
 
         batch.append(item)
-        batch_size += get_len(item)
+        batch_size += item_len
 
     if batch:
         yield tuple(batch)
