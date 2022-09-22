@@ -5197,6 +5197,14 @@ class BatchedTests(TestCase):
                 actual = list(mi.batched(iter(zen), size))
                 self.assertEqual(actual, expected)
 
+    def test_max_count(self):
+        iterable = ['1', '1', '12345678', '12345', '12345']
+        max_size = 10
+        max_count = 2
+        actual = list(mi.batched(iterable, max_size, max_count))
+        expected = [('1', '1'), ('12345678',), ('12345', '12345')]
+        self.assertEqual(actual, expected)
+
     def test_strict(self):
         iterable = ['1', '123456789', '1']
         size = 8
