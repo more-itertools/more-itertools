@@ -5137,3 +5137,96 @@ class IequalsTests(TestCase):
 
     def test_not_identical_but_equal(self):
         self.assertTrue([1, True], [1.0, complex(1, 0)])
+
+
+class BatchedTests(TestCase):
+    def test_basic(self):
+        zen = [
+            'Beautiful is better than ugly',
+            'Explicit is better than implicit',
+            'Simple is better than complex',
+            'Complex is better than complicated',
+            'Flat is better than nested',
+            'Sparse is better than dense',
+            'Readability counts',
+        ]
+        for size, expected in (
+            (
+                34,
+                [
+                    (zen[0],),
+                    (zen[1],),
+                    (zen[2],),
+                    (zen[3],),
+                    (zen[4],),
+                    (zen[5],),
+                    (zen[6],),
+                ],
+            ),
+            (
+                61,
+                [
+                    (zen[0], zen[1]),
+                    (zen[2],),
+                    (zen[3], zen[4]),
+                    (zen[5], zen[6]),
+                ],
+            ),
+            (
+                90,
+                [
+                    (zen[0], zen[1], zen[2]),
+                    (zen[3], zen[4], zen[5]),
+                    (zen[6],),
+                ],
+            ),
+            (
+                124,
+                [(zen[0], zen[1], zen[2], zen[3]), (zen[4], zen[5], zen[6])],
+            ),
+            (
+                150,
+                [(zen[0], zen[1], zen[2], zen[3], zen[4]), (zen[5], zen[6])],
+            ),
+            (
+                177,
+                [(zen[0], zen[1], zen[2], zen[3], zen[4], zen[5]), (zen[6],)],
+            ),
+        ):
+            with self.subTest(size=size):
+                actual = list(mi.batched(iter(zen), size))
+                self.assertEqual(actual, expected)
+
+    def test_max_count(self):
+        iterable = ['1', '1', '12345678', '12345', '12345']
+        max_size = 10
+        max_count = 2
+        actual = list(mi.batched(iterable, max_size, max_count))
+        expected = [('1', '1'), ('12345678',), ('12345', '12345')]
+        self.assertEqual(actual, expected)
+
+    def test_strict(self):
+        iterable = ['1', '123456789', '1']
+        size = 8
+        with self.assertRaises(ValueError):
+            list(mi.batched(iterable, size))
+
+        actual = list(mi.batched(iterable, size, strict=False))
+        expected = [('1',), ('123456789',), ('1',)]
+        self.assertEqual(actual, expected)
+
+    def test_get_len(self):
+        class Record(tuple):
+            def total_size(self):
+                return sum(len(x) for x in self)
+
+        record_3 = Record(('1', '23'))
+        record_5 = Record(('1234', '1'))
+        record_10 = Record(('1', '12345678', '1'))
+        record_2 = Record(('1', '1'))
+        iterable = [record_3, record_5, record_10, record_2]
+
+        self.assertEqual(
+            list(mi.batched(iterable, 10, get_len=lambda x: x.total_size())),
+            [(record_3, record_5), (record_10,), (record_2,)],
+        )

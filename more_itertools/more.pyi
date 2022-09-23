@@ -666,3 +666,10 @@ def longest_common_prefix(
     iterables: Iterable[Iterable[_T]],
 ) -> Iterator[_T]: ...
 def iequals(*iterables: Iterable[object]) -> bool: ...
+def batched(
+    iterable: Iterable[object],
+    max_size: int,
+    max_count: Optional[int] = ...,
+    get_len: Callable[[_T], object] = ...,
+    strict: bool = ...,
+) -> Iterator[Tuple[_T]]: ...

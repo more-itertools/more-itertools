@@ -46,6 +46,7 @@ __all__ = [
     'all_unique',
     'always_iterable',
     'always_reversible',
+    'batched',
     'bucket',
     'callback_iter',
     'chunked',
@@ -4331,3 +4332,51 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
                 hi, hi_key = y, y_key
 
     return lo, hi
+
+
+def batched(iterable, max_size, max_count=None, get_len=len, strict=True):
+    """Yield batches of items from *iterable* with a combined size limited by
+    *max_size*.
+
+    >>> iterable = [b'12345', b'123', b'12345678', b'1', b'1', b'12', b'1']
+    >>> list(batched(iterable, 10))
+    [(b'12345', b'123'), (b'12345678', b'1', b'1'), (b'12', b'1')]
+
+    If a *max_count* is supplied, the number of items per batch is also
+    limited:
+
+    >>> iterable = [b'12345', b'123', b'12345678', b'1', b'1', b'12', b'1']
+    >>> list(batched(iterable, 10, max_count = 2))
+    [(b'12345', b'123'), (b'12345678', b'1'), (b'1', b'12'), (b'1',)]
+
+    If a *get_len* function is supplied, use that instead of :func:`len` to
+    determine item size.
+
+    If *strict* is ``True``, raise ``ValueError`` if any single item is bigger
+    than *max_size*. Otherwise, allow single items to exceed *max_size*.
+    """
+    if max_size <= 0:
+        raise ValueError('maximum size must be greater than zero')
+
+    batch = []
+    batch_size = 0
+    batch_count = 0
+    for item in iterable:
+        item_len = get_len(item)
+        if strict and item_len > max_size:
+            raise ValueError('item size exceeds maximum size')
+
+        reached_count = batch_count == max_count
+        reached_size = item_len + batch_size > max_size
+        if batch_count and (reached_size or reached_count):
+            yield tuple(batch)
+            batch.clear()
+            batch_size = 0
+            batch_count = 0
+
+        batch.append(item)
+        batch_size += item_len
+        batch_count += 1
+
+    if batch:
+        yield tuple(batch)
