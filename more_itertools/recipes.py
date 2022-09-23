@@ -822,7 +822,7 @@ def sieve(n):
     limit = isqrt(n) + 1
     data = bytearray([1]) * n
     data[:2] = 0, 0
-    for p in compress(count(), islice(data, limit)):
+    for p in compress(range(limit), data):
         data[p + p : n : p] = bytearray(len(range(p + p, n, p)))
 
     return compress(count(), data)
