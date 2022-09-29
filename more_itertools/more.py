@@ -876,7 +876,9 @@ def windowed(seq, n, fillvalue=None, step=1):
             yield tuple(window)
 
     size = len(window)
-    if size < n:
+    if size == 0:
+        return
+    elif size < n:
         yield tuple(chain(window, repeat(fillvalue, n - size)))
     elif 0 < i < min(step, n):
         window += (fillvalue,) * i
