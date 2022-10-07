@@ -5130,7 +5130,7 @@ class IequalsTests(TestCase):
         self.assertTrue([1, True], [1.0, complex(1, 0)])
 
 
-class BatchedTests(TestCase):
+class ConstrainedBatchesTests(TestCase):
     def test_basic(self):
         zen = [
             'Beautiful is better than ugly',
@@ -5185,14 +5185,14 @@ class BatchedTests(TestCase):
             ),
         ):
             with self.subTest(size=size):
-                actual = list(mi.batched(iter(zen), size))
+                actual = list(mi.constrained_batches(iter(zen), size))
                 self.assertEqual(actual, expected)
 
     def test_max_count(self):
         iterable = ['1', '1', '12345678', '12345', '12345']
         max_size = 10
         max_count = 2
-        actual = list(mi.batched(iterable, max_size, max_count))
+        actual = list(mi.constrained_batches(iterable, max_size, max_count))
         expected = [('1', '1'), ('12345678',), ('12345', '12345')]
         self.assertEqual(actual, expected)
 
@@ -5200,9 +5200,9 @@ class BatchedTests(TestCase):
         iterable = ['1', '123456789', '1']
         size = 8
         with self.assertRaises(ValueError):
-            list(mi.batched(iterable, size))
+            list(mi.constrained_batches(iterable, size))
 
-        actual = list(mi.batched(iterable, size, strict=False))
+        actual = list(mi.constrained_batches(iterable, size, strict=False))
         expected = [('1',), ('123456789',), ('1',)]
         self.assertEqual(actual, expected)
 
@@ -5218,6 +5218,10 @@ class BatchedTests(TestCase):
         iterable = [record_3, record_5, record_10, record_2]
 
         self.assertEqual(
-            list(mi.batched(iterable, 10, get_len=lambda x: x.total_size())),
+            list(
+                mi.constrained_batches(
+                    iterable, 10, get_len=lambda x: x.total_size()
+                )
+            ),
             [(record_3, record_5), (record_10,), (record_2,)],
         )
