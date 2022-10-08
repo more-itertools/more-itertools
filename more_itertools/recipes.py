@@ -31,6 +31,7 @@ from random import randrange, sample, choice
 
 __all__ = [
     'all_equal',
+    'batched',
     'before_and_after',
     'consume',
     'convolve',
@@ -826,3 +827,20 @@ def sieve(n):
         data[p + p : n : p] = bytearray(len(range(p + p, n, p)))
 
     return compress(count(), data)
+
+
+def batched(iterable, n):
+    """Batch data into lists of length *n*. The last batch may be shorter.
+
+    >>> list(batched('ABCDEFG', 3))
+    [['A', 'B', 'C'], ['D', 'E', 'F'], ['G']]
+
+    This recipe is from the ``itertools`` docs. This library also provides
+    :func:`chunked`, which has a different implementation.
+    """
+    it = iter(iterable)
+    while True:
+        batch = list(islice(it, n))
+        if not batch:
+            break
+        yield batch

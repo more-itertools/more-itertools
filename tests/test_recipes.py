@@ -903,3 +903,20 @@ class SieveTests(TestCase):
         for n in (0, 1, 2):
             with self.subTest(n=n):
                 self.assertEqual(list(mi.sieve(n)), [])
+
+
+class BatchedTests(TestCase):
+    def test_basic(self):
+        iterable = range(1, 5 + 1)
+        for n, expected in (
+            (0, []),
+            (1, [[1], [2], [3], [4], [5]]),
+            (2, [[1, 2], [3, 4], [5]]),
+            (3, [[1, 2, 3], [4, 5]]),
+            (4, [[1, 2, 3, 4], [5]]),
+            (5, [[1, 2, 3, 4, 5]]),
+            (6, [[1, 2, 3, 4, 5]]),
+        ):
+            with self.subTest(n=n):
+                actual = list(mi.batched(iterable, n))
+                self.assertEqual(actual, expected)
