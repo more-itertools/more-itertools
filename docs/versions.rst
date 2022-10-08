@@ -12,6 +12,7 @@ Version History
     * :func:`grouper` no longer accepts an integer as its first argument. Previously this raised a ``DeprecationWarning``.
     * :func:`collate` has been removed. Use the built-in :func:`heapq.merge` instead.
     * :func:`windowed` now yields nothing when its iterable is empty.
+    * This library now advertises support for Python 3.7+.
 
 * New functions
     * :func:`constrained_batches`

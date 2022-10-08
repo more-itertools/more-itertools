@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9.0, 3.10.0, pypy3]
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy3']
 
     steps:
     - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
       run: |
         flake8 .
     - name: Check formatting with black
-      if: "matrix.python-version == '3.6'"
+      if: "matrix.python-version == '3.7'"
       run: |
         pip install -U black
         black --check .
@@ -41,18 +41,18 @@ jobs:
         pip install -U mypy
         stubtest more_itertools.more more_itertools.recipes
     - name: Build docs with sphinx
-      if: "matrix.python-version == '3.6'"
+      if: "matrix.python-version == '3.7'"
       run: |
         pip install -U sphinx sphinx_rtd_theme
         sphinx-build -W -b html docs docs/_build/html
     - name: Build packages
-      if: "matrix.python-version == '3.6'"
+      if: "matrix.python-version == '3.7'"
       run: |
         pip install -U flit twine
         flit build --setup-py
         twine check dist/*
     - name: Upload packages
-      if: "matrix.python-version == '3.6'"
+      if: "matrix.python-version == '3.7'"
       uses: actions/upload-artifact@v2
       with:
         name: more-itertools-packages
