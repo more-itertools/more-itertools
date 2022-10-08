@@ -11,10 +11,11 @@ Version History
 * Potentially breaking changes
     * :func:`grouper` no longer accepts an integer as its first argument. Previously this raised a ``DeprecationWarning``.
     * :func:`collate` has been removed. Use the built-in :func:`heapq.merge` instead.
-    * :func:`windowed` now behaves differently for...
+    * :func:`windowed` now yields nothing when its iterable is empty.
 
 * New functions
-    * :func:`batched`
+    * :func:`constrained_batches`
+    * :func:`batched` (from the Python itertools docs)
     * :func:`polynomial_from_roots` (from the Python itertools docs)
     * :func:`sieve` (from the Python itertools docs)
 
