@@ -1,5 +1,3 @@
-import warnings
-
 from doctest import DocTestSuite
 from itertools import combinations, count, permutations
 from math import factorial

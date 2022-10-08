@@ -3,7 +3,7 @@ import warnings
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
 from functools import partial, reduce, wraps
-from heapq import merge, heapify, heapreplace, heappop
+from heapq import heapify, heapreplace, heappop
 from itertools import (
     chain,
     compress,

@@ -9,7 +9,6 @@ Some backward-compatible usability improvements have been made.
 """
 import math
 import operator
-import warnings
 
 from collections import deque
 from collections.abc import Sized

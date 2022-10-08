@@ -7,7 +7,6 @@ from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
 from functools import partial, reduce
-from heapq import merge
 from io import StringIO
 from itertools import (
     accumulate,
