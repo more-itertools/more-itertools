@@ -41,51 +41,6 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-class CollateTests(TestCase):
-    """Unit tests for ``collate()``"""
-
-    # Also accidentally tests peekable, though that could use its own tests
-
-    def test_default(self):
-        """Test with the default `key` function."""
-        iterables = [range(4), range(7), range(3, 6)]
-        self.assertEqual(
-            sorted(reduce(list.__add__, [list(it) for it in iterables])),
-            list(mi.collate(*iterables)),
-        )
-
-    def test_key(self):
-        """Test using a custom `key` function."""
-        iterables = [range(5, 0, -1), range(4, 0, -1)]
-        actual = sorted(
-            reduce(list.__add__, [list(it) for it in iterables]), reverse=True
-        )
-        expected = list(mi.collate(*iterables, key=lambda x: -x))
-        self.assertEqual(actual, expected)
-
-    def test_empty(self):
-        """Be nice if passed an empty list of iterables."""
-        self.assertEqual([], list(mi.collate()))
-
-    def test_one(self):
-        """Work when only 1 iterable is passed."""
-        self.assertEqual([0, 1], list(mi.collate(range(2))))
-
-    def test_reverse(self):
-        """Test the `reverse` kwarg."""
-        iterables = [range(4, 0, -1), range(7, 0, -1), range(3, 6, -1)]
-
-        actual = sorted(
-            reduce(list.__add__, [list(it) for it in iterables]), reverse=True
-        )
-        expected = list(mi.collate(*iterables, reverse=True))
-        self.assertEqual(actual, expected)
-
-    def test_alias(self):
-        self.assertNotEqual(merge.__doc__, mi.collate.__doc__)
-        self.assertNotEqual(partial.__doc__, mi.collate.__doc__)
-
-
 class ChunkedTests(TestCase):
     """Tests for ``chunked()``"""
 
@@ -289,11 +244,6 @@ class PeekableMixinTests:
 
 
 class PeekableTests(PeekableMixinTests, TestCase):
-    """Tests for ``peekable()`` behavior not incidentally covered by testing
-    ``collate()``
-
-    """
-
     cls = mi.peekable
 
     def test_indexing(self):
