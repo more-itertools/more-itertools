@@ -733,64 +733,55 @@ class UniqueToEachTests(TestCase):
 
 
 class WindowedTests(TestCase):
-    """Tests for ``windowed()``"""
-
     def test_basic(self):
-        actual = list(mi.windowed([1, 2, 3, 4, 5], 3))
-        expected = [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
-        self.assertEqual(actual, expected)
-
-    def test_large_size(self):
-        """
-        When the window size is larger than the iterable, and no fill value is
-        given,``None`` should be filled in.
-        """
-        actual = list(mi.windowed([1, 2, 3, 4, 5], 6))
-        expected = [(1, 2, 3, 4, 5, None)]
-        self.assertEqual(actual, expected)
-
-    def test_fillvalue(self):
-        """
-        When sizes don't match evenly, the given fill value should be used.
-        """
         iterable = [1, 2, 3, 4, 5]
 
-        for n, kwargs, expected in [
-            (6, {}, [(1, 2, 3, 4, 5, '!')]),  # n > len(iterable)
-            (3, {'step': 3}, [(1, 2, 3), (4, 5, '!')]),  # using ``step``
-        ]:
-            actual = list(mi.windowed(iterable, n, fillvalue='!', **kwargs))
-            self.assertEqual(actual, expected)
+        for n, expected in (
+            (6, [(1, 2, 3, 4, 5, None)]),
+            (5, [(1, 2, 3, 4, 5)]),
+            (4, [(1, 2, 3, 4), (2, 3, 4, 5)]),
+            (3, [(1, 2, 3), (2, 3, 4), (3, 4, 5)]),
+            (2, [(1, 2), (2, 3), (3, 4), (4, 5)]),
+            (1, [(1,), (2,), (3,), (4,), (5,)]),
+            (0, [()]),
+        ):
+            with self.subTest(n=n):
+                actual = list(mi.windowed(iterable, n))
+                self.assertEqual(actual, expected)
 
-    def test_zero(self):
-        """When the window size is zero, an empty tuple should be emitted."""
-        actual = list(mi.windowed([1, 2, 3, 4, 5], 0))
-        expected = [tuple()]
+    def test_fillvalue(self):
+        actual = list(mi.windowed([1, 2, 3, 4, 5], 6, fillvalue='!'))
+        expected = [(1, 2, 3, 4, 5, '!')]
         self.assertEqual(actual, expected)
 
-    def test_negative(self):
-        """When the window size is negative, ValueError should be raised."""
-        with self.assertRaises(ValueError):
-            list(mi.windowed([1, 2, 3, 4, 5], -1))
-
     def test_step(self):
-        """The window should advance by the number of steps provided"""
         iterable = [1, 2, 3, 4, 5, 6, 7]
         for n, step, expected in [
             (3, 2, [(1, 2, 3), (3, 4, 5), (5, 6, 7)]),  # n > step
             (3, 3, [(1, 2, 3), (4, 5, 6), (7, None, None)]),  # n == step
-            (3, 4, [(1, 2, 3), (5, 6, 7)]),  # line up nicely
+            (3, 4, [(1, 2, 3), (5, 6, 7)]),  # lines up nicely
             (3, 5, [(1, 2, 3), (6, 7, None)]),  # off by one
             (3, 6, [(1, 2, 3), (7, None, None)]),  # off by two
             (3, 7, [(1, 2, 3)]),  # step past the end
             (7, 8, [(1, 2, 3, 4, 5, 6, 7)]),  # step > len(iterable)
         ]:
-            actual = list(mi.windowed(iterable, n, step=step))
-            self.assertEqual(actual, expected)
+            with self.subTest(n=n, step=step):
+                actual = list(mi.windowed(iterable, n, step=step))
+                self.assertEqual(actual, expected)
 
+    def test_invalid_step(self):
         # Step must be greater than or equal to 1
         with self.assertRaises(ValueError):
-            list(mi.windowed(iterable, 3, step=0))
+            list(mi.windowed([1, 2, 3, 4, 5], 3, step=0))
+
+    def test_fillvalue_step(self):
+        actual = list(mi.windowed([1, 2, 3, 4, 5], 3, fillvalue='!', step=3))
+        expected = [(1, 2, 3), (4, 5, '!')]
+        self.assertEqual(actual, expected)
+
+    def test_negative(self):
+        with self.assertRaises(ValueError):
+            list(mi.windowed([1, 2, 3, 4, 5], -1))
 
 
 class SubstringsTests(TestCase):
@@ -5089,7 +5080,7 @@ class IequalsTests(TestCase):
         self.assertTrue([1, True], [1.0, complex(1, 0)])
 
 
-class BatchedTests(TestCase):
+class ConstrainedBatchesTests(TestCase):
     def test_basic(self):
         zen = [
             'Beautiful is better than ugly',
@@ -5144,14 +5135,14 @@ class BatchedTests(TestCase):
             ),
         ):
             with self.subTest(size=size):
-                actual = list(mi.batched(iter(zen), size))
+                actual = list(mi.constrained_batches(iter(zen), size))
                 self.assertEqual(actual, expected)
 
     def test_max_count(self):
         iterable = ['1', '1', '12345678', '12345', '12345']
         max_size = 10
         max_count = 2
-        actual = list(mi.batched(iterable, max_size, max_count))
+        actual = list(mi.constrained_batches(iterable, max_size, max_count))
         expected = [('1', '1'), ('12345678',), ('12345', '12345')]
         self.assertEqual(actual, expected)
 
@@ -5159,9 +5150,9 @@ class BatchedTests(TestCase):
         iterable = ['1', '123456789', '1']
         size = 8
         with self.assertRaises(ValueError):
-            list(mi.batched(iterable, size))
+            list(mi.constrained_batches(iterable, size))
 
-        actual = list(mi.batched(iterable, size, strict=False))
+        actual = list(mi.constrained_batches(iterable, size, strict=False))
         expected = [('1',), ('123456789',), ('1',)]
         self.assertEqual(actual, expected)
 
@@ -5177,6 +5168,10 @@ class BatchedTests(TestCase):
         iterable = [record_3, record_5, record_10, record_2]
 
         self.assertEqual(
-            list(mi.batched(iterable, 10, get_len=lambda x: x.total_size())),
+            list(
+                mi.constrained_batches(
+                    iterable, 10, get_len=lambda x: x.total_size()
+                )
+            ),
             [(record_3, record_5), (record_10,), (record_2,)],
         )

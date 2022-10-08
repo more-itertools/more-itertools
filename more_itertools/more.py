@@ -46,7 +46,6 @@ __all__ = [
     'all_unique',
     'always_iterable',
     'always_reversible',
-    'batched',
     'bucket',
     'callback_iter',
     'chunked',
@@ -55,6 +54,7 @@ __all__ = [
     'collapse',
     'combination_index',
     'consecutive_groups',
+    'constrained_batches',
     'consumer',
     'count_cycle',
     'countable',
@@ -837,7 +837,9 @@ def windowed(seq, n, fillvalue=None, step=1):
             yield tuple(window)
 
     size = len(window)
-    if size < n:
+    if size == 0:
+        return
+    elif size < n:
         yield tuple(chain(window, repeat(fillvalue, n - size)))
     elif 0 < i < min(step, n):
         window += (fillvalue,) * i
@@ -4295,19 +4297,21 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
     return lo, hi
 
 
-def batched(iterable, max_size, max_count=None, get_len=len, strict=True):
+def constrained_batches(
+    iterable, max_size, max_count=None, get_len=len, strict=True
+):
     """Yield batches of items from *iterable* with a combined size limited by
     *max_size*.
 
     >>> iterable = [b'12345', b'123', b'12345678', b'1', b'1', b'12', b'1']
-    >>> list(batched(iterable, 10))
+    >>> list(constrained_batches(iterable, 10))
     [(b'12345', b'123'), (b'12345678', b'1', b'1'), (b'12', b'1')]
 
     If a *max_count* is supplied, the number of items per batch is also
     limited:
 
     >>> iterable = [b'12345', b'123', b'12345678', b'1', b'1', b'12', b'1']
-    >>> list(batched(iterable, 10, max_count = 2))
+    >>> list(constrained_batches(iterable, 10, max_count = 2))
     [(b'12345', b'123'), (b'12345678', b'1'), (b'1', b'12'), (b'1',)]
 
     If a *get_len* function is supplied, use that instead of :func:`len` to
