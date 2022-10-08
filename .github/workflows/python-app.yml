@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11.0-rc.2', 'pypy3.7']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11.0-rc.2', 'pypy3.7-v7.3.3']
 
     steps:
     - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         pip install -U black
         black --check .
     - name: Check type stubs with mypy
-      if: "matrix.python-version != 'pypy3'"
+      if: "matrix.python-version != 'pypy3.7-v7.3.3'"
       run: |
         pip install -U mypy
         stubtest more_itertools.more more_itertools.recipes
