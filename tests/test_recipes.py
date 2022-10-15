@@ -799,7 +799,7 @@ class BeforeAndAfterTests(TestCase):
             # again, which would be problematic if the remainder is a
             # generator function (as in Python 3.10 itertools recipes), since
             # that creates recursion. `itertools.chain` solves this problem.
-            numbers, events = before_and_after(lambda e: isinstance(e, int), events)
+            numbers, events = mi.before_and_after(lambda e: isinstance(e, int), events)
 
             yield (operation, numbers)
     
