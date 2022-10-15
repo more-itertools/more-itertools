@@ -1,6 +1,7 @@
 import warnings
 
 from doctest import DocTestSuite
+from functools import reduce
 from itertools import combinations, count, permutations
 from math import factorial
 from unittest import TestCase
