@@ -1,6 +1,7 @@
 import warnings
 
 from doctest import DocTestSuite
+from functools import reduce
 from itertools import combinations, count, permutations
 from math import factorial
 from unittest import TestCase
@@ -782,6 +783,39 @@ class BeforeAndAfterTests(TestCase):
         before, after = mi.before_and_after(bool, [1, True, 0, False])
         self.assertEqual(list(before), [1, True])
         self.assertEqual(list(after), [0, False])
+
+    @staticmethod
+    def _group_events(events):
+        events = iter(events)
+
+        while True:
+            try:
+                operation = next(events)
+            except StopIteration:
+                break
+            assert operation in ["SUM", "MULTIPLY"]
+
+            # Here, the remainder `events` is passed into `before_and_after`
+            # again, which would be problematic if the remainder is a
+            # generator function (as in Python 3.10 itertools recipes), since
+            # that creates recursion. `itertools.chain` solves this problem.
+            numbers, events = mi.before_and_after(
+                lambda e: isinstance(e, int), events
+            )
+
+            yield (operation, numbers)
+
+    def test_nested_remainder(self):
+        events = ["SUM", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
+        events += ["MULTIPLY", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
+
+        for operation, numbers in self._group_events(events):
+            if operation == "SUM":
+                res = sum(numbers)
+                self.assertEqual(res, 55)
+            elif operation == "MULTIPLY":
+                res = reduce(lambda a, b: a * b, numbers)
+                self.assertEqual(res, 3628800)
 
 
 class TriplewiseTests(TestCase):

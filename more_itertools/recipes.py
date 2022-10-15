@@ -744,11 +744,12 @@ def before_and_after(predicate, it):
                 transition.append(elem)
                 return
 
-    def remainder_iterator():
-        yield from transition
-        yield from it
+    # Note: this is different from itertools recipes to allow nesting
+    # before_and_after remainders into before_and_after again. See tests
+    # for an example.
+    remainder_iterator = chain(transition, it)
 
-    return true_iterator(), remainder_iterator()
+    return true_iterator(), remainder_iterator
 
 
 def triplewise(iterable):
