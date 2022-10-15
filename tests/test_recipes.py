@@ -783,7 +783,7 @@ class BeforeAndAfterTests(TestCase):
         before, after = mi.before_and_after(bool, [1, True, 0, False])
         self.assertEqual(list(before), [1, True])
         self.assertEqual(list(after), [0, False])
-    
+
     @staticmethod
     def _group_events(events):
         events = iter(events)
@@ -802,7 +802,7 @@ class BeforeAndAfterTests(TestCase):
             numbers, events = mi.before_and_after(lambda e: isinstance(e, int), events)
 
             yield (operation, numbers)
-    
+
     def test_nested_remainder(self):
         events = ["SUM", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
         events += ["MULTIPLY", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
@@ -810,8 +810,10 @@ class BeforeAndAfterTests(TestCase):
         for operation, numbers in self._group_events(events):
             if operation == "SUM":
                 res = sum(numbers)
+                self.assertEqual(res, 55)
             elif operation == "MULTIPLY":
                 res = reduce(lambda a, b: a * b, numbers)
+                self.assertEqual(res, 3628800)
 
 
 class TriplewiseTests(TestCase):
