@@ -6,7 +6,7 @@ build-backend = "flit_core.buildapi"
 name = "more-itertools"
 authors = [{name = "Erik Rose", email = "erikrose@grinchcentral.com"}]
 readme = "README.rst"
-requires-python = ">=3.5"
+requires-python = ">=3.7"
 license = {file = "LICENSE"}
 keywords = [
     "itertools",
@@ -15,7 +15,6 @@ keywords = [
     "filter",
     "peek",
     "peekable",
-    "collate",
     "chunk",
     "chunked",
 ]
@@ -25,11 +24,11 @@ classifiers = [
     "Natural Language :: English",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
@@ -45,5 +44,5 @@ name = "more_itertools"
 
 [tool.black]
 line-length = 79
-target-version = ['py35']
+target-version = ['py37']
 skip-string-normalization = true

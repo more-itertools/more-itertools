@@ -5,6 +5,24 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+9.0.0
+------
+
+* Potentially breaking changes
+    * :func:`grouper` no longer accepts an integer as its first argument. Previously this raised a ``DeprecationWarning``.
+    * :func:`collate` has been removed. Use the built-in :func:`heapq.merge` instead.
+    * :func:`windowed` now yields nothing when its iterable is empty.
+    * This library now advertises support for Python 3.7+.
+
+* New functions
+    * :func:`constrained_batches`
+    * :func:`batched` (from the Python itertools docs)
+    * :func:`polynomial_from_roots` (from the Python itertools docs)
+    * :func:`sieve` (from the Python itertools docs)
+
+* Other changes
+    * Some documentation issues were fixed (thanks to nanouasyn)
+
 8.14.0
 ------
 

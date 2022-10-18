@@ -9,7 +9,6 @@ Some backward-compatible usability improvements have been made.
 """
 import math
 import operator
-import warnings
 
 from collections import deque
 from collections.abc import Sized
@@ -370,11 +369,6 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
     UnequalIterablesError
 
     """
-    if isinstance(iterable, int):
-        warnings.warn(
-            "grouper expects iterable as first parameter", DeprecationWarning
-        )
-        n, iterable = iterable, n
     args = [iter(iterable)] * n
     if incomplete == 'fill':
         return zip_longest(*args, fillvalue=fillvalue)

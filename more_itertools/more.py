@@ -3,7 +3,7 @@ import warnings
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
 from functools import partial, reduce, wraps
-from heapq import merge, heapify, heapreplace, heappop
+from heapq import heapify, heapreplace, heappop
 from itertools import (
     chain,
     compress,
@@ -52,7 +52,6 @@ __all__ = [
     'chunked_even',
     'circular_shifts',
     'collapse',
-    'collate',
     'combination_index',
     'consecutive_groups',
     'constrained_batches',
@@ -411,44 +410,6 @@ class peekable:
             self._cache.extend(islice(self._it, index + 1 - cache_len))
 
         return self._cache[index]
-
-
-def collate(*iterables, **kwargs):
-    """Return a sorted merge of the items from each of several already-sorted
-    *iterables*.
-
-        >>> list(collate('ACDZ', 'AZ', 'JKL'))
-        ['A', 'A', 'C', 'D', 'J', 'K', 'L', 'Z', 'Z']
-
-    Works lazily, keeping only the next value from each iterable in memory. Use
-    :func:`collate` to, for example, perform a n-way mergesort of items that
-    don't fit in memory.
-
-    If a *key* function is specified, the iterables will be sorted according
-    to its result:
-
-        >>> key = lambda s: int(s)  # Sort by numeric value, not by string
-        >>> list(collate(['1', '10'], ['2', '11'], key=key))
-        ['1', '2', '10', '11']
-
-
-    If the *iterables* are sorted in descending order, set *reverse* to
-    ``True``:
-
-        >>> list(collate([5, 3, 1], [4, 2, 0], reverse=True))
-        [5, 4, 3, 2, 1, 0]
-
-    If the elements of the passed-in iterables are out of order, you might get
-    unexpected results.
-
-    On Python 3.5+, this function is an alias for :func:`heapq.merge`.
-
-    """
-    warnings.warn(
-        "collate is no longer part of more_itertools, use heapq.merge",
-        DeprecationWarning,
-    )
-    return merge(*iterables, **kwargs)
 
 
 def consumer(func):

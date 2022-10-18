@@ -1,5 +1,3 @@
-import warnings
-
 from doctest import DocTestSuite
 from functools import reduce
 from itertools import combinations, count, permutations
@@ -335,16 +333,6 @@ class GrouperTests(TestCase):
             with self.subTest(n=n):
                 with self.assertRaises(ValueError):
                     list(mi.grouper(iter(seq), n, incomplete='strict'))
-
-    def test_legacy_order(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter('always')
-            self.assertEqual(
-                list(mi.grouper(3, 'ABCDEF')),
-                [('A', 'B', 'C'), ('D', 'E', 'F')],
-            )
-
-        self.assertEqual(caught[0].category, DeprecationWarning)
 
     def test_invalid_incomplete(self):
         with self.assertRaises(ValueError):
