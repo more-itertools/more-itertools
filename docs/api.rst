@@ -286,6 +286,7 @@ Others
 
 **Itertools recipes**
 
+.. autofunction:: iter_index
 .. autofunction:: consume
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc

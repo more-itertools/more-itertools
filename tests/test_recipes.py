@@ -880,6 +880,35 @@ class PolynomialFromRootsTests(TestCase):
                 self.assertEqual(actual, expected)
 
 
+class IterIndexTests(TestCase):
+    def test_basic(self):
+        iterable = 'AABCADEAF'
+        for wrapper in (list, iter):
+            with self.subTest(wrapper=wrapper):
+                actual = list(mi.iter_index(wrapper(iterable), 'A'))
+                expected = [0, 1, 4, 7]
+                self.assertEqual(actual, expected)
+
+    def test_start(self):
+        for wrapper in (list, iter):
+            with self.subTest(wrapper=wrapper):
+                iterable = 'AABCADEAF'
+                i = -1
+                actual = []
+                while True:
+                    try:
+                        i = next(
+                            mi.iter_index(wrapper(iterable), 'A', start=i + 1)
+                        )
+                    except StopIteration:
+                        break
+                    else:
+                        actual.append(i)
+
+                expected = [0, 1, 4, 7]
+                self.assertEqual(actual, expected)
+
+
 class SieveTests(TestCase):
     def test_basic(self):
         self.assertEqual(
