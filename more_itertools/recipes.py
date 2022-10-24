@@ -39,6 +39,7 @@ __all__ = [
     'flatten',
     'grouper',
     'iter_except',
+    'iter_index',
     'ncycles',
     'nth',
     'nth_combination',
@@ -808,6 +809,35 @@ def polynomial_from_roots(roots):
     ]
 
 
+def iter_index(iterable, value, start=0):
+    """Yield the index of each place in *iterable* that *value* occurs,
+    beginning with index *start*.
+
+    See :func:`locate` for a more general means of finding the indexes
+    associated with particular values.
+
+    >>> list(iter_index('AABCADEAF', 'A'))
+    [0, 1, 4, 7]
+    """
+    try:
+        seq_index = iterable.index
+    except AttributeError:
+        # Slow path for general iterables
+        it = islice(iterable, start, None)
+        for i, element in enumerate(it, start):
+            if element is value or element == value:
+                yield i
+    else:
+        # Fast path for sequences
+        i = start - 1
+        try:
+            while True:
+                i = seq_index(value, i + 1)
+                yield i
+        except ValueError:
+            pass
+
+
 def sieve(n):
     """Yield the primes less than n.
 
@@ -815,13 +845,13 @@ def sieve(n):
     [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
     """
     isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
+    data = bytearray((0, 1)) * (n // 2)
+    data[:3] = 0, 0, 0
     limit = isqrt(n) + 1
-    data = bytearray([1]) * n
-    data[:2] = 0, 0
     for p in compress(range(limit), data):
-        data[p + p : n : p] = bytearray(len(range(p + p, n, p)))
-
-    return compress(count(), data)
+        data[p * p : n : p + p] = bytes(len(range(p * p, n, p + p)))
+    data[2] = 1
+    return iter_index(data, 1) if n > 2 else iter([])
 
 
 def batched(iterable, n):
