@@ -1,3 +1,4 @@
+import itertools
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
@@ -3122,7 +3123,7 @@ def partitions(iterable):
         yield [sequence[i:j] for i, j in zip((0,) + i, i + (n,))]
 
 
-def set_partitions(iterable, k=None):
+def set_partitions(iterable, k=None, unique=False):
     """
     Yield the set partitions of *iterable* into *k* parts. Set partitions are
     not order-preserving.
@@ -3146,6 +3147,22 @@ def set_partitions(iterable, k=None):
     ['b', 'ac']
     ['a', 'b', 'c']
 
+    if *unique* is not given or False, duplicates in the iterable can result in
+    duplicate set partitions.
+
+    >>> iterable = 'aac'
+    >>> for part in set_partitions(iterable, k=2, unique=False):
+    ...     print([''.join(p) for p in part])
+    ['a', 'ac']
+    ['aa', 'c']
+    ['a', 'ac']
+
+    However, when *unique* is True, each yielded result will be unique.
+
+    >>> for part in set_partitions(iterable, k=2, unique=True):
+    ...     print([''.join(p) for p in part])
+    ['a', 'ac']
+    ['aa', 'c']
     """
     L = list(iterable)
     n = len(L)
@@ -3171,11 +3188,16 @@ def set_partitions(iterable, k=None):
                 for i in range(len(p)):
                     yield p[:i] + [[e] + p[i]] + p[i + 1 :]
 
-    if k is None:
-        for k in range(1, n + 1):
-            yield from set_partitions_helper(L, k)
+    results = itertools.chain.from_iterable(
+        set_partitions_helper(L, i) for i in ([k] if k else range(1, n + 1))
+    )
+
+    if unique:
+        yield from unique_everseen(
+            results, key=lambda s: tuple(tuple(p) for p in sorted(s))
+        )
     else:
-        yield from set_partitions_helper(L, k)
+        yield from results
 
 
 class time_limited:
