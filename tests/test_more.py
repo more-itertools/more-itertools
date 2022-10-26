@@ -3847,6 +3847,32 @@ class SetPartitionsTests(TestCase):
             self._normalize_partitions(expected),
             self._normalize_partitions(actual),
         )
+    
+    def test_found_all_unique(self):
+        """small example, hand-checked"""
+        expected = [
+            [[0], [1], [2, 3, 3]],
+            [[0], [1, 2], [3, 3]],
+            [[0], [2], [1, 3, 3]],
+            [[0], [3], [1, 2, 3]],
+            [[0], [1, 3], [2, 3]],
+            [[1], [2], [0, 3, 3]],
+            [[1], [3], [0, 2, 3]],
+            [[1], [0, 2], [3, 3]],
+            [[1], [0, 3], [2, 3]],
+            [[2], [3], [0, 1, 3]],
+            [[2], [0, 3], [1, 3]],
+            [[2], [0, 1], [3, 3]],
+            [[3], [3], [0, 1, 2]],
+            [[3], [0, 1], [2, 3]],
+            [[3], [0, 2], [1, 3]],
+            [[3], [0, 3], [1, 2]],
+        ]
+        actual = mi.set_partitions([0, 1, 2, 3, 3], 3, unique=True)
+        self.assertEqual(
+            self._normalize_partitions(expected),
+            self._normalize_partitions(actual),
+        )
 
     def test_stirling_numbers(self):
         """Check against https://en.wikipedia.org/wiki/
