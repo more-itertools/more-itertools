@@ -9,6 +9,7 @@ Some backward-compatible usability improvements have been made.
 """
 import math
 import operator
+import warnings
 
 from collections import deque
 from collections.abc import Sized
@@ -27,6 +28,7 @@ from itertools import (
     zip_longest,
 )
 from random import randrange, sample, choice
+from sys import hexversion
 
 __all__ = [
     'all_equal',
@@ -863,6 +865,16 @@ def batched(iterable, n):
     This recipe is from the ``itertools`` docs. This library also provides
     :func:`chunked`, which has a different implementation.
     """
+    if hexversion >= 0x30C00A0:  # Python 3.12.0a0
+        warnings.warn(
+            (
+                'batched will be removed in a future version of '
+                'more-itertools. Use the standard library '
+                'itertools.batched function instead'
+            ),
+            DeprecationWarning,
+        )
+
     it = iter(iterable)
     while True:
         batch = list(islice(it, n))
