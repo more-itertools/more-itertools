@@ -1448,6 +1448,10 @@ class SplitAfterTest(TestCase):
                 ('a,b,c,d', lambda c: c != ',', 2),
                 [['a'], [',', 'b'], [',', 'c', ',', 'd']],
             ),
+            (
+                ([1], lambda x: x == 1, 1),
+                [[1]],
+            ),
         ]:
             actual = list(mi.split_after(*args))
             self.assertEqual(actual, expected)

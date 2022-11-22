@@ -1391,7 +1391,9 @@ def split_after(iterable, pred, maxsplit=-1):
         if pred(item) and buf:
             yield buf
             if maxsplit == 1:
-                yield list(it)
+                buf = list(it)
+                if buf:
+                    yield buf
                 return
             buf = []
             maxsplit -= 1
