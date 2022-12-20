@@ -1301,7 +1301,7 @@ def split_at(iterable, pred, maxsplit=-1, keep_separator=False):
         [[0], [2], [4, 5, 6, 7, 8, 9]]
 
     By default, the delimiting items are not included in the output.
-    The include them, set *keep_separator* to ``True``.
+    To include them, set *keep_separator* to ``True``.
 
         >>> list(split_at('abcdcba', lambda x: x == 'b', keep_separator=True))
         [['a'], ['b'], ['c', 'd', 'c'], ['b'], ['a']]
