@@ -68,6 +68,7 @@ __all__ = [
     'exactly_n',
     'filter_except',
     'first',
+    'gray_product',
     'groupby_transform',
     'ichunked',
     'iequals',
@@ -4347,3 +4348,46 @@ def constrained_batches(
 
     if batch:
         yield tuple(batch)
+
+
+def gray_product(*iterables):
+    """Like :func:`itertools.product`, but return tuples in an order such
+    that only one element in the generated tuple changes from one iteration
+    to the next.
+
+        >>> list(gray_product('AB','CD'))
+        [('A', 'C'), ('B', 'C'), ('B', 'D'), ('A', 'D')]
+
+    Note that it is also true that only one element changes from the last
+    to the first item of the sequence, so it can be looped.
+
+    This is known under several names: "n-ary", "non-Boolean", "non-binary",
+    or "mixed-radix" Gray code.
+
+    All input iterables are consumed by this function before the first output
+    item can be generated. Each iterable must have at least two items, or a
+    ``ValueError`` is raised.
+
+    Reference: Knuth's "The Art of Computer Programming", Pre-Fascicle 2A,
+    "A Draft of Section 7.2.1.1: Generating all n-Tuples", Page 20,
+    Algorithm H, available at
+    https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz
+    """
+    m = tuple(tuple(x) for x in iterables)
+    for x in m:
+        if len(x) < 2:
+            raise ValueError("each iterable must have two or more items")
+    a = [0] * len(m)
+    f = list(range(len(m) + 1))
+    o = [1] * len(m)
+    while True:
+        yield tuple(m[i][a[i]] for i in range(len(m)))
+        j = f[0]
+        f[0] = 0
+        if j == len(m):
+            break
+        a[j] = a[j] + o[j]
+        if a[j] == 0 or a[j] == len(m[j])-1:
+            o[j] = -o[j]
+            f[j] = f[j+1]
+            f[j+1] = j+1
