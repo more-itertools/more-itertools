@@ -4358,9 +4358,6 @@ def gray_product(*iterables):
         >>> list(gray_product('AB','CD'))
         [('A', 'C'), ('B', 'C'), ('B', 'D'), ('A', 'D')]
 
-    Note that it is also true that only one element changes from the last
-    to the first item of the sequence, so it can be looped.
-
     This is known under several names: "n-ary", "non-Boolean", "non-binary",
     or "mixed-radix" Gray code.
 
