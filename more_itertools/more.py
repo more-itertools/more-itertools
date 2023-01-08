@@ -4387,7 +4387,7 @@ def gray_product(*iterables):
         if j == len(m):
             break
         a[j] = a[j] + o[j]
-        if a[j] == 0 or a[j] == len(m[j])-1:
+        if a[j] == 0 or a[j] == len(m[j]) - 1:
             o[j] = -o[j]
-            f[j] = f[j+1]
-            f[j+1] = j+1
+            f[j] = f[j + 1]
+            f[j + 1] = j + 1
