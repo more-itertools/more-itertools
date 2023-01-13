@@ -4359,7 +4359,8 @@ def gray_product(*iterables):
         [('A', 'C'), ('B', 'C'), ('B', 'D'), ('A', 'D')]
 
     This function consumes all of the input iterables before producing output.
-    If any of the input iterables have fewer than two items, ``ValueError`` is raised.
+    If any of the input iterables have fewer than two items, ``ValueError``
+    is raised.
 
     For information on the algorithm, see
     `this section <https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz>`__
@@ -4373,8 +4374,8 @@ def gray_product(*iterables):
 
     # This is based on "Algorithm H" from section 7.2.1.1, page 20.
     # a holds the indexes of the source iterables for the n-tuple to be yielded
-    # f is the array of "focus pointers" 
-    # o is the array of "directions" 
+    # f is the array of "focus pointers"
+    # o is the array of "directions"
     a = [0] * iterable_count
     f = list(range(iterable_count + 1))
     o = [1] * iterable_count
