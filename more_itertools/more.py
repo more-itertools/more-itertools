@@ -97,6 +97,7 @@ __all__ = [
     'one',
     'only',
     'padded',
+    'partial_product',
     'partitions',
     'peekable',
     'permutation_index',
@@ -4390,3 +4391,41 @@ def gray_product(*iterables):
             o[j] = -o[j]
             f[j] = f[j + 1]
             f[j + 1] = j + 1
+
+
+def partial_product(*args):
+    """Yields tuples containing one item from each iterator, with subsequent
+    tuples changing a single item at a time by advancing each iterator until it
+    is exhausted. This sequence guarantees every value in each iterable is
+    output at least once without generating all possible combinations.
+
+    This may be useful, for example, when testing an expensive function.
+
+        >>> list(partial_product('AB', 'C', 'DEF'))
+        [('A', 'C', 'D'), ('B', 'C', 'D'), ('B', 'C', 'E'), ('B', 'C', 'F')]
+    """
+
+    iterables = [iter(it) for it in args]
+
+    if len(iterables) == 0:
+        return
+
+    if len(iterables) == 1:
+        yield from iterables[0]
+        return
+
+    previous, current, future = [], [], []
+
+    try:
+        current, *future = [next(i) for i in iterables]
+    except StopIteration:
+        raise ValueError("iterable must have at least one value.")
+
+    yield (*previous, current, *future)
+
+    for i in iterables:
+        for current in i:
+            yield (*previous, current, *future)
+        previous.append(current)
+        current = future[0] if len(future) > 0 else None
+        future = future[1:]
