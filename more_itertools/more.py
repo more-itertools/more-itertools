@@ -659,6 +659,7 @@ def distinct_permutations(iterable, r=None):
         [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
 
     """
+
     # Algorithm: https://w.wiki/Qai
     def _full(A):
         while True:
@@ -2917,6 +2918,7 @@ def make_decorator(wrapping_func, result_index=0):
         '7'
 
     """
+
     # See https://sites.google.com/site/bbayles/index/decorator_factory for
     # notes on how this works.
     def decorator(*wrapping_args, **wrapping_kwargs):
@@ -3467,7 +3469,6 @@ def _sample_unweighted(iterable, k):
     next_index = k + floor(log(random()) / log(1 - W))
 
     for index, element in enumerate(iterable, k):
-
         if index == next_index:
             reservoir[randrange(k)] = element
             # The new W is the largest in a sample of k U(0, `old_W`) numbers
@@ -4287,7 +4288,6 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
         lo_key = hi_key = key(lo)
 
         for x, y in zip_longest(it, it, fillvalue=lo):
-
             x_key, y_key = key(x), key(y)
 
             if y_key < x_key:
