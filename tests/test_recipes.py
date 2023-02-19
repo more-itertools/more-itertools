@@ -1,7 +1,8 @@
 from doctest import DocTestSuite
 from functools import reduce
 from itertools import combinations, count, permutations
-from math import factorial, prod
+from operator import mul
+from math import factorial
 from unittest import TestCase
 
 import more_itertools as mi
@@ -1030,6 +1031,7 @@ class FactorTests(TestCase):
                 self.assertEqual(actual, expected)
 
     def test_cross_check(self):
+        prod = lambda x: reduce(mul, x, 1)
         self.assertTrue(all(prod(mi.factor(n)) == n for n in range(1, 2000)))
         self.assertTrue(
             all(set(mi.factor(n)) <= set(mi.sieve(n + 1)) for n in range(2000))
