@@ -916,7 +916,8 @@ def factor(n):
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
     """
-    for prime in sieve(math.isqrt(n) + 1):
+    isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
+    for prime in sieve(isqrt(n) + 1):
         while True:
             quotient, remainder = divmod(n, prime)
             if remainder:
