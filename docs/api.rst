@@ -35,6 +35,7 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: batched
 .. autofunction:: grouper
 .. autofunction:: partition
+.. autofunction:: transpose
 
 
 Lookahead and lookback
@@ -293,3 +294,5 @@ Others
 .. autofunction:: repeatfunc
 .. autofunction:: polynomial_from_roots
 .. autofunction:: sieve
+.. autofunction:: factor
+.. autofunction:: matmul

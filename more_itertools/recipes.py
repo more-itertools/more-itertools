@@ -22,6 +22,7 @@ from itertools import (
     cycle,
     groupby,
     islice,
+    product,
     repeat,
     starmap,
     tee,
@@ -38,10 +39,12 @@ __all__ = [
     'convolve',
     'dotproduct',
     'first_true',
+    'factor',
     'flatten',
     'grouper',
     'iter_except',
     'iter_index',
+    'matmul',
     'ncycles',
     'nth',
     'nth_combination',
@@ -65,6 +68,7 @@ __all__ = [
     'tabulate',
     'tail',
     'take',
+    'transpose',
     'triplewise',
     'unique_everseen',
     'unique_justseen',
@@ -881,3 +885,46 @@ def batched(iterable, n):
         if not batch:
             break
         yield batch
+
+
+def transpose(it):
+    """Swap the rows and columns of the input.
+
+    >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
+    [(1, 11), (2, 22), (3, 33)]
+
+    The caller should ensure that the dimensions of the input are compatible.
+    """
+    # TODO: when 3.9 goes end-of-life, add stric=True to this.
+    return zip(*it)
+
+
+def matmul(m1, m2):
+    """Multiply two matrices.
+    >>> list(matmul([(7, 5), (3, 5)], [(2, 5), (7, 9)]))
+    [[49, 80], [41, 60]]
+
+    The caller should ensure that the dimensions of the input matrices are
+    compatible with each other.
+    """
+    n = len(m2[0])
+    return batched(starmap(dotproduct, product(m1, transpose(m2))), n)
+
+
+def factor(n):
+    """Yield the prime factors of n.
+    >>> list(factor(360))
+    [2, 2, 2, 3, 3, 5]
+    """
+    isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
+    for prime in sieve(isqrt(n) + 1):
+        while True:
+            quotient, remainder = divmod(n, prime)
+            if remainder:
+                break
+            yield prime
+            n = quotient
+            if n == 1:
+                return
+    if n >= 2:
+        yield n
