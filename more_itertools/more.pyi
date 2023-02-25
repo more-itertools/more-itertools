@@ -11,6 +11,7 @@ from typing import (
     Hashable,
     Iterable,
     Iterator,
+    Mapping,
     overload,
     Reversible,
     Sequence,
@@ -664,3 +665,7 @@ def constrained_batches(
     strict: bool = ...,
 ) -> Iterator[tuple[_T]]: ...
 def gray_product(*iterables: Iterable[_T]) -> Iterator[tuple[_T, ...]]: ...
+def doublestarmap(
+    function: Callable[..., _T],
+    iterable: Iterable[Mapping[str, Any]]
+) -> Iterator[_T]: ...

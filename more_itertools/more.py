@@ -121,8 +121,9 @@ __all__ = [
     'split_when',
     'spy',
     'stagger',
-    'strip',
+    'doublestarmap',
     'strictly_n',
+    'strip',
     'substrings',
     'substrings_indexes',
     'time_limited',
@@ -4390,3 +4391,23 @@ def gray_product(*iterables):
             o[j] = -o[j]
             f[j] = f[j + 1]
             f[j + 1] = j + 1
+
+
+def doublestarmap(function, iterable):
+    """Transform each item from *iterable* by dictionary unpacking it onto
+    *function* and yielding the result.
+
+    *function* is called to transform each item in *iterable*.
+    It should accept arguments according to the mappings contained in the
+    *iterable*.
+
+    >>> iterable = [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
+    >>> list(doublestarmap(lambda a, b: a+b, iterable))
+    [3, 7]
+
+    Raises TypeError if *function*'s signature does not match the mapping
+    contained in the iterable.
+    Raises TypeError if *iterable* does not contain mappings.
+    """
+    for item in iterable:
+        yield function(**item)
