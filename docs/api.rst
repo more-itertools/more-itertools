@@ -293,6 +293,7 @@ Others
 .. autoclass:: SequenceView
 .. autofunction:: time_limited
 .. autofunction:: map_if(iterable, pred, func, func_else=lambda x: x)
+.. autofunction:: doublestarmap
 
 ----
 

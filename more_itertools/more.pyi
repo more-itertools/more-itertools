@@ -13,6 +13,7 @@ from typing import (
     Mapping,
     Iterable,
     Iterator,
+    Mapping,
     overload,
     Reversible,
     Sequence,
@@ -700,3 +701,7 @@ def powerset_of_sets(iterable: Iterable[_T]) -> Iterator[set[_T]]: ...
 def join_mappings(
     **field_to_map: Mapping[_T, _V]
 ) -> dict[_T, dict[str, _V]]: ...
+def doublestarmap(
+    func: Callable[..., _T],
+    iterable: Iterable[Mapping[str, Any]],
+) -> Iterator[_T]: ...

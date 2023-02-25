@@ -5803,3 +5803,48 @@ class JoinMappingTests(TestCase):
 
     def test_empty(self):
         self.assertEqual(dict(mi.join_mappings()), {})
+
+
+class DoubleStarMapTests(TestCase):
+    def test_construction(self):
+        iterable = [{'price': 1.23}, {'price': 42}, {'price': 0.1}]
+        actual = list(mi.doublestarmap('{price:.2f}'.format, iterable))
+        expected = ['1.23', '42.00', '0.10']
+        self.assertEqual(actual, expected)
+
+    def test_identity(self):
+        iterable = [{'x': 1}, {'x': 2}, {'x': 3}]
+        actual = list(mi.doublestarmap(lambda x: x, iterable))
+        expected = [1, 2, 3]
+        self.assertEqual(actual, expected)
+
+    def test_adding(self):
+        iterable = [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
+        actual = list(mi.doublestarmap(lambda a, b: a + b, iterable))
+        expected = [3, 7]
+        self.assertEqual(actual, expected)
+
+    def test_mismatch_function_smaller(self):
+        iterable = [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
+        with self.assertRaises(TypeError):
+            list(mi.doublestarmap(lambda a: a, iterable))
+
+    def test_mismatch_function_different(self):
+        iterable = [{'a': 1}, {'a': 2}]
+        with self.assertRaises(TypeError):
+            list(mi.doublestarmap(lambda x: x, iterable))
+
+    def test_mismatch_function_larger(self):
+        iterable = [{'a': 1}, {'a': 2}]
+        with self.assertRaises(TypeError):
+            list(mi.doublestarmap(lambda a, b: a + b, iterable))
+
+    def test_no_mapping(self):
+        iterable = [1, 2, 3, 4]
+        with self.assertRaises(TypeError):
+            list(mi.doublestarmap(lambda x: x, iterable))
+
+    def test_empty(self):
+        actual = list(mi.doublestarmap(lambda x: x, []))
+        expected = []
+        self.assertEqual(actual, expected)
