@@ -5231,18 +5231,19 @@ class GrayProductTests(TestCase):
 
 
 class PartialProductTests(TestCase):
-
     def test_empty(self):
-        self.assertEqual(
-            tuple(mi.partial_product()),
-            ()
-        )
+        self.assertEqual(tuple(mi.partial_product()), ())
 
     def test_one_iterator(self):
         # a single iterable should pass through
         self.assertEqual(
             tuple(mi.partial_product('ABCD')),
-            ('A', 'B', 'C', 'D',),
+            (
+                'A',
+                'B',
+                'C',
+                'D',
+            ),
         )
 
     def test_two_iterators(self):
@@ -5251,16 +5252,19 @@ class PartialProductTests(TestCase):
 
         self.assertEqual(
             list(mi.partial_product('ABCD', [1])),
-            [('A', 1), ('B', 1), ('C', 1), ('D', 1)]
+            [('A', 1), ('B', 1), ('C', 1), ('D', 1)],
         )
         expected = [
-            ('A', 1), ('B', 1), ('C', 1),
-            ('D', 1), ('D', 2), ('D', 3),
-            ('D', 4)
+            ('A', 1),
+            ('B', 1),
+            ('C', 1),
+            ('D', 1),
+            ('D', 2),
+            ('D', 3),
+            ('D', 4),
         ]
         self.assertEqual(
-            list(mi.partial_product('ABCD', [1, 2, 3, 4])),
-            expected
+            list(mi.partial_product('ABCD', [1, 2, 3, 4])), expected
         )
 
     def test_basic(self):
@@ -5288,10 +5292,7 @@ class PartialProductTests(TestCase):
             ('A', 'C', 'D'),
             ('B', 'C', 'D'),
             ('B', 'C', 'E'),
-            ('B', 'C', 'F')
+            ('B', 'C', 'F'),
         ]
 
-        self.assertEqual(
-            list(mi.partial_product('AB', 'C', 'DEF')),
-            expected
-        )
+        self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
