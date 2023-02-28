@@ -5,8 +5,8 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
-8.14.0
-------
+9.1.0
+-----
 
 * New functions
     * :func:`iter_index` (from the Python itertools docs)
@@ -27,7 +27,7 @@ Version History
     * Some documentation issues were fixed (thanks to Voskov and jdkandersson)
 
 9.0.0
-------
+-----
 
 * Potentially breaking changes
     * :func:`grouper` no longer accepts an integer as its first argument. Previously this raised a ``DeprecationWarning``.
