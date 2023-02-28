@@ -5228,3 +5228,71 @@ class GrayProductTests(TestCase):
         self.assertEqual(
             sorted(product(*iters)), sorted(mi.gray_product(*iters))
         )
+
+
+class PartialProductTests(TestCase):
+    def test_empty(self):
+        self.assertEqual(tuple(mi.partial_product()), ())
+
+    def test_one_iterator(self):
+        # a single iterable should pass through
+        self.assertEqual(
+            tuple(mi.partial_product('ABCD')),
+            (
+                'A',
+                'B',
+                'C',
+                'D',
+            ),
+        )
+
+    def test_two_iterators(self):
+        with self.assertRaises(ValueError):
+            list(mi.partial_product('ABCD', []))
+
+        self.assertEqual(
+            list(mi.partial_product('ABCD', [1])),
+            [('A', 1), ('B', 1), ('C', 1), ('D', 1)],
+        )
+        expected = [
+            ('A', 1),
+            ('B', 1),
+            ('C', 1),
+            ('D', 1),
+            ('D', 2),
+            ('D', 3),
+            ('D', 4),
+        ]
+        self.assertEqual(
+            list(mi.partial_product('ABCD', [1, 2, 3, 4])), expected
+        )
+
+    def test_basic(self):
+        ones = [1, 2, 3]
+        tens = [10, 20, 30, 40, 50]
+        hundreds = [100, 200]
+
+        expected = [
+            (1, 10, 100),
+            (2, 10, 100),
+            (3, 10, 100),
+            (3, 20, 100),
+            (3, 30, 100),
+            (3, 40, 100),
+            (3, 50, 100),
+            (3, 50, 200),
+        ]
+
+        actual = list(mi.partial_product(ones, tens, hundreds))
+        self.assertEqual(actual, expected)
+
+    def test_uneven_length_lists(self):
+        # this is also the docstring example
+        expected = [
+            ('A', 'C', 'D'),
+            ('B', 'C', 'D'),
+            ('B', 'C', 'E'),
+            ('B', 'C', 'F'),
+        ]
+
+        self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
