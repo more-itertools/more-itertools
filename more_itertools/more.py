@@ -3972,7 +3972,8 @@ def combination_with_replacement_index(element, iterable):
     ``ValueError`` will be raised if the given *element* isn't one of the
     combinations with replacement of *iterable*.
     """
-    l = ilen(element)
+    element = tuple(element)
+    l = len(element)
     element = enumerate(element)
 
     k, y = next(element, (None, None))
@@ -3980,7 +3981,9 @@ def combination_with_replacement_index(element, iterable):
         return 0
 
     indexes = []
-    pool = enumerate(iterable)
+    pool = tuple(iterable)
+    _n = len(pool)
+    pool = enumerate(pool)
     for n, x in pool:
         while x == y:
             indexes.append(n)
@@ -3996,8 +3999,7 @@ def combination_with_replacement_index(element, iterable):
             'element is not a combination with replacment of iterable'
         )
 
-    n = ilen(iterable)
-
+    n = _n
     occupations = [0] * n
     for p in indexes:
         occupations[p] += 1
