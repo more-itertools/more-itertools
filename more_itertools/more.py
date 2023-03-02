@@ -53,6 +53,7 @@ __all__ = [
     'circular_shifts',
     'collapse',
     'combination_index',
+    'combination_with_replacement_index',
     'consecutive_groups',
     'constrained_batches',
     'consumer',
@@ -3954,6 +3955,36 @@ def combination_index(element, iterable):
             index += factorial(j) // (factorial(i) * factorial(j - i))
 
     return factorial(n + 1) // (factorial(k + 1) * factorial(n - k)) - index
+
+
+def combination_with_replacement_index(element, iterable):
+    element = enumerate(element)
+
+    k, y = next(element, (None, None))
+    if k is None:
+        return 0
+
+    indexes = []
+    pool = enumerate(iterable)
+    for n, x in pool:
+        while x == y:
+            indexes.append(n)
+            tmp, y = next(element, (None, None))
+            if tmp is None:
+                break
+            else:
+                k = tmp
+        if y is None:
+            break
+    else:
+        raise ValueError(
+            'element is not a combination with replacment of iterable'
+        )
+    print(indexes)
+    n, _ = last(pool, default=(n, None))
+    print(n, _)
+    index = 1
+
 
 
 def permutation_index(element, iterable):
