@@ -18,7 +18,7 @@ from itertools import (
     tee,
     zip_longest,
 )
-from math import exp, factorial, floor, log, comb
+from math import exp, factorial, floor, log
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
@@ -4003,7 +4003,10 @@ def combination_with_replacement_index(element, iterable):
 
     index = 0
     for k in range(1, n):
-        index += comb(l + n - 1 - k - sum(occupations[:k]), n - k)
+        j = l + n - 1 - k - sum(occupations[:k])
+        i = n - k
+        if i <= j:
+            index += factorial(j) // (factorial(i) * factorial(j - i))
 
     return index
 
