@@ -18,7 +18,7 @@ from itertools import (
     tee,
     zip_longest,
 )
-from math import exp, factorial, floor, log
+from math import exp, factorial, floor, log, comb
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
@@ -3958,6 +3958,20 @@ def combination_index(element, iterable):
 
 
 def combination_with_replacement_index(element, iterable):
+    """Equivalent to ``list(combinations_with_replacement(iterable, r)).index(element)``
+
+    The subsequences with repetition of *iterable* that are of length *r* can
+    be ordered lexicographically. :func:`combination_with_replacement_index`
+    computes the index of the first *element*, without computing the previous
+    combinations with replacement.
+
+        >>> combination_with_replacement_index('adf', 'abcdefg')
+        20
+
+    ``ValueError`` will be raised if the given *element* isn't one of the
+    combinations with replacement of *iterable*.
+    """
+    l = ilen(element)
     element = enumerate(element)
 
     k, y = next(element, (None, None))
@@ -3980,11 +3994,18 @@ def combination_with_replacement_index(element, iterable):
         raise ValueError(
             'element is not a combination with replacment of iterable'
         )
-    print(indexes)
-    n, _ = last(pool, default=(n, None))
-    print(n, _)
-    index = 1
 
+    n = ilen(iterable)
+
+    occupations = [0] * n
+    for p in indexes:
+        occupations[p] += 1
+
+    index = 0
+    for k in range(1, n):
+        index += comb(l + n - 1 - k - sum(occupations[:k]), n - k)
+
+    return index
 
 
 def permutation_index(element, iterable):
