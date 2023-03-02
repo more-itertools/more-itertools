@@ -4590,7 +4590,9 @@ class CombinationWithReplacementIndexTests(TestCase):
         iterable = 'abcdefg'
         r = 4
         first_index = {}
-        for index, element in enumerate(combinations_with_replacement(iterable, r)):
+        for index, element in enumerate(
+            combinations_with_replacement(iterable, r)
+        ):
             actual = mi.combination_with_replacement_index(element, iterable)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
@@ -4599,7 +4601,9 @@ class CombinationWithReplacementIndexTests(TestCase):
         iterable = 'abcd'
         r = len(iterable)
         first_index = {}
-        for index, element in enumerate(combinations_with_replacement(iterable, r=r)):
+        for index, element in enumerate(
+            combinations_with_replacement(iterable, r=r)
+        ):
             actual = mi.combination_with_replacement_index(element, iterable)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
@@ -4608,7 +4612,9 @@ class CombinationWithReplacementIndexTests(TestCase):
         iterable = 'abacba'
         r = 3
         first_index = {}
-        for index, element in enumerate(combinations_with_replacement(iterable, r)):
+        for index, element in enumerate(
+            combinations_with_replacement(iterable, r)
+        ):
             actual = mi.combination_with_replacement_index(element, iterable)
             expected = first_index.setdefault(element, index)
             self.assertEqual(actual, expected)
@@ -4619,7 +4625,9 @@ class CombinationWithReplacementIndexTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_long(self):
-        actual = mi.combination_with_replacement_index((22, 65, 68, 81), range(90))
+        actual = mi.combination_with_replacement_index(
+            (22, 65, 68, 81), range(90)
+        )
         expected = 2000000
         self.assertEqual(actual, expected)
 
