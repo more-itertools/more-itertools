@@ -3958,7 +3958,8 @@ def combination_index(element, iterable):
 
 
 def combination_with_replacement_index(element, iterable):
-    """Equivalent to ``list(combinations_with_replacement(iterable, r)).index(element)``
+    """Equivalent to
+    ``list(combinations_with_replacement(iterable, r)).index(element)``
 
     The subsequences with repetition of *iterable* that are of length *r* can
     be ordered lexicographically. :func:`combination_with_replacement_index`
