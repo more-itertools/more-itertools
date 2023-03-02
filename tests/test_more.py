@@ -4585,7 +4585,7 @@ class CombinationIndexTests(TestCase):
             mi.combination_index(tuple('axe'), 'abcde')
 
 
-class CombinationWithReplacmenetIndexTests(TestCase):
+class CombinationWithReplacementIndexTests(TestCase):
     def test_r_less_than_n(self):
         iterable = 'abcdefg'
         r = 4
