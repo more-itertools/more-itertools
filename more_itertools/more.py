@@ -3982,9 +3982,7 @@ def combination_with_replacement_index(element, iterable):
 
     indexes = []
     pool = tuple(iterable)
-    _n = len(pool)
-    pool = enumerate(pool)
-    for n, x in pool:
+    for n, x in enumerate(pool):
         while x == y:
             indexes.append(n)
             tmp, y = next(element, (None, None))
@@ -3999,7 +3997,7 @@ def combination_with_replacement_index(element, iterable):
             'element is not a combination with replacment of iterable'
         )
 
-    n = _n
+    n = len(pool)
     occupations = [0] * n
     for p in indexes:
         occupations[p] += 1
