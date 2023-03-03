@@ -830,9 +830,13 @@ def iter_index(iterable, value, start=0):
     except AttributeError:
         # Slow path for general iterables
         it = islice(iterable, start, None)
-        for i, element in enumerate(it, start):
-            if element is value or element == value:
+        i = start - 1
+        try:
+            while True:
+                i = i + operator.indexOf(it, value) + 1
                 yield i
+        except ValueError:
+            pass
     else:
         # Fast path for sequences
         i = start - 1
