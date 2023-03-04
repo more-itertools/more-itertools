@@ -5296,3 +5296,34 @@ class PartialProductTests(TestCase):
         ]
 
         self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
+
+
+class ZipLongestFillLastTests(TestCase):
+    def test_three_lists(self):
+        ones_3 = [1, 2, 3]
+        tens_5 = [10, 20, 30, 40, 50]
+        hundreds_2 = [100, 200]
+
+        expected = [
+            (1, 10, 100),
+            (2, 20, 200),
+            (3, 30, 200),
+            (3, 40, 200),
+            (3, 50, 200),
+        ]
+
+        actual = list(mi.zip_longest_fill_last(ones_3, tens_5, hundreds_2))
+        self.assertEqual(actual, expected)
+
+    def test_string_empty_string(self):
+        text = 'ABCD'
+
+        expected = [
+            ('A', '-'),
+            ('B', '-'),
+            ('C', '-'),
+            ('D', '-'),
+        ]
+
+        actual = list(mi.zip_longest_fill_last(text, '', fill_empty='-'))
+        self.assertEqual(actual, expected)

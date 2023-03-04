@@ -137,6 +137,7 @@ __all__ = [
     'zip_broadcast',
     'zip_equal',
     'zip_offset',
+    'zip_longest_fill_last',
 ]
 
 
@@ -4429,3 +4430,42 @@ def partial_product(*args):
         previous.append(current)
         current = future[0] if len(future) > 0 else None
         future = future[1:]
+
+
+def zip_longest_fill_last(*args, fill_empty=None):
+    """
+    zip_longest_fill_last('ABCD', 'xy')  -->  Ax By Cy Dy
+    zip_longest_fill_last('ABCD', [], fill_empty='-')  -->  A- B- C- D-
+    Purpose:
+    Sometimes in testing, it is good to try / test value combinations,
+    but cartesian product (itertools.product) can be expensive, and
+    itertools.zip_longest uses prefilled value given in argument to fill up
+    the places in shorter iterables. And it is possible that a given value
+    is not suitable / not compatible with elements of the iterables.
+    This function solves the above issues:
+    it is between the above ones: cheap, and values are taken from iterables
+    The last item is used repeatedly in sorter iterables.
+    based on zip_longest example:
+    https://docs.python.org/3/library/itertools.html#itertools.zip_longest
+    """
+
+    iterators = [iter(it) for it in args]
+    num_active = len(iterators)
+    if not num_active:
+        return
+    prev_values = []
+    while True:
+        values = []
+        for i, it in enumerate(iterators):
+            try:
+                value = next(it)
+            except StopIteration:
+                num_active -= 1
+                if not num_active:
+                    return
+                iterators[i] = repeat(prev_values[i]) if prev_values else repeat(fill_empty)
+                value = prev_values[i] if prev_values else fill_empty
+            values.append(value)
+        prev_values = values
+        yield tuple(values)
+
