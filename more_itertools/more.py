@@ -4463,7 +4463,10 @@ def zip_longest_fill_last(*args, fill_empty=None):
                 num_active -= 1
                 if not num_active:
                     return
-                iterators[i] = repeat(prev_values[i]) if prev_values else repeat(fill_empty)
+                iterators[i] = (
+                    repeat(prev_values[i]) if prev_values
+                    else repeat(fill_empty)
+                )
                 value = prev_values[i] if prev_values else fill_empty
             values.append(value)
         prev_values = values
