@@ -3599,8 +3599,8 @@ class RlocateTests(TestCase):
             self.assertEqual(actual, expected)
 
     def test_efficient_reversal(self):
-        iterable = range(9**9)  # Is efficiently reversible
-        target = 9**9 - 2
+        iterable = range(9 ** 9)  # Is efficiently reversible
+        target = 9 ** 9 - 2
         pred = lambda x: x == target  # Find-able from the right
         actual = next(mi.rlocate(iterable, pred))
         self.assertEqual(actual, target)
@@ -5296,3 +5296,42 @@ class PartialProductTests(TestCase):
         ]
 
         self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
+
+
+class SortedGroupByTests(TestCase):
+    @staticmethod
+    def build_lookup(iterable, key):
+        return {k: tuple(v) for k, v in mi.sorted_group_by(iterable, key)}
+
+    def test_empty(self):
+        self.assertEqual(
+            tuple(mi.sorted_group_by((), key=lambda x: x)), tuple()
+        )
+
+    def test_does_not_group_items_if_unique_keys(self):
+        iterable = tuple(range(5))
+        expected = {v: (v,) for v in iterable}
+        self.assertEqual(self.build_lookup(iterable, lambda x: x), expected)
+
+    @staticmethod
+    def simple_fixture():
+        iterable = ((0, 1), (0, -1), (1, 2), (1, 5), (0, 2))
+        expected = ((0, ((0, 1), (0, -1), (0, 2))), (1, ((1, 2), (1, 5))))
+        return iterable, expected
+
+    def test_only_group_by_fails_to_group_by_key(self):
+        iterable, expected = self.simple_fixture()
+        output = tuple(
+            (k, tuple(v)) for k, v in groupby(iterable, key=lambda x: x[0])
+        )
+        self.assertNotEqual(output, expected)
+        self.assertEqual(len(output), 3)
+
+    def test_group_items_with_unique_keys(self):
+        iterable, expected = self.simple_fixture()
+        output = tuple(
+            (k, items)
+            for k, items in self.build_lookup(iterable, lambda x: x[0]).items()
+        )
+        self.assertEqual(output, expected)
+        self.assertEqual(len(output), 2)
