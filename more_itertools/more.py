@@ -2700,6 +2700,9 @@ class seekable:
         >>> it.seek(10)
         >>> next(it)
         '10'
+        >>> it.relative_seek(-2)  # Seeking relative to the current position
+        >>> next(it)
+        '9'
         >>> it.seek(20)  # Seeking past the end of the source isn't a problem
         >>> list(it)
         []
@@ -2812,6 +2815,10 @@ class seekable:
         remainder = index - len(self._cache)
         if remainder > 0:
             consume(self, remainder)
+
+    def relative_seek(self, count):
+        index = len(self._cache)
+        self.seek(max(index + count, 0))
 
 
 class run_length:
