@@ -115,7 +115,7 @@ __all__ = [
     'side_effect',
     'sliced',
     'sort_together',
-    'sorted_group_by',
+    'sorted_groupby',
     'split_after',
     'split_at',
     'split_before',
@@ -4432,6 +4432,6 @@ def partial_product(*args):
         future = future[1:]
 
 
-def sorted_group_by(iterable, key):
+def sorted_groupby(iterable, key):
     for k, items in groupby(sorted(iter(iterable), key=key), key=key):
         yield k, items

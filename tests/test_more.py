@@ -5301,11 +5301,11 @@ class PartialProductTests(TestCase):
 class SortedGroupByTests(TestCase):
     @staticmethod
     def build_lookup(iterable, key):
-        return {k: tuple(v) for k, v in mi.sorted_group_by(iterable, key)}
+        return {k: tuple(v) for k, v in mi.sorted_groupby(iterable, key)}
 
     def test_empty(self):
         self.assertEqual(
-            tuple(mi.sorted_group_by((), key=lambda x: x)), tuple()
+            tuple(mi.sorted_groupby((), key=lambda x: x)), tuple()
         )
 
     def test_does_not_group_items_if_unique_keys(self):
