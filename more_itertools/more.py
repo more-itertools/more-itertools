@@ -4433,5 +4433,7 @@ def partial_product(*args):
 
 
 def sorted_groupby(iterable, key):
-    for k, items in groupby(sorted(iter(iterable), key=key), key=key):
-        yield k, items
+    d = defaultdict(list)
+    for item in iterable:
+        d[key(item)].append(item)
+    yield from d.items()
