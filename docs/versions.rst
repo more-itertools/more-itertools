@@ -5,8 +5,29 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+9.1.0
+-----
+
+* New functions
+    * :func:`iter_index` (from the Python itertools docs)
+    * :func:`transpose` (from the Python itertools docs)
+    * :func:`matmul` (from the Python itertools docs)
+    * :func:`factor` (from the Python itertools docs)
+    * :func:`gray_product` (thanks to haukex)
+
+* Changes to existing functions
+    * :func:`sieve` was updated to match the Python itertools docs
+    * :func:`maxsplit` was updated to fix a bug (thanks to abingham)
+    * :func:`sliced` had its `type hint <https://github.com/more-itertools/more-itertools/pull/667>`__ updated (thanks to ad-chaos)
+    
+
+* Other changes
+    * The ``batched`` function is marked as deprecated and will be removed in a future major release. For Python 3.12 and above, use ``itertools.batched`` instead. (thanks to neutrinoceros)
+    * The type hints now used postponed evaluation of annotations from PEP 563 (thanks to Isira-Seneviratne)
+    * Some documentation issues were fixed (thanks to Voskov and jdkandersson)
+
 9.0.0
-------
+-----
 
 * Potentially breaking changes
     * :func:`grouper` no longer accepts an integer as its first argument. Previously this raised a ``DeprecationWarning``.
