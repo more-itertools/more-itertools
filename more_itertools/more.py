@@ -4430,4 +4430,3 @@ def partial_product(*args):
         previous.append(current)
         current = future[0] if len(future) > 0 else None
         future = future[1:]
-
