@@ -4065,26 +4065,20 @@ def _chunked_even_finite(iterable, N, n):
     num_full = N - partial_size * num_lists
     num_partial = num_lists - num_full
 
-    buffer = []
-    iterator = iter(iterable)
-
     # Yield num_full lists of full_size
-    for x in iterator:
-        buffer.append(x)
-        if len(buffer) == full_size:
-            yield buffer
-            buffer = []
-            num_full -= 1
-            if num_full <= 0:
-                break
+    partial_start_idx = num_full * full_size
+    if full_size > 0:
+        for i in range(0, partial_start_idx, full_size):
+            yield list(islice(iterable, i, i + full_size))
 
     # Yield num_partial lists of partial_size
-    for x in iterator:
-        buffer.append(x)
-        if len(buffer) == partial_size:
-            yield buffer
-            buffer = []
-            num_partial -= 1
+    if partial_size > 0:
+        for i in range(
+            partial_start_idx,
+            partial_start_idx + (num_partial * partial_size),
+            partial_size,
+        ):
+            yield list(islice(iterable, i, i + partial_size))
 
 
 def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
