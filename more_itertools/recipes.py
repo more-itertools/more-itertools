@@ -909,12 +909,12 @@ def transpose(it):
     []
     >>> list(transpose([(), ()]))
     []
-    >>> list(transpose(transpose([(), ()])))
-    []  # not `[(), ()]`
-    >>> list(transpose({'a': 1, 'b': 2}.items()))
-    [('a', 'b'), (1, 2)]  # a pair of keys and values
-    >>> list(transpose({}.items()))
-    []  # not a pair of keys and values
+    >>> list(transpose(transpose([(), ()])))  # not `[(), ()]`
+    []
+    >>> list(transpose({'a': 1, 'b': 2}.items()))  # a pair of keys and values
+    [('a', 'b'), (1, 2)]
+    >>> list(transpose({}.items()))  # not a pair of keys and values
+    []
     """
     # TODO: when 3.9 goes end-of-life, add stric=True to this.
     return zip(*it)
