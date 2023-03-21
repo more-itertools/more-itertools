@@ -899,9 +899,9 @@ def transpose(it):
 
     The caller should ensure that the dimensions of the input are compatible.
 
-    The caller should be aware of the input may be empty. :func:`transpose` will
-    not raise an exception in this case, but it will not yield any. It does not
-    guarantee symmetric between empty inputs and outputs.
+    The caller should be aware of the input may be empty. :func:`transpose`
+    will not raise an exception in this case, but it will not yield any. It
+    does not guarantee symmetric between empty inputs and outputs.
 
     >>> list(transpose(transpose([(1, 2, 3), (11, 22, 33)])))
     [(1, 2, 3), (11, 22, 33)]
