@@ -1133,7 +1133,7 @@ def interleave_evenly(iterables, lengths=None):
         yield next(iter_primary)
         to_yield -= 1
         # update errors for each secondary iterable
-        errors = [e - delta for e, delta in zip(errors, deltas_secondary)]
+        errors = list(map(sub, errors, deltas_secondary))
 
         # those iterables for which the error is negative are yielded
         # ("diagonal step" in Bresenham)
