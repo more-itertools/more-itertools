@@ -12,6 +12,7 @@ from itertools import (
     accumulate,
     chain,
     combinations,
+    combinations_with_replacement,
     count,
     cycle,
     groupby,
@@ -4594,6 +4595,65 @@ class CombinationIndexTests(TestCase):
     def test_invalid_match(self):
         with self.assertRaises(ValueError):
             mi.combination_index(tuple('axe'), 'abcde')
+
+
+class CombinationWithReplacementIndexTests(TestCase):
+    def test_r_less_than_n(self):
+        iterable = 'abcdefg'
+        r = 4
+        first_index = {}
+        for index, element in enumerate(
+            combinations_with_replacement(iterable, r)
+        ):
+            actual = mi.combination_with_replacement_index(element, iterable)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_r_equal_to_n(self):
+        iterable = 'abcd'
+        r = len(iterable)
+        first_index = {}
+        for index, element in enumerate(
+            combinations_with_replacement(iterable, r=r)
+        ):
+            actual = mi.combination_with_replacement_index(element, iterable)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_multiplicity(self):
+        iterable = 'abacba'
+        r = 3
+        first_index = {}
+        for index, element in enumerate(
+            combinations_with_replacement(iterable, r)
+        ):
+            actual = mi.combination_with_replacement_index(element, iterable)
+            expected = first_index.setdefault(element, index)
+            self.assertEqual(actual, expected)
+
+    def test_null(self):
+        actual = mi.combination_with_replacement_index(tuple(), [])
+        expected = 0
+        self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.combination_with_replacement_index(
+            (22, 65, 68, 81), range(90)
+        )
+        expected = 2000000
+        self.assertEqual(actual, expected)
+
+    def test_invalid_order(self):
+        with self.assertRaises(ValueError):
+            mi.combination_with_replacement_index(tuple('acb'), 'abcde')
+
+    def test_invalid_large(self):
+        with self.assertRaises(ValueError):
+            mi.combination_with_replacement_index(tuple('abcdefg'), 'abcdef')
+
+    def test_invalid_match(self):
+        with self.assertRaises(ValueError):
+            mi.combination_with_replacement_index(tuple('axe'), 'abcde')
 
 
 class PermutationIndexTests(TestCase):
