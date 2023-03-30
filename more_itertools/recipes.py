@@ -898,6 +898,23 @@ def transpose(it):
     [(1, 11), (2, 22), (3, 33)]
 
     The caller should ensure that the dimensions of the input are compatible.
+
+    The caller should be aware of the input may be empty. :func:`transpose`
+    will not raise an exception in this case, but it will not yield any. It
+    does not guarantee symmetric between empty inputs and outputs.
+
+    >>> list(transpose(transpose([(1, 2, 3), (11, 22, 33)])))
+    [(1, 2, 3), (11, 22, 33)]
+    >>> list(transpose([]))
+    []
+    >>> list(transpose([(), ()]))
+    []
+    >>> list(transpose(transpose([(), ()])))  # not `[(), ()]`
+    []
+    >>> list(transpose({'a': 1, 'b': 2}.items()))  # a pair of keys and values
+    [('a', 'b'), (1, 2)]
+    >>> list(transpose({}.items()))  # not a pair of keys and values
+    []
     """
     # TODO: when 3.9 goes end-of-life, add stric=True to this.
     return zip(*it)
