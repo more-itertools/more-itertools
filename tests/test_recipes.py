@@ -902,6 +902,7 @@ class PolynomialEvalTests(TestCase):
                 self.assertEqual(actual, expected)
                 self.assertEqual(type(actual), type(x))
 
+
 class IterIndexTests(TestCase):
     def test_basic(self):
         iterable = 'AABCADEAF'
