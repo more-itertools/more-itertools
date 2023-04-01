@@ -4472,6 +4472,31 @@ class NthProductTests(TestCase):
             mi.nth_product(24, 'ab', 'cde', 'fghi')
 
 
+class NthCombinationWithReplacementTests(TestCase):
+    def test_basic(self):
+        iterable = 'abcdefg'
+        r = 4
+        for index, expected in enumerate(
+            combinations_with_replacement(iterable, r)
+        ):
+            actual = mi.nth_combination_with_replacement(iterable, r, index)
+            self.assertEqual(actual, expected)
+
+    def test_long(self):
+        actual = mi.nth_combination_with_replacement(range(90), 4, 2000000)
+        expected = (22, 65, 68, 81)
+        self.assertEqual(actual, expected)
+
+    def test_invalid_r(self):
+        for r in (-1, 3):
+            with self.assertRaises(ValueError):
+                mi.nth_combination_with_replacement([], r, 0)
+
+    def test_invalid_index(self):
+        with self.assertRaises(IndexError):
+            mi.nth_combination_with_replacement('abcdefg', 3, -85)
+
+
 class ValueChainTests(TestCase):
     def test_empty(self):
         actual = list(mi.value_chain())
