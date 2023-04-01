@@ -948,7 +948,7 @@ def polynomial_eval(coefficients, x):
     >>> polynomial_eval(coefficients, x)
     8.125
     """
-    # Use math.isqrt for Python 3.12+
+    # Use math.sumprod for Python 3.12+
     sumprod = getattr(math, 'sumprod', lambda x, y: dotproduct(x, y))
     n = len(coefficients)
     if n == 0:
