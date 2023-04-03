@@ -94,6 +94,7 @@ __all__ = [
     'nth_or_last',
     'nth_permutation',
     'nth_product',
+    'nth_combination_with_replacement',
     'numeric_range',
     'one',
     'only',
@@ -3866,6 +3867,54 @@ def nth_permutation(iterable, r, index):
             break
 
     return tuple(map(pool.pop, result))
+
+
+def nth_combination_with_replacement(iterable, r, index):
+    """Equivalent to
+    ``list(combinations_with_replacement(iterable, r))[index]``.
+
+
+    The subsequences with repetition of *iterable* that are of length *r* can
+    be ordered lexicographically. :func:`nth_combination_with_replacement`
+    computes the subsequence at sort position *index* directly, without
+    computing the previous subsequences with replacement.
+
+        >>> nth_combination_with_replacement(range(5), 3, 5)
+        (0, 1, 1)
+
+    ``ValueError`` will be raised If *r* is negative or greater than the length
+    of *iterable*.
+    ``IndexError`` will be raised if the given *index* is invalid.
+    """
+    pool = tuple(iterable)
+    n = len(pool)
+    if (r < 0) or (r > n):
+        raise ValueError
+
+    c = factorial(n + r - 1) // (factorial(r) * factorial(n - 1))
+
+    if index < 0:
+        index += c
+
+    if (index < 0) or (index >= c):
+        raise IndexError
+
+    result = []
+    i = 0
+    while r:
+        r -= 1
+        while n >= 0:
+            num_combs = factorial(n + r - 1) // (
+                factorial(r) * factorial(n - 1)
+            )
+            if index < num_combs:
+                break
+            n -= 1
+            i += 1
+            index -= num_combs
+        result.append(pool[i])
+
+    return tuple(result)
 
 
 def value_chain(*args):
