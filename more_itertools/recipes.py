@@ -52,6 +52,7 @@ __all__ = [
     'pad_none',
     'pairwise',
     'partition',
+    'polynomial_eval',
     'polynomial_from_roots',
     'powerset',
     'prepend',
@@ -854,6 +855,7 @@ def sieve(n):
     >>> list(sieve(30))
     [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
     """
+    # Use math.isqrt for Python 3.8+
     isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
     data = bytearray((0, 1)) * (n // 2)
     data[:3] = 0, 0, 0
@@ -921,6 +923,7 @@ def factor(n):
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
     """
+    # Use math.isqrt for Python 3.8+
     isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
     for prime in sieve(isqrt(n) + 1):
         while True:
@@ -933,3 +936,22 @@ def factor(n):
                 return
     if n >= 2:
         yield n
+
+
+def polynomial_eval(coefficients, x):
+    """Evaluate a polynomial at a specific value.
+
+    Example: evaluating x^3 - 4 * x^2 - 17 * x + 60 at x = 2.5:
+
+    >>> coefficients = [1, -4, -17, 60]
+    >>> x = 2.5
+    >>> polynomial_eval(coefficients, x)
+    8.125
+    """
+    # Use math.sumprod for Python 3.12+
+    sumprod = getattr(math, 'sumprod', lambda x, y: dotproduct(x, y))
+    n = len(coefficients)
+    if n == 0:
+        return x * 0  # coerce zero to the type of x
+    powers = map(pow, repeat(x), reversed(range(n)))
+    return sumprod(coefficients, powers)

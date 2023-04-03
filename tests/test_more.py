@@ -23,11 +23,10 @@ from itertools import (
 )
 from operator import add, mul, itemgetter
 from pickle import loads, dumps
-from platform import python_implementation
 from random import seed, Random
 from statistics import mean
 from string import ascii_letters
-from sys import version_info, getsizeof
+from sys import version_info
 from time import sleep
 from traceback import format_exc
 from unittest import skipIf, TestCase
@@ -3995,27 +3994,23 @@ class IchunkedTests(TestCase):
         self.assertEqual(next(chunk), 0)
         self.assertRaises(RuntimeError, next, it)
 
-    @skipIf(
-        'PyPy' == python_implementation(),
-        'tracemalloc not implemented in pypy',
-    )
     def test_memory_in_order(self):
-        """Test that only one item is kept in memory at a time if chunks are
-        iterated over in order."""
-        import tracemalloc
+        # No items should be kept in memory when a chunk is produced
+        all_chunks = mi.ichunked(count(), 4)
+        first_chunk = next(all_chunks)
+        self.assertEqual(len(first_chunk._cache), 0)
 
-        def big_string_iterator():
-            while True:
-                # Must be larger than 4096 to get around str interning
-                yield 'X' * 5000
+        # If we don't read a chunk before getting its successor, its contents
+        # will be cached
+        second_chunk = next(all_chunks)
+        self.assertEqual(len(first_chunk._cache), 4)
 
-        ichunks = mi.ichunked(big_string_iterator(), 50)
-        ichunk = next(ichunks)
-        tracemalloc.start()
-        mi.consume(ichunk)
-        curr_mem, peak_mem = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
-        self.assertLess(peak_mem, getsizeof('X' * 5000) * 2)
+        # If we read in order, there again should be nothing cached
+        mi.consume(first_chunk)
+        mi.consume(second_chunk)
+        third_chunk = next(all_chunks)
+        for chunk in (first_chunk, second_chunk, third_chunk):
+            self.assertEqual(len(chunk._cache), 0)
 
 
 class DistinctCombinationsTests(TestCase):

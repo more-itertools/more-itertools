@@ -1,4 +1,6 @@
+from decimal import Decimal
 from doctest import DocTestSuite
+from fractions import Fraction
 from functools import reduce
 from itertools import combinations, count, permutations
 from operator import mul
@@ -879,6 +881,26 @@ class PolynomialFromRootsTests(TestCase):
             with self.subTest(roots=roots):
                 actual = mi.polynomial_from_roots(roots)
                 self.assertEqual(actual, expected)
+
+
+class PolynomialEvalTests(TestCase):
+    def test_basic(self):
+        for coefficients, x, expected in [
+            ([1, -4, -17, 60], 2, 18),
+            ([1, -4, -17, 60], 2.5, 8.125),
+            ([1, -4, -17, 60], Fraction(2, 3), Fraction(1274, 27)),
+            ([1, -4, -17, 60], Decimal('1.75'), Decimal('23.359375')),
+            ([], 2, 0),
+            ([], 2.5, 0.0),
+            ([], Fraction(2, 3), Fraction(0, 1)),
+            ([], Decimal('1.75'), Decimal('0.00')),
+            ([11], 7, 11),
+            ([11, 2], 7, 79),
+        ]:
+            with self.subTest(x=x):
+                actual = mi.polynomial_eval(coefficients, x)
+                self.assertEqual(actual, expected)
+                self.assertEqual(type(actual), type(x))
 
 
 class IterIndexTests(TestCase):
