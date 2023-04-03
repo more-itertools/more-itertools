@@ -1,10 +1,6 @@
 from doctest import DocTestSuite
 from functools import reduce
-from itertools import (
-    combinations,
-    count,
-    permutations,
-)
+from itertools import combinations, count, permutations
 from operator import mul
 from math import factorial
 from unittest import TestCase
