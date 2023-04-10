@@ -904,7 +904,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    # TODO: when 3.9 goes end-of-life, add stric=True to this.
+    # TODO: when 3.9 goes end-of-life, add strict=True to this.
     return zip(*it)
 
 
