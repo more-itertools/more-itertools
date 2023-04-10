@@ -299,3 +299,4 @@ Others
 .. autofunction:: sieve
 .. autofunction:: factor
 .. autofunction:: matmul
+.. autofunction:: sum_of_squares
