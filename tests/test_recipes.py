@@ -1063,3 +1063,15 @@ class FactorTests(TestCase):
                 list(mi.factor(n)) == sorted(mi.factor(n)) for n in range(2000)
             )
         )
+
+
+class SumOfSquaresTests(TestCase):
+    def test_basic(self):
+        for it, expected in (
+            ([], 0),
+            ([1, 2, 3], 1 + 4 + 9),
+            ([2, 4, 6, 8], 4 + 16 + 36 + 64),
+        ):
+            with self.subTest(it=it):
+                actual = mi.sum_of_squares(it)
+                self.assertEqual(actual, expected)

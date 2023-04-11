@@ -13,7 +13,6 @@ import warnings
 
 from collections import deque
 from collections.abc import Sized
-from functools import reduce
 from itertools import (
     chain,
     combinations,
@@ -66,6 +65,7 @@ __all__ = [
     'sieve',
     'sliding_window',
     'subslices',
+    'sum_of_squares',
     'tabulate',
     'tail',
     'take',
@@ -76,6 +76,13 @@ __all__ = [
 ]
 
 _marker = object()
+
+
+# math.isqrt is available for Python 3.8+
+_isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
+
+# math.sumprod is available for Python 3.12+
+_sumprod = getattr(math, 'sumprod', lambda x, y: dotproduct(x, y))
 
 
 def take(n, iterable):
@@ -715,10 +722,9 @@ def convolve(signal, kernel):
     """
     kernel = tuple(kernel)[::-1]
     n = len(kernel)
-    window = deque([0], maxlen=n) * n
-    for x in chain(signal, repeat(0, n - 1)):
-        window.append(x)
-        yield sum(map(operator.mul, kernel, window))
+    padded_signal = chain(repeat(0, n - 1), signal, [0] * (n - 1))
+    for window in sliding_window(padded_signal, n):
+        yield _sumprod(kernel, window)
 
 
 def before_and_after(predicate, it):
@@ -808,12 +814,10 @@ def polynomial_from_roots(roots):
     >>> polynomial_from_roots(roots)  # x^3 - 4 * x^2 - 17 * x + 60
     [1, -4, -17, 60]
     """
-    # Use math.prod for Python 3.8+,
-    prod = getattr(math, 'prod', lambda x: reduce(operator.mul, x, 1))
-    roots = list(map(operator.neg, roots))
-    return [
-        sum(map(prod, combinations(roots, k))) for k in range(len(roots) + 1)
-    ]
+    expansion = [1]
+    for r in roots:
+        expansion = convolve(expansion, (1, -r))
+    return list(expansion)
 
 
 def iter_index(iterable, value, start=0):
@@ -855,11 +859,9 @@ def sieve(n):
     >>> list(sieve(30))
     [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
     """
-    # Use math.isqrt for Python 3.8+
-    isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
     data = bytearray((0, 1)) * (n // 2)
     data[:3] = 0, 0, 0
-    limit = isqrt(n) + 1
+    limit = _isqrt(n) + 1
     for p in compress(range(limit), data):
         data[p * p : n : p + p] = bytes(len(range(p * p, n, p + p)))
     data[2] = 1
@@ -902,7 +904,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    # TODO: when 3.9 goes end-of-life, add stric=True to this.
+    # TODO: when 3.9 goes end-of-life, add strict=True to this.
     return zip(*it)
 
 
@@ -915,7 +917,7 @@ def matmul(m1, m2):
     compatible with each other.
     """
     n = len(m2[0])
-    return batched(starmap(dotproduct, product(m1, transpose(m2))), n)
+    return batched(starmap(_sumprod, product(m1, transpose(m2))), n)
 
 
 def factor(n):
@@ -923,9 +925,7 @@ def factor(n):
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
     """
-    # Use math.isqrt for Python 3.8+
-    isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
-    for prime in sieve(isqrt(n) + 1):
+    for prime in sieve(_isqrt(n) + 1):
         while True:
             quotient, remainder = divmod(n, prime)
             if remainder:
@@ -948,10 +948,17 @@ def polynomial_eval(coefficients, x):
     >>> polynomial_eval(coefficients, x)
     8.125
     """
-    # Use math.sumprod for Python 3.12+
-    sumprod = getattr(math, 'sumprod', lambda x, y: dotproduct(x, y))
     n = len(coefficients)
     if n == 0:
         return x * 0  # coerce zero to the type of x
     powers = map(pow, repeat(x), reversed(range(n)))
-    return sumprod(coefficients, powers)
+    return _sumprod(coefficients, powers)
+
+
+def sum_of_squares(it):
+    """Return the sum of the squares of the input values.
+
+    >>> sum_of_squares([10, 20, 30])
+    1400
+    """
+    return _sumprod(*tee(it))
