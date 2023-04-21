@@ -475,7 +475,10 @@ def iterate(func, start):
     """
     while True:
         yield start
-        start = func(start)
+        try:
+            start = func(start)
+        except StopIteration:
+            break
 
 
 def with_iter(context_manager):

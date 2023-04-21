@@ -5388,3 +5388,20 @@ class PartialProductTests(TestCase):
         ]
 
         self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
+
+
+class IterateTests(TestCase):
+    def test_basic(self) -> None:
+        result = list(islice(mi.iterate(lambda x: 2 * x, start=1), 10))
+        expected = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+        self.assertEqual(result, expected)
+
+    def test_func_controls_iteration_stop(self) -> None:
+        def func(num):
+            if num > 100:
+                raise StopIteration
+            return num * 2
+
+        result = list(islice(mi.iterate(func, start=1), 10))
+        expected = [1, 2, 4, 8, 16, 32, 64, 128]
+        self.assertEqual(result, expected)
