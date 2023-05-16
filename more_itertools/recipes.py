@@ -444,10 +444,7 @@ def partition(pred, iterable):
 
     t1, t2, p = tee(iterable, 3)
     p1, p2 = tee(map(pred, p))
-    return (
-        compress(t1, map(operator.not_, p1)),
-        compress(t2, p2)
-    )
+    return (compress(t1, map(operator.not_, p1)), compress(t2, p2))
 
 
 def powerset(iterable):
