@@ -442,12 +442,9 @@ def partition(pred, iterable):
     if pred is None:
         pred = bool
 
-    evaluations = ((pred(x), x) for x in iterable)
-    t1, t2 = tee(evaluations)
-    return (
-        (x for (cond, x) in t1 if not cond),
-        (x for (cond, x) in t2 if cond),
-    )
+    t1, t2, p = tee(iterable, 3)
+    p1, p2 = tee(map(pred, p))
+    return (compress(t1, map(operator.not_, p1)), compress(t2, p2))
 
 
 def powerset(iterable):
