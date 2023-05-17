@@ -302,7 +302,7 @@ def _pairwise(iterable):
     """
     a, b = tee(iterable)
     next(b, None)
-    yield from zip(a, b)
+    return zip(a, b)
 
 
 try:
@@ -312,7 +312,7 @@ except ImportError:
 else:
 
     def pairwise(iterable):
-        yield from itertools_pairwise(iterable)
+        return itertools_pairwise(iterable)
 
     pairwise.__doc__ = _pairwise.__doc__
 
