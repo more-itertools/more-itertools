@@ -4502,7 +4502,7 @@ def gray_product(*iterables):
             f[j + 1] = j + 1
 
 
-def partial_product(*args):
+def partial_product(*iterables):
     """Yields tuples containing one item from each iterator, with subsequent
     tuples changing a single item at a time by advancing each iterator until it
     is exhausted. This sequence guarantees every value in each iterable is
@@ -4514,27 +4514,17 @@ def partial_product(*args):
         [('A', 'C', 'D'), ('B', 'C', 'D'), ('B', 'C', 'E'), ('B', 'C', 'F')]
     """
 
-    iterables = [iter(it) for it in args]
-
-    if len(iterables) == 0:
-        return
-
-    if len(iterables) == 1:
-        yield from iterables[0]
-        return
-
-    previous, current, future = [], [], []
+    iterators = list(map(iter, iterables))
 
     try:
-        current, *future = [next(i) for i in iterables]
+        future = [next(it) for it in iterators]
     except StopIteration:
-        raise ValueError("iterable must have at least one value.")
+        return
+    yield (*future,)
 
-    yield (*previous, current, *future)
-
-    for i in iterables:
-        for current in i:
+    previous = []
+    for it in iterators:
+        current = future.pop(0)
+        for current in it:
             yield (*previous, current, *future)
         previous.append(current)
-        current = future[0] if len(future) > 0 else None
-        future = future[1:]
