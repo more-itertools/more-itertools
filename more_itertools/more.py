@@ -4517,14 +4517,11 @@ def partial_product(*iterables):
     iterators = list(map(iter, iterables))
 
     try:
-        future = [next(it) for it in iterators]
+        prod = [next(it) for it in iterators]
     except StopIteration:
         return
-    yield (*future,)
+    yield tuple(prod)
 
-    previous = []
-    for it in iterators:
-        current = future.pop(0)
-        for current in it:
-            yield (*previous, current, *future)
-        previous.append(current)
+    for i, it in enumerate(iterators):
+        for prod[i] in it:
+            yield tuple(prod)
