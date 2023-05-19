@@ -4331,12 +4331,7 @@ def duplicates_justseen(iterable, key=None):
     This function is analagous to :func:`unique_justseen`.
 
     """
-    return flatten(
-        map(
-            lambda group_tuple: islice_extended(group_tuple[1])[1:],
-            groupby(iterable, key),
-        )
-    )
+    return flatten(g for _, g in groupby(iterable, key) for _ in g)
 
 
 def minmax(iterable_or_value, *others, key=None, default=_marker):
