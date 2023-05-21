@@ -4273,21 +4273,21 @@ def unique_in_window(iterable, n, key=None):
         raise ValueError('n must be greater than 0')
 
     window = deque(maxlen=n)
-    uniques = defaultdict(int)
+    counts = defaultdict(int)
     use_key = key is not None
 
     for item in iterable:
         if len(window) == n:
             to_discard = window[0]
-            if uniques[to_discard] == 1:
-                del uniques[to_discard]
+            if counts[to_discard] == 1:
+                del counts[to_discard]
             else:
-                uniques[to_discard] -= 1
+                counts[to_discard] -= 1
 
         k = key(item) if use_key else item
-        if k not in uniques:
+        if k not in counts:
             yield item
-        uniques[k] += 1
+        counts[k] += 1
         window.append(k)
 
 
