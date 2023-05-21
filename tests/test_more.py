@@ -4875,11 +4875,16 @@ class UniqueInWindowTests(TestCase):
         for iterable, n, expected in [
             (range(9), 10, list(range(9))),
             (range(20), 10, list(range(20))),
-            ([1, 2, 3, 4, 4, 4], 1, [1, 2, 3, 4]),
+            ([1, 2, 3, 4, 4, 4], 1, [1, 2, 3, 4, 4, 4]),
             ([1, 2, 3, 4, 4, 4], 2, [1, 2, 3, 4]),
             ([1, 2, 3, 4, 4, 4], 3, [1, 2, 3, 4]),
             ([1, 2, 3, 4, 4, 4], 4, [1, 2, 3, 4]),
             ([1, 2, 3, 4, 4, 4], 5, [1, 2, 3, 4]),
+            (
+                [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 3, 4, 2],
+                2,
+                [0, 1, 0, 2, 3, 4, 2],
+            ),
         ]:
             with self.subTest(expected=expected):
                 actual = list(mi.unique_in_window(iterable, n))
