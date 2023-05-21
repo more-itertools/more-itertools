@@ -4273,21 +4273,22 @@ def unique_in_window(iterable, n, key=None):
         raise ValueError('n must be greater than 0')
 
     window = deque(maxlen=n)
-    uniques = set()
+    uniques = defaultdict(int)
     use_key = key is not None
 
     for item in iterable:
+        if len(window) == n:
+            to_discard = window[0][1]
+            if uniques[to_discard] == 1:
+                del uniques[to_discard]
+            else:
+                uniques[to_discard] -= 1
+
         k = key(item) if use_key else item
-        if k in uniques:
-            continue
-
-        if len(uniques) == n:
-            uniques.discard(window[0])
-
-        uniques.add(k)
-        window.append(k)
-
-        yield item
+        if k not in uniques:
+            yield item
+        uniques[k] += 1
+        window.append((item, k))
 
 
 def duplicates_everseen(iterable, key=None):
