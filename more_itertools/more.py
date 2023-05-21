@@ -4278,7 +4278,7 @@ def unique_in_window(iterable, n, key=None):
 
     for item in iterable:
         if len(window) == n:
-            to_discard = window[0][1]
+            to_discard = window[0]
             if uniques[to_discard] == 1:
                 del uniques[to_discard]
             else:
@@ -4288,7 +4288,7 @@ def unique_in_window(iterable, n, key=None):
         if k not in uniques:
             yield item
         uniques[k] += 1
-        window.append((item, k))
+        window.append(k)
 
 
 def duplicates_everseen(iterable, key=None):
