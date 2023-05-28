@@ -493,7 +493,7 @@ def iterate(func, *initials, start=_marker):
     If no initial values are specified, the sequence func(), func(), ...
     is returned. Thus, it is an equivalent of ``repeatfunc(func)``:
 
-        >>> lists = take(10, iterate(list))
+        >>> take(10, iterate(list))
         [[], [], [], [], [], [], [], [], [], []]
 
     Instead of passing the initial elements as positional parameters, you
