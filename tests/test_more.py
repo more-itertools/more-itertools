@@ -5396,9 +5396,31 @@ class PartialProductTests(TestCase):
 
 
 class IterateTests(TestCase):
-    def test_basic(self) -> None:
+    def test_with_one_initial(self):
+        result = list(islice(mi.iterate(lambda x: 2 * x, 1), 10))
+        expected = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+        self.assertEqual(result, expected)
+
+    def test_with_one_initial_passed_by_keyword(self):
         result = list(islice(mi.iterate(lambda x: 2 * x, start=1), 10))
         expected = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+        self.assertEqual(result, expected)
+
+    def test_with_two_initials(self):
+        result = list(islice(mi.iterate(lambda a, b: a + b, 0, 1), 10))
+        expected = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+        self.assertEqual(result, expected)
+
+    def test_with_zero_initials(self):
+        result = list(islice(mi.iterate(lambda: 0), 10))
+        expected = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.assertEqual(result, expected)
+
+    def test_first_value_is_not_cached_with_zero_initials(self):
+        result = list(islice(mi.iterate(list), 10))
+        for i, alist in enumerate(result):
+            alist.append(i)
+        expected = [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]]
         self.assertEqual(result, expected)
 
     def test_func_controls_iteration_stop(self) -> None:
@@ -5410,3 +5432,19 @@ class IterateTests(TestCase):
         result = list(islice(mi.iterate(func, start=1), 10))
         expected = [1, 2, 4, 8, 16, 32, 64, 128]
         self.assertEqual(result, expected)
+
+    def test_func_controls_iteration_stop_with_zero_initials(self):
+        alist = [1, 2, 3]
+
+        def func():
+            if not alist:
+                raise StopIteration()
+            return alist.pop()
+
+        result = list(islice(mi.iterate(func), 10))
+        expected = [3, 2, 1]
+        self.assertEqual(result, expected)
+
+    def test_start_with_initials_error(self):
+        with self.assertRaises(TypeError):
+            list(islice(mi.iterate(lambda *args: 0, 0, start=0), 10))

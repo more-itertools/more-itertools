@@ -465,20 +465,73 @@ def ilen(iterable):
     return next(counter)
 
 
-def iterate(func, start):
-    """Return ``start``, ``func(start)``, ``func(func(start))``, ...
+def iterate(func, *initials, start=_marker):
+    """Generate infinite sequence starting from elements *initials*
+    using a function *func* that calculates next element by previous
+    ``len(initials)`` elements.
 
-    >>> from itertools import islice
-    >>> list(islice(iterate(lambda x: 2*x, 1), 10))
-    [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    Powers of two:
+
+        >>> take(10, iterate(lambda x: 2 * x, 1))
+        [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+    Fibonacci numbers:
+
+        >>> take(10, iterate(lambda a, b: a + b, 0, 1))
+        [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+    Factorials:
+
+        >>> take(10, iterate(lambda a, b: b ** 2 // a + b, 1, 2))
+        [1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800]
+
+    Triangular numbers:
+
+        >>> take(10, iterate(lambda a, b, c: 3 * c - 3 * b + a, 0, 1, 3))
+        [0, 1, 3, 6, 10, 15, 21, 28, 36, 45]
+
+    If no initial values are specified, the sequence func(), func(), ...
+    is returned. Thus, it is an equivalent of ``repeatfunc(func)``:
+
+        >>> lists = take(10, iterate(list))
+        [[], [], [], [], [], [], [], [], [], []]
+
+    Instead of passing the initial elements as positional parameters, you
+    can pass a single initial element by the keyword *start*. But you
+    can't pass both *start* and *initials*:
+
+        >>> take(10, iterate(lambda x: 2 * x, start=1))
+        [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+    Function *func* can break the sequence by raising ``StopIteration``:
+
+        >>> def func(x, y):
+        ...     if x > 2 * y:
+        ...         raise StopIteration()
+        ...     return 2 * y - x
+        >>> list(iterate(func, 100, 90))
+        [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0]
 
     """
+    if start is not _marker:
+        if initials:
+            raise TypeError('cannot mix "start" and "initials" args')
+        initials = [start]
+    if not initials:
+        while True:
+            try:
+                yield func()
+            except StopIteration:
+                return
+    yield from initials
+    queue = deque(initials, maxlen=len(initials))
     while True:
-        yield start
         try:
-            start = func(start)
+            next_element = func(*queue)
         except StopIteration:
-            break
+            return
+        yield next_element
+        queue.append(next_element)
 
 
 def with_iter(context_manager):
