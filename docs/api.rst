@@ -296,6 +296,7 @@ Others
 .. autofunction:: repeatfunc
 .. autofunction:: polynomial_from_roots
 .. autofunction:: polynomial_eval
+.. autofunction:: polynomial_derivative
 .. autofunction:: sieve
 .. autofunction:: factor
 .. autofunction:: matmul
