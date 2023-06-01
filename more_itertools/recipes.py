@@ -54,6 +54,7 @@ __all__ = [
     'partition',
     'polynomial_eval',
     'polynomial_from_roots',
+    'polynomial_derivative',
     'powerset',
     'prepend',
     'quantify',
@@ -444,10 +445,7 @@ def partition(pred, iterable):
 
     t1, t2, p = tee(iterable, 3)
     p1, p2 = tee(map(pred, p))
-    return (
-        compress(t1, map(operator.not_, p1)),
-        compress(t2, p2)
-    )
+    return (compress(t1, map(operator.not_, p1)), compress(t2, p2))
 
 
 def powerset(iterable):
@@ -961,3 +959,18 @@ def sum_of_squares(it):
     1400
     """
     return _sumprod(*tee(it))
+
+
+def polynomial_derivative(coefficients):
+    """Compute the first derivative of a polynomial.
+
+    Example: evaluating the derivative of x^3 - 4 * x^2 - 17 * x + 60
+
+    >>> coefficients = [1, -4, -17, 60]
+    >>> derivative_coefficients = polynomial_derivative(coefficients)
+    >>> derivative_coefficients
+    [3, -8, -17]
+    """
+    n = len(coefficients)
+    powers = reversed(range(1, n))
+    return list(map(operator.mul, coefficients, powers))
