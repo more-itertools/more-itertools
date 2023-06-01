@@ -20,7 +20,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .
-        pip install -U coverage flake8 wheel
+        pip install -U coverage wheel
     - name: Run tests
       run: |
         coverage run --include="more_itertools/*.py" -m unittest
@@ -28,7 +28,9 @@ jobs:
       run: |
         coverage report --show-missing --fail-under=99
     - name: Lint with flake8
+      if: "matrix.python-version == '3.7'"
       run: |
+        pip install -U flake8
         flake8 .
     - name: Check formatting with black
       if: "matrix.python-version == '3.7'"
