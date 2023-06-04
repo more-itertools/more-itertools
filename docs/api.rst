@@ -115,6 +115,7 @@ These tools combine multiple iterables.
 **New itertools**
 
 .. autofunction:: collapse
+.. autofunction:: full_outer_join(*iterables, key=lambda x: x)
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
 .. autofunction:: interleave_evenly

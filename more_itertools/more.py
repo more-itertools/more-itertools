@@ -4,6 +4,8 @@ from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
 from functools import cached_property, partial, reduce, wraps
 from heapq import heapify, heapreplace, heappop
+from functools import partial, reduce, wraps
+from heapq import heapify, heapreplace, heappop, merge
 from itertools import (
     chain,
     compress,
@@ -71,6 +73,7 @@ __all__ = [
     'exactly_n',
     'filter_except',
     'first',
+    'full_outer_join',
     'gray_product',
     'groupby_transform',
     'ichunked',
@@ -4567,3 +4570,43 @@ def outer_product(func, xs, ys, *args, **kwargs):
         starmap(lambda x, y: func(x, y, *args, **kwargs), product(xs, ys)),
         n=len(ys),
     )
+
+
+def _discriminate_iterable(idx, iterable):
+    for item in iterable:
+        yield idx, item
+
+
+def full_outer_join(*iterables, key=lambda x: x):
+    """Lazily yields a full outer join of all iterables. The iterables are
+    expected to be sorted. Uses the merge join algorithm which runs in O(n)
+    time. Avoids buffering an entire iterable into memory.
+
+    To get an inner join of the iterables only consume the join keys that have
+    values for all iterables. To get a left/right/Nth join only consume the
+    join keys with values from your left/right/Nth iterable.
+
+    The default key function is an identity function.
+
+        >>> left_rows = [{"id": 1, "val": "foo"}]
+        >>> right_rows = [{"id": 1, "val": "bar"}, {"id": 2, "val": "baz"}]
+        >>> list(full_outer_join(left_rows, right_rows, key=lambda x: x["id"]))
+        [(1, ([{'id': 1, 'val': 'foo'}], [{'id': 1, 'val': 'bar'}])), \
+(2, ([], [{'id': 2, 'val': 'baz'}]))]
+    """
+    discriminated_iterables = [
+        _discriminate_iterable(iterable_idx, iterable)
+        for iterable_idx, iterable in enumerate(iterables)
+    ]
+
+    def _unwrapping_keyfunc(row):
+        return key(row[1])
+
+    for group_key, group in groupby(
+        merge(*discriminated_iterables, key=_unwrapping_keyfunc),
+        key=_unwrapping_keyfunc,
+    ):
+        key_batches = tuple(list() for _ in range(len(iterables)))
+        for discriminant, value in group:
+            key_batches[discriminant].append(value)
+        yield group_key, key_batches

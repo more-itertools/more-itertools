@@ -5482,3 +5482,31 @@ class OuterProductTests(TestCase):
             ('Goodbye, Alice!', 'Goodbye, Bob!', 'Goodbye, Carol!'),
         ]
         self.assertEqual(result, expected)
+
+
+class FullOuterJoinTests(TestCase):
+    def test_empty(self):
+        result = list(mi.full_outer_join([], []))
+        expected = []
+        self.assertEqual(result, expected)
+
+    def test_all_match(self):
+        i1 = [1, 2]
+        i2 = [1, 2]
+
+        result = list(mi.full_outer_join(i1, i2))
+        expected = [(1, ([1], [1])), (2, ([2], [2]))]
+        self.assertEqual(result, expected)
+
+    def test_not_match(self):
+        i1 = [1, 2]
+        i2 = [1, 2]
+        i3 = [1, 3]
+
+        result = list(mi.full_outer_join(i1, i2, i3))
+        expected = [
+            (1, ([1], [1], [1])),
+            (2, ([2], [2], [])),
+            (3, ([], [], [3]))
+        ]
+        self.assertEqual(result, expected)
