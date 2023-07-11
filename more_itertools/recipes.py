@@ -722,8 +722,8 @@ def convolve(signal, kernel):
     kernel = tuple(kernel)[::-1]
     n = len(kernel)
     padded_signal = chain(repeat(0, n - 1), signal, repeat(0, n - 1))
-    for window in sliding_window(padded_signal, n):
-        yield _sumprod(kernel, window)
+    windowed_signal = sliding_window(padded_signal, n)
+    return map(_sumprod, repeat(kernel), windowed_signal)
 
 
 def before_and_after(predicate, it):
@@ -784,9 +784,7 @@ def sliding_window(iterable, n):
     For a variant with more features, see :func:`windowed`.
     """
     it = iter(iterable)
-    window = deque(islice(it, n), maxlen=n)
-    if len(window) == n:
-        yield tuple(window)
+    window = deque(islice(it, n - 1), maxlen=n)
     for x in it:
         window.append(x)
         yield tuple(window)
