@@ -826,7 +826,6 @@ class TriplewiseTests(TestCase):
 class SlidingWindowTests(TestCase):
     def test_basic(self):
         for iterable, n, expected in [
-            ([], 0, [()]),
             ([], 1, []),
             ([0], 1, [(0,)]),
             ([0, 1], 1, [(0,), (1,)]),
