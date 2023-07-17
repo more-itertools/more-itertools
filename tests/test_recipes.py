@@ -5,7 +5,8 @@ from functools import reduce
 from itertools import combinations, count, permutations
 from operator import mul
 from math import factorial
-from unittest import TestCase
+from sys import version_info
+from unittest import TestCase, skipIf
 
 import more_itertools as mi
 
@@ -1007,7 +1008,14 @@ class TransposeTests(TestCase):
         expected = [(10, 20, 30), (11, 21, 31), (12, 22, 32)]
         self.assertEqual(actual, expected)
 
-    def test_incompatible(self):
+    @skipIf(version_info[:2] < (3, 10), 'strict=True missing on 3.9')
+    def test_incompatible_error(self):
+        it = [(10, 11, 12, 13), (20, 21, 22), (30, 31, 32)]
+        with self.assertRaises(ValueError):
+            list(mi.transpose(it))
+
+    @skipIf(version_info[:2] >= (3, 9), 'strict=True missing on 3.9')
+    def test_incompatible_allow(self):
         it = [(10, 11, 12, 13), (20, 21, 22), (30, 31, 32)]
         actual = list(mi.transpose(it))
         expected = [(10, 20, 30), (11, 21, 31), (12, 22, 32)]
