@@ -982,13 +982,12 @@ class BatchedTests(TestCase):
     def test_basic(self):
         iterable = range(1, 5 + 1)
         for n, expected in (
-            (0, []),
-            (1, [[1], [2], [3], [4], [5]]),
-            (2, [[1, 2], [3, 4], [5]]),
-            (3, [[1, 2, 3], [4, 5]]),
-            (4, [[1, 2, 3, 4], [5]]),
-            (5, [[1, 2, 3, 4, 5]]),
-            (6, [[1, 2, 3, 4, 5]]),
+            (1, [(1,), (2,), (3,), (4,), (5,)]),
+            (2, [(1, 2), (3, 4), (5,)]),
+            (3, [(1, 2, 3), (4, 5)]),
+            (4, [(1, 2, 3, 4), (5,)]),
+            (5, [(1, 2, 3, 4, 5)]),
+            (6, [(1, 2, 3, 4, 5)]),
         ):
             with self.subTest(n=n):
                 actual = list(mi.batched(iterable, n))
@@ -1018,7 +1017,7 @@ class TransposeTests(TestCase):
 class MatMulTests(TestCase):
     def test_n_by_n(self):
         actual = list(mi.matmul([(7, 5), (3, 5)], [[2, 5], [7, 9]]))
-        expected = [[49, 80], [41, 60]]
+        expected = [(49, 80), (41, 60)]
         self.assertEqual(actual, expected)
 
     def test_m_by_n(self):
@@ -1026,9 +1025,9 @@ class MatMulTests(TestCase):
         m2 = [[7, 11, 5, 4, 9], [3, 5, 2, 6, 3]]
         actual = list(mi.matmul(m1, m2))
         expected = [
-            [29, 47, 20, 38, 33],
-            [76, 122, 53, 82, 90],
-            [33, 53, 23, 36, 39],
+            (29, 47, 20, 38, 33),
+            (76, 122, 53, 82, 90),
+            (33, 53, 23, 36, 39),
         ]
         self.assertEqual(actual, expected)
 
