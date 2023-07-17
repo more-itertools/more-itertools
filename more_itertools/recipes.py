@@ -927,14 +927,13 @@ def factor(n):
     """
     for prime in sieve(math.isqrt(n) + 1):
         while True:
-            quotient, remainder = divmod(n, prime)
-            if remainder:
+            if n % prime:
                 break
             yield prime
-            n = quotient
+            n //= prime
             if n == 1:
                 return
-    if n >= 2:
+    if n > 1:
         yield n
 
 
