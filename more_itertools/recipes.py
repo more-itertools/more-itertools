@@ -872,7 +872,7 @@ def _batched(iterable, n):
     >>> list(batched('ABCDEFG', 3))
     [('A', 'B', 'C'), ('D', 'E', 'F'), ('G',)]
 
-    On Python 3.12 and above, this is an alias for :func:`itertools.pairwise`.
+    On Python 3.12 and above, this is an alias for :func:`itertools.batched`.
     """
     if n < 1:
         raise ValueError('n must be at least one')
