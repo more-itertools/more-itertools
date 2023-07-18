@@ -10,8 +10,8 @@ Version History
 
 * Potentially breaking changes
     * Python 3.7 support was dropped, since it went EOL on 2023-06-27
-    * :func:`batched` and :func:`matmul` now yield tuples instead of lists
     * :func:`batched` no longer issues a ``DeprecationWarning``; it is now an alias for ``itertools.batched`` for Python 3.12+
+    * :func:`batched` and :func:`matmul` now yield tuples instead of lists
 
 * New functions
     * :func:`combination_with_replacement_index` (thanks to Schoyen)
@@ -27,6 +27,8 @@ Version History
     * :func:`unique_in_window` had its implementation updated (thanks to elliotwutingfeng)
     * :func:`iterate` now breaks when its ``func`` argument raises ``StopIteration`` (thanks to jrebiffe)
 
+* Other changes
+    * Some documentation and testing issues were fixed (thanks to lonnen and XuehaiPan)
 
 9.1.0
 -----
