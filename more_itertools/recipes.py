@@ -722,11 +722,14 @@ def convolve(signal, kernel):
     is immediately consumed and stored.
 
     """
+    # This implementation intentionally doesn't match the one in the itertools
+    # documentation.
     kernel = tuple(kernel)[::-1]
     n = len(kernel)
-    padded_signal = chain(repeat(0, n - 1), signal, repeat(0, n - 1))
-    windowed_signal = sliding_window(padded_signal, n)
-    return map(_sumprod, repeat(kernel), windowed_signal)
+    window = deque([0], maxlen=n) * n
+    for x in chain(signal, repeat(0, n - 1)):
+        window.append(x)
+        yield _sumprod(kernel, window)
 
 
 def before_and_after(predicate, it):
