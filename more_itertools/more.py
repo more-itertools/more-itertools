@@ -139,6 +139,7 @@ __all__ = [
     'zip_broadcast',
     'zip_equal',
     'zip_offset',
+    'takewhile_inclusive',
 ]
 
 
@@ -4521,3 +4522,19 @@ def partial_product(*iterables):
     for i, it in enumerate(iterators):
         for prod[i] in it:
             yield tuple(prod)
+
+
+def takewhile_inclusive(predicate, iterable):
+    """A variant of :func:`takewhile` that yields one additional element.
+
+        >>> list(takewhile_inclusive(lambda x: x < 5, [1, 4, 6, 4, 1]))
+        [1, 4, 6]
+
+    :func:`takewhile` would return ``[1, 4]``.
+    """
+    for x in iterable:
+        if predicate(x):
+            yield x
+        else:
+            yield x
+            break

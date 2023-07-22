@@ -5410,3 +5410,27 @@ class IterateTests(TestCase):
         result = list(islice(mi.iterate(func, start=1), 10))
         expected = [1, 2, 4, 8, 16, 32, 64, 128]
         self.assertEqual(result, expected)
+
+
+class TakewhileInclusiveTests(TestCase):
+    def test_basic(self) -> None:
+        result = list(mi.takewhile_inclusive(lambda x: x < 5, [1, 4, 6, 4, 1]))
+        expected = [1, 4, 6]
+        self.assertEqual(result, expected)
+
+    def test_empty_iterator(self) -> None:
+        result = list(mi.takewhile_inclusive(lambda x: True, []))
+        expected = []
+        self.assertEqual(result, expected)
+
+    def test_collatz_sequence(self) -> None:
+        is_even = lambda n: n % 2 == 0
+        start = 11
+        result = list(
+            mi.takewhile_inclusive(
+                lambda n: n != 1,
+                mi.iterate(lambda n: n // 2 if is_even(n) else 3 * n + 1, start),
+            )
+        )
+        expected = [11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
+        self.assertEqual(result, expected)
