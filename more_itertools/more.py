@@ -4221,13 +4221,10 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         else:
             return False
 
-    size = len(objects)
-    if not size:
+    if not objects:
         return
 
-    scalars = [obj for obj in objects if is_scalar(obj)]
-
-    if len(scalars) == size:
+    if all(is_scalar(obj) for obj in objects):
         yield tuple(objects)
         return
 
