@@ -913,6 +913,7 @@ def transpose(it):
 
 def matmul(m1, m2):
     """Multiply two matrices.
+
     >>> list(matmul([(7, 5), (3, 5)], [(2, 5), (7, 9)]))
     [(49, 80), (41, 60)]
 
@@ -925,6 +926,7 @@ def matmul(m1, m2):
 
 def factor(n):
     """Yield the prime factors of n.
+
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
     """
