@@ -4228,10 +4228,10 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         yield tuple(objects)
         return
 
-    emitters = [repeat(obj) if is_scalar(obj) else obj for obj in objects]
+    iterables = [repeat(obj) if is_scalar(obj) else obj for obj in objects]
 
     zipper = _zip_equal if strict else zip
-    yield from zipper(*emitters)
+    yield from zipper(*iterables)
 
 
 def unique_in_window(iterable, n, key=None):
