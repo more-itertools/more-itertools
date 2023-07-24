@@ -5,6 +5,32 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.0.0
+------
+
+* Potentially breaking changes
+    * Python 3.7 support was dropped, since it went EOL on 2023-06-27
+    * :func:`batched` no longer issues a ``DeprecationWarning``; it is now an alias for ``itertools.batched`` for Python 3.12+
+    * :func:`batched` and :func:`matmul` now yield tuples instead of lists
+
+* New functions
+    * :func:`combination_with_replacement_index` (thanks to Schoyen)
+    * :func:`nth_combination_with_replacement` (thanks to Schoyen)
+    * :func:`polynomial_eval` (from the Python itertools docs)
+    * :func:`polynomial_derivative` (from the Python itertools docs)
+    * :func:`sum_of_squares` (from the Python itertools docs)
+
+* Changes to existing functions
+    * :func:`seekable` now has ``relative_seek`` method (thanks to karlb)
+    * :func:`chunked_even` was optimized (thanks to elliotwutingfeng)
+    * :func:`numeric_range` was optimized (thanks to eltoder)
+    * :func:`duplicates_justseen`, :func:`pairwise`, :func:`partial_product`, and :func:`partition` were updated and optimized (thanks to pochmann)
+    * :func:`unique_in_window` had its implementation updated (thanks to elliotwutingfeng)
+    * :func:`iterate` now breaks when its ``func`` argument raises ``StopIteration`` (thanks to jrebiffe)
+
+* Other changes
+    * Some documentation and testing issues were fixed (thanks to lonnen and XuehaiPan)
+
 9.1.0
 -----
 
@@ -14,6 +40,7 @@ Version History
     * :func:`matmul` (from the Python itertools docs)
     * :func:`factor` (from the Python itertools docs)
     * :func:`gray_product` (thanks to haukex)
+    * :func:`partial_product` (thanks to lonnen)
 
 * Changes to existing functions
     * :func:`sieve` was updated to match the Python itertools docs

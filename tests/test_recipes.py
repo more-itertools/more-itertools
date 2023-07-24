@@ -5,7 +5,8 @@ from functools import reduce
 from itertools import combinations, count, permutations
 from operator import mul
 from math import factorial
-from unittest import TestCase
+from sys import version_info
+from unittest import TestCase, skipIf
 
 import more_itertools as mi
 
@@ -982,13 +983,12 @@ class BatchedTests(TestCase):
     def test_basic(self):
         iterable = range(1, 5 + 1)
         for n, expected in (
-            (0, []),
-            (1, [[1], [2], [3], [4], [5]]),
-            (2, [[1, 2], [3, 4], [5]]),
-            (3, [[1, 2, 3], [4, 5]]),
-            (4, [[1, 2, 3, 4], [5]]),
-            (5, [[1, 2, 3, 4, 5]]),
-            (6, [[1, 2, 3, 4, 5]]),
+            (1, [(1,), (2,), (3,), (4,), (5,)]),
+            (2, [(1, 2), (3, 4), (5,)]),
+            (3, [(1, 2, 3), (4, 5)]),
+            (4, [(1, 2, 3, 4), (5,)]),
+            (5, [(1, 2, 3, 4, 5)]),
+            (6, [(1, 2, 3, 4, 5)]),
         ):
             with self.subTest(n=n):
                 actual = list(mi.batched(iterable, n))
@@ -1008,7 +1008,14 @@ class TransposeTests(TestCase):
         expected = [(10, 20, 30), (11, 21, 31), (12, 22, 32)]
         self.assertEqual(actual, expected)
 
-    def test_incompatible(self):
+    @skipIf(version_info[:2] < (3, 10), 'strict=True missing on 3.9')
+    def test_incompatible_error(self):
+        it = [(10, 11, 12, 13), (20, 21, 22), (30, 31, 32)]
+        with self.assertRaises(ValueError):
+            list(mi.transpose(it))
+
+    @skipIf(version_info[:2] >= (3, 9), 'strict=True missing on 3.9')
+    def test_incompatible_allow(self):
         it = [(10, 11, 12, 13), (20, 21, 22), (30, 31, 32)]
         actual = list(mi.transpose(it))
         expected = [(10, 20, 30), (11, 21, 31), (12, 22, 32)]
@@ -1018,7 +1025,7 @@ class TransposeTests(TestCase):
 class MatMulTests(TestCase):
     def test_n_by_n(self):
         actual = list(mi.matmul([(7, 5), (3, 5)], [[2, 5], [7, 9]]))
-        expected = [[49, 80], [41, 60]]
+        expected = [(49, 80), (41, 60)]
         self.assertEqual(actual, expected)
 
     def test_m_by_n(self):
@@ -1026,9 +1033,9 @@ class MatMulTests(TestCase):
         m2 = [[7, 11, 5, 4, 9], [3, 5, 2, 6, 3]]
         actual = list(mi.matmul(m1, m2))
         expected = [
-            [29, 47, 20, 38, 33],
-            [76, 122, 53, 82, 90],
-            [33, 53, 23, 36, 39],
+            (29, 47, 20, 38, 33),
+            (76, 122, 53, 82, 90),
+            (33, 53, 23, 36, 39),
         ]
         self.assertEqual(actual, expected)
 

@@ -9,11 +9,10 @@ Some backward-compatible usability improvements have been made.
 """
 import math
 import operator
-import warnings
 
 from collections import deque
 from collections.abc import Sized
-from functools import reduce
+from functools import partial, reduce
 from itertools import (
     chain,
     combinations,
@@ -29,7 +28,6 @@ from itertools import (
     zip_longest,
 )
 from random import randrange, sample, choice
-from sys import hexversion
 
 __all__ = [
     'all_equal',
@@ -80,8 +78,13 @@ __all__ = [
 _marker = object()
 
 
-# math.isqrt is available for Python 3.8+
-_isqrt = getattr(math, 'isqrt', lambda x: int(math.sqrt(x)))
+# zip with strict is available for Python 3.10+
+try:
+    zip(strict=True)
+except TypeError:
+    _zip_strict = zip
+else:
+    _zip_strict = partial(zip, strict=True)
 
 # math.sumprod is available for Python 3.12+
 _sumprod = getattr(math, 'sumprod', lambda x, y: dotproduct(x, y))
@@ -719,11 +722,14 @@ def convolve(signal, kernel):
     is immediately consumed and stored.
 
     """
+    # This implementation intentionally doesn't match the one in the itertools
+    # documentation.
     kernel = tuple(kernel)[::-1]
     n = len(kernel)
-    padded_signal = chain(repeat(0, n - 1), signal, repeat(0, n - 1))
-    windowed_signal = sliding_window(padded_signal, n)
-    return map(_sumprod, repeat(kernel), windowed_signal)
+    window = deque([0], maxlen=n) * n
+    for x in chain(signal, repeat(0, n - 1)):
+        window.append(x)
+        yield _sumprod(kernel, window)
 
 
 def before_and_after(predicate, it):
@@ -856,38 +862,41 @@ def sieve(n):
     """
     data = bytearray((0, 1)) * (n // 2)
     data[:3] = 0, 0, 0
-    limit = _isqrt(n) + 1
+    limit = math.isqrt(n) + 1
     for p in compress(range(limit), data):
         data[p * p : n : p + p] = bytes(len(range(p * p, n, p + p)))
     data[2] = 1
     return iter_index(data, 1) if n > 2 else iter([])
 
 
-def batched(iterable, n):
+def _batched(iterable, n):
     """Batch data into lists of length *n*. The last batch may be shorter.
 
     >>> list(batched('ABCDEFG', 3))
-    [['A', 'B', 'C'], ['D', 'E', 'F'], ['G']]
+    [('A', 'B', 'C'), ('D', 'E', 'F'), ('G',)]
 
-    This recipe is from the ``itertools`` docs. This library also provides
-    :func:`chunked`, which has a different implementation.
+    On Python 3.12 and above, this is an alias for :func:`itertools.batched`.
     """
-    if hexversion >= 0x30C00A0:  # Python 3.12.0a0
-        warnings.warn(
-            (
-                'batched will be removed in a future version of '
-                'more-itertools. Use the standard library '
-                'itertools.batched function instead'
-            ),
-            DeprecationWarning,
-        )
-
+    if n < 1:
+        raise ValueError('n must be at least one')
     it = iter(iterable)
     while True:
-        batch = list(islice(it, n))
+        batch = tuple(islice(it, n))
         if not batch:
             break
         yield batch
+
+
+try:
+    from itertools import batched as itertools_batched
+except ImportError:
+    batched = _batched
+else:
+
+    def batched(iterable, n):
+        return itertools_batched(iterable, n)
+
+    batched.__doc__ = _batched.__doc__
 
 
 def transpose(it):
@@ -899,14 +908,13 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    # TODO: when 3.9 goes end-of-life, add strict=True to this.
-    return zip(*it)
+    return _zip_strict(*it)
 
 
 def matmul(m1, m2):
     """Multiply two matrices.
     >>> list(matmul([(7, 5), (3, 5)], [(2, 5), (7, 9)]))
-    [[49, 80], [41, 60]]
+    [(49, 80), (41, 60)]
 
     The caller should ensure that the dimensions of the input matrices are
     compatible with each other.
@@ -920,16 +928,15 @@ def factor(n):
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
     """
-    for prime in sieve(_isqrt(n) + 1):
+    for prime in sieve(math.isqrt(n) + 1):
         while True:
-            quotient, remainder = divmod(n, prime)
-            if remainder:
+            if n % prime:
                 break
             yield prime
-            n = quotient
+            n //= prime
             if n == 1:
                 return
-    if n >= 2:
+    if n > 1:
         yield n
 
 
