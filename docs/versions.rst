@@ -23,6 +23,7 @@ Version History
 * Changes to existing functions
     * :func:`seekable` now has ``relative_seek`` method (thanks to karlb)
     * :func:`chunked_even` was optimized (thanks to elliotwutingfeng)
+    * :func:`numeric_range` was optimized (thanks to eltoder)
     * :func:`duplicates_justseen`, :func:`pairwise`, :func:`partial_product`, and :func:`partition` were updated and optimized (thanks to pochmann)
     * :func:`unique_in_window` had its implementation updated (thanks to elliotwutingfeng)
     * :func:`iterate` now breaks when its ``func`` argument raises ``StopIteration`` (thanks to jrebiffe)
