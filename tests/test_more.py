@@ -4798,63 +4798,52 @@ class ChunkedEvenTests(TestCase):
 
 
 class ZipBroadcastTests(TestCase):
-
     def test_zip(self):
         for objects, zipped, strict_ok in [
             # Empty
             ([], [], True),
-
             # One argument
             ([1], [(1,)], True),
             ([[1]], [(1,)], True),
             ([[1, 2]], [(1,), (2,)], True),
-
             # All scalars
             ([1, 2], [(1, 2)], True),
             ([1, 2, 3], [(1, 2, 3)], True),
-
             # Iterables with length = 0
             ([[], 1], [], True),
             ([1, []], [], True),
             ([[], []], [], True),
-
             ([[], 1, 2], [], True),
             ([[], 1, []], [], True),
             ([1, [], 2], [], True),
             ([1, [], []], [], True),
             ([[], [], 1], [], True),
             ([[], [], []], [], True),
-
             # Iterables with length = 1
             ([1, [2]], [(1, 2)], True),
             ([[1], 2], [(1, 2)], True),
             ([[1], [2]], [(1, 2)], True),
-
             ([1, [2], 3], [(1, 2, 3)], True),
             ([1, [2], [3]], [(1, 2, 3)], True),
             ([[1], 2, 3], [(1, 2, 3)], True),
             ([[1], 2, [3]], [(1, 2, 3)], True),
             ([[1], [2], 3], [(1, 2, 3)], True),
             ([[1], [2], [3]], [(1, 2, 3)], True),
-
             # Iterables with length > 1
             ([1, [2, 3]], [(1, 2), (1, 3)], True),
             ([[1, 2], 3], [(1, 3), (2, 3)], True),
             ([[1, 2], [3, 4]], [(1, 3), (2, 4)], True),
-
             ([1, [2, 3], 4], [(1, 2, 4), (1, 3, 4)], True),
             ([1, [2, 3], [4, 5]], [(1, 2, 4), (1, 3, 5)], True),
             ([[1, 2], 3, 4], [(1, 3, 4), (2, 3, 4)], True),
             ([[1, 2], 3, [4, 5]], [(1, 3, 4), (2, 3, 5)], True),
             ([[1, 2], [3, 4], 5], [(1, 3, 5), (2, 4, 5)], True),
             ([[1, 2], [3, 4], [5, 6]], [(1, 3, 5), (2, 4, 6)], True),
-
             # Iterables with different lengths
             ([[], [1]], [], False),
             ([[1], []], [], False),
             ([[1], [2, 3]], [(1, 2)], False),
             ([[1, 2], [3]], [(1, 3)], False),
-
             ([[1, 2], [3], [4]], [(1, 3, 4)], False),
             ([[1], [2, 3], [4]], [(1, 2, 4)], False),
             ([[1], [2], [3, 4]], [(1, 2, 3)], False),
@@ -4867,14 +4856,11 @@ class ZipBroadcastTests(TestCase):
             ([[1, 2, 3], 4, [5, 6]], [(1, 4, 5), (2, 4, 6)], False),
             ([[1, 2], [3, 4, 5], 6], [(1, 3, 6), (2, 4, 6)], False),
             ([[1, 2, 3], [4, 5], 6], [(1, 4, 6), (2, 5, 6)], False),
-
             # Infinite
             ([count(), 1, [2]], [(0, 1, 2)], False),
             ([count(), 1, [2, 3]], [(0, 1, 2), (1, 1, 3)], False),
-
             # Miscellaneous
             (['a', [1, 2], [3, 4, 5]], [('a', 1, 3), ('a', 2, 4)], False),
-
         ]:
             # Truncate by default
             with self.subTest(objects=objects, strict=False, zipped=zipped):
