@@ -4883,7 +4883,10 @@ class ZipBroadcastTests(TestCase):
             # Raise an exception for strict=True
             with self.subTest(objects=objects, strict=True, zipped=zipped):
                 if strict_ok:
-                    self.assertEqual(list(mi.zip_broadcast(*objects, strict=True)), zipped)
+                    self.assertEqual(
+                        list(mi.zip_broadcast(*objects, strict=True)),
+                        zipped,
+                    )
                 else:
                     with self.assertRaises(ValueError):
                         list(mi.zip_broadcast(*objects, strict=True))
@@ -4908,7 +4911,6 @@ class ZipBroadcastTests(TestCase):
             list(mi.zip_broadcast({'a': 'b'}, [1, 2, 3], scalar_types=dict)),
             [({'a': 'b'}, 1), ({'a': 'b'}, 2), ({'a': 'b'}, 3)],
         )
-
 
 
 class UniqueInWindowTests(TestCase):
