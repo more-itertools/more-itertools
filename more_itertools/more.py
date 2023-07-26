@@ -4223,7 +4223,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
 
     if not objects:
         return
-    
+
     iterables_count = sum(1 for obj in objects if not is_scalar(obj))
 
     if not iterables_count:
