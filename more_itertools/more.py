@@ -4223,15 +4223,50 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
 
     if not objects:
         return
+    
+    iterables_count = sum(1 for obj in objects if not is_scalar(obj))
 
-    if all(is_scalar(obj) for obj in objects):
+    if not iterables_count:
         yield tuple(objects)
         return
 
     iterables = [repeat(obj) if is_scalar(obj) else obj for obj in objects]
 
-    zipper = _zip_equal if strict else zip
-    yield from zipper(*iterables)
+    if strict:
+        yield from _zip_equal_scalars(iterables_count, *iterables)
+    else:
+        yield from zip(*iterables)
+
+
+def _zip_equal_scalars(n, *iterables):
+    # Check whether the iterables are all the same size.
+    try:
+        first_size = len(iterables[0])
+        for i, it in enumerate(iterables[1:], 1):
+            size = len(it)
+            if size != first_size:
+                break
+        else:
+            # If we didn't break out, we can use the built-in zip.
+            return zip(*iterables)
+
+        # If we did break out, there was a mismatch.
+        raise UnequalIterablesError(details=(first_size, i, size))
+    # If any one of the iterables didn't have a length, start reading
+    # them until one runs out.
+    except TypeError:
+        return _zip_equal_generator_scalars(n, iterables)
+
+
+def _zip_equal_generator_scalars(n, iterables):
+    for combo in zip_longest(*iterables, fillvalue=_marker):
+        markers = combo.count(_marker)
+        if markers == 0:
+            yield combo
+        elif markers == n:
+            break
+        else:
+            raise UnequalIterablesError()
 
 
 def unique_in_window(iterable, n, key=None):
