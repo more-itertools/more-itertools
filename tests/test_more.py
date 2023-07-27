@@ -5429,7 +5429,10 @@ class TakewhileInclusiveTests(TestCase):
         result = list(
             mi.takewhile_inclusive(
                 lambda n: n != 1,
-                mi.iterate(lambda n: n // 2 if is_even(n) else 3 * n + 1, start),
+                mi.iterate(
+                    lambda n: n // 2 if is_even(n) else 3 * n + 1,
+                    start
+                )
             )
         )
         expected = [11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
