@@ -2,6 +2,7 @@
 <!-- If you're adding a new feature, please make an issue first -->
 <!-- If you're fixing a trivial bug (e.g. a typo) you need not make an issue first -->
 <!-- If you're fixing a non-trivial bug, please go ahead and make an issue first -->
+<!-- Not all proposals for new functionality will be accepted, so please save yourself some work by checking first with an issue -->
 more-itertools/more-itertools#XXXX
 
 ### Changes
