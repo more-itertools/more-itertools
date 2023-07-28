@@ -4240,16 +4240,14 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         yield tuple(objects)
         return
 
+    new_item = [None] * size
+    for i, elem in zip(scalar_positions, scalars):
+        new_item[i] = elem
+
     zipper = _zip_equal if strict else zip
     for item in zipper(*iterables):
-        new_item = [None] * size
-
         for i, elem in zip(iterable_positions, item):
             new_item[i] = elem
-
-        for i, elem in zip(scalar_positions, scalars):
-            new_item[i] = elem
-
         yield tuple(new_item)
 
 
