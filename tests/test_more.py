@@ -5469,3 +5469,16 @@ class TakewhileInclusiveTests(TestCase):
         )
         expected = [11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
         self.assertEqual(result, expected)
+
+
+class OuterProductTests(TestCase):
+    def test_basic(self) -> None:
+        greetings = ['Hello', 'Goodbye']
+        names = ['Alice', 'Bob', 'Carol']
+        greet = lambda greeting, name: f'{greeting}, {name}!'
+        result = list(mi.outer_product(greet, greetings, names))
+        expected = [
+            ('Hello, Alice!', 'Hello, Bob!', 'Hello, Carol!'),
+            ('Goodbye, Alice!', 'Goodbye, Bob!', 'Goodbye, Carol!'),
+        ]
+        self.assertEqual(result, expected)
