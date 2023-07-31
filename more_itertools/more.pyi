@@ -675,3 +675,10 @@ def partial_product(*iterables: Iterable[_T]) -> Iterator[tuple[_T, ...]]: ...
 def takewhile_inclusive(
     predicate: Callable[[_T], bool], iterable: Iterable[_T]
 ) -> Iterator[_T]: ...
+def outer_product(
+    func: Callable[[_T, _U], _V],
+    xs: Iterable[_T],
+    ys: Iterable[_U],
+    *args: Any,
+    **kwargs: Any,
+) -> Iterator[tuple[_V, ...]]: ...
