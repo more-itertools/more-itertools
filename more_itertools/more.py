@@ -4542,8 +4542,8 @@ def takewhile_inclusive(predicate, iterable):
 
 
 def outer_product(func, xs, ys, *args, **kwargs):
-    """A generalized outer product that applies a binary function to all pairs of items.
-    Returns a 2D matrix with len(xs) rows and len(ys) columns.
+    """A generalized outer product that applies a binary function to all
+    pairs of items. Returns a 2D matrix with len(xs) rows and len(ys) columns.
     Also accepts ``*args`` and ``**kwargs`` that are passed to ``func``.
 
     Multiplication table:
@@ -4559,9 +4559,9 @@ def outer_product(func, xs, ys, *args, **kwargs):
     [(2, 3, 0), (1, 0, 4)]
 
     Usage with ``*args`` and ``**kwargs``:
-    >>> animals = ['cat', 'wolf', 'elephant']
+    >>> animals = ['cat', 'wolf', 'mouse']
     >>> list(outer_product(min, animals, animals, key=len))
-    [('cat', 'cat', 'cat'), ('cat', 'wolf', 'wolf'), ('cat', 'wolf', 'elephant')]
+    [('cat', 'cat', 'cat'), ('cat', 'wolf', 'wolf'), ('cat', 'wolf', 'mouse')]
     """
     ys = tuple(ys)
     return batched(
