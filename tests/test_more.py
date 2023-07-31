@@ -30,6 +30,7 @@ from sys import version_info
 from time import sleep
 from traceback import format_exc
 from unittest import skipIf, TestCase
+from unittest.mock import ANY
 
 import more_itertools as mi
 
@@ -4861,6 +4862,7 @@ class ZipBroadcastTests(TestCase):
             ([count(), 1, [2, 3]], [(0, 1, 2), (1, 1, 3)], False),
             # Miscellaneous
             (['a', [1, 2], [3, 4, 5]], [('a', 1, 3), ('a', 2, 4)], False),
+            ([1, [2, ANY, 3]], [(1, 2), (1, ANY), (1, 3)], True),
         ]:
             # Truncate by default
             with self.subTest(objects=objects, strict=False, zipped=zipped):
