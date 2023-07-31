@@ -4261,7 +4261,7 @@ def _zip_equal_scalars(n, *iterables):
 
 def _zip_equal_generator_scalars(n, iterables):
     for combo in zip_longest(*iterables, fillvalue=_marker):
-        markers = combo.count(_marker)
+        markers = sum(1 for c in combo if c is _marker)
         if markers == 0:
             yield combo
         elif markers == n:
