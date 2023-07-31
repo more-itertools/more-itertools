@@ -4229,28 +4229,23 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     if not size:
         return
 
+    new_item = [None] * size
     iterables, iterable_positions = [], []
-    scalars, scalar_positions = [], []
     for i, obj in enumerate(objects):
         if is_scalar(obj):
-            scalars.append(obj)
-            scalar_positions.append(i)
+            new_item[i] = obj
         else:
             iterables.append(iter(obj))
             iterable_positions.append(i)
 
-    if len(scalars) == size:
+    if not iterables:
         yield tuple(objects)
         return
 
-    new_item = [None] * size
-    for i, elem in zip(scalar_positions, scalars):
-        new_item[i] = elem
-
     zipper = _zip_equal if strict else zip
     for item in zipper(*iterables):
-        for i, elem in zip(iterable_positions, item):
-            new_item[i] = elem
+        for i, new_item[i] in zip(iterable_positions, item):
+            pass
         yield tuple(new_item)
 
 
