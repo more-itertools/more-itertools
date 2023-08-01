@@ -355,6 +355,7 @@ def _zip_equal(*iterables):
     except TypeError:
         return _zip_equal_generator(iterables)
 
+
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
     """Group elements from *iterable* into fixed-length groups of length *n*.
 
