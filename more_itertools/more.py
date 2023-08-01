@@ -10,6 +10,7 @@ from itertools import (
     count,
     cycle,
     dropwhile,
+    filterfalse,
     groupby,
     islice,
     repeat,
@@ -4228,14 +4229,14 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     if not objects:
         return
 
-    iterables_count = sum(1 for obj in objects if not is_scalar(obj))
+    iterables = list(filterfalse(is_scalar, objects))
+    iterables_count = ilen(iterables)
 
     if not iterables_count:
         yield tuple(objects)
         return
 
-    iterables = [obj for obj in objects if not is_scalar(obj)]
-    emitters = [repeat(obj) if is_scalar(obj) else obj for obj in objects]
+    emitters = map_if(objects, is_scalar, repeat)
 
     if not strict:
         yield from zip(*emitters)
