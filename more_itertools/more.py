@@ -4234,43 +4234,34 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         yield tuple(objects)
         return
 
-    iterables = [repeat(obj) if is_scalar(obj) else obj for obj in objects]
+    iterables = [obj for obj in objects if not is_scalar(obj)]
+    emitters = [repeat(obj) if is_scalar(obj) else obj for obj in objects]
 
-    if strict:
-        yield from _zip_equal_scalars(iterables_count, *iterables)
-    else:
-        yield from zip(*iterables)
+    if not strict:
+        yield from zip(*emitters)
+        return
 
-
-def _zip_equal_scalars(n, *iterables):
-    # Check whether the iterables are all the same size.
+    # If all true iterables are equal on len, use default zip 
     try:
         first_size = len(iterables[0])
         for i, it in enumerate(iterables[1:], 1):
             size = len(it)
             if size != first_size:
-                break
-        else:
-            # If we didn't break out, we can use the built-in zip.
-            return zip(*iterables)
+                raise UnequalIterablesError(details=(first_size, i, size))
 
-        # If we did break out, there was a mismatch.
-        raise UnequalIterablesError(details=(first_size, i, size))
+        yield from zip(*emitters)
+
     # If any one of the iterables didn't have a length, start reading
     # them until one runs out.
     except TypeError:
-        return _zip_equal_generator_scalars(n, iterables)
-
-
-def _zip_equal_generator_scalars(n, iterables):
-    for combo in zip_longest(*iterables, fillvalue=_marker):
-        markers = sum(1 for c in combo if c is _marker)
-        if markers == 0:
-            yield combo
-        elif markers == n:
-            break
-        else:
-            raise UnequalIterablesError()
+        for combo in zip_longest(*emitters, fillvalue=_marker):
+            markers = sum(1 for c in combo if c is _marker)
+            if markers == 0:
+                yield combo
+            elif markers == iterables_count:
+                break
+            else:
+                raise UnequalIterablesError()
 
 
 def unique_in_window(iterable, n, key=None):
