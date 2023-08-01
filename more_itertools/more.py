@@ -4242,7 +4242,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         yield from zip(*emitters)
         return
 
-    # If all true iterables are equal on len, use default zip 
+    # If all true iterables are equal on len, use default zip
     try:
         first_size = len(iterables[0])
         for i, it in enumerate(iterables[1:], 1):
