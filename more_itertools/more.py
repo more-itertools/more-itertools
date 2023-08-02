@@ -4230,9 +4230,8 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         return
 
     iterables = list(filterfalse(is_scalar, objects))
-    iterables_count = ilen(iterables)
 
-    if not iterables_count:
+    if not iterables:
         yield tuple(objects)
         return
 
@@ -4259,7 +4258,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
             markers = sum(1 for c in combo if c is _marker)
             if markers == 0:
                 yield combo
-            elif markers == iterables_count:
+            elif markers == len(iterables):
                 break
             else:
                 raise UnequalIterablesError()
