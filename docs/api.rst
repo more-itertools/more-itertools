@@ -196,6 +196,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: duplicates_everseen
 .. autofunction:: duplicates_justseen
 .. autofunction:: longest_common_prefix
+.. autofunction:: takewhile_inclusive
 
 ----
 
@@ -229,6 +230,7 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: permutation_index
 .. autofunction:: combination_with_replacement_index
 .. autofunction:: gray_product
+.. autofunction:: outer_product
 
 ----
 

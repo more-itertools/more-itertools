@@ -5,6 +5,20 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.1.0
+------
+
+* New functions
+    * :func:`takewhile_inclusive` (thanks to OlegAlexander)
+    * :func:`outer_product` (thanks to OlegAlexander)
+
+* Changes to existing functions
+    * :func:`zip_broadcast` was improved (thanks to kalekundert and pochmann)
+    * :func:`consume` had its type annotation fixed (thanks to obaltian)
+
+* Other changes
+    * Some documentation and testing issues were fixed (thanks to OlegAlexander)
+
 10.0.0
 ------
 
