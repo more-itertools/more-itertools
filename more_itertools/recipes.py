@@ -925,9 +925,7 @@ def factor(n):
     [2, 2, 2, 3, 3, 5]
     """
     for prime in sieve(math.isqrt(n) + 1):
-        while True:
-            if n % prime:
-                break
+        while not n % prime:
             yield prime
             n //= prime
             if n == 1:
