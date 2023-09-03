@@ -160,10 +160,8 @@ class LastTests(TestCase):
             (iter(range(1)), 0),
             (IterOnlyRange(5), 4),
             ({n: str(n) for n in range(5)}, 4),
+            ({0: '0', -1: '-1', 2: '-2'}, 2),
         ]
-        # Versions below 3.6.0 don't have ordered dicts
-        if version_info >= (3, 6, 0):
-            cases.append(({0: '0', -1: '-1', 2: '-2'}, 2))
 
         for iterable, expected in cases:
             with self.subTest(iterable=iterable):
@@ -3259,7 +3257,6 @@ class DifferenceTest(TestCase):
     def test_empty(self):
         self.assertEqual(list(mi.difference([])), [])
 
-    @skipIf(version_info[:2] < (3, 8), 'accumulate with initial needs 3.8+')
     def test_initial(self):
         original = list(range(100))
         accumulated = accumulate(original, initial=100)
