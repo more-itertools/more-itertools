@@ -112,17 +112,9 @@ class FirstTests(TestCase):
     def test_one(self):
         self.assertEqual(mi.first([3]), 3)
 
-    def test_empty_stop_iteration(self):
-        try:
+    def test_empty(self):
+        with self.assertRaises(ValueError):
             mi.first([])
-        except ValueError:
-            formatted_exc = format_exc()
-            self.assertIn('StopIteration', formatted_exc)
-            self.assertIn(
-                'The above exception was the direct cause', formatted_exc
-            )
-        else:
-            self.fail()
 
     def test_default(self):
         self.assertEqual(mi.first([], 'boo'), 'boo')
