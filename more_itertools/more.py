@@ -198,15 +198,14 @@ def first(iterable, default=_marker):
     ``next(iter(iterable), default)``.
 
     """
-    try:
-        return next(iter(iterable))
-    except StopIteration as e:
-        if default is _marker:
-            raise ValueError(
-                'first() was called on an empty iterable, and no '
-                'default value was provided.'
-            ) from e
-        return default
+    for item in iterable:
+        return item
+    if default is _marker:
+        raise ValueError(
+            'first() was called on an empty iterable, and no '
+            'default value was provided.'
+        ) from e
+    return default
 
 
 def last(iterable, default=_marker):
