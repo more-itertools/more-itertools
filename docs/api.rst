@@ -191,6 +191,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: rstrip
 .. autofunction:: filter_except
 .. autofunction:: map_except
+.. autofunction:: iter_suppress
 .. autofunction:: nth_or_last(iterable, n[, default])
 .. autofunction:: unique_in_window
 .. autofunction:: duplicates_everseen
