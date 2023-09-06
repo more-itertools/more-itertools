@@ -4588,17 +4588,6 @@ def iter_suppress(iterable, *exceptions):
     [1, 2, 3, 4, 2, 3, 4]
     """
     try:
-        it = iter(iterable)
+        yield from iterable
     except exceptions:
         return
-
-    while True:
-        try:
-            item = next(it, _marker)
-        except exceptions:
-            break
-
-        if item is _marker:
-            break
-
-        yield item
