@@ -682,3 +682,7 @@ def outer_product(
     *args: Any,
     **kwargs: Any,
 ) -> Iterator[tuple[_V, ...]]: ...
+def iter_suppress(
+    iterable: Iterable[_T],
+    *exceptions: Type[BaseException],
+) -> Iterator[_T]: ...

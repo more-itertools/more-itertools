@@ -5471,3 +5471,47 @@ class OuterProductTests(TestCase):
             ('Goodbye, Alice!', 'Goodbye, Bob!', 'Goodbye, Carol!'),
         ]
         self.assertEqual(result, expected)
+
+
+class IterSuppressTests(TestCase):
+    class Producer:
+        def __init__(self, exc, die_early=False):
+            self.exc = exc
+            self.pos = 0
+            self.die_early = die_early
+
+        def __iter__(self):
+            if self.die_early:
+                raise self.exc
+
+            return self
+
+        def __next__(self):
+            ret = self.pos
+            if self.pos >= 5:
+                raise self.exc
+            self.pos += 1
+            return ret
+
+    def test_no_error(self):
+        iterator = range(5)
+        actual = list(mi.iter_suppress(iterator, RuntimeError))
+        expected = [0, 1, 2, 3, 4]
+        self.assertEqual(actual, expected)
+
+    def test_raises_error(self):
+        iterator = self.Producer(ValueError)
+        with self.assertRaises(ValueError):
+            list(mi.iter_suppress(iterator, RuntimeError))
+
+    def test_suppression(self):
+        iterator = self.Producer(ValueError)
+        actual = list(mi.iter_suppress(iterator, RuntimeError, ValueError))
+        expected = [0, 1, 2, 3, 4]
+        self.assertEqual(actual, expected)
+
+    def test_early_suppression(self):
+        iterator = self.Producer(ValueError, die_early=True)
+        actual = list(mi.iter_suppress(iterator, RuntimeError, ValueError))
+        expected = []
+        self.assertEqual(actual, expected)
