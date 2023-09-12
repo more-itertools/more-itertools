@@ -108,6 +108,7 @@ def iter_index(
     iterable: Iterable[_T],
     value: Any,
     start: int | None = ...,
+    stop: int | None = ...,
 ) -> Iterator[int]: ...
 def sieve(n: int) -> Iterator[int]: ...
 def batched(
