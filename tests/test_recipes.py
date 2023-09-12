@@ -932,7 +932,6 @@ class IterIndexTests(TestCase):
                 self.assertEqual(actual, expected)
 
     def test_stop(self):
-        iterable = 'AABCADEAF'
         actual = list(mi.iter_index('AABCADEAF', 'A', stop=7))
         expected = [0, 1, 4]
         self.assertEqual(actual, expected)
