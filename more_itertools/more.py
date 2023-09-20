@@ -3356,7 +3356,7 @@ def iequals(*iterables):
     >>> iequals("abc", "acb")
     False
 
-    Not to be confused with :func:`all_equals`, which checks whether all
+    Not to be confused with :func:`all_equal`, which checks whether all
     elements of iterable are equal to each other.
 
     """
