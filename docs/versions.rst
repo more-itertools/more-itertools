@@ -169,7 +169,7 @@ Version History
     * :func:`countable` (thanks to krzysieq)
 
 * Changes to existing functions
-    * :func:`split_before` was updated to handle empy collections (thanks to TiunovNN)
+    * :func:`split_before` was updated to handle empty collections (thanks to TiunovNN)
     * :func:`unique_everseen` got a performance boost (thanks to Numerlor)
     * The type hint for :func:`value_chain` was corrected (thanks to vr2262)
 
@@ -256,7 +256,7 @@ Version History
     * :func:`zip_equal` (thanks to frankier and alexmojaki)
 
 * Changes to existing itertools:
-    * :func:`split_at`, :func:`split_before`, :func:`split_after`, and :func:`split_when` all got a ``maxsplit`` paramter (thanks to jferard and ilai-deutel)
+    * :func:`split_at`, :func:`split_before`, :func:`split_after`, and :func:`split_when` all got a ``maxsplit`` parameter (thanks to jferard and ilai-deutel)
     * :func:`split_at` now accepts a ``keep_separator`` parameter (thanks to jferard)
     * :func:`distinct_permutations` can now generate ``r``-length permutations (thanks to SergBobrovsky and ilai-deutel)
     * The :func:`windowed` implementation was improved  (thanks to SergBobrovsky)

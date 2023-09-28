@@ -4137,7 +4137,7 @@ class SampleTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_scale_invariance_of_weights(self):
-        """The probabilit of chosing element a_i is w_i / sum(weights).
+        """The probabilit of choosing element a_i is w_i / sum(weights).
         Scaling weights should not change the probability or outcome."""
         data = "abcdef"
 
