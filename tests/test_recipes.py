@@ -103,7 +103,7 @@ class ConsumeTests(TestCase):
         self.assertEqual(0, next(r))
 
     def test_negative_consume(self):
-        """Check that negative consumsion throws an error"""
+        """Check that negative consumption throws an error"""
         r = (x for x in range(10))
         self.assertRaises(ValueError, lambda: mi.consume(r, -1))
 
@@ -203,7 +203,7 @@ class NcyclesTests(TestCase):
         n = mi.ncycles(range(100), 0)
         self.assertRaises(StopIteration, lambda: next(n))
 
-    def test_pathalogical_case(self):
+    def test_pathological_case(self):
         """asking for negative cycles should return an empty iterator"""
         n = mi.ncycles(range(100), -10)
         self.assertRaises(StopIteration, lambda: next(n))

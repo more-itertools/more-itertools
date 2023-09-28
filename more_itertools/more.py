@@ -4057,7 +4057,7 @@ def combination_with_replacement_index(element, iterable):
             break
     else:
         raise ValueError(
-            'element is not a combination with replacment of iterable'
+            'element is not a combination with replacement of iterable'
         )
 
     n = len(pool)
@@ -4296,7 +4296,7 @@ def duplicates_everseen(iterable, key=None):
     >>> list(duplicates_everseen('AaaBbbCccAaa', str.lower))
     ['a', 'a', 'b', 'b', 'c', 'c', 'A', 'a', 'a']
 
-    This function is analagous to :func:`unique_everseen` and is subject to
+    This function is analogous to :func:`unique_everseen` and is subject to
     the same performance considerations.
 
     """
@@ -4326,7 +4326,7 @@ def duplicates_justseen(iterable, key=None):
     >>> list(duplicates_justseen('AaaBbbCccAaa', str.lower))
     ['a', 'a', 'b', 'b', 'c', 'c', 'a', 'a']
 
-    This function is analagous to :func:`unique_justseen`.
+    This function is analogous to :func:`unique_justseen`.
 
     """
     return flatten(g for _, g in groupby(iterable, key) for _ in g)
