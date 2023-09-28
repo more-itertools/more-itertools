@@ -245,7 +245,7 @@ class PeekableTests(PeekableMixinTests, TestCase):
         self.assertEqual(p[0], 'a')
         self.assertEqual(next(p), 'a')
 
-        # Indexing further into the peekable shouldn't advance the itertor
+        # Indexing further into the peekable shouldn't advance the iterator
         self.assertEqual(p[2], 'd')
         self.assertEqual(next(p), 'b')
 
@@ -317,7 +317,7 @@ class PeekableTests(PeekableMixinTests, TestCase):
     # prepend() behavior tests
 
     def test_prepend(self):
-        """Tests intersperesed ``prepend()`` and ``next()`` calls"""
+        """Tests interspersed ``prepend()`` and ``next()`` calls"""
         it = mi.peekable(range(2))
         actual = []
 
@@ -4129,7 +4129,7 @@ class SampleTests(TestCase):
             expected = min(k, len(data))
             self.assertEqual(actual, expected)
 
-    def test_samling_entire_iterable(self):
+    def test_sampling_entire_iterable(self):
         """If k=len(iterable), the sample contains the original elements."""
         data = ["a", 2, "a", 4, (1, 2, 3)]
         actual = set(mi.sample(data, k=len(data)))
@@ -4137,7 +4137,7 @@ class SampleTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_scale_invariance_of_weights(self):
-        """The probabilit of choosing element a_i is w_i / sum(weights).
+        """The probability of choosing element a_i is w_i / sum(weights).
         Scaling weights should not change the probability or outcome."""
         data = "abcdef"
 
