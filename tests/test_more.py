@@ -5515,3 +5515,30 @@ class IterSuppressTests(TestCase):
         actual = list(mi.iter_suppress(iterator, RuntimeError, ValueError))
         expected = []
         self.assertEqual(actual, expected)
+
+
+class FilterMapTests(TestCase):
+    def test_no_iterables(self):
+        actual = list(mi.filter_map(lambda _: None, []))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_filter(self):
+        actual = list(mi.filter_map(lambda _: None, [1, 2, 3]))
+        expected = []
+        self.assertEqual(actual, expected)
+
+    def test_map(self):
+        actual = list(mi.filter_map(lambda x: x + 1, [1, 2, 3]))
+        expected = [2, 3, 4]
+        self.assertEqual(actual, expected)
+
+    def test_filter_map(self):
+        actual = list(
+            mi.filter_map(
+                lambda x: int(x) if x.isnumeric() else None,
+                ['1', 'a', '2', 'b', '3'],
+            )
+        )
+        expected = [1, 2, 3]
+        self.assertEqual(actual, expected)

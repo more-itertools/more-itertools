@@ -686,3 +686,7 @@ def iter_suppress(
     iterable: Iterable[_T],
     *exceptions: Type[BaseException],
 ) -> Iterator[_T]: ...
+def filter_map(
+    func: Callable[[_T], _V | None],
+    iterable: Iterable[_T],
+) -> Iterator[_V]: ...
