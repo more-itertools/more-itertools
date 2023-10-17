@@ -4594,7 +4594,7 @@ def iter_suppress(iterable, *exceptions):
 
 
 def filter_map(func, iterable):
-    """Apply ``func`` to every element of ``iterable`, yielding only those
+    """Apply *func* to every element of *iterable*, yielding only those
        which are not ``None``.
 
     >>> elems = ['1', 'a', '2', 'b', '3']
