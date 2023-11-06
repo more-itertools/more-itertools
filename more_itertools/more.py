@@ -4530,10 +4530,8 @@ def takewhile_inclusive(predicate, iterable):
     :func:`takewhile` would return ``[1, 4]``.
     """
     for x in iterable:
-        if predicate(x):
-            yield x
-        else:
-            yield x
+        yield x
+        if not predicate(x):
             break
 
 
