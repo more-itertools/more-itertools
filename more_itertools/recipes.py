@@ -868,7 +868,7 @@ def sieve(n):
 
 
 def _batched(iterable, n):
-    """Batch data into lists of length *n*. The last batch may be shorter.
+    """Batch data into tuples of length *n*. The last batch may be shorter.
 
     >>> list(batched('ABCDEFG', 3))
     [('A', 'B', 'C'), ('D', 'E', 'F'), ('G',)]
