@@ -4067,8 +4067,10 @@ def combination_with_replacement_index(element, iterable):
         occupations[p] += 1
 
     index = 0
+    cumulative_sum = 0
     for k in range(1, n):
-        j = l + n - 1 - k - sum(occupations[:k])
+        cumulative_sum += occupations[k-1]
+        j = l + n - 1 - k - cumulative_sum
         i = n - k
         if i <= j:
             index += factorial(j) // (factorial(i) * factorial(j - i))
