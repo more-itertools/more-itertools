@@ -4069,7 +4069,7 @@ def combination_with_replacement_index(element, iterable):
     index = 0
     cumulative_sum = 0
     for k in range(1, n):
-        cumulative_sum += occupations[k-1]
+        cumulative_sum += occupations[k - 1]
         j = l + n - 1 - k - cumulative_sum
         i = n - k
         if i <= j:
