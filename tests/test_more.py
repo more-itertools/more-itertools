@@ -5088,6 +5088,32 @@ class IsUniqueEverseenTests(TestCase):
         self.assertEqual(list(u), [True, True, False, False])
 
 
+class UniqueEverseenTests(TestCase):
+    """Tests for ``unique_everseen()``"""
+
+    def test_everseen(self):
+        """ensure duplicate elements are ignored"""
+        u = mi.unique_everseen('AAAABBBBCCDAABBB')
+        self.assertEqual(['A', 'B', 'C', 'D'], list(u))
+
+    def test_custom_key(self):
+        """ensure the custom key comparison works"""
+        u = mi.unique_everseen('aAbACCc', key=str.lower)
+        self.assertEqual(list('abC'), list(u))
+
+    def test_unhashable(self):
+        """ensure things work for unhashable items"""
+        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
+        u = mi.unique_everseen(iterable)
+        self.assertEqual(list(u), ['a', [1, 2, 3]])
+
+    def test_unhashable_key(self):
+        """ensure things work for unhashable items with a custom key"""
+        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
+        u = mi.unique_everseen(iterable, key=lambda x: x)
+        self.assertEqual(list(u), ['a', [1, 2, 3]])
+
+
 class DuplicatesEverSeenTests(TestCase):
     def test_basic(self):
         for iterable, expected in [
