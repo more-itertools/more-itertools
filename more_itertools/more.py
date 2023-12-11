@@ -4351,22 +4351,11 @@ def unique_everseen(iterable, key=None):
     ``key=lambda x: frozenset(x.items())`` can be used.
 
     """
-    seenset = set()
-    seenset_add = seenset.add
-    seenlist = []
-    seenlist_add = seenlist.append
-    use_key = key is not None
-
-    for element in iterable:
-        k = key(element) if use_key else element
-        try:
-            if k not in seenset:
-                seenset_add(k)
-                yield element
-        except TypeError:
-            if k not in seenlist:
-                seenlist_add(k)
-                yield element
+    for is_uniq in is_unique_everseen(
+        (element := elem for elem in iterable), key=key
+    ):
+        if is_uniq:
+            yield element
 
 
 def duplicates_everseen(iterable, key=None):
@@ -4381,22 +4370,11 @@ def duplicates_everseen(iterable, key=None):
     the same performance considerations.
 
     """
-    seen_set = set()
-    seen_list = []
-    use_key = key is not None
-
-    for element in iterable:
-        k = key(element) if use_key else element
-        try:
-            if k not in seen_set:
-                seen_set.add(k)
-            else:
-                yield element
-        except TypeError:
-            if k not in seen_list:
-                seen_list.append(k)
-            else:
-                yield element
+    for is_uniq in is_unique_everseen(
+        (element := elem for elem in iterable), key=key
+    ):
+        if not is_uniq:
+            yield element
 
 
 def duplicates_justseen(iterable, key=None):
