@@ -4300,8 +4300,22 @@ def is_unique_everseen(iterable, key=None):
     >>> list(is_unique_everseen('mississippi'))
     [True, True, True, False, False, False, False, False, True, False, False]
 
-    This function is analogous to :func:`unique_everseen` and is subject to
-    the same performance considerations.
+    Sequences with a mix of hashable and unhashable items can be used.
+    The function will be slower (i.e., `O(n^2)`) for unhashable items.
+
+    Remember that ``list`` objects are unhashable - you can use the *key*
+    parameter to transform the list to a tuple (which is hashable) to
+    avoid a slowdown.
+
+        >>> iterable = ([1, 2], [2, 3], [1, 2])
+        >>> list(is_unique_everseen(iterable))  # Slower
+        [True, True, False]
+        >>> list(is_unique_everseen(iterable, key=tuple))  # Faster
+        [True, True, False]
+
+    Similarly, you may want to convert unhashable ``set`` objects with
+    ``key=frozenset``. For ``dict`` objects,
+    ``key=lambda x: frozenset(x.items())`` can be used.
 
     """
     seen_set = set()
@@ -4333,22 +4347,8 @@ def unique_everseen(iterable, key=None):
         >>> list(unique_everseen('ABBCcAD', str.lower))
         ['A', 'B', 'C', 'D']
 
-    Sequences with a mix of hashable and unhashable items can be used.
-    The function will be slower (i.e., `O(n^2)`) for unhashable items.
-
-    Remember that ``list`` objects are unhashable - you can use the *key*
-    parameter to transform the list to a tuple (which is hashable) to
-    avoid a slowdown.
-
-        >>> iterable = ([1, 2], [2, 3], [1, 2])
-        >>> list(unique_everseen(iterable))  # Slow
-        [[1, 2], [2, 3]]
-        >>> list(unique_everseen(iterable, key=tuple))  # Faster
-        [[1, 2], [2, 3]]
-
-    Similarly, you may want to convert unhashable ``set`` objects with
-    ``key=frozenset``. For ``dict`` objects,
-    ``key=lambda x: frozenset(x.items())`` can be used.
+    This function is implemented in terms of :func:`is_unique_everseen`
+    and is subject to the same performance considerations.
 
     """
     for is_uniq in is_unique_everseen(
@@ -4366,8 +4366,8 @@ def duplicates_everseen(iterable, key=None):
     >>> list(duplicates_everseen('AaaBbbCccAaa', str.lower))
     ['a', 'a', 'b', 'b', 'c', 'c', 'A', 'a', 'a']
 
-    This function is analogous to :func:`unique_everseen` and is subject to
-    the same performance considerations.
+    This function is implemented in terms of :func:`is_unique_everseen`
+    and is subject to the same performance considerations.
 
     """
     for is_uniq in is_unique_everseen(
