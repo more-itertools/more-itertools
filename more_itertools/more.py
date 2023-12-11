@@ -66,6 +66,7 @@ __all__ = [
     'distinct_permutations',
     'distribute',
     'divide',
+    'is_unique_everseen',
     'duplicates_everseen',
     'duplicates_justseen',
     'exactly_n',
@@ -4289,6 +4290,38 @@ def unique_in_window(iterable, n, key=None):
             yield item
         counts[k] += 1
         window.append(k)
+
+
+def is_unique_everseen(iterable, key=None):
+    """For each element in the input iterable, return either :obj:`True` if
+    this element is being seen for the first time, or :obj:`False` if this
+    element has been seen in the input before.
+
+    >>> list(is_unique_everseen('mississippi'))
+    [True, True, True, False, False, False, False, False, True, False, False]
+
+    This function is analogous to :func:`unique_everseen` and is subject to
+    the same performance considerations.
+
+    """
+    seen_set = set()
+    seen_list = []
+    use_key = key is not None
+
+    for element in iterable:
+        k = key(element) if use_key else element
+        try:
+            if k not in seen_set:
+                seen_set.add(k)
+                yield True
+            else:
+                yield False
+        except TypeError:
+            if k not in seen_list:
+                seen_list.append(k)
+                yield True
+            else:
+                yield False
 
 
 def duplicates_everseen(iterable, key=None):

@@ -195,6 +195,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: iter_suppress
 .. autofunction:: nth_or_last(iterable, n[, default])
 .. autofunction:: unique_in_window
+.. autofunction:: is_unique_everseen
 .. autofunction:: duplicates_everseen
 .. autofunction:: duplicates_justseen
 .. autofunction:: longest_common_prefix

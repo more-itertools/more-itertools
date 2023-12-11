@@ -4982,6 +4982,112 @@ class StrictlyNTests(TestCase):
         self.assertIn('Picked the first 2 items', cm.output[0])
 
 
+class IsUniqueEverseenTests(TestCase):
+    """Tests for ``is_unique_everseen()``"""
+
+    def test_everseen(self):
+        """ensure duplicate elements are detected"""
+        self.assertEqual(
+            list(mi.is_unique_everseen('mississippi')),
+            [
+                True,
+                True,
+                True,
+                False,
+                False,
+                False,
+                False,
+                False,
+                True,
+                False,
+                False,
+            ],
+        )
+        self.assertEqual(
+            tuple(mi.is_unique_everseen('AAAABBBCCDAABBB')),
+            (
+                True,
+                False,
+                False,
+                False,
+                True,
+                False,
+                False,
+                True,
+                False,
+                True,
+                False,
+                False,
+                False,
+                False,
+                False,
+            ),
+        )
+        self.assertEqual(
+            tuple(mi.is_unique_everseen(("foo", "bar", "quz", 123))),
+            (True, True, True, True),
+        )
+        self.assertEqual(
+            tuple(mi.is_unique_everseen(["foo", ["bar", "quz"]])), (True, True)
+        )
+        self.assertEqual(
+            tuple(mi.is_unique_everseen(("foo", 123, "bar", "foo"))),
+            (True, True, True, False),
+        )
+        self.assertEqual(
+            tuple(
+                mi.is_unique_everseen(
+                    [["foo", "bar"], "quz", ["quz"], ["foo", "bar"], "quz"]
+                )
+            ),
+            (True, True, True, False, False),
+        )
+
+    def test_custom_key(self):
+        """ensure the custom key comparison works"""
+        self.assertEqual(
+            tuple(mi.is_unique_everseen('AaaBbbCccAaa', key=str.lower)),
+            (
+                True,
+                False,
+                False,
+                True,
+                False,
+                False,
+                True,
+                False,
+                False,
+                False,
+                False,
+                False,
+            ),
+        )
+        self.assertEqual(
+            tuple(mi.is_unique_everseen('ABBcCAD', key=str.lower)),
+            (True, True, False, True, False, False, True),
+        )
+        self.assertEqual(
+            tuple(
+                mi.is_unique_everseen(
+                    ("foo", "bar", "quz", "Foo"), key=str.lower
+                )
+            ),
+            (True, True, True, False),
+        )
+
+    def test_unhashable(self):
+        """ensure things work for unhashable items"""
+        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
+        u = mi.is_unique_everseen(iterable)
+        self.assertEqual(list(u), [True, True, False, False])
+
+    def test_unhashable_key(self):
+        """ensure things work for unhashable items with a custom key"""
+        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
+        u = mi.is_unique_everseen(iterable, key=lambda x: x)
+        self.assertEqual(list(u), [True, True, False, False])
+
+
 class DuplicatesEverSeenTests(TestCase):
     def test_basic(self):
         for iterable, expected in [
