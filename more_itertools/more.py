@@ -4342,12 +4342,10 @@ def classify_unique(iterable, key=None):
     For each element in the input iterable, return a 3-tuple consisting of:
 
     1. The element itself
-
     2. ``False`` if the element is equal to the one preceding it in the input,
-    ``True`` otherwise (i.e. the equivalent of :func:`unique_justseen`)
-
+       ``True`` otherwise (i.e. the equivalent of :func:`unique_justseen`)
     3. ``False`` if this element has been seen anywhere in the input before,
-    ``True`` otherwise (i.e. the equivalent of :func:`unique_everseen`)
+       ``True`` otherwise (i.e. the equivalent of :func:`unique_everseen`)
 
     >>> list(classify_unique('otto'))    # doctest: +NORMALIZE_WHITESPACE
     [('o', True,  True),
