@@ -921,7 +921,7 @@ def substrings_indexes(seq, reverse=False):
 
 
 class bucket:
-    """Wrap *iterable* and return an object that buckets it iterable into
+    """Wrap *iterable* and return an object that buckets the iterable into
     child iterables based on a *key* function.
 
         >>> iterable = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'b3']
