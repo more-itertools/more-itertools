@@ -5,10 +5,10 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 test -d .venv || python3 -m venv .venv
 set +x
-echo "+ . .venv/bin/activate"
-. .venv/bin/activate
+echo "+ . .venv/{Scripts,bin}/activate"
+test -e .venv/Scripts && . .venv/Scripts/activate || . .venv/bin/activate
 set -x
-pip install -q --upgrade pip wheel
+python3 -m pip install -q --upgrade pip wheel
 pip install -q coverage flake8 black mypy sphinx sphinx_rtd_theme flit twine
 
 coverage run --include="more_itertools/*.py" -m unittest
