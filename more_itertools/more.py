@@ -19,7 +19,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import exp, factorial, floor, log
+from math import exp, factorial, floor, log, perm, comb
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
@@ -3855,7 +3855,7 @@ def nth_permutation(iterable, r, index):
     elif not 0 <= r < n:
         raise ValueError
     else:
-        c = factorial(n) // factorial(n - r)
+        c = perm(n, r)
 
     if index < 0:
         index += c
@@ -3900,7 +3900,7 @@ def nth_combination_with_replacement(iterable, r, index):
     if (r < 0) or (r > n):
         raise ValueError
 
-    c = factorial(n + r - 1) // (factorial(r) * factorial(n - 1))
+    c = comb(n + r - 1, r)
 
     if index < 0:
         index += c
@@ -3913,9 +3913,7 @@ def nth_combination_with_replacement(iterable, r, index):
     while r:
         r -= 1
         while n >= 0:
-            num_combs = factorial(n + r - 1) // (
-                factorial(r) * factorial(n - 1)
-            )
+            num_combs = comb(n + r - 1, r)
             if index < num_combs:
                 break
             n -= 1
@@ -4017,9 +4015,9 @@ def combination_index(element, iterable):
     for i, j in enumerate(reversed(indexes), start=1):
         j = n - j
         if i <= j:
-            index += factorial(j) // (factorial(i) * factorial(j - i))
+            index += comb(j, i)
 
-    return factorial(n + 1) // (factorial(k + 1) * factorial(n - k)) - index
+    return comb(n + 1, k + 1) - index
 
 
 def combination_with_replacement_index(element, iterable):
@@ -4074,7 +4072,7 @@ def combination_with_replacement_index(element, iterable):
         j = l + n - 1 - k - cumulative_sum
         i = n - k
         if i <= j:
-            index += factorial(j) // (factorial(i) * factorial(j - i))
+            index += comb(j, i)
 
     return index
 
