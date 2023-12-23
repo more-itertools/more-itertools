@@ -56,6 +56,7 @@ __all__ = [
     'powerset',
     'prepend',
     'quantify',
+    'reshape',
     'random_combination_with_replacement',
     'random_combination',
     'random_permutation',
@@ -69,6 +70,7 @@ __all__ = [
     'tabulate',
     'tail',
     'take',
+    'totient',
     'transpose',
     'triplewise',
     'unique_everseen',
@@ -524,6 +526,9 @@ def unique_justseen(iterable, key=None):
     ['A', 'B', 'C', 'A', 'D']
 
     """
+    if key is None:
+        return map(operator.itemgetter(0), groupby(iterable))
+
     return map(next, map(operator.itemgetter(1), groupby(iterable, key)))
 
 
@@ -898,7 +903,7 @@ else:
 
 
 def transpose(it):
-    """Swap the rows and columns of the input.
+    """Swap the rows and columns of the input matrix.
 
     >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
     [(1, 11), (2, 22), (3, 33)]
@@ -907,6 +912,17 @@ def transpose(it):
     If the input is empty, no output will be produced.
     """
     return _zip_strict(*it)
+
+
+def reshape(matrix, cols):
+    """Reshape the 2-D input *matrix* to have a column count given by *cols*.
+
+    >>> matrix = [(0, 1), (2, 3), (4, 5)]
+    >>> cols = 3
+    >>> list(reshape(matrix, cols))
+    [(0, 1, 2), (3, 4, 5)]
+    """
+    return batched(chain.from_iterable(matrix), cols)
 
 
 def matmul(m1, m2):
@@ -977,3 +993,17 @@ def polynomial_derivative(coefficients):
     n = len(coefficients)
     powers = reversed(range(1, n))
     return list(map(operator.mul, coefficients, powers))
+
+
+def totient(n):
+    """Return the count of natural numbers up to *n* that are coprime with *n*.
+
+    >>> totient(9)
+    6
+    >>> totient(12)
+    4
+    """
+    for p in unique_justseen(factor(n)):
+        n = n // p * (p - 1)
+
+    return n

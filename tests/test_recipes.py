@@ -1027,6 +1027,47 @@ class TransposeTests(TestCase):
         self.assertEqual(actual, expected)
 
 
+class ReshapeTests(TestCase):
+    def test_empty(self):
+        actual = list(mi.reshape([], 3))
+        self.assertEqual(actual, [])
+
+    def test_zero(self):
+        matrix = [(0, 1, 2, 3), (4, 5, 6, 7), (8, 9, 10, 11)]
+        with self.assertRaises(ValueError):
+            list(mi.reshape(matrix, 0))
+
+    def test_basic(self):
+        matrix = [(0, 1, 2, 3), (4, 5, 6, 7), (8, 9, 10, 11)]
+        for cols, expected in (
+            (
+                1,
+                [
+                    (0,),
+                    (1,),
+                    (2,),
+                    (3,),
+                    (4,),
+                    (5,),
+                    (6,),
+                    (7,),
+                    (8,),
+                    (9,),
+                    (10,),
+                    (11,),
+                ],
+            ),
+            (2, [(0, 1), (2, 3), (4, 5), (6, 7), (8, 9), (10, 11)]),
+            (3, [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9, 10, 11)]),
+            (4, [(0, 1, 2, 3), (4, 5, 6, 7), (8, 9, 10, 11)]),
+            (6, [(0, 1, 2, 3, 4, 5), (6, 7, 8, 9, 10, 11)]),
+            (12, [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)]),
+        ):
+            with self.subTest(cols=cols):
+                actual = list(mi.reshape(matrix, cols))
+                self.assertEqual(actual, expected)
+
+
 class MatMulTests(TestCase):
     def test_n_by_n(self):
         actual = list(mi.matmul([(7, 5), (3, 5)], [[2, 5], [7, 9]]))
@@ -1101,3 +1142,20 @@ class PolynomialDerivativeTests(TestCase):
             with self.subTest(coefficients=coefficients):
                 actual = mi.polynomial_derivative(coefficients)
                 self.assertEqual(actual, expected)
+
+
+class TotientTests(TestCase):
+    def test_basic(self):
+        for n, expected in (
+            (1, 1),
+            (2, 1),
+            (3, 2),
+            (4, 2),
+            (9, 6),
+            (12, 4),
+            (128_884_753_939, 128_884_753_938),
+            (999953 * 999983, 999952 * 999982),
+            (6**20, 1 * 2**19 * 2 * 3**19),
+        ):
+            with self.subTest(n=n):
+                self.assertEqual(mi.totient(n), expected)
