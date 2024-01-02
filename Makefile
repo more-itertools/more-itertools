@@ -1,6 +1,7 @@
 .PHONY: requirements
 requirements:
-	python3 -m pip install -r requirements/development.txt .
+	python3 -m pip install -r requirements/development.txt
+	python -m pip install -e .
 
 .PHONY: check
 check:
