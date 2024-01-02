@@ -1,0 +1,10 @@
+black
+coverage
+flake8
+flit
+mypy
+setuptools
+sphinx
+sphinx_rtd_theme
+twine
+wheel
