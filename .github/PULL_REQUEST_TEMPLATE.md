@@ -7,3 +7,6 @@ more-itertools/more-itertools#XXXX
 
 ### Changes
 <!-- Describe what your PR adds, fixes, or changes here -->
+
+### Checks and tests
+<!-- Please run `make format`, `make check`, and `make test` to help make sure your branch meets the standards enforced by GitHub Actions -->
