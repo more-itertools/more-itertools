@@ -114,6 +114,8 @@ def sieve(n: int) -> Iterator[int]: ...
 def batched(
     iterable: Iterable[_T],
     n: int,
+    *,
+    strict: bool = False
 ) -> Iterator[tuple[_T]]: ...
 def transpose(
     it: Iterable[Iterable[_T]],
