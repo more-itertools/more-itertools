@@ -999,6 +999,15 @@ class BatchedTests(TestCase):
                 actual = list(mi.batched(iterable, n))
                 self.assertEqual(actual, expected)
 
+    def test_strict(self):
+        with self.assertRaises(ValueError):
+            list(mi.batched('ABCDEFG', 3, strict=True))
+
+        self.assertEqual(
+            list(mi.batched('ABCDEF', 3, strict=True)),
+            [('A', 'B', 'C'), ('D', 'E', 'F')],
+        )
+
 
 class TransposeTests(TestCase):
     def test_empty(self):

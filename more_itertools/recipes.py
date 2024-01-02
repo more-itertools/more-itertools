@@ -28,6 +28,7 @@ from itertools import (
     zip_longest,
 )
 from random import randrange, sample, choice
+from sys import hexversion
 
 __all__ = [
     'all_equal',
@@ -872,32 +873,34 @@ def sieve(n):
     yield from iter_index(data, 1, start)
 
 
-def _batched(iterable, n):
-    """Batch data into tuples of length *n*. The last batch may be shorter.
+def _batched(iterable, n, *, strict=False):
+    """Batch data into tuples of length *n*. If the number of items in
+    *iterable* is not divisible by *n*:
+    * The last batch will be shorter if *strict* is ``False``.
+    * :exc:`ValueError` will be raised if *strict* is ``True``.
 
     >>> list(batched('ABCDEFG', 3))
     [('A', 'B', 'C'), ('D', 'E', 'F'), ('G',)]
 
-    On Python 3.12 and above, this is an alias for :func:`itertools.batched`.
+    On Python 3.13 and above, this is an alias for :func:`itertools.batched`.
     """
     if n < 1:
         raise ValueError('n must be at least one')
     it = iter(iterable)
-    while True:
-        batch = tuple(islice(it, n))
-        if not batch:
-            break
+    while batch := tuple(islice(it, n)):
+        if strict and len(batch) != n:
+            raise ValueError('batched(): incomplete batch')
         yield batch
 
 
-try:
+if hexversion >= 0x30D00A2:
     from itertools import batched as itertools_batched
-except ImportError:
-    batched = _batched
-else:
 
-    def batched(iterable, n):
-        return itertools_batched(iterable, n)
+    def batched(iterable, n, *, strict=False):
+        return itertools_batched(iterable, n, strict=strict)
+
+else:
+    batched = _batched
 
     batched.__doc__ = _batched.__doc__
 
