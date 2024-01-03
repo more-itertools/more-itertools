@@ -1,7 +1,7 @@
 .PHONY: requirements
 requirements:
 	python3 -m pip install -r requirements/development.txt
-	python -m pip install -e .
+	python3 -m pip install --editable .
 
 .PHONY: check
 check:
@@ -20,7 +20,7 @@ coverage:
 
 .PHONY: test
 test:
-	python -m unittest -v ${tests}
+	python3 -m unittest -v ${tests}
 
 .PHONY: docs
 docs:
