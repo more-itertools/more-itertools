@@ -18,24 +18,18 @@ jobs:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: Install dependencies
-      run: |
-        make requirements
+      run: make requirements
     - name: Run tests
-      run: |
-        make coverage
+      run: make coverage
     - name: Static checks
       if: "matrix.python-version == '3.8'"
-      run: |
-        make check
-        black --check .
+      run: make check
     - name: Build docs with sphinx
       if: "matrix.python-version == '3.8'"
-      run: |
-        make docs
+      run: make docs
     - name: Build packages
       if: "matrix.python-version == '3.8'"
-      run: |
-        make package
+      run: make package
     - name: Upload packages
       if: "matrix.python-version == '3.8'"
       uses: actions/upload-artifact@v4

@@ -1,12 +1,15 @@
+.PHONY: all-checks
+all-checks: requirements coverage check docs package
+
 .PHONY: requirements
 requirements:
 	python3 -m pip install -r requirements/development.txt
-	python -m pip install -e .
+	python3 -m pip install --editable .
 
 .PHONY: check
 check:
 	black --check .
-	flake8 .
+	flake8 --exclude .venv,venv,docs/conf.py .
 	stubtest more_itertools.more more_itertools.recipes
 
 .PHONY: format
@@ -20,7 +23,7 @@ coverage:
 
 .PHONY: test
 test:
-	python -m unittest -v ${tests}
+	python3 -m unittest -v
 
 .PHONY: docs
 docs:
