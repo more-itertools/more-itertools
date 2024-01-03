@@ -1,3 +1,6 @@
+.PHONY: all-checks
+all-checks: requirements coverage check docs package
+
 .PHONY: requirements
 requirements:
 	python3 -m pip install -r requirements/development.txt
