@@ -23,7 +23,7 @@ coverage:
 
 .PHONY: test
 test:
-	python3 -m unittest -v ${tests}
+	python3 -m unittest -v
 
 .PHONY: docs
 docs:
