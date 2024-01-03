@@ -6,7 +6,7 @@ requirements:
 .PHONY: check
 check:
 	black --check .
-	flake8 .
+	flake8 --exclude .venv,venv,docs/conf.py .
 	stubtest more_itertools.more more_itertools.recipes
 
 .PHONY: format
