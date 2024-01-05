@@ -162,8 +162,8 @@ Python iterables.
 |                        | `sieve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sieve>`_,                                                                                   |
 |                        | `factor <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.factor>`_,                                                                                 |
 |                        | `matmul <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.matmul>`_,                                                                                 |
-|                        | `sum_of_squares <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sum_of_squares>`_                                                                  |
-|                        | `totient <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.totient>`_                                                                                |
+|                        | `sum_of_squares <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sum_of_squares>`_,                                                                 |
+|                        | `totient <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.totient>`_,                                                                               |
 |                        | `reshape <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.reshape>`_                                                                                |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
