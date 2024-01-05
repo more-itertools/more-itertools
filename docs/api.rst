@@ -307,3 +307,5 @@ Others
 .. autofunction:: factor
 .. autofunction:: matmul
 .. autofunction:: sum_of_squares
+.. autofunction:: totient
+.. autofunction:: reshape

@@ -5,6 +5,28 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.2.0
+------
+
+* New functions
+    * :func:`iter_suppress` (thanks to jaraco, pochmann, and rhettinger)
+    * :func:`filter_map` (thanks to struktured)
+    * :func:`classify_unique` (thanks to struktured)
+    * :func:`totient` (from the itertools docs)
+    * :func:`reshape` (from the itertools docs)
+
+* Changes to existing functions
+    * :func:`factor`, :func:`iter_index`, :func:`sieve`, and :func:`unique_justseen` were updated to match the itertools docs
+    * :func:`first` was was optimized (thanks to pochmann)
+    * :func:`takewhile_inclusive` was was refactored (thanks to eltoder)
+    * :func:`combination_with_replacement_index` was was optimized (thanks to haukex)
+    * :func:`nth_permutation`, :func:`nth_combination_with_replacement`, :func:`combination_index`, and :func:`combination_with_replacement_index` were optimized (thanks to rhettinger)
+    * :func:`batched` now accepts a `strict` argument (adapted from itertools docs)
+
+* Other changes
+    * Several typing updates were made (thanks to obaltian and ilai-deutel)
+    * Some documentation issues were fixed (thanks to F-park, DimitriPapadopoulos, peterbygrave, shuuji3, eltoder, and homeworkprod)
+
 10.1.0
 ------
 
