@@ -584,6 +584,9 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
         >>> list(strictly_n(iterable, n))
         ['a', 'b', 'c', 'd']
 
+    Note that the returned iterable must be consumed in order for the check to be
+    made.
+
     By default, *too_short* and *too_long* are functions that raise
     ``ValueError``.
 
