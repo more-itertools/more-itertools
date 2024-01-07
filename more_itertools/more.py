@@ -3227,6 +3227,8 @@ class time_limited:
     stops if  the time elapsed is greater than *limit_seconds*. If your time
     limit is 1 second, but it takes 2 seconds to generate the first item from
     the iterable, the function will run for 2 seconds and not yield anything.
+    As a special case, when *limit_seconds* is zero, the iterator never
+    returns anything.
 
     """
 
@@ -3242,6 +3244,9 @@ class time_limited:
         return self
 
     def __next__(self):
+        if self.limit_seconds == 0:
+            self.timed_out = True
+            raise StopIteration
         item = next(self._iterable)
         if monotonic() - self._start_time > self.limit_seconds:
             self.timed_out = True
