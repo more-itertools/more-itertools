@@ -268,6 +268,12 @@ class PairwiseTests(TestCase):
         p = mi.pairwise("a")
         self.assertRaises(StopIteration, lambda: next(p))
 
+    def test_coverage(self):
+        from more_itertools import recipes
+
+        p = recipes._pairwise([1, 2, 3])
+        self.assertEqual([(1, 2), (2, 3)], list(p))
+
 
 class GrouperTests(TestCase):
     def test_basic(self):
