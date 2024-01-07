@@ -1649,7 +1649,7 @@ def zip_equal(*iterables):
         lengths
 
     """
-    if hexversion >= 0x30A00A6:
+    if hexversion >= 0x30A00A6:  # pragma: no cover
         warnings.warn(
             (
                 'zip_equal will be removed in a future version of '

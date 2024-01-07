@@ -84,9 +84,9 @@ _marker = object()
 # zip with strict is available for Python 3.10+
 try:
     zip(strict=True)
-except TypeError:
+except TypeError:  # pragma: no cover
     _zip_strict = zip
-else:
+else:  # pragma: no cover
     _zip_strict = partial(zip, strict=True)
 
 # math.sumprod is available for Python 3.12+
@@ -314,9 +314,9 @@ def _pairwise(iterable):
 
 try:
     from itertools import pairwise as itertools_pairwise
-except ImportError:
+except ImportError:  # pragma: no cover
     pairwise = _pairwise
-else:
+else:  # pragma: no cover
 
     def pairwise(iterable):
         return itertools_pairwise(iterable)
@@ -893,7 +893,7 @@ def _batched(iterable, n, *, strict=False):
         yield batch
 
 
-if hexversion >= 0x30D00A2:
+if hexversion >= 0x30D00A2:  # pragma: no cover
     from itertools import batched as itertools_batched
 
     def batched(iterable, n, *, strict=False):
