@@ -698,7 +698,7 @@ class NthPermutationTests(TestCase):
         n = factorial(len(iterable)) // factorial(len(iterable) - r)
         for index in [-1 - n, n + 1]:
             with self.assertRaises(IndexError):
-                mi.nth_combination(iterable, r, index)
+                mi.nth_permutation(iterable, r, index)
 
     def test_invalid_r(self):
         iterable = 'abcde'
@@ -706,7 +706,7 @@ class NthPermutationTests(TestCase):
         n = factorial(len(iterable)) // factorial(len(iterable) - r)
         for r in [-1, n + 1]:
             with self.assertRaises(ValueError):
-                mi.nth_combination(iterable, r, 0)
+                mi.nth_permutation(iterable, r, 0)
 
 
 class PrependTests(TestCase):
