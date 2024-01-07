@@ -1,4 +1,5 @@
 import warnings
+import sys
 
 from collections import Counter, abc
 from collections.abc import Set
@@ -3901,6 +3902,12 @@ class TimeLimitedTests(TestCase):
         self.assertEqual(actual, expected)
         self.assertFalse(iterable.timed_out)
 
+    @skipIf(
+        condition=sys.platform.startswith('win32'),
+        reason='monotonic() too inaccurate on Windows',
+        # On Windows, in time_limited.__next__,
+        # monotonic() - self._start_time == self.limit_seconds
+    )
     def test_zero_limit(self):
         iterable = mi.time_limited(0, count())
         actual = list(iterable)
