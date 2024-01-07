@@ -5494,6 +5494,10 @@ class ConstrainedBatchesTests(TestCase):
             [(record_3, record_5), (record_10,), (record_2,)],
         )
 
+    def test_bad_max(self):
+        with self.assertRaises(ValueError):
+            list(mi.constrained_batches([], 0))
+
 
 class GrayProductTests(TestCase):
     def test_basic(self):
