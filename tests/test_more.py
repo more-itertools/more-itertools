@@ -772,6 +772,11 @@ class WindowedTests(TestCase):
         with self.assertRaises(ValueError):
             list(mi.windowed([1, 2, 3, 4, 5], -1))
 
+    def test_empty_seq(self):
+        actual = list(mi.windowed([], 3))
+        expected = []
+        self.assertEqual(actual, expected)
+
 
 class SubstringsTests(TestCase):
     def test_basic(self):
