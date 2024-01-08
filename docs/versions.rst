@@ -22,6 +22,7 @@ Version History
     * :func:`combination_with_replacement_index` was was optimized (thanks to elliotwutingfeng and rhettinger)
     * :func:`nth_permutation`, :func:`nth_combination_with_replacement`, :func:`combination_index`, and :func:`combination_with_replacement_index` were optimized (thanks to rhettinger)
     * :func:`batched` now accepts a `strict` argument (adapted from itertools docs)
+    * :func:`time_limited` was improved for Windows (thanks to haukex)
 
 * Other changes
     * Several typing updates were made (thanks to obaltian and ilai-deutel)
