@@ -11,7 +11,7 @@ Version History
 * New functions
     * :func:`iter_suppress` (thanks to jaraco, pochmann, and rhettinger)
     * :func:`filter_map` (thanks to struktured)
-    * :func:`classify_unique` (thanks to struktured)
+    * :func:`classify_unique` (thanks to haukex)
     * :func:`totient` (from the itertools docs)
     * :func:`reshape` (from the itertools docs)
 
@@ -19,7 +19,7 @@ Version History
     * :func:`factor`, :func:`iter_index`, :func:`sieve`, and :func:`unique_justseen` were updated to match the itertools docs
     * :func:`first` was was optimized (thanks to pochmann)
     * :func:`takewhile_inclusive` was was refactored (thanks to eltoder)
-    * :func:`combination_with_replacement_index` was was optimized (thanks to haukex)
+    * :func:`combination_with_replacement_index` was was optimized (thanks to elliotwutingfeng and rhettinger)
     * :func:`nth_permutation`, :func:`nth_combination_with_replacement`, :func:`combination_index`, and :func:`combination_with_replacement_index` were optimized (thanks to rhettinger)
     * :func:`batched` now accepts a `strict` argument (adapted from itertools docs)
 
