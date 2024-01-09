@@ -1184,27 +1184,40 @@ def collapse(iterable, base_type=None, levels=None):
     ['a', ['b'], 'c', ['d']]
 
     """
+    node_groups = deque()
+    # Add our first node group, treat the iterable as a single node
+    node_groups.append((0, repeat(iterable, 1)))
 
-    def walk(node, level):
-        if (
-            ((levels is not None) and (level > levels))
-            or isinstance(node, (str, bytes))
-            or ((base_type is not None) and isinstance(node, base_type))
-        ):
-            yield node
-            return
+    while node_groups:
+        node_group = node_groups.popleft()
+        level, nodes = node_group
+        
+        # Check if beyond
+        if levels is not None and level > levels:
+            yield from nodes
+            continue
 
-        try:
-            tree = iter(node)
-        except TypeError:
-            yield node
-            return
-        else:
-            for child in tree:
-                yield from walk(child, level + 1)
-
-    yield from walk(iterable, 0)
-
+        for node in nodes:
+            # Check if done iterating
+            if (
+                isinstance(node, (str, bytes))
+                or ((base_type is not None) and isinstance(node, base_type))
+            ):
+                yield node
+            # Otherwise try to create child nodes
+            else:
+                try:
+                    tree = iter(node)
+                except TypeError:
+                    yield node
+                else:
+                    # Save our current location
+                    node_groups.appendleft(node_group)
+                    # Append the new child node
+                    node_groups.appendleft((level + 1, tree))
+                    # Break to process child node
+                    break
+        
 
 def side_effect(func, iterable, chunk_size=None, before=None, after=None):
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
