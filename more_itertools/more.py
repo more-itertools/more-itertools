@@ -1184,15 +1184,15 @@ def collapse(iterable, base_type=None, levels=None):
     ['a', ['b'], 'c', ['d']]
 
     """
-    node_groups = deque()
+    stack = deque()
     # Add our first node group, treat the iterable as a single node
-    node_groups.append((0, repeat(iterable, 1)))
+    stack.append((0, repeat(iterable, 1)))
 
-    while node_groups:
-        node_group = node_groups.popleft()
+    while stack:
+        node_group = stack.popleft()
         level, nodes = node_group
         
-        # Check if beyond
+        # Check if beyond max level
         if levels is not None and level > levels:
             yield from nodes
             continue
@@ -1212,9 +1212,9 @@ def collapse(iterable, base_type=None, levels=None):
                     yield node
                 else:
                     # Save our current location
-                    node_groups.appendleft(node_group)
+                    stack.appendleft(node_group)
                     # Append the new child node
-                    node_groups.appendleft((level + 1, tree))
+                    stack.appendleft((level + 1, tree))
                     # Break to process child node
                     break
         
