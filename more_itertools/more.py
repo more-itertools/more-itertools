@@ -1186,7 +1186,7 @@ def collapse(iterable, base_type=None, levels=None):
     """
     stack = deque()
     # Add our first node group, treat the iterable as a single node
-    stack.append((0, repeat(iterable, 1)))
+    stack.appendleft((0, repeat(iterable, 1)))
 
     while stack:
         node_group = stack.popleft()
