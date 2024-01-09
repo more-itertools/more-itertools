@@ -3352,13 +3352,16 @@ def ichunked(iterable, n):
         raise ValueError('n must be a positive integer')
     
     while True:
+        # Create new chunk
         (chunk, materialize_next) = _ichunk(iterable, n)
 
+        # Check to see whether we're at the end of the source iterable
         if not materialize_next():
             return
 
         yield chunk
 
+        # Fill previous chunk's cache
         materialize_next(None)
 
 
