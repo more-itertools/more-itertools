@@ -21,6 +21,8 @@ pip-log.txt
 .coverage
 .tox
 .noseids
+htmlcov/
+coverage.xml
 
 # Docs by Sphinx
 _build

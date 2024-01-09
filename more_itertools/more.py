@@ -3864,15 +3864,13 @@ def nth_permutation(iterable, r, index):
         raise ValueError
     else:
         c = perm(n, r)
+    assert c > 0  # factortial(n)>0, and r<n so perm(n,r) is never zero
 
     if index < 0:
         index += c
 
     if not 0 <= index < c:
         raise IndexError
-
-    if c == 0:
-        return tuple()
 
     result = [0] * r
     q = index * factorial(n) // c if r < n else index

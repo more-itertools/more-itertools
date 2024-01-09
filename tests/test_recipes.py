@@ -268,6 +268,12 @@ class PairwiseTests(TestCase):
         p = mi.pairwise("a")
         self.assertRaises(StopIteration, lambda: next(p))
 
+    def test_coverage(self):
+        from more_itertools import recipes
+
+        p = recipes._pairwise([1, 2, 3])
+        self.assertEqual([(1, 2), (2, 3)], list(p))
+
 
 class GrouperTests(TestCase):
     def test_basic(self):
@@ -698,7 +704,7 @@ class NthPermutationTests(TestCase):
         n = factorial(len(iterable)) // factorial(len(iterable) - r)
         for index in [-1 - n, n + 1]:
             with self.assertRaises(IndexError):
-                mi.nth_combination(iterable, r, index)
+                mi.nth_permutation(iterable, r, index)
 
     def test_invalid_r(self):
         iterable = 'abcde'
@@ -706,7 +712,7 @@ class NthPermutationTests(TestCase):
         n = factorial(len(iterable)) // factorial(len(iterable) - r)
         for r in [-1, n + 1]:
             with self.assertRaises(ValueError):
-                mi.nth_combination(iterable, r, 0)
+                mi.nth_permutation(iterable, r, 0)
 
 
 class PrependTests(TestCase):
