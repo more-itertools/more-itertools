@@ -3296,25 +3296,36 @@ def only(iterable, default=None, too_long=None):
     return first_value
 
 
-class _IChunk:
-    def __init__(self, iterable, n):
-        self._it = islice(iterable, n)
-        self._cache = deque()
+def _ichunk(iterable, n):
+    cache = deque()
+    chunk = islice(iterable, n)
 
-    def fill_cache(self):
-        self._cache.extend(self._it)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        try:
-            return next(self._it)
-        except StopIteration:
-            if self._cache:
-                return self._cache.popleft()
+    def generator():
+        while True:
+            if cache:
+                yield cache.popleft()
             else:
-                raise
+                try:
+                    item = next(chunk)
+                except StopIteration:
+                    return
+                else:
+                    yield item
+
+    def materialize_next(n = 1):
+        if n and n < 0:
+            raise ValueError('n must be >= 0 or None')
+        
+        inital_cache_len = len(cache)
+
+        if n is None:
+            cache.extend(chunk)
+        else:
+            cache.extend(islice(chunk, n))
+
+        return len(cache) - inital_cache_len
+        
+    return (generator(), materialize_next)
 
 
 def ichunked(iterable, n):
@@ -3338,19 +3349,20 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-    source = peekable(iter(iterable))
-    ichunk_marker = object()
+
+    iterable = iter(iterable)
+    if not n or n <= 0:
+        raise ValueError('n must be a positive integer')
+    
     while True:
-        # Check to see whether we're at the end of the source iterable
-        item = source.peek(ichunk_marker)
-        if item is ichunk_marker:
+        (chunk, materialize_next) = _ichunk(iterable, n)
+
+        if not materialize_next():
             return
 
-        chunk = _IChunk(source, n)
         yield chunk
 
-        # Advance the source iterable and fill previous chunk's cache
-        chunk.fill_cache()
+        materialize_next(None)
 
 
 def iequals(*iterables):
