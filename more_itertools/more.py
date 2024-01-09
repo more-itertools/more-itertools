@@ -1536,8 +1536,9 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
             item_count += 1
 
         remaining = (n - item_count) % n if next_multiple else n - item_count
-        for _ in range(remaining):
-            yield fillvalue
+
+        if remaining > 0:
+            yield from repeat(fillvalue, remaining)
 
 
 def repeat_each(iterable, n=2):
