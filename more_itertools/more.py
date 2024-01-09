@@ -1199,10 +1199,7 @@ def collapse(iterable, base_type=None, levels=None):
 
         for node in nodes:
             # Check if done iterating
-            if (
-                isinstance(node, (str, bytes))
-                or ((base_type is not None) and isinstance(node, base_type))
-            ):
+            if (isinstance(node, (str, bytes)) or ((base_type is not None) and isinstance(node, base_type))):
                 yield node
             # Otherwise try to create child nodes
             else:
