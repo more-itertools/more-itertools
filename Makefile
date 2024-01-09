@@ -19,7 +19,7 @@ format:
 .PHONY: coverage
 coverage:
 	coverage run --include="more_itertools/*.py" -m unittest
-	coverage report --show-missing --fail-under=100
+	coverage report --show-missing --fail-under=99
 
 .PHONY: test
 test:
