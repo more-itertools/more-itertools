@@ -3346,11 +3346,7 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-
     iterable = iter(iterable)
-    if not n or n <= 0:
-        raise ValueError('n must be a positive integer')
-    
     while True:
         # Create new chunk
         (chunk, materialize_next) = _ichunk(iterable, n)
