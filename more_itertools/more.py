@@ -3313,9 +3313,6 @@ def _ichunk(iterable, n):
                     yield item
 
     def materialize_next(n = 1):
-        if n and n < 0:
-            raise ValueError('n must be >= 0 or None')
-        
         inital_cache_len = len(cache)
 
         if n is None:
