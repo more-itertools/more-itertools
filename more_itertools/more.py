@@ -3312,16 +3312,24 @@ def _ichunk(iterable, n):
                 else:
                     yield item
 
-    def materialize_next(n = 1):
-        inital_cache_len = len(cache)
-
+    def materialize_next(n=1):
+        # materialize everything if n not specified
         if n is None:
             cache.extend(chunk)
-        else:
-            cache.extend(islice(chunk, n))
+            return len(cache)
 
-        return len(cache) - inital_cache_len
-        
+        inital_cache_len = len(cache)
+
+        # check if we need to materialize any
+        if n <= inital_cache_len:
+            return n
+
+        # materialize up to n
+        cache.extend(islice(chunk, n - inital_cache_len))
+
+        # return num materialized up to n
+        return min(n, len(cache))
+
     return (generator(), materialize_next)
 
 
@@ -3349,7 +3357,7 @@ def ichunked(iterable, n):
     iterable = iter(iterable)
     while True:
         # Create new chunk
-        (chunk, materialize_next) = _ichunk(iterable, n)
+        chunk, materialize_next = _ichunk(iterable, n)
 
         # Check to see whether we're at the end of the source iterable
         if not materialize_next():
