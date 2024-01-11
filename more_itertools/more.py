@@ -1191,7 +1191,7 @@ def collapse(iterable, base_type=None, levels=None):
     while stack:
         node_group = stack.popleft()
         level, nodes = node_group
-        
+
         # Check if beyond max level
         if levels is not None and level > levels:
             yield from nodes
@@ -1199,7 +1199,9 @@ def collapse(iterable, base_type=None, levels=None):
 
         for node in nodes:
             # Check if done iterating
-            if (isinstance(node, (str, bytes)) or ((base_type is not None) and isinstance(node, base_type))):
+            if isinstance(node, (str, bytes)) or (
+                (base_type is not None) and isinstance(node, base_type)
+            ):
                 yield node
             # Otherwise try to create child nodes
             else:
@@ -1214,7 +1216,7 @@ def collapse(iterable, base_type=None, levels=None):
                     stack.appendleft((level + 1, tree))
                     # Break to process child node
                     break
-        
+
 
 def side_effect(func, iterable, chunk_size=None, before=None, after=None):
     """Invoke *func* on each item in *iterable* (or on each *chunk_size* group
