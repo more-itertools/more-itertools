@@ -3313,21 +3313,18 @@ def _ichunk(iterable, n):
                     yield item
 
     def materialize_next(n=1):
-        # materialize everything if n not specified
+        # if n not specified materialize everything
         if n is None:
             cache.extend(chunk)
             return len(cache)
 
-        inital_cache_len = len(cache)
-
-        # check if we need to materialize any
-        if n <= inital_cache_len:
-            return n
+        to_cache = n - len(cache)
 
         # materialize up to n
-        cache.extend(islice(chunk, n - inital_cache_len))
+        if to_cache > 0:
+            cache.extend(islice(chunk, to_cache))
 
-        # return num materialized up to n
+        # return number materialized up to n
         return min(n, len(cache))
 
     return (generator(), materialize_next)
