@@ -940,6 +940,14 @@ class BucketTests(TestCase):
         self.assertEqual(list(D[20]), [])
         self.assertEqual(list(D[30]), [30, 31, 33])
 
+    def test_as_dict(self):
+        iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
+        key = lambda x: 10 * (x // 10)
+        D = mi.bucket(iterable, key)
+        as_dict = D.as_dict()
+        self.assertFalse(isinstance(as_dict[10], tuple)) # Should be generator
+        self.assertEqual(tuple(as_dict[10]), (10,11,12))
+
 
 class SpyTests(TestCase):
     """Tests for ``spy()``"""

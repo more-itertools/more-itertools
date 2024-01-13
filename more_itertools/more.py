@@ -1018,6 +1018,9 @@ class bucket:
 
         return self._get_values(value)
 
+    def as_dict(self):
+        return {key: self[key] for key in self}
+
 
 def spy(iterable, n=1):
     """Return a 2-tuple with a list containing the first *n* elements of
