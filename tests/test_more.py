@@ -945,8 +945,8 @@ class BucketTests(TestCase):
         key = lambda x: 10 * (x // 10)
         D = mi.bucket(iterable, key)
         as_dict = D.as_dict()
-        self.assertFalse(isinstance(as_dict[10], tuple)) # Should be generator
-        self.assertEqual(tuple(as_dict[10]), (10,11,12))
+        self.assertFalse(isinstance(as_dict[10], tuple))  # Should be generator
+        self.assertEqual(tuple(as_dict[10]), (10, 11, 12))
 
 
 class SpyTests(TestCase):
