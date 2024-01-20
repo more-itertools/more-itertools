@@ -1536,20 +1536,25 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
     If *n* is ``None``, *fillvalue* will be emitted indefinitely.
 
     """
-    it = iter(iterable)
+    iterable = iter(iterable)
+    iterable_with_repeat = chain(iterable, repeat(fillvalue))
+
     if n is None:
-        yield from chain(it, repeat(fillvalue))
+        return iterable_with_repeat
     elif n < 1:
         raise ValueError('n must be at least 1')
-    else:
-        item_count = 0
-        for item in it:
-            yield item
-            item_count += 1
+    elif next_multiple:
 
-        remaining = (n - item_count) % n if next_multiple else n - item_count
-        for _ in range(remaining):
-            yield fillvalue
+        def slice_generator():
+            for first in iterable:
+                yield (first,)
+                yield islice(iterable_with_repeat, n - 1)
+
+        # While elements exist produce slices of size n
+        return chain.from_iterable(slice_generator())
+    else:
+        # Ensure the first batch is at least size n then iterate
+        return chain(islice(iterable_with_repeat, n), iterable)
 
 
 def repeat_each(iterable, n=2):
