@@ -3935,6 +3935,7 @@ def value_chain(*args):
         ['12', '34', '56', '78']
 
     Pre- or postpend a single element to an iterable:
+    
         >>> list(value_chain(1, [2, 3, 4, 5, 6]))
         [1, 2, 3, 4, 5, 6]
         >>> list(value_chain([1, 2, 3, 4, 5], 6))
