@@ -5742,3 +5742,59 @@ class FilterMapTests(TestCase):
         )
         expected = [1, 2, 3]
         self.assertEqual(actual, expected)
+
+
+class MakeSizeTests(TestCase):
+    def test_errors(self):
+        with self.assertRaises(ValueError):
+            mi.make_size([], -1)
+        with self.assertRaises(TypeError):
+            mi.make_size(None, 1)
+
+    def test_empty(self):
+        seq = []
+
+        self.assertEqual(
+            list(mi.make_size(seq, 6)),
+            [None, None, None, None, None, None],
+        )
+        self.assertEqual(
+            list(mi.make_size(seq, 6, fillvalue=0)),
+            [0, 0, 0, 0, 0, 0],
+        )
+
+    def test_too_short(self):
+        seq = [1, 2, 3, 4]
+
+        self.assertEqual(
+            list(mi.make_size(seq, 6)),
+            [1, 2, 3, 4, None, None],
+        )
+        self.assertEqual(
+            list(mi.make_size(seq, 6, fillvalue=0)),
+            [1, 2, 3, 4, 0, 0],
+        )
+
+    def test_exact_size(self):
+        seq = [1, 2, 3, 4, 5, 6]
+
+        self.assertEqual(
+            list(mi.make_size(seq, 6)),
+            [1, 2, 3, 4, 5, 6],
+        )
+        self.assertEqual(
+            list(mi.make_size(seq, 6, fillvalue=0)),
+            [1, 2, 3, 4, 5, 6],
+        )
+
+    def test_too_long(self):
+        seq = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        self.assertEqual(
+            list(mi.make_size(seq, 6)),
+            [1, 2, 3, 4, 5, 6],
+        )
+        self.assertEqual(
+            list(mi.make_size(seq, 6, fillvalue=0)),
+            [1, 2, 3, 4, 5, 6],
+        )

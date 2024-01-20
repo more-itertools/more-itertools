@@ -91,6 +91,7 @@ __all__ = [
     'longest_common_prefix',
     'lstrip',
     'make_decorator',
+    'make_size',
     'map_except',
     'map_if',
     'map_reduce',
@@ -4664,3 +4665,23 @@ def filter_map(func, iterable):
         y = func(x)
         if y is not None:
             yield y
+
+
+def make_size(iterable, n, fillvalue=None):
+    """Yield the elements from *iterable*, followed by *fillvalue*, such that
+    exactly *n* items are emitted.
+
+        >>> list(make_size([1, 2, 3], 5))
+        [1, 2, 3, None, None]
+
+        >>> list(make_size([1, 2, 3], 5, fillvalue=0))
+        [1, 2, 3, 0, 0]
+
+    *n* must be >= 0
+    """
+
+    iterable = iter(iterable)
+    if n < 0:
+        raise ValueError('n must be >= 0')
+
+    return islice(chain(iterable, repeat(fillvalue)), n)

@@ -693,3 +693,14 @@ def filter_map(
     func: Callable[[_T], _V | None],
     iterable: Iterable[_T],
 ) -> Iterator[_V]: ...
+@overload
+def make_size(
+    iterable: Iterable[_T],
+    n: int,
+) -> Iterator[_T | None]: ...
+@overload
+def make_size(
+    iterable: Iterable[_T],
+    n: int,
+    fillvalue: _U,
+) -> Iterator[_T | _U]: ...
