@@ -4679,7 +4679,6 @@ def make_size(iterable, n, fillvalue=None):
 
     *n* must be >= 0
     """
-
     iterable = iter(iterable)
     if n < 0:
         raise ValueError('n must be >= 0')
