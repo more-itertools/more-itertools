@@ -1535,8 +1535,7 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
 
     If *n* is ``None``, *fillvalue* will be emitted indefinitely.
 
-    To create an *iterable* of exactly *n* size you can compose native
-    itertools methods:
+    To create an *iterable* of exactly *n* size you can compose native itertools methods:
 
         >>> list(islice(chain([1, 2, 3], repeat('?')), 5))
         [1, 2, 3, '?', '?']
