@@ -1528,12 +1528,19 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
         [1, 2, 3, '?', '?']
 
     If *next_multiple* is ``True``, *fillvalue* will be emitted until the
-    number of items emitted is a multiple of *n*::
+    number of items emitted is a multiple of *n*:
 
         >>> list(padded([1, 2, 3, 4], n=3, next_multiple=True))
         [1, 2, 3, 4, None, None]
 
     If *n* is ``None``, *fillvalue* will be emitted indefinitely.
+
+    To create an *iterable* of exactly *n* size you can compose native itertools methods:
+
+        >>> list(islice(chain([1, 2, 3], repeat('?')), 5))
+        [1, 2, 3, '?', '?']
+        >>> list(islice(chain([1, 2, 3, 4, 5, 6, 7, 8], repeat('?')), 5))
+        [1, 2, 3, 4, 5]
 
     """
     iterable = iter(iterable)
