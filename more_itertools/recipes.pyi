@@ -1,4 +1,5 @@
 """Stubs for more_itertools.recipes"""
+
 from __future__ import annotations
 
 from typing import (

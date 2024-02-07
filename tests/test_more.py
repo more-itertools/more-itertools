@@ -2126,9 +2126,9 @@ class SortTogetherTest(TestCase):
             mi.sort_together(
                 iterables,
                 key_list=(0, 2),
-                key=lambda state, number: number
-                if state == 'CT'
-                else 2 * number,
+                key=lambda state, number: (
+                    number if state == 'CT' else 2 * number
+                ),
             ),
             [
                 ('CT', 'GA', 'CT', 'CT', 'GA', 'GA'),

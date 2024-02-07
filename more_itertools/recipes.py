@@ -7,6 +7,7 @@ Some backward-compatible usability improvements have been made.
 .. [1] http://docs.python.org/library/itertools.html#recipes
 
 """
+
 import math
 import operator
 
