@@ -1,4 +1,5 @@
 """Stubs for more_itertools.more"""
+
 from __future__ import annotations
 
 from types import TracebackType
