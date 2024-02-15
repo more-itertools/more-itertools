@@ -3989,22 +3989,41 @@ class IchunkedTests(TestCase):
         self.assertRaises(RuntimeError, next, it)
 
     def test_memory_in_order(self):
-        # No items should be kept in memory when a chunk is produced
-        all_chunks = mi.ichunked(count(), 4)
+        gen_numbers = []
+
+        def gen():
+            for gen_number in count():
+                gen_numbers.append(gen_number)
+                yield gen_number
+
+        # No items should be kept in memory when a ichunked is first called
+        all_chunks = mi.ichunked(gen(), 4)
+        self.assertEqual(gen_numbers, [])
+
+        # The first item of each chunk should be generated on chunk generation
         first_chunk = next(all_chunks)
-        self.assertEqual(len(first_chunk._cache), 0)
+        self.assertEqual(gen_numbers, [0])
 
         # If we don't read a chunk before getting its successor, its contents
         # will be cached
         second_chunk = next(all_chunks)
-        self.assertEqual(len(first_chunk._cache), 4)
+        self.assertEqual(gen_numbers, [0, 1, 2, 3, 4])
 
-        # If we read in order, there again should be nothing cached
-        mi.consume(first_chunk)
-        mi.consume(second_chunk)
+        # Check if we can read in cached values
+        self.assertEqual(list(first_chunk), [0, 1, 2, 3])
+        self.assertEqual(list(second_chunk), [4, 5, 6, 7])
+
+        # Again only the most recent chunk should have an item cached
         third_chunk = next(all_chunks)
-        for chunk in (first_chunk, second_chunk, third_chunk):
-            self.assertEqual(len(chunk._cache), 0)
+        self.assertEqual(len(gen_numbers), 9)
+
+        # No new item should be cached when reading past the first number
+        next(third_chunk)
+        self.assertEqual(len(gen_numbers), 9)
+
+        # we should not be able to read spent chunks
+        self.assertEqual(list(first_chunk), [])
+        self.assertEqual(list(second_chunk), [])
 
 
 class DistinctCombinationsTests(TestCase):
