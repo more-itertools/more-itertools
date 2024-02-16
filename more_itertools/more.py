@@ -840,7 +840,7 @@ def windowed(seq, n, fillvalue=None, step=1):
     if n < 0:
         raise ValueError('n must be >= 0')
     if n == 0:
-        return (tuple(), )
+        return (tuple(),)
     if step < 1:
         raise ValueError('step must be >= 1')
 
