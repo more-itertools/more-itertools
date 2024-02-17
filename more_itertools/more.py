@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from functools import cached_property, partial, reduce, wraps
 from heapq import heapify, heapreplace, heappop
 from itertools import (
+    accumulate,
     chain,
     compress,
     count,
@@ -1982,11 +1983,23 @@ def adjacent(predicate, iterable, distance=1):
     if distance < 0:
         raise ValueError('distance must be at least 0')
 
-    i1, i2 = tee(iterable)
-    padding = [False] * distance
-    selected = chain(padding, map(predicate, i1), padding)
-    adjacent_to_selected = map(any, windowed(selected, 2 * distance + 1))
-    return zip(adjacent_to_selected, i2)
+    # split the iterable into two
+    items, lookahead = tee(iterable)
+
+    # Create an adjacency score that will keep track of the
+    # last value that had a True predicate via a count
+    bad_adj_score = -(distance + 1)
+    adj_scores = accumulate(
+        chain(map(predicate, lookahead), repeat(False)),
+        lambda score, pred_value: distance if pred_value else score - 1,
+        initial=bad_adj_score,
+    )
+
+    # Fast forward the adjacency score
+    consume(adj_scores, distance + 1)
+
+    # Check the score against the bad_score minimum for each item
+    return zip((score > bad_adj_score for score in adj_scores), items)
 
 
 def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
