@@ -1983,11 +1983,11 @@ def adjacent(predicate, iterable, distance=1):
     if distance < 0:
         raise ValueError('distance must be at least 0')
 
-    # split the iterable into two
+    # Split the iterable into two
     items, lookahead = tee(iterable)
 
     # Create an adjacency score that will keep track of the
-    # last value that had a True predicate via a count
+    # last value that had a true predicate via a count
     bad_adj_score = -(distance + 1)
     adj_scores = accumulate(
         chain(map(predicate, lookahead), repeat(False)),
