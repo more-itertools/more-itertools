@@ -3128,30 +3128,27 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
     # Save the substitutes iterable, since it's used more than once
     substitutes = tuple(substitutes)
 
-    # Add padding such that the number of windows matches the length of the
-    # iterable
-    it = chain(iterable, [_marker] * (window_size - 1))
-    windows = windowed(it, window_size)
+    # Create the iterable with padding so we don't run out of elements
+    # to pass to the predicate
+    iterable = chain(iter(iterable), (_marker,) * (window_size - 1))
+
+    # Create an almost full window
+    window = deque(islice(iterable, window_size - 1), maxlen=window_size)
+
+    # An iterable that will advance the window
+    filler = map(window.append, iterable)
 
     n = 0
-    for w in windows:
-        # If the current window matches our predicate (and we haven't hit
-        # our maximum number of replacements), splice in the substitutes
-        # and then consume the following windows that overlap with this one.
-        # For example, if the iterable is (0, 1, 2, 3, 4...)
-        # and the window size is 2, we have (0, 1), (1, 2), (2, 3)...
-        # If the predicate matches on (0, 1), we need to zap (0, 1) and (1, 2)
-        if pred(*w):
-            if (count is None) or (n < count):
-                n += 1
-                yield from substitutes
-                consume(windows, window_size - 1)
-                continue
-
-        # If there was no match (or we've reached the replacement limit),
-        # yield the first item from the window.
-        if w and (w[0] is not _marker):
-            yield w[0]
+    for _ in filler:
+        # Produce substitues and advance the window if
+        # the predicate is true and we haven't reached our count
+        if pred(*window) and (count is None or n < count):
+            n += 1
+            yield from substitutes
+            consume(filler, window_size - 1)
+        # Otherwise just yield the first element of the window
+        else:
+            yield window[0]
 
 
 def partitions(iterable):
