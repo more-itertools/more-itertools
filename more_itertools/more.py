@@ -3093,7 +3093,9 @@ def rlocate(iterable, pred=bool, window_size=None):
     return reversed(list(locate(iterable, pred, window_size)))
 
 
-def replace(iterable, pred, substitutes, count=None, window_size=1):
+def replace(
+    iterable, pred, substitutes, count=None, window_size=1, default_arg=_marker
+):
     """Yield the items from *iterable*, replacing the items for which *pred*
     returns ``True`` with the items from the iterable *substitutes*.
 
@@ -3121,6 +3123,20 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         >>> list(replace(iterable, pred, substitutes, window_size=window_size))
         [3, 4, 5, 3, 4, 5]
 
+    Use *default_arg* to specify the default value passed as arguments to
+    *pred* when at the end of the iterable.
+    This option is only used when *window_size* is greater than 1.
+
+        >>> list(replace(
+        ...     [1, 0, 0, 5, 0, 1, 1],
+        ...     # 3 items passed to pred with default of 0
+        ...     lambda *args: args == (1, 0, 0),
+        ...     [3, 4], # Splice in these items
+        ...     window_size=3,
+        ...     default_arg=0,
+        ... ))
+        [3, 4, 5, 0, 1, 3, 4]
+
     """
     if window_size < 1:
         raise ValueError('window_size must be at least 1')
@@ -3130,7 +3146,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
     # Create the iterable with padding so we don't run out of elements
     # to pass to the predicate
-    iterable = chain(iter(iterable), (_marker,) * (window_size - 1))
+    iterable = chain(iter(iterable), (default_arg,) * (window_size - 1))
 
     # Create an almost full window
     window = deque(islice(iterable, window_size - 1), maxlen=window_size)

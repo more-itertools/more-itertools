@@ -495,6 +495,7 @@ def replace(
     substitutes: Iterable[_U],
     count: int | None = ...,
     window_size: int = ...,
+    default_arg: _V = ...,
 ) -> Iterator[_T | _U]: ...
 def partitions(iterable: Iterable[_T]) -> Iterator[list[list[_T]]]: ...
 def set_partitions(
