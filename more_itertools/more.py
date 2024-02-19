@@ -840,41 +840,38 @@ def windowed(seq, n, fillvalue=None, step=1):
     if n < 0:
         raise ValueError('n must be >= 0')
     if n == 0:
-        return (tuple(),)
+        yield tuple()
+        return
     if step < 1:
         raise ValueError('step must be >= 1')
 
-    iterable = iter(seq)
+    iterable = iter(iterable)
+    filled_iterable = chain(iterable, repeat(fillvalue))
 
     # When we have no overlapping windows
     if step >= n:
-        filled_iterable = chain(iterable, repeat(fillvalue))
-        return (
-            (first, *islice(filled_iterable, n - 1))
-            for first in islice(iterable, None, None, step - n + 1)
-        )
-    # When we have overlapping windows
+        for f in islice(iterable, None, None, step - n + 1):
+            yield (f, *islice(filled_iterable, n - 1))
+    # When we havean overlapping windows
     else:
-        window = deque(islice(iterable, n), maxlen=n)
+        # Try to generate first item
+        try:
+            first = next(iterable)
+        except StopIteration:
+            return
 
-        # deal with first window not being full
-        if len(window) < n:
-            if not window:
-                return tuple()
-            return (tuple(window) + ((fillvalue,) * (n - len(window))),)
+        # Fill rest of the first window and yield
+        window = deque(islice(filled_iterable, n - 1), maxlen=n)
+        yield (first, *window)
 
-        # generates each window by appending over each step
-        # by appending the fillvalue step - 1 times
-        # we ensure any needed windows get filled
-        filler = islice(
+        # Fill the next step slices and yield
+        for _ in islice(
             map(window.append, chain(iterable, repeat(fillvalue, step - 1))),
             step - 1,
             None,
             step,
-        )
-
-        # chain the first window and each generated window
-        return chain((tuple(window),), (tuple(window) for _ in filler))
+        ):
+            yield tuple(window)
 
 
 def substrings(iterable):
