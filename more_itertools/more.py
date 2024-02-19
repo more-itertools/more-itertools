@@ -1,6 +1,6 @@
 import warnings
 
-from collections import Counter, defaultdict, deque, abc
+from collections import Counter, OrderedDict, defaultdict, deque, abc
 from collections.abc import Sequence
 from functools import cached_property, partial, reduce, wraps
 from heapq import heapify, heapreplace, heappop
@@ -4307,7 +4307,7 @@ def unique_in_window(iterable, n, key=None):
 
         >>> iterable = [0, 1, 0, 2, 3, 0]
         >>> n = 3
-        >>> list(unique_in_window(iterable, n))
+        >>> list(unique_in_window([0, 1, 0, 2, 3, 0], 3))
         [0, 1, 2, 3, 0]
 
     The *key* function, if provided, will be used to determine uniqueness:
@@ -4321,23 +4321,33 @@ def unique_in_window(iterable, n, key=None):
     if n <= 0:
         raise ValueError('n must be greater than 0')
 
-    window = deque(maxlen=n)
-    counts = defaultdict(int)
-    use_key = key is not None
+    iterable = iter(iterable)
 
-    for item in iterable:
-        if len(window) == n:
-            to_discard = window[0]
-            if counts[to_discard] == 1:
-                del counts[to_discard]
-            else:
-                counts[to_discard] -= 1
+    key_exists = key is not None
 
-        k = key(item) if use_key else item
-        if k not in counts:
+    buffer = OrderedDict()
+    for idx, item in enumerate(iterable):
+        k = key(item) if key_exists else item
+
+        # If item in the buffer we possibly have seen it
+        if k in buffer:
+            # We've seen it too long ago, yield it
+            if idx - buffer[k] >= n:
+                yield item
+
+            # Update the index and move the key forward so it doesn't
+            # fall off the queue
+            buffer[k] = idx
+            buffer.move_to_end(k)
+
+        # The item isn't in the buffer e.g. we haven't see it
+        else:
             yield item
-        counts[k] += 1
-        window.append(k)
+            if n > 1:
+                # Replace old item in the buffer with new
+                if len(buffer) >= n:
+                    buffer.popitem(False)
+                buffer[k] = idx
 
 
 def duplicates_everseen(iterable, key=None):
