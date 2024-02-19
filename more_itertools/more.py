@@ -4307,7 +4307,7 @@ def unique_in_window(iterable, n, key=None):
 
         >>> iterable = [0, 1, 0, 2, 3, 0]
         >>> n = 3
-        >>> list(unique_in_window([0, 1, 0, 2, 3, 0], 3))
+        >>> list(unique_in_window(iterable, n))
         [0, 1, 2, 3, 0]
 
     The *key* function, if provided, will be used to determine uniqueness:
