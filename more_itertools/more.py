@@ -852,7 +852,7 @@ def windowed(iterable, n, fillvalue=None, step=1):
     if step >= n:
         for f in islice(iterable, None, None, step - n + 1):
             yield (f, *islice(filled_iterable, n - 1))
-    # When we havean overlapping windows
+    # When we have overlapping windows
     else:
         # Try to generate first item
         try:
