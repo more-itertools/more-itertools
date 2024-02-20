@@ -4322,10 +4322,9 @@ def unique_in_window(iterable, n, key=None):
         raise ValueError('n must be greater than 0')
 
     iterable = iter(iterable)
-
     key_exists = key is not None
-
     buffer = OrderedDict()
+
     for idx, item in enumerate(iterable):
         k = key(item) if key_exists else item
 
@@ -4335,19 +4334,17 @@ def unique_in_window(iterable, n, key=None):
             if idx - buffer[k] >= n:
                 yield item
 
-            # Update the index and move the key forward so it doesn't
-            # fall off the queue
-            buffer[k] = idx
+            # Move the key forward so it doesn't fall off the queue
             buffer.move_to_end(k)
-
         # The item isn't in the buffer e.g. we haven't see it
         else:
             yield item
-            if n > 1:
-                # Replace old item in the buffer with new
-                if len(buffer) >= n:
-                    buffer.popitem(False)
-                buffer[k] = idx
+            # Replace old item in the buffer with new
+            if len(buffer) >= n:
+                buffer.popitem(False)
+
+        # Update the key index
+        buffer[k] = idx
 
 
 def duplicates_everseen(iterable, key=None):
