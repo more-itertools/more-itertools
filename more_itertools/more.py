@@ -5,7 +5,6 @@ from collections.abc import Sequence
 from functools import cached_property, partial, reduce, wraps
 from heapq import heapify, heapreplace, heappop
 from itertools import (
-    accumulate,
     chain,
     compress,
     count,
@@ -1983,23 +1982,24 @@ def adjacent(predicate, iterable, distance=1):
     if distance < 0:
         raise ValueError('distance must be at least 0')
 
-    # Split the iterable into two
-    items, lookahead = tee(iterable)
+    values, fastforward = tee(iterable)
 
-    # Create an adjacency score that will keep track of the
-    # last value that had a true predicate via a count
-    bad_adj_score = -(distance + 1)
-    adj_scores = accumulate(
-        chain(map(predicate, lookahead), repeat(False)),
-        lambda score, pred_value: distance if pred_value else score - 1,
-        initial=bad_adj_score,
-    )
+    # Creating an adjacency window by checking predicate of the current item
+    # and sutract from the the adjacency window until it is out of bounds
+    def is_adjacent():
+        pred_map = map(predicate, fastforward)
+        max_adj_window = distance * 2 + 1
+        adj_window = 0
+        while True:
+            if next(pred_map, False):
+                adj_window = max_adj_window
+            yield adj_window > 0
+            adj_window -= 1
 
-    # Fast forward the adjacency score
-    consume(adj_scores, distance + 1)
-
-    # Check the score against the bad_score minimum for each item
-    return zip((score > bad_adj_score for score in adj_scores), items)
+    # Generate adjacency value and fast forward them, then zip with output
+    adjacent_values = is_adjacent()
+    consume(adjacent_values, distance)
+    return zip(adjacent_values, values)
 
 
 def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
