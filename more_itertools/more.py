@@ -840,38 +840,32 @@ def windowed(iterable, n, fillvalue=None, step=1):
     if n < 0:
         raise ValueError('n must be >= 0')
     if n == 0:
-        yield tuple()
+        yield ()
         return
     if step < 1:
         raise ValueError('step must be >= 1')
 
     iterable = iter(iterable)
-    filled_iterable = chain(iterable, repeat(fillvalue))
 
-    # When we have no overlapping windows
-    if step >= n:
-        for f in islice(iterable, None, None, step - n + 1):
-            yield (f, *islice(filled_iterable, n - 1))
-    # When we have overlapping windows
-    else:
-        # Try to generate first item
-        try:
-            first = next(iterable)
-        except StopIteration:
-            return
+    # Generate first window
+    window = deque(islice(iterable, n), maxlen=n)
 
-        # Fill rest of the first window and yield
-        window = deque(islice(filled_iterable, n - 1), maxlen=n)
-        yield (first, *window)
+    # Deal with the first window not being full
+    if not window:
+        return
+    if len(window) < n:
+        yield tuple(window) + ((fillvalue,) * (n - len(window)))
+        return
+    yield tuple(window)
 
-        # Fill the next step slices and yield
-        for _ in islice(
-            map(window.append, chain(iterable, repeat(fillvalue, step - 1))),
-            step - 1,
-            None,
-            step,
-        ):
-            yield tuple(window)
+    # Create the filler for the next windows. The padding ensures
+    # we have just enough elements to fill the last window.
+    padding = (fillvalue,) * (n - 1 if step >= n else step - 1)
+    filler = map(window.append, chain(iterable, padding))
+
+    # Generate the rest of the windows
+    for _ in islice(filler, step - 1, None, step):
+        yield tuple(window)
 
 
 def substrings(iterable):
