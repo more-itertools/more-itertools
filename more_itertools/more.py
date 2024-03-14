@@ -810,7 +810,7 @@ def unique_to_each(*iterables):
     return [list(filter(uniques.__contains__, it)) for it in pool]
 
 
-def windowed(iterable, n, fillvalue=None, step=1):
+def windowed(seq, n, fillvalue=None, step=1):
     """Return a sliding window of width *n* over the given iterable.
 
         >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
@@ -845,7 +845,7 @@ def windowed(iterable, n, fillvalue=None, step=1):
     if step < 1:
         raise ValueError('step must be >= 1')
 
-    iterable = iter(iterable)
+    iterable = iter(seq)
 
     # Generate first window
     window = deque(islice(iterable, n), maxlen=n)
