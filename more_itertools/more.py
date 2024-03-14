@@ -1982,24 +1982,19 @@ def adjacent(predicate, iterable, distance=1):
     if distance < 0:
         raise ValueError('distance must be at least 0')
 
-    values, fastforward = tee(iterable)
+    values, adj_iter = tee(iterable)
 
-    # Creating an adjacency window by checking predicate of the current item
-    # and sutract from the the adjacency window until it is out of bounds
+    # Creat a relative last seen adjacency index by checking the predicate
+    # of the current item then subtracting each time is_adjacent is called.
     def is_adjacent():
-        pred_map = map(predicate, fastforward)
-        max_adj_window = distance * 2 + 1
-        adj_window = 0
-        while True:
-            if next(pred_map, False):
-                adj_window = max_adj_window
-            yield adj_window > 0
-            adj_window -= 1
+        max_rel_idx = distance * 2
+        rel_idx = 0
+        for is_pred in chain(map(predicate, adj_iter), (False,) * distance):
+            yield is_pred or rel_idx > 0
+            rel_idx = max_rel_idx if is_pred else rel_idx - 1
 
     # Generate adjacency value and fast forward them, then zip with output
-    adjacent_values = is_adjacent()
-    consume(adjacent_values, distance)
-    return zip(adjacent_values, values)
+    return zip(islice(is_adjacent(), distance, None), values)
 
 
 def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
