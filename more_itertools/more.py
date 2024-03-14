@@ -1955,7 +1955,7 @@ def adjacent(predicate, iterable, distance=1):
     drawn from *iterable* and the `bool` indicates whether
     that item satisfies the *predicate* or is adjacent to an item that does.
 
-    For example, to find whether items are adjacent to a ``3``::
+    For example, to find whether items are adjacent to a ``3``:
 
         >>> list(adjacent(lambda x: x == 3, range(6)))
         [(False, 0), (False, 1), (True, 2), (True, 3), (True, 4), (False, 5)]
