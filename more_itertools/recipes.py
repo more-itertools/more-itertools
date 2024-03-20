@@ -199,7 +199,7 @@ def nth(iterable, n, default=None):
     return next(islice(iterable, n, None), default)
 
 
-def all_equal(iterable):
+def all_equal(iterable, key=None):
     """
     Returns ``True`` if all the elements are equal to each other.
 
@@ -208,9 +208,17 @@ def all_equal(iterable):
         >>> all_equal('aaab')
         False
 
+    A function that accepts a single argument and returns a transformed version
+    of each input item can be specified with *key*:
+    
+        >>> all_equal('AaaA', key=str.casefold)
+        True
+        >>> all_equal([1, 2, 3], key=lambda x: x < 10)
+        True
+
     """
-    g = groupby(iterable)
-    return next(g, True) and not next(g, False)
+    return len(list(islice(groupby(iterable, key), 2))) <= 1
+
 
 
 def quantify(iterable, pred=bool):
