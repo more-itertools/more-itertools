@@ -210,7 +210,7 @@ def all_equal(iterable, key=None):
 
     A function that accepts a single argument and returns a transformed version
     of each input item can be specified with *key*:
-    
+
         >>> all_equal('AaaA', key=str.casefold)
         True
         >>> all_equal([1, 2, 3], key=lambda x: x < 10)
@@ -218,7 +218,6 @@ def all_equal(iterable, key=None):
 
     """
     return len(list(islice(groupby(iterable, key), 2))) <= 1
-
 
 
 def quantify(iterable, pred=bool):

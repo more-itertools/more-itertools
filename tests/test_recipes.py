@@ -153,7 +153,7 @@ class AllEqualTests(TestCase):
     def test_one(self):
         self.assertTrue(mi.all_equal('0'))
         self.assertTrue(mi.all_equal([0]))
-    
+
     def test_key(self):
         self.assertTrue(mi.all_equal('4٤໔４৪', key=int))
         self.assertFalse(mi.all_equal('Abc', key=str.casefold))
