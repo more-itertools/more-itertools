@@ -5768,8 +5768,7 @@ class PowersetOfSetsTests(TestCase):
         iterable = [0, 1, 2]
         actual = list(mi.powerset_of_sets(iterable))
         expected = [set(), {0}, {1}, {2}, {0, 1}, {0, 2}, {1, 2}, {0, 1, 2}]
-        self.assertEqual(len(actual), len(expected))
-        self.assertTrue(all(a == e for a, e in zip(actual, expected)))
+        self.assertEqual(actual, expected)
 
     def test_hash_count(self):
         hash_count = 0

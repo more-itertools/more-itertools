@@ -4696,8 +4696,8 @@ def filter_map(func, iterable):
 def powerset_of_sets(iterable):
     """Yields all possible subsets of the iterable.
 
-        >>> list(powerset_of_sets([1, 2, 3]))
-        [set(), {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3}, {1, 2, 3}]
+        >>> list(powerset_of_sets([1, 2, 3]))  # doctest: +SKIP
+        [set(), {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3}, {1, 2, 3}]  # doctest: +SKIP  # noqa:E501
         >>> list(powerset_of_sets([1, 1, 0]))
         [set(), {1}, {0}, {0, 1}]
 
