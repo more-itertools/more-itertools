@@ -418,16 +418,11 @@ def roundrobin(*iterables):
     iterables is small).
 
     """
-    # Recipe credited to George Sakkis
-    pending = len(iterables)
-    nexts = cycle(iter(it).__next__ for it in iterables)
-    while pending:
-        try:
-            for next in nexts:
-                yield next()
-        except StopIteration:
-            pending -= 1
-            nexts = cycle(islice(nexts, pending))
+    # Algorithm credited to George Sakkis
+    iterators = map(iter, iterables)
+    for num_active in range(len(iterables), 0, -1):
+        iterators = cycle(islice(iterators, num_active))
+        yield from map(next, iterators)
 
 
 def partition(pred, iterable):
