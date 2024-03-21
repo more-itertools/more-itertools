@@ -6,6 +6,7 @@ from functools import cached_property, partial, reduce, wraps
 from heapq import heapify, heapreplace, heappop
 from itertools import (
     chain,
+    combinations,
     compress,
     count,
     cycle,
@@ -109,6 +110,7 @@ __all__ = [
     'partitions',
     'peekable',
     'permutation_index',
+    'powerset_of_sets',
     'product_index',
     'raise_',
     'repeat_each',
@@ -4689,3 +4691,19 @@ def filter_map(func, iterable):
         y = func(x)
         if y is not None:
             yield y
+
+
+def powerset_of_sets(iterable):
+    """Yields all possible subsets of the iterable.
+
+        >>> list(powerset_of_sets([1, 2, 3]))  # doctest: +SKIP
+        [set(), {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3}, {1, 2, 3}]
+        >>> list(powerset_of_sets([1, 1, 0]))  # doctest: +SKIP
+        [set(), {1}, {0}, {0, 1}]
+
+    :func:`powerset_of_sets` takes care to minimize the number
+    of hash operations performed.
+    """
+    sets = tuple(map(set, dict.fromkeys(map(frozenset, zip(iterable)))))
+    for r in range(len(sets) + 1):
+        yield from starmap(set().union, combinations(sets, r))

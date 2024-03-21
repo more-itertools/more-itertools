@@ -5761,3 +5761,24 @@ class FilterMapTests(TestCase):
         )
         expected = [1, 2, 3]
         self.assertEqual(actual, expected)
+
+
+class PowersetOfSetsTests(TestCase):
+    def test_simple(self):
+        iterable = [0, 1, 2]
+        actual = list(mi.powerset_of_sets(iterable))
+        expected = [set(), {0}, {1}, {2}, {0, 1}, {0, 2}, {1, 2}, {0, 1, 2}]
+        self.assertEqual(actual, expected)
+
+    def test_hash_count(self):
+        hash_count = 0
+
+        class Str(str):
+            def __hash__(true_self):
+                nonlocal hash_count
+                hash_count += 1
+                return super.__hash__(true_self)
+
+        iterable = map(Str, 'ABBBCDD')
+        self.assertEqual(len(list(mi.powerset_of_sets(iterable))), 128)
+        self.assertLessEqual(hash_count, 14)
