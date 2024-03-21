@@ -134,32 +134,29 @@ class NthTests(TestCase):
 
 
 class AllEqualTests(TestCase):
-    """Tests for ``all_equal()``"""
-
     def test_true(self):
-        """Everything is equal"""
         self.assertTrue(mi.all_equal('aaaaaa'))
         self.assertTrue(mi.all_equal([0, 0, 0, 0]))
 
     def test_false(self):
-        """Not everything is equal"""
         self.assertFalse(mi.all_equal('aaaaab'))
         self.assertFalse(mi.all_equal([0, 0, 0, 1]))
 
     def test_tricky(self):
-        """Not everything is identical, but everything is equal"""
         items = [1, complex(1, 0), 1.0]
         self.assertTrue(mi.all_equal(items))
 
     def test_empty(self):
-        """Return True if the iterable is empty"""
         self.assertTrue(mi.all_equal(''))
         self.assertTrue(mi.all_equal([]))
 
     def test_one(self):
-        """Return True if the iterable is singular"""
         self.assertTrue(mi.all_equal('0'))
         self.assertTrue(mi.all_equal([0]))
+
+    def test_key(self):
+        self.assertTrue(mi.all_equal('4٤໔４৪', key=int))
+        self.assertFalse(mi.all_equal('Abc', key=str.casefold))
 
 
 class QuantifyTests(TestCase):
