@@ -4205,7 +4205,7 @@ def chunked_even(iterable, n):
     """
     iterable = iter(iterable)
 
-    # Initalize a buffer to process the chunks while keeping
+    # Initialize a buffer to process the chunks while keeping
     # some back to fill any underfilled chunks
     min_buffer = (n - 1) * (n - 2)
     buffer = list(islice(iterable, min_buffer))
