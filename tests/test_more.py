@@ -1713,6 +1713,27 @@ class SplitIntoTests(TestCase):
         sizes_actual = list(sizes)
         self.assertEqual(sizes_actual, sizes_expected)
 
+class TestJoinIf(TestCase):
+    def test_basic(self):
+        self.assertEqual(list(mi.join_if([1], [2], [3], predicate=lambda x,y: x[0]+y[0] == 3)), [1, 2])
+
+    def test_no_iterables(self):
+        self.assertEqual(list(mi.join_if(predicate=lambda x,y: len(x) > len(y))),[])
+
+    def test_no_predicate(self):
+        self.assertEqual(list(mi.join_if([1], [2], [3])), [1, 2, 3])
+
+    def test_not_equal_length(self):
+        self.assertEqual(list(mi.join_if([1], [2, 3], [4])), [1, 2, 3, 4])
+
+    def test_iterables(self):
+        self.assertEqual(list(mi.join_if(iter([1]), iter([2]), iter([3]), iter([4]))), [1, 2,3,4])
+
+    def test_partially_hashable(self):
+        self.assertEqual(list(mi.join_if([1], [2], (3,4), predicate=lambda x,y: x[0]+y[0] == 3)), [1, 2])
+
+    def test_mixed_iterables(self):
+        self.assertEqual(list(mi.join_if([1], {2}, (3,))), [1, 2, 3])
 
 class PaddedTest(TestCase):
     """Tests for ``padded()``"""

@@ -87,6 +87,7 @@ __all__ = [
     'islice_extended',
     'iterate',
     'iter_suppress',
+    'join_if',
     'last',
     'locate',
     'longest_common_prefix',
@@ -1525,6 +1526,22 @@ def split_into(iterable, sizes):
             return
         else:
             yield list(islice(it, size))
+
+def join_if(*iterables,predicate=lambda x,y: True):
+    """
+    Join iterables when predicate is True. If no predicate is given, join all iterables.
+    Does not modify the original iterables. Does not work with infinite iterables.
+    Joins iterables in order they are given. E.g. join_when([1], [2], [3]) joins [1] and [2] and then joins the result with [3].
+    >>> list(join_if([1], [2], [3], [2], predicate=lambda x,y: x[0]+y[0] == 3))
+    [1, 2, 2]
+    """
+    if not iterables:
+        return []
+    joined = list(iterables[0])
+    for iterable in iterables[1:]:
+        if predicate(iterables[0], iterable):
+            joined.extend(iterable)
+    return joined
 
 
 def padded(iterable, fillvalue=None, n=None, next_multiple=False):
