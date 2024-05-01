@@ -1527,7 +1527,7 @@ def split_into(iterable, sizes):
         else:
             yield list(islice(it, size))
 
-def join_if(*iterables,predicate=lambda x,y: True):
+def join_if(*iterables,predicate=lambda x,y: True, test_first=False):
     """
     Join iterables when predicate is True. If no predicate is given, join all iterables.
     Does not modify the original iterables. Does not work with infinite iterables.
@@ -1537,8 +1537,13 @@ def join_if(*iterables,predicate=lambda x,y: True):
     """
     if not iterables:
         return []
-    joined = list(iterables[0])
-    for iterable in iterables[1:]:
+
+    joined = []
+    start = 0
+    if not test_first:
+        joined.extend(iterables[0])
+        start = 1
+    for iterable in iterables[start:]:
         if predicate(iterables[0], iterable):
             joined.extend(iterable)
     return joined

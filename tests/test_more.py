@@ -1729,6 +1729,9 @@ class TestJoinIf(TestCase):
     def test_iterables(self):
         self.assertEqual(list(mi.join_if(iter([1]), iter([2]), iter([3]), iter([4]))), [1, 2,3,4])
 
+    def test_test_first(self):
+        self.assertEqual(list(mi.join_if([1], [2], [3], [4], predicate=lambda x,y: y[0] % 2 == 0 ,test_first=True)), [2, 4])
+
     def test_partially_hashable(self):
         self.assertEqual(list(mi.join_if([1], [2], (3,4), predicate=lambda x,y: x[0]+y[0] == 3)), [1, 2])
 
