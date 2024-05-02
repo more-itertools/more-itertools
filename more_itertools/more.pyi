@@ -175,9 +175,11 @@ def split_when(
 def split_into(
     iterable: Iterable[_T], sizes: Iterable[int | None]
 ) -> Iterator[list[_T]]: ...
-
-def chain_if(*iterables: Iterable[Any], predicate: Callable[[Any,Any], bool] = lambda x,y: True, test_first:bool = True) -> Iterator[_T]: ...
-
+def chain_if(
+    *iterables: Iterable[Any],
+    predicate: Callable[[Any, Any], bool] = lambda x, y: True,
+    test_first: bool = False,
+) -> Iterator[_T]: ...
 @overload
 def padded(
     iterable: Iterable[_T],
