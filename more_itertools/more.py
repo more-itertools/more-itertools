@@ -741,14 +741,37 @@ def distinct_permutations(iterable, r=None):
             i += 1
             head[i:], tail[:] = tail[: r - i], tail[r - i :]
 
-    items = sorted(iterable)
+    try:
+        items = sorted(iterable)
+        sortable = True
+    except TypeError:
+        items = list(iterable)
+        sortable = False
+
+        # Sets are unordered.  Could use list(dict.fromkeys(items))
+        # if every item was Hashable.
+        # This is suboptimal, but the both functions above are already O(n^2)
+        unique = []
+        for item in items:
+            if item not in unique:
+                unique.append(item)
+
+        # Also suboptimal, but the tool is already O(n^2), as per
+        # the previous loop.
+        indices = [unique.index(item) for item in items]
+        # assert sorted(indices) == indices
+
+
 
     size = len(items)
     if r is None:
         r = size
 
+    # functools.partial
+    algorithm = _full if r==size else partial(_partial, r=r)
+
     if 0 < r <= size:
-        return _full(items) if (r == size) else _partial(items, r)
+        return algorithm(items) if sortable else (unique[index] for index in algorithm(indices))
 
     return iter(() if r else ((),))
 
