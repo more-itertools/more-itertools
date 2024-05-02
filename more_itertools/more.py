@@ -87,7 +87,7 @@ __all__ = [
     'islice_extended',
     'iterate',
     'iter_suppress',
-    'join_if',
+    'chain_if',
     'last',
     'locate',
     'longest_common_prefix',
@@ -1527,24 +1527,20 @@ def split_into(iterable, sizes):
         else:
             yield list(islice(it, size))
 
-def join_if(*iterables,predicate=lambda x,y: True, test_first=False):
+def chain_if(*iterables,predicate=lambda x,y: True, test_first=False):
     """
     Join iterables when predicate is True. If no predicate is given, join all iterables.
     Does not modify the original iterables. Does not work with infinite iterables.
     Joins iterables in order they are given. E.g. join_when([1], [2], [3]) joins [1] and [2] and then joins the result with [3].
-    >>> list(join_if([1], [2], [3], [2], predicate=lambda x,y: x[0]+y[0] == 3))
+    >>> list(chain_if([1], [2], [3], [2], predicate=lambda x,y: x[0]+y[0] == 3))
     [1, 2, 2]
     """
     if not iterables:
         return []
 
     joined = []
-    start = 0
-    if not test_first:
-        joined.extend(iterables[0])
-        start = 1
-    for iterable in iterables[start:]:
-        if predicate(joined, iterable):
+    for iterable in iterables:
+        if not test_first and not joined or predicate(joined, iterable):
             joined.extend(iterable)
     return joined
 
