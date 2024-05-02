@@ -751,7 +751,7 @@ def distinct_permutations(iterable, r=None):
 
         # Sets are unordered.  Could use list(dict.fromkeys(items))
         # if every item was Hashable.
-        # Suboptimal, but this tool is already O(n^2).
+        # Suboptimal, but this tool is already slower than O(n^2).
         indices = [items.index(item) for item in items]
         indices.sort()
 
