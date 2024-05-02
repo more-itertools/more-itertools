@@ -541,6 +541,7 @@ class DistinctPermutationsTests(TestCase):
             [(0,), 10, 1, 0, 1],
             [(0,2,4,7), 0, 1, 1, (3.45, 2.34, 10.03), 0],
             ['a', (), 7.79, 1, 2, 'bv', b'\x03', (87,3), "beep"],
+            [1, True, 'love'],
         ):
             with self.subTest(iterable=iterable):
 
