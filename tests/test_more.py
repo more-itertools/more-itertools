@@ -1719,7 +1719,7 @@ class TestChainIf(TestCase):
         self.assertEqual(
             list(
                 mi.chain_if(
-                    [1], [2], [3], predicate=lambda x, y: x[0] + y[0] == 3
+                    [[1], [2], [3]], predicate=lambda x, y: x[0] + y[0] == 3
                 )
             ),
             [1, 2],
@@ -1731,14 +1731,14 @@ class TestChainIf(TestCase):
         )
 
     def test_no_predicate(self):
-        self.assertEqual(list(mi.chain_if([1], [2], [3])), [1, 2, 3])
+        self.assertEqual(list(mi.chain_if([[1], [2], [3]])), [1, 2, 3])
 
     def test_not_equal_length(self):
-        self.assertEqual(list(mi.chain_if([1], [2, 3], [4])), [1, 2, 3, 4])
+        self.assertEqual(list(mi.chain_if([[1], [2, 3], [4]])), [1, 2, 3, 4])
 
     def test_iterables(self):
         self.assertEqual(
-            list(mi.chain_if(iter([1]), iter([2]), iter([3]), iter([4]))),
+            list(mi.chain_if([iter([1]), iter([2]), iter([3]), iter([4])])),
             [1, 2, 3, 4],
         )
 
@@ -1746,10 +1746,7 @@ class TestChainIf(TestCase):
         self.assertEqual(
             list(
                 mi.chain_if(
-                    [1],
-                    [2],
-                    [3],
-                    [4],
+                    [[1], [2], [3], [4]],
                     predicate=lambda x, y: y[0] % 2 == 0,
                     test_first=True,
                 )
@@ -1761,14 +1758,14 @@ class TestChainIf(TestCase):
         self.assertEqual(
             list(
                 mi.chain_if(
-                    [1], [2], (3, 4), predicate=lambda x, y: x[0] + y[0] == 3
+                    [[1], [2], (3, 4)], predicate=lambda x, y: x[0] + y[0] == 3
                 )
             ),
             [1, 2],
         )
 
     def test_mixed_iterables(self):
-        self.assertEqual(list(mi.chain_if([1], {2}, (3,))), [1, 2, 3])
+        self.assertEqual(list(mi.chain_if([[1], {2}, (3,)])), [1, 2, 3])
 
 
 class PaddedTest(TestCase):

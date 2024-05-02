@@ -1528,12 +1528,12 @@ def split_into(iterable, sizes):
             yield list(islice(it, size))
 
 
-def chain_if(*iterables, predicate=lambda x, y: True, test_first=False):
+def chain_if(iterables=[], predicate=lambda x, y: True, test_first=False):
     """
     Join iterables when predicate is True. If no predicate is given,
     join all iterables. Does not modify the original iterables. Does not
     work with infinite iterables. Joins iterables in order they are given.
-    >>> list(chain_if([1], [3], [2], predicate=lambda x,y: x[0]+y[0] == 3))
+    >>> list(chain_if([[1], [3], [2]], predicate=lambda x,y: x[0]+y[0] == 3))
     [1, 2]
     """
 
