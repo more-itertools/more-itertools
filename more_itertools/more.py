@@ -1544,7 +1544,7 @@ def join_if(*iterables,predicate=lambda x,y: True, test_first=False):
         joined.extend(iterables[0])
         start = 1
     for iterable in iterables[start:]:
-        if predicate(iterables[0], iterable):
+        if predicate(joined, iterable):
             joined.extend(iterable)
     return joined
 
