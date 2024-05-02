@@ -1536,8 +1536,6 @@ def chain_if(*iterables, predicate=lambda x, y: True, test_first=False):
     >>> list(chain_if([1], [3], [2], predicate=lambda x,y: x[0]+y[0] == 3))
     [1, 2]
     """
-    if not iterables:
-        return []
 
     joined = []
     for iterable in iterables:
