@@ -741,11 +741,12 @@ def distinct_permutations(iterable, r=None):
             i += 1
             head[i:], tail[:] = tail[: r - i], tail[r - i :]
 
+    items = list(iterable)
+
     try:
-        items = sorted(iterable)
+        items.sort()
         sortable = True
     except TypeError:
-        items = list(iterable)
         sortable = False
 
         # Sets are unordered.  Could use list(dict.fromkeys(items))
@@ -771,7 +772,10 @@ def distinct_permutations(iterable, r=None):
     algorithm = _full if (r==size) else partial(_partial, r=r)
 
     if 0 < r <= size:
-        return algorithm(items) if sortable else (unique[index] for index in algorithm(indices))
+        return algorithm(items) if sortable else (tuple(unique[index] for index in permutation)
+                                                  for permutation in algorithm(indices))
+
+                                                  
 
     return iter(() if r else ((),))
 
