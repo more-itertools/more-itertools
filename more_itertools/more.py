@@ -749,10 +749,12 @@ def distinct_permutations(iterable, r=None):
     except TypeError:
         sortable = False
 
+        items_and_types = [(item, type(item)) for item in items]
         # Sets are unordered.  Could use list(dict.fromkeys(items))
         # if every item was Hashable.
         # Suboptimal, but this tool is already slower than O(n^2).
-        indices = [items.index(item) for item in items]
+        indices = [items_and_types.index(item_and_type) 
+                   for item_and_type in items_and_types]
         indices.sort()
 
 
@@ -765,7 +767,8 @@ def distinct_permutations(iterable, r=None):
     algorithm = _full if (r==size) else partial(_partial, r=r)
 
     if 0 < r <= size:
-        return algorithm(items) if sortable else (tuple(items[index] for index in permutation)
+        return algorithm(items) if sortable else (tuple(items_and_types[index][0] 
+                                                        for index in permutation)
                                                   for permutation in algorithm(indices))
 
                                                   
