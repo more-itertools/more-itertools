@@ -751,16 +751,9 @@ def distinct_permutations(iterable, r=None):
 
         # Sets are unordered.  Could use list(dict.fromkeys(items))
         # if every item was Hashable.
-        # This is suboptimal, but both functions above are already O(n^2)
-        unique = []
-        for item in items:
-            if item not in unique:
-                unique.append(item)
-
-        # Also suboptimal, but the tool is already O(n^2), as is
-        # the previous loop.
-        indices = [unique.index(item) for item in items]
-        # assert sorted(indices) == indices
+        # Suboptimal, but this tool is already O(n^2).
+        indices = [items.index(item) for item in items]
+        indices.sort()
 
 
 
@@ -772,7 +765,7 @@ def distinct_permutations(iterable, r=None):
     algorithm = _full if (r==size) else partial(_partial, r=r)
 
     if 0 < r <= size:
-        return algorithm(items) if sortable else (tuple(unique[index] for index in permutation)
+        return algorithm(items) if sortable else (tuple(items[index] for index in permutation)
                                                   for permutation in algorithm(indices))
 
                                                   
