@@ -552,6 +552,32 @@ class DistinctPermutationsTests(TestCase):
                 actual = set(mi.distinct_permutations(iter(iterable)))
                 self.assertEqual(actual, expected)
 
+    def _run_test_on_unhashable_unsortable(self, iterable):
+        with self.subTest(iterable=iterable):
+
+            # We cannot use sets due to the unhashable.  The list
+            # comprehensions below contain the two
+            # set differences (possibly with duplications if
+            # non-empty).
+            expected = list(permutations(iterable))
+            actual = list(mi.distinct_permutations(iter(iterable)))
+
+            # If empty, then everything in expected is in actual
+            missing_from_actual = [
+                tagged_perm
+                for tagged_perm in expected
+                if tagged_perm not in actual
+            ]
+            self.assertFalse(missing_from_actual)
+
+            # If empty, then everything in actual is in expected
+            unexpected = [
+                tagged_perm
+                for tagged_perm in actual
+                if tagged_perm not in expected
+            ]
+            self.assertFalse(unexpected)
+
     def test_unsortable_some_unhashables(self):
         for iterable in (
             [[], 0, 1],
@@ -563,30 +589,33 @@ class DistinctPermutationsTests(TestCase):
             [[1, 2, 3], {'a': 1, 'b': 2, 'c': 3}, set('bar'), 0, 0, 1],
             [[1], [True], 'love'],
         ):
-            with self.subTest(iterable=iterable):
+            self._run_test_on_unhashable_unsortable(iterable)
 
-                # We cannot use sets due to the unhashable.  The list
-                # comprehensions below contain the two
-                # set differences (possibly with duplications if
-                # non-empty).
-                expected = list(permutations(iterable))
-                actual = list(mi.distinct_permutations(iter(iterable)))
+    def test_super_market_analogy(self):
+        " Fails with memory error on my 4GB laptop. "
+        def product_ranges(names_and_frequencies):
 
-                # If empty, then everything in expected is in actual
-                missing_from_actual = [
-                    tagged_perm
-                    for tagged_perm in expected
-                    if tagged_perm not in actual
-                ]
-                self.assertFalse(missing_from_actual)
+            class Product:
+                def __init__(self, name, number):
+                    self.name = name
+                    self.number = number
 
-                # If empty, then everything in actual is in expected
-                unexpected = [
-                    tagged_perm
-                    for tagged_perm in actual
-                    if tagged_perm not in expected
-                ]
-                self.assertFalse(unexpected)
+                def __eq__(self, other):
+                    return self.name == other.name
+
+            for name, freq in names_and_frequencies.items():
+                for i in range(freq):
+                    yield Product(name, i)
+
+        products = product_ranges(
+            {
+                'Toothpaste': 3,
+                'Soap': 5,
+                'Creme': 4,
+            }
+        )
+
+        self._run_test_on_unhashable_unsortable(products)
 
 
 class IlenTests(TestCase):
