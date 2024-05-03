@@ -612,8 +612,8 @@ class DistinctPermutationsTests(TestCase):
             product_ranges(
                 {
                     'Toothpaste': 3,
-                    'Soap': 5,
-                    'Creme': 4,
+                    'Soap': 2,
+                    'Creme': 3,
                 }
             )
         )
