@@ -528,10 +528,11 @@ class DistinctPermutationsTests(TestCase):
                 self.assertEqual(actual, expected)
 
     @staticmethod
-    def _get_type_tagged_set(permutations):
-        return {tuple((obj, type(obj)) for obj in permutation)
-                for permutation in permutations
-        }
+    def _get_type_tagged(permutations):
+        # Allows cases such as {1} == {True} to be caught as test failures.
+        # i.e. set(self._get_typed_tagged([1])) != set(self._get_typed_tagged([True]))
+        for permutation in permutations:
+            yield tuple((obj, type(obj)) for obj in permutation)
 
     def test_unsortable_hashables(self):
         for iterable in (
@@ -554,30 +555,52 @@ class DistinctPermutationsTests(TestCase):
                 # sorted(iterable) will raise a TypeError
                 # TODO: Add not in docs to emphasise return order
                 #       is not guaranteed if items are incomparable.
-                expected = self._get_type_tagged_set(permutations(iterable))
-                actual = self._get_type_tagged_set(mi.distinct_permutations(iter(iterable)))
+                expected = set(self._get_type_tagged(permutations(iterable)))
+                actual = set(
+                    self._get_type_tagged(
+                        mi.distinct_permutations(iter(iterable))
+                    )
+                )
                 self.assertEqual(actual, expected)
 
-    # def test_unsortable_some_unhashables(self):
-    #     for iterable in (
-    #         [[], 0, 1],
-    #         [[],[], 0, 1],
-    #         [[], [], 0, 0, 'a', 'b'],
-    #         [{}, 0, 1],
-    #         [{}, 0, {}, 1, 1, True],
-    #         [[],{}, 'a', 'b', 'c'],
-    #         [[1,2,3],{'a' : 1, 'b' : 2, 'c' : 3}, set('bar'), 0, 0, 1]
-    #     ):
-    #         with self.subTest(iterable=iterable):
+    def test_unsortable_some_unhashables(self):
+        for iterable in (
+            [[], 0, 1],
+            [[], [], 0, 1],
+            [[], [], 0, 0, 'a', 'b'],
+            [{}, 0, 1],
+            [{}, 0, {}, 1, 1, True],
+            [[], {}, 'a', 'b', 'c'],
+            [[1, 2, 3], {'a': 1, 'b': 2, 'c': 3}, set('bar'), 0, 0, 1],
+        ):
+            with self.subTest(iterable=iterable):
 
-    #             # sorted(iterable) will raise a TypeError
-    #             # TODO: Add not in docs to emphasise return order
-    #             #       is not guaranteed if items are incomparable.
-    #             # expected = set(permutations(iterable))
-    #             # actual = set(mi.distinct_permutations(iter(iterable)))
-    #             expected = self._get_type_tagged_set(permutations(iterable))
-    #             actual = self._get_type_tagged_set(mi.distinct_permutations(iter(iterable)))
-    #             self.assertEqual(actual, expected)
+                expected = list(self._get_type_tagged(permutations(iterable)))
+                actual = list(
+                    self._get_type_tagged(
+                        mi.distinct_permutations(iter(iterable))
+                    )
+                )
+
+                # Can't do expected == actual or set(expected) == set(actual) as
+                # the same order is not required to pass, and the point of these
+                # subtests is that iterable is unsortable, and contains an unhashable item.
+
+                # If empty, then everything in expected is in actual
+                missing_from_actual = [
+                    tagged_perm
+                    for tagged_perm in expected
+                    if tagged_perm not in actual
+                ]
+                self.assertFalse(missing_from_actual)
+
+                # If empty, then everything in actual is in expected
+                unexpected = [
+                    tagged_perm
+                    for tagged_perm in actual
+                    if tagged_perm not in expected
+                ]
+                self.assertFalse(unexpected)
 
 
 class IlenTests(TestCase):
