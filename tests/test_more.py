@@ -584,8 +584,8 @@ class DistinctPermutationsTests(TestCase):
                 )
 
                 # Can't do expected == actual or set(expected) == set(actual)
-                # as the same order is not required to pass, and the point of 
-                # these subtests is that iterable is unsortable, and contains 
+                # as the same order is not required to pass, and the point of
+                # these subtests is that iterable is unsortable, and contains
                 # an unhashable item.
 
                 # If empty, then everything in expected is in actual
