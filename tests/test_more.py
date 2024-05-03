@@ -530,7 +530,8 @@ class DistinctPermutationsTests(TestCase):
     @staticmethod
     def _get_type_tagged(permutations):
         # Allows cases such as {1} == {True} to be caught as test failures.
-        # i.e. set(self._get_typed_tagged([1])) != set(self._get_typed_tagged([True]))
+        # i.e. set(self._get_typed_tagged([1])) !=
+        #      set(self._get_typed_tagged([True]))
         for permutation in permutations:
             yield tuple((obj, type(obj)) for obj in permutation)
 
@@ -582,9 +583,10 @@ class DistinctPermutationsTests(TestCase):
                     )
                 )
 
-                # Can't do expected == actual or set(expected) == set(actual) as
-                # the same order is not required to pass, and the point of these
-                # subtests is that iterable is unsortable, and contains an unhashable item.
+                # Can't do expected == actual or set(expected) == set(actual)
+                # as the same order is not required to pass, and the point of 
+                # these subtests is that iterable is unsortable, and contains 
+                # an unhashable item.
 
                 # If empty, then everything in expected is in actual
                 missing_from_actual = [
