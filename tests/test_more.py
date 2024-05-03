@@ -568,7 +568,9 @@ class DistinctPermutationsTests(TestCase):
                 for tagged_perm in expected
                 if tagged_perm not in actual
             ]
-            self.assertFalse(missing_from_actual)
+            self.assertFalse(
+                missing_from_actual, msg=f'{actual=}, {expected=}'
+            )
 
             # If empty, then everything in actual is in expected
             unexpected = [
@@ -576,7 +578,7 @@ class DistinctPermutationsTests(TestCase):
                 for tagged_perm in actual
                 if tagged_perm not in expected
             ]
-            self.assertFalse(unexpected)
+            self.assertFalse(unexpected, msg=f'{actual=}, {expected=}')
 
     def test_unsortable_some_unhashables(self):
         for iterable in (
@@ -606,12 +608,14 @@ class DistinctPermutationsTests(TestCase):
                 for i in range(freq):
                     yield Product(name, i)
 
-        products = product_ranges(
-            {
-                'Toothpaste': 2,
-                'Soap': 3,
-                'Creme': 2,
-            }
+        products = list(
+            product_ranges(
+                {
+                    'Toothpaste': 3,
+                    'Soap': 5,
+                    'Creme': 4,
+                }
+            )
         )
 
         self._run_test_on_unhashable_unsortable(products)
