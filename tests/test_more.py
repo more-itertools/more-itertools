@@ -527,14 +527,6 @@ class DistinctPermutationsTests(TestCase):
                 actual = sorted(mi.distinct_permutations(iter(iterable), r))
                 self.assertEqual(actual, expected)
 
-    @staticmethod
-    def _get_type_tagged(permutations):
-        # Allows cases such as {1} == {True} to be caught as test failures.
-        # i.e. set(self._get_typed_tagged([1])) !=
-        #      set(self._get_typed_tagged([True]))
-        for permutation in permutations:
-            yield tuple((obj, type(obj)) for obj in permutation)
-
     def test_unsortable_hashables(self):
         for iterable in (
             [None, 2, "U"],  # Nothing compares 2U
@@ -556,12 +548,8 @@ class DistinctPermutationsTests(TestCase):
                 # sorted(iterable) will raise a TypeError
                 # TODO: Add not in docs to emphasise return order
                 #       is not guaranteed if items are incomparable.
-                expected = set(self._get_type_tagged(permutations(iterable)))
-                actual = set(
-                    self._get_type_tagged(
-                        mi.distinct_permutations(iter(iterable))
-                    )
-                )
+                expected = set(permutations(iterable))
+                actual = set(mi.distinct_permutations(iter(iterable)))
                 self.assertEqual(actual, expected)
 
     def test_unsortable_some_unhashables(self):
@@ -573,20 +561,16 @@ class DistinctPermutationsTests(TestCase):
             [{}, 0, {}, 1, 1, True],
             [[], {}, 'a', 'b', 'c'],
             [[1, 2, 3], {'a': 1, 'b': 2, 'c': 3}, set('bar'), 0, 0, 1],
+            [[1], [True], 'love'],
         ):
             with self.subTest(iterable=iterable):
 
-                expected = list(self._get_type_tagged(permutations(iterable)))
-                actual = list(
-                    self._get_type_tagged(
-                        mi.distinct_permutations(iter(iterable))
-                    )
-                )
-
-                # Can't do expected == actual or set(expected) == set(actual)
-                # as the same order is not required to pass, and the point of
-                # these subtests is that iterable is unsortable, and contains
-                # an unhashable item.
+                # We cannot use sets due to the unhashable.  The list
+                # comprehensions below contain the two
+                # set differences (possibly with duplications if
+                # non-empty).
+                expected = list(permutations(iterable))
+                actual = list(mi.distinct_permutations(iter(iterable)))
 
                 # If empty, then everything in expected is in actual
                 missing_from_actual = [
