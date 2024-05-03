@@ -592,7 +592,6 @@ class DistinctPermutationsTests(TestCase):
             self._run_test_on_unhashable_unsortable(iterable)
 
     def test_super_market_analogy(self):
-        " Fails with memory error on my 4GB laptop. "
         def product_ranges(names_and_frequencies):
 
             class Product:
@@ -609,9 +608,9 @@ class DistinctPermutationsTests(TestCase):
 
         products = product_ranges(
             {
-                'Toothpaste': 3,
-                'Soap': 5,
-                'Creme': 4,
+                'Toothpaste': 2,
+                'Soap': 3,
+                'Creme': 2,
             }
         )
 
