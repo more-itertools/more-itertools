@@ -760,7 +760,9 @@ def distinct_permutations(iterable, r=None):
         equivalent_items = {k: cycle(v) for k, v in indices_dict.items()}
 
         def permuted_items(permuted_indices):
-            return tuple(next(equivalent_items[index]) for index in permuted_indices)
+            return tuple(
+                next(equivalent_items[index]) for index in permuted_indices
+            )
 
     size = len(items)
     if r is None:
