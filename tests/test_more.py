@@ -568,9 +568,9 @@ class DistinctPermutationsTests(TestCase):
             ['a', (), 7.79, 1, 2, 'bv', b'\x03', (87, 3), "beep"],
             [1, True, 'love'],
         ):
-            for r in range(len(iterable)-1, 1, -2):
+            for r in range(len(iterable) - 1, 1, -2):
                 with self.subTest(iterable=iterable, r=r):
-                    
+
                     # sorted(iterable) will raise a TypeError
                     # TODO: Add not in docs to emphasise return order
                     #       is not guaranteed if items are incomparable.
@@ -578,7 +578,7 @@ class DistinctPermutationsTests(TestCase):
                     actual = set(mi.distinct_permutations(iter(iterable), r=r))
                     self.assertEqual(actual, expected)
 
-    def _run_test_on_unhashable_unsortable(self, iterable, r = None):
+    def _run_test_on_unhashable_unsortable(self, iterable, r=None):
         r = r or len(iterable)
         with self.subTest(iterable=iterable, r=r):
 
@@ -631,7 +631,7 @@ class DistinctPermutationsTests(TestCase):
             [[1, 2, 3], {'a': 1, 'b': 2, 'c': 3}, set('bar'), 0, 0, 1],
             [[1], [True], 'love'],
         ):
-            for r in range(len(iterable)-1, 1, -2):
+            for r in range(len(iterable) - 1, 1, -2):
                 self._run_test_on_unhashable_unsortable(iterable, r=r)
 
     def test_super_market_analogy(self):
