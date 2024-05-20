@@ -10,6 +10,7 @@ from typing import (
     ContextManager,
     Generic,
     Hashable,
+    Mapping,
     Iterable,
     Iterator,
     overload,
@@ -696,5 +697,5 @@ def filter_map(
 ) -> Iterator[_V]: ...
 def powerset_of_sets(iterable: Iterable[_T]) -> Iterator[set[_T]]: ...
 def join_mappings(
-    **field_to_map: dict[Any, dict[Any, Any]]
-) -> dict[Any, dict[Any, Any]]: ...
+    **field_to_map: Mapping[_T, _V]
+) -> dict[_T, dict[str, _V]]: ...

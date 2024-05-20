@@ -4716,7 +4716,7 @@ def join_mappings(**field_to_map):
 
     >>> user_scores = {'elliot': 50, 'claris': 60}
     >>> user_times = {'elliot': 30, 'claris': 40}
-    >>> dict(join_mappings(score=user_scores, time=user_times))
+    >>> join_mappings(score=user_scores, time=user_times)
     {'elliot': {'score': 50, 'time': 30}, 'claris': {'score': 60, 'time': 40}}
     """
     ret = defaultdict(dict)
