@@ -87,6 +87,7 @@ __all__ = [
     'islice_extended',
     'iterate',
     'iter_suppress',
+    'join_mapping',
     'last',
     'locate',
     'longest_common_prefix',
@@ -4707,3 +4708,34 @@ def powerset_of_sets(iterable):
     sets = tuple(map(set, dict.fromkeys(map(frozenset, zip(iterable)))))
     for r in range(len(sets) + 1):
         yield from starmap(set().union, combinations(sets, r))
+
+
+def join_mapping(field_to_map, strict=False):
+    """
+    Joins multiple mappings together using their common keys.
+
+    >>> user_scores = {'elliot': 50, 'claris': 60}
+    >>> user_times = {'elliot': 30, 'claris': 40}
+    >>> field_to_map = {'score': user_scores, 'time': user_times}
+    >>> dict(join_mapping(field_to_map))
+    {'elliot': {'score': 50, 'time': 30}, 'claris': {'score': 60, 'time': 40}}
+
+    When *strict* is ``True``, the input mappings must have identical keys.
+    If they don't ``ValueError`` is raised.
+
+    The returned object is a :obj:`collections.defaultdict` with the
+    ``default_factory`` set to ``None``, such that it behaves like a normal
+    dictionary.
+
+    """
+    ret = defaultdict(dict)
+
+    for field_name, mapping in field_to_map.items():
+        for key, value in mapping.items():
+            ret[key][field_name] = value
+
+    if strict and not all_equal((d.keys() for d in ret.values())):
+        raise ValueError('keys were not the same in all mappings')
+
+    ret.default_factory = None
+    return ret
