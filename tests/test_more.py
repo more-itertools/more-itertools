@@ -5799,18 +5799,7 @@ class JoinMappingTests(TestCase):
             'e2': {'salary': 23, 'dept': 'sales', 'service': 9},
             'e3': {'salary': 34, 'dept': 'eng', 'service': 2},
         }
-        self.assertEqual(dict(mi.join_mapping(field_to_map)), expected)
-        self.assertEqual(
-            dict(mi.join_mapping(field_to_map, strict=True)), expected
-        )
-
-    def test_strict_error(self):
-        salary_map = {'e1': 12, 'e2': 23, 'e3': 34}
-        dept_map = {'e1': 'eng', 'e2': 'sales', 'e4': 'eng'}
-        field_to_map = {'salary': salary_map, 'dept': dept_map}
-        with self.assertRaises(ValueError):
-            dict(mi.join_mapping(field_to_map, strict=True))
+        self.assertEqual(dict(mi.join_mappings(**field_to_map)), expected)
 
     def test_empty(self):
-        self.assertEqual(dict(mi.join_mapping({})), {})
-        self.assertEqual(dict(mi.join_mapping({}, strict=True)), {})
+        self.assertEqual(dict(mi.join_mappings()), {})
