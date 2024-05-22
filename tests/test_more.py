@@ -5782,3 +5782,24 @@ class PowersetOfSetsTests(TestCase):
         iterable = map(Str, 'ABBBCDD')
         self.assertEqual(len(list(mi.powerset_of_sets(iterable))), 128)
         self.assertLessEqual(hash_count, 14)
+
+
+class JoinMappingTests(TestCase):
+    def test_basic(self):
+        salary_map = {'e1': 12, 'e2': 23, 'e3': 34}
+        dept_map = {'e1': 'eng', 'e2': 'sales', 'e3': 'eng'}
+        service_map = {'e1': 5, 'e2': 9, 'e3': 2}
+        field_to_map = {
+            'salary': salary_map,
+            'dept': dept_map,
+            'service': service_map,
+        }
+        expected = {
+            'e1': {'salary': 12, 'dept': 'eng', 'service': 5},
+            'e2': {'salary': 23, 'dept': 'sales', 'service': 9},
+            'e3': {'salary': 34, 'dept': 'eng', 'service': 2},
+        }
+        self.assertEqual(dict(mi.join_mappings(**field_to_map)), expected)
+
+    def test_empty(self):
+        self.assertEqual(dict(mi.join_mappings()), {})

@@ -151,6 +151,7 @@ These tools return summarized or aggregated data from an iterable.
 .. autofunction:: consecutive_groups(iterable, ordering=lambda x: x)
 .. autoclass:: run_length
 .. autofunction:: map_reduce
+.. autofunction:: join_mappings
 .. autofunction:: exactly_n(iterable, n, predicate=bool)
 .. autofunction:: is_sorted
 .. autofunction:: all_unique
