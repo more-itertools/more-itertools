@@ -1624,8 +1624,10 @@ def distribute(n, iterable):
         >>> [list(c) for c in children]
         [[1], [2], [3], [], []]
 
-    This function uses :func:`itertools.tee` and may require significant
-    storage. If you need the order items in the smaller iterables to match the
+    This function uses :func:`itertools.tee` and in the worse case may require
+    significant storage.
+
+    If you need the order of items in the smaller iterables to match the
     original iterable, see :func:`divide`.
 
     """
@@ -1873,9 +1875,12 @@ def divide(n, iterable):
         >>> [list(c) for c in children]
         [[1], [2], [3], [], []]
 
-    This function will exhaust the iterable before returning and may require
-    significant storage. If order is not important, see :func:`distribute`,
-    which does not first pull the iterable into memory.
+    This function will convert the iterable to a tuple upfront and thus may
+    require significant storage.
+
+    If order is not important, see :func:`distribute`, which only consumes
+    the iterable on demand but in the worst case could still keep the entire
+    iterable in memory.
 
     """
     if n < 1:
