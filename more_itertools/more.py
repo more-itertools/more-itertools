@@ -20,7 +20,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import exp, factorial, floor, log, perm, comb
+from math import comb, e, exp, factorial, floor, log, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
@@ -29,6 +29,7 @@ from time import monotonic
 
 from .recipes import (
     _marker,
+    _sumprod,
     _zip_equal,
     UnequalIterablesError,
     consume,
@@ -62,6 +63,7 @@ __all__ = [
     'consumer',
     'count_cycle',
     'countable',
+    'dft',
     'difference',
     'distinct_combinations',
     'distinct_permutations',
@@ -78,6 +80,7 @@ __all__ = [
     'groupby_transform',
     'ichunked',
     'iequals',
+    'idft',
     'ilen',
     'interleave',
     'interleave_evenly',
@@ -553,10 +556,10 @@ def one(iterable, too_short=None, too_long=None):
 
     try:
         first_value = next(it)
-    except StopIteration as e:
+    except StopIteration as exc:
         raise (
             too_short or ValueError('too few items in iterable (expected 1)')
-        ) from e
+        ) from exc
 
     try:
         second_value = next(it)
@@ -1159,8 +1162,8 @@ def interleave_evenly(iterables, lengths=None):
 
         # those iterables for which the error is negative are yielded
         # ("diagonal step" in Bresenham)
-        for i, e in enumerate(errors):
-            if e < 0:
+        for i, e_ in enumerate(errors):
+            if e_ < 0:
                 yield next(iters_secondary[i])
                 to_yield -= 1
                 errors[i] += delta_primary
@@ -4457,12 +4460,12 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
 
     try:
         lo = hi = next(it)
-    except StopIteration as e:
+    except StopIteration as exc:
         if default is _marker:
             raise ValueError(
                 '`minmax()` argument is an empty iterable. '
                 'Provide a `default` value to suppress this error.'
-            ) from e
+            ) from exc
         return default
 
     # Different branches depending on the presence of key. This saves a lot
@@ -4726,3 +4729,53 @@ def join_mappings(**field_to_map):
             ret[key][field_name] = value
 
     return dict(ret)
+
+
+def _complex_sumprod(v1, v2):
+    """High precision sumprod() for complex numbers.
+    Used by :func:`dft` and :func:`idft`.
+    """
+    r1 = chain((p.real for p in v1), (-p.imag for p in v1))
+    r2 = chain((q.real for q in v2), (q.imag for q in v2))
+    i1 = chain((p.real for p in v1), (p.imag for p in v1))
+    i2 = chain((q.imag for q in v2), (q.real for q in v2))
+    return complex(_sumprod(r1, r2), _sumprod(i1, i2))
+
+
+def dft(xarr):
+    """Discrete Fourier Tranform. *xarr* is a sequence of complex numbers.
+    Yields the components of the corresponding transformed output vector.
+
+    >>> from cmath import isclose
+    >>> xarr = [1, 2-1j, -1j, -1+2j]
+    >>> Xarr = [2, -2-2j, -2j, 4+4j]
+    >>> all(map(isclose, dft(xarr), Xarr))
+    True
+
+    See :func:`idft` for the inverse Discrete Fourier Transform.
+    """
+    N = len(xarr)
+    roots_of_unity = [e ** (n / N * tau * -1j) for n in range(N)]
+    for k in range(N):
+        coeffs = [roots_of_unity[k * n % N] for n in range(N)]
+        yield _complex_sumprod(xarr, coeffs)
+
+
+def idft(Xarr):
+    """Inverse Discrete Fourier Tranform. *Xarr* is a sequence of
+    complex numbers. Yields the components of the corresponding
+    inverse-transformed output vector.
+
+    >>> from cmath import isclose
+    >>> xarr = [1, 2-1j, -1j, -1+2j]
+    >>> Xarr = [2, -2-2j, -2j, 4+4j]
+    >>> all(map(isclose, idft(Xarr), xarr))
+    True
+
+    See :func:`dft` for the Discrete Fourier Transform.
+    """
+    N = len(Xarr)
+    roots_of_unity = [e ** (n / N * tau * 1j) for n in range(N)]
+    for k in range(N):
+        coeffs = [roots_of_unity[k * n % N] for n in range(N)]
+        yield _complex_sumprod(Xarr, coeffs) / N
