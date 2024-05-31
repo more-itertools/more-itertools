@@ -544,10 +544,6 @@ class DistinctPermutationsTests(TestCase):
             [1, True, 'love'],
         ):
             with self.subTest(iterable=iterable):
-
-                # sorted(iterable) will raise a TypeError
-                # TODO: Add not in docs to emphasise return order
-                #       is not guaranteed if items are incomparable.
                 expected = set(permutations(iterable))
                 actual = set(mi.distinct_permutations(iter(iterable)))
                 self.assertEqual(actual, expected)
@@ -570,10 +566,6 @@ class DistinctPermutationsTests(TestCase):
         ):
             for r in range(len(iterable) - 1, 1, -2):
                 with self.subTest(iterable=iterable, r=r):
-
-                    # sorted(iterable) will raise a TypeError
-                    # TODO: Add not in docs to emphasise return order
-                    #       is not guaranteed if items are incomparable.
                     expected = set(permutations(iterable, r=r))
                     actual = set(mi.distinct_permutations(iter(iterable), r=r))
                     self.assertEqual(actual, expected)
