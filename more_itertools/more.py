@@ -675,11 +675,11 @@ def distinct_permutations(iterable, r=None):
         >>> sorted(distinct_permutations(range(3), r=2))
         [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
 
-    The elements in *iterable* need not be sortable.  If a) sorting is 
+    The elements in *iterable* need not be sortable.  If a) sorting is
     not possible, and b) multiple distinct elements compare equal, forming
-    equivalent group (e.g. [1,True] in [1, True, "love"]), then the 
-    particular element in the permutations, representing its equivalent 
-    class, is drawn evenly from its class, in the order of appearance 
+    equivalent group (e.g. [1,True] in [1, True, "love"]), then the
+    particular element in the permutations, representing its equivalent
+    class, is drawn evenly from its class, in the order of appearance
     in *iterable* (cycled thereafter).
 
     """
