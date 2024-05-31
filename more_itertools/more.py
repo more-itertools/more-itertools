@@ -1,3 +1,4 @@
+import math
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
@@ -20,7 +21,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, log, perm, tau
+from math import comb, e, exp, factorial, floor, fsum, log, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
@@ -29,7 +30,6 @@ from time import monotonic
 
 from .recipes import (
     _marker,
-    _sumprod,
     _zip_equal,
     UnequalIterablesError,
     consume,
@@ -69,6 +69,7 @@ __all__ = [
     'distinct_permutations',
     'distribute',
     'divide',
+    'doublestarmap',
     'duplicates_everseen',
     'duplicates_justseen',
     'classify_unique',
@@ -153,6 +154,9 @@ __all__ = [
     'zip_equal',
     'zip_offset',
 ]
+
+# math.sumprod is available for Python 3.12+
+_fsumprod = getattr(math, 'sumprod', lambda x, y: fsum(map(mul, x, y)))
 
 
 def chunked(iterable, n, strict=False):
@@ -1628,7 +1632,9 @@ def distribute(n, iterable):
         [[1], [2], [3], [], []]
 
     This function uses :func:`itertools.tee` and may require significant
-    storage. If you need the order items in the smaller iterables to match the
+    storage.
+
+    If you need the order items in the smaller iterables to match the
     original iterable, see :func:`divide`.
 
     """
@@ -1876,9 +1882,9 @@ def divide(n, iterable):
         >>> [list(c) for c in children]
         [[1], [2], [3], [], []]
 
-    This function will exhaust the iterable before returning and may require
-    significant storage. If order is not important, see :func:`distribute`,
-    which does not first pull the iterable into memory.
+    This function will exhaust the iterable before returning.
+    If order is not important, see :func:`distribute`, which does not first
+    pull the iterable into memory.
 
     """
     if n < 1:
@@ -4735,21 +4741,22 @@ def _complex_sumprod(v1, v2):
     """High precision sumprod() for complex numbers.
     Used by :func:`dft` and :func:`idft`.
     """
+
     r1 = chain((p.real for p in v1), (-p.imag for p in v1))
     r2 = chain((q.real for q in v2), (q.imag for q in v2))
     i1 = chain((p.real for p in v1), (p.imag for p in v1))
     i2 = chain((q.imag for q in v2), (q.real for q in v2))
-    return complex(_sumprod(r1, r2), _sumprod(i1, i2))
+    return complex(_fsumprod(r1, r2), _fsumprod(i1, i2))
 
 
 def dft(xarr):
     """Discrete Fourier Tranform. *xarr* is a sequence of complex numbers.
     Yields the components of the corresponding transformed output vector.
 
-    >>> from cmath import isclose
+    >>> import cmath
     >>> xarr = [1, 2-1j, -1j, -1+2j]
     >>> Xarr = [2, -2-2j, -2j, 4+4j]
-    >>> all(map(isclose, dft(xarr), Xarr))
+    >>> all(map(cmath.isclose, dft(xarr), Xarr))
     True
 
     See :func:`idft` for the inverse Discrete Fourier Transform.
@@ -4766,10 +4773,10 @@ def idft(Xarr):
     complex numbers. Yields the components of the corresponding
     inverse-transformed output vector.
 
-    >>> from cmath import isclose
+    >>> import cmath
     >>> xarr = [1, 2-1j, -1j, -1+2j]
     >>> Xarr = [2, -2-2j, -2j, 4+4j]
-    >>> all(map(isclose, idft(Xarr), xarr))
+    >>> all(map(cmath.isclose, idft(Xarr), xarr))
     True
 
     See :func:`dft` for the Discrete Fourier Transform.
@@ -4779,3 +4786,21 @@ def idft(Xarr):
     for k in range(N):
         coeffs = [roots_of_unity[k * n % N] for n in range(N)]
         yield _complex_sumprod(Xarr, coeffs) / N
+
+
+def doublestarmap(func, iterable):
+    """Apply *func* to every item of *iterable* by dictionary unpacking
+    the item into *func*.
+
+    The difference between :func:`itertools.starmap` and :func:`doublestarmap`
+    parallels the distinction between ``func(*a)`` and ``func(**a)``.
+
+    >>> iterable = [{'a': 1, 'b': 2}, {'a': 40, 'b': 60}]
+    >>> list(doublestarmap(lambda a, b: a + b, iterable))
+    [3, 100]
+
+    ``TypeError`` will be raised if *func*'s signature doesn't match the
+    mapping contained in *iterable* or if *iterable* does not contain mappings.
+    """
+    for item in iterable:
+        yield func(**item)
