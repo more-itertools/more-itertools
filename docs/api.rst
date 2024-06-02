@@ -129,8 +129,6 @@ These tools combine multiple iterables.
 
 **Itertools recipes**
 
-.. autofunction:: dotproduct
-.. autofunction:: convolve
 .. autofunction:: flatten
 .. autofunction:: roundrobin
 .. autofunction:: prepend
@@ -275,6 +273,29 @@ consume iterables.
 .. autofunction:: iter_except
 
 
+Math
+====
+**New itertools**
+
+.. autofunction:: dft
+.. autofunction:: idft
+
+----
+
+**Itertools recipes**
+
+.. autofunction:: convolve
+.. autofunction:: dotproduct
+.. autofunction:: factor
+.. autofunction:: matmul
+.. autofunction:: polynomial_from_roots
+.. autofunction:: polynomial_derivative
+.. autofunction:: polynomial_eval
+.. autofunction:: sieve
+.. autofunction:: sum_of_squares
+.. autofunction:: totient
+
+
 Others
 ======
 
@@ -303,12 +324,4 @@ Others
 .. autofunction:: consume
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc
-.. autofunction:: polynomial_from_roots
-.. autofunction:: polynomial_eval
-.. autofunction:: polynomial_derivative
-.. autofunction:: sieve
-.. autofunction:: factor
-.. autofunction:: matmul
-.. autofunction:: sum_of_squares
-.. autofunction:: totient
 .. autofunction:: reshape

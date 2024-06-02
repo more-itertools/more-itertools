@@ -1,3 +1,4 @@
+import cmath
 import warnings
 
 from collections import Counter, abc
@@ -23,7 +24,7 @@ from itertools import (
 )
 from operator import add, mul, itemgetter
 from pickle import loads, dumps
-from random import seed, Random
+from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
 from sys import version_info
@@ -5803,6 +5804,23 @@ class JoinMappingTests(TestCase):
 
     def test_empty(self):
         self.assertEqual(dict(mi.join_mappings()), {})
+
+
+class DiscreteFourierTransformTests(TestCase):
+    def test_basic(self):
+        # Example calculation from:
+        # https://en.wikipedia.org/wiki/Discrete_Fourier_transform#Example
+        xarr = [1, 2 - 1j, -1j, -1 + 2j]
+        Xarr = [2, -2 - 2j, -2j, 4 + 4j]
+        self.assertTrue(all(map(cmath.isclose, mi.dft(xarr), Xarr)))
+        self.assertTrue(all(map(cmath.isclose, mi.idft(Xarr), xarr)))
+
+    def test_roundtrip(self):
+        for _ in range(1_000):
+            N = randrange(35)
+            xarr = [complex(random(), random()) for i in range(N)]
+            Xarr = list(mi.dft(xarr))
+            assert all(map(cmath.isclose, mi.idft(Xarr), xarr))
 
 
 class DoubleStarMapTests(TestCase):
