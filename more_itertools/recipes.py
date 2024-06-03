@@ -75,6 +75,7 @@ __all__ = [
     'totient',
     'transpose',
     'triplewise',
+    'unique',
     'unique_everseen',
     'unique_justseen',
 ]
@@ -532,6 +533,25 @@ def unique_justseen(iterable, key=None):
         return map(operator.itemgetter(0), groupby(iterable))
 
     return map(next, map(operator.itemgetter(1), groupby(iterable, key)))
+
+
+def unique(iterable, key=None, reverse=False):
+    """Yields unique elements in sorted order.
+
+    >>> list(unique([[1, 2], [3, 4], [1, 2]]))
+    [[1, 2], [3, 4]]
+
+    *key* and *reverse* are passed to :func:`sorted`.
+
+    >>> list(unique('ABBcCAD', str.casefold))
+    ['A', 'B', 'c', 'D']
+    >>> list(unique('ABBcCAD', str.casefold, reverse=True))
+    ['D', 'c', 'B', 'A']
+
+    The elements in *iterable* need not be hashable, but they must be
+    comparable for sorting to work.
+    """
+    return unique_justseen(sorted(iterable, key=key, reverse=reverse), key=key)
 
 
 def iter_except(func, exception, first=None):
