@@ -12,6 +12,7 @@ Version History
     * :func:`powerset_of_sets`, :func:`dft`, and :func:`idft` (thanks to rhettinger)
     * :func:`join_mappings` (thanks to NeilGirdhar and rhettinger)
     * :func:`doublestarmap` (thanks to Skeen, monk-time, DamianB-BitFlipper, and ergoithz)
+    * :func:`unique` (thanks to rhettinger)
 
 * Changes to existing functions
     * :func:`collapse`, :func:`chunked_even`, :func:`ichunked`, :func:`padded`, and :func:`windowed` were optimized and improved (thanks to james-wasson)
