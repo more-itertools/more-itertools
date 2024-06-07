@@ -124,7 +124,7 @@ Python iterables.
 |                        | `polynomial_eval <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.polynomial_eval>`_,                                                               |
 |                        | `sieve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sieve>`_,                                                                                   |
 |                        | `sum_of_squares <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sum_of_squares>`_,                                                                 |
-|                        | `totient <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.totient>`_,                                                                               |
+|                        | `totient <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.totient>`_                                                                                |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Combinatorics          | `distinct_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_permutations>`_,                                                   |
 |                        | `distinct_combinations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_combinations>`_,                                                   |
