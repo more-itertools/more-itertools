@@ -61,6 +61,11 @@ def unique_everseen(
 def unique_justseen(
     iterable: Iterable[_T], key: Callable[[_T], object] | None = ...
 ) -> Iterator[_T]: ...
+def unique(
+    iterable: Iterable[_T],
+    key: Callable[[_T], object] | None = ...,
+    reverse: bool = False,
+) -> Iterator[_T]: ...
 @overload
 def iter_except(
     func: Callable[[], _T],
