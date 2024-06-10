@@ -5,6 +5,27 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.3.0
+------
+
+* New functions
+    * :func:`powerset_of_sets`, :func:`dft`, and :func:`idft` (thanks to rhettinger)
+    * :func:`join_mappings` (thanks to NeilGirdhar and rhettinger)
+    * :func:`doublestarmap` (thanks to Skeen, monk-time, DamianB-BitFlipper, and ergoithz)
+    * :func:`unique` (thanks to rhettinger)
+
+* Changes to existing functions
+    * :func:`collapse`, :func:`chunked_even`, :func:`ichunked`, :func:`padded`, and :func:`windowed` were optimized and improved (thanks to james-wasson)
+    * :func:`totient` was optimized (thanks to rhettinger)
+    * :func:`roundrobin` was updated and improved (thanks to rhettinger)
+    * :func:`all_equal` now accepts a *key* parameter.
+    * The docs for :func:`value_chain` were improved (thanks to bjrtx)
+    * The type annotations for :class:`countable` were improved (thanks to aidanholm)
+
+* Other changes
+    * Unit tests were improved (thanks to haukex)
+    * Some documentation issues were fixed (thanks to bjrtx and DimitriPapadopoulos)
+
 10.2.0
 ------
 
