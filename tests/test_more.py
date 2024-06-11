@@ -4145,6 +4145,11 @@ class SampleTests(TestCase):
         expected = ['f', 'e']
         self.assertEqual(actual, expected)
 
+    def test_negative(self):
+        data = [1, 2, 3, 4, 5]
+        with self.assertRaises(ValueError):
+            mi.sample(data, k=-1)
+
     def test_length(self):
         """Check that *k* elements are sampled."""
         data = [1, 2, 3, 4, 5]

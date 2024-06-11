@@ -23,7 +23,7 @@ from itertools import (
 )
 from math import comb, e, exp, factorial, floor, fsum, log, perm, tau
 from queue import Empty, Queue
-from random import random, randrange, uniform
+from random import random, randrange, shuffle, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
 from sys import hexversion, maxsize
 from time import monotonic
@@ -3557,6 +3557,7 @@ def _sample_unweighted(iterable, k):
             W *= exp(log(random()) / k)
             next_index += floor(log(random()) / log(1 - W)) + 1
 
+    shuffle(reservoir)
     return reservoir
 
 
@@ -3592,19 +3593,21 @@ def _sample_weighted(iterable, k, weights):
             weights_to_skip -= weight
 
     # Equivalent to [element for weight_key, element in sorted(reservoir)]
+    shuffle(reservoir)
     return [heappop(reservoir)[1] for _ in range(k)]
 
 
 def sample(iterable, k, weights=None):
     """Return a *k*-length list of elements chosen (without replacement)
-    from the *iterable*. Like :func:`random.sample`, but works on iterables
-    of unknown length.
+    from the *iterable*. Similar to :func:`random.sample`, but works on
+    iterables of unknown length.
 
     >>> iterable = range(100)
     >>> sample(iterable, 5)  # doctest: +SKIP
     [81, 60, 96, 16, 4]
 
-    An iterable with *weights* may also be given:
+    An iterable with *weights* may also be given (this is not analagous to
+    :func:`random.sample`'s  ``counts`` parameter):
 
     >>> iterable = range(100)
     >>> weights = (i * i + 1 for i in range(100))
@@ -3619,7 +3622,12 @@ def sample(iterable, k, weights=None):
     >>> weights = range(1, len(data) + 1)
     >>> sample(data, k=len(data), weights=weights)  # doctest: +SKIP
     ['c', 'a', 'b', 'e', 'g', 'd', 'h', 'f']
+
+    If the length of *iterable* is less than *k*, all elements will be
+    returned.
     """
+    if k < 0:
+        raise ValueError('k must be non-negative')
     if k == 0:
         return []
 
