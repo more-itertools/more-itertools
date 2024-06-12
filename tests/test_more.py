@@ -4159,6 +4159,12 @@ class SampleTests(TestCase):
             expected = min(k, len(data))
             self.assertEqual(actual, expected)
 
+    def test_strict(self):
+        data = ['1', '2', '3', '4', '5']
+        self.assertEqual(set(mi.sample(data, 6, strict=False)), set(data))
+        with self.assertRaises(ValueError):
+            mi.sample(data, 6, strict=True)
+
     def test_sampling_entire_iterable(self):
         """If k=len(iterable), the sample contains the original elements."""
         data = ["a", 2, "a", 4, (1, 2, 3)]

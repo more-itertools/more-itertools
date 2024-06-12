@@ -542,6 +542,7 @@ def sample(
     iterable: Iterable[_T],
     k: int,
     weights: Iterable[float] | None = ...,
+    strict: bool = ...,
 ) -> list[_T]: ...
 def is_sorted(
     iterable: Iterable[_T],

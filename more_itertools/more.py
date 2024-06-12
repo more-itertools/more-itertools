@@ -3535,12 +3535,14 @@ def map_if(iterable, pred, func, func_else=lambda x: x):
         yield func(item) if pred(item) else func_else(item)
 
 
-def _sample_unweighted(iterable, k):
+def _sample_unweighted(it, k, strict):
     # Implementation of "Algorithm L" from the 1994 paper by Kim-Hung Li:
     # "Reservoir-Sampling Algorithms of Time Complexity O(n(1+log(N/n)))".
 
     # Fill up the reservoir (collection of samples) with the first `k` samples
-    reservoir = take(k, iterable)
+    reservoir = take(k, it)
+    if strict and len(reservoir) < k:
+        raise ValueError('Sample larger than population')
 
     # Generate random number that's the largest in a sample of k U(0,1) numbers
     # Largest order statistic: https://en.wikipedia.org/wiki/Order_statistic
@@ -3550,7 +3552,7 @@ def _sample_unweighted(iterable, k):
     # number with a geometric distribution. Sample it using random() and logs.
     next_index = k + floor(log(random()) / log(1 - W))
 
-    for index, element in enumerate(iterable, k):
+    for index, element in enumerate(it, k):
         if index == next_index:
             reservoir[randrange(k)] = element
             # The new W is the largest in a sample of k U(0, `old_W`) numbers
@@ -3561,7 +3563,7 @@ def _sample_unweighted(iterable, k):
     return reservoir
 
 
-def _sample_weighted(iterable, k, weights):
+def _sample_weighted(it, k, weights, strict):
     # Implementation of "A-ExpJ" from the 2006 paper by Efraimidis et al. :
     # "Weighted random sampling with a reservoir".
 
@@ -3570,7 +3572,10 @@ def _sample_weighted(iterable, k, weights):
 
     # Fill up the reservoir (collection of samples) with the first `k`
     # weight-keys and elements, then heapify the list.
-    reservoir = take(k, zip(weight_keys, iterable))
+    reservoir = take(k, zip(weight_keys, it))
+    if strict and len(reservoir) < k:
+        raise ValueError('Sample larger than population')
+
     heapify(reservoir)
 
     # The number of jumps before changing the reservoir is a random variable
@@ -3578,7 +3583,7 @@ def _sample_weighted(iterable, k, weights):
     smallest_weight_key, _ = reservoir[0]
     weights_to_skip = log(random()) / smallest_weight_key
 
-    for weight, element in zip(weights, iterable):
+    for weight, element in zip(weights, it):
         if weight >= weights_to_skip:
             # The notation here is consistent with the paper, but we store
             # the weight-keys in log-space for better numerical stability.
@@ -3597,7 +3602,7 @@ def _sample_weighted(iterable, k, weights):
     return [heappop(reservoir)[1] for _ in range(k)]
 
 
-def sample(iterable, k, weights=None):
+def sample(iterable, k, weights=None, strict=False):
     """Return a *k*-length list of elements chosen (without replacement)
     from the *iterable*. Similar to :func:`random.sample`, but works on
     iterables of unknown length.
@@ -3623,8 +3628,9 @@ def sample(iterable, k, weights=None):
     >>> sample(data, k=len(data), weights=weights)  # doctest: +SKIP
     ['c', 'a', 'b', 'e', 'g', 'd', 'h', 'f']
 
-    If the length of *iterable* is less than *k*, all elements will be
-    returned.
+    If the length of *iterable* is less than *k*:
+    * ``ValueError`` is raised if *strict* is ``True``
+    * All elements arereturned (in shuffled order) if *strict* is ``False``
     """
     if k < 0:
         raise ValueError('k must be non-negative')
@@ -3633,10 +3639,10 @@ def sample(iterable, k, weights=None):
 
     iterable = iter(iterable)
     if weights is None:
-        return _sample_unweighted(iterable, k)
+        return _sample_unweighted(iterable, k, strict)
     else:
         weights = iter(weights)
-        return _sample_weighted(iterable, k, weights)
+        return _sample_weighted(iterable, k, weights, strict)
 
 
 def is_sorted(iterable, key=None, reverse=False, strict=False):
