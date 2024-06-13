@@ -3535,12 +3535,12 @@ def map_if(iterable, pred, func, func_else=lambda x: x):
         yield func(item) if pred(item) else func_else(item)
 
 
-def _sample_unweighted(it, k, strict):
+def _sample_unweighted(iterator, k, strict):
     # Implementation of "Algorithm L" from the 1994 paper by Kim-Hung Li:
     # "Reservoir-Sampling Algorithms of Time Complexity O(n(1+log(N/n)))".
 
     # Fill up the reservoir (collection of samples) with the first `k` samples
-    reservoir = take(k, it)
+    reservoir = take(k, iterator)
     if strict and len(reservoir) < k:
         raise ValueError('Sample larger than population')
 
@@ -3552,7 +3552,7 @@ def _sample_unweighted(it, k, strict):
     # number with a geometric distribution. Sample it using random() and logs.
     next_index = k + floor(log(random()) / log(1 - W))
 
-    for index, element in enumerate(it, k):
+    for index, element in enumerate(iterator, k):
         if index == next_index:
             reservoir[randrange(k)] = element
             # The new W is the largest in a sample of k U(0, `old_W`) numbers
@@ -3563,7 +3563,7 @@ def _sample_unweighted(it, k, strict):
     return reservoir
 
 
-def _sample_weighted(it, k, weights, strict):
+def _sample_weighted(iterator, k, weights, strict):
     # Implementation of "A-ExpJ" from the 2006 paper by Efraimidis et al. :
     # "Weighted random sampling with a reservoir".
 
@@ -3572,7 +3572,7 @@ def _sample_weighted(it, k, weights, strict):
 
     # Fill up the reservoir (collection of samples) with the first `k`
     # weight-keys and elements, then heapify the list.
-    reservoir = take(k, zip(weight_keys, it))
+    reservoir = take(k, zip(weight_keys, iterator))
     if strict and len(reservoir) < k:
         raise ValueError('Sample larger than population')
 
@@ -3583,7 +3583,7 @@ def _sample_weighted(it, k, weights, strict):
     smallest_weight_key, _ = reservoir[0]
     weights_to_skip = log(random()) / smallest_weight_key
 
-    for weight, element in zip(weights, it):
+    for weight, element in zip(weights, iterator):
         if weight >= weights_to_skip:
             # The notation here is consistent with the paper, but we store
             # the weight-keys in log-space for better numerical stability.
@@ -3637,12 +3637,12 @@ def sample(iterable, k, weights=None, strict=False):
     if k == 0:
         return []
 
-    iterable = iter(iterable)
+    iterator = iter(iterable)
     if weights is None:
-        return _sample_unweighted(iterable, k, strict)
+        return _sample_unweighted(iterator, k, strict)
     else:
         weights = iter(weights)
-        return _sample_weighted(iterable, k, weights, strict)
+        return _sample_weighted(iterator, k, weights, strict)
 
 
 def is_sorted(iterable, key=None, reverse=False, strict=False):
