@@ -3611,26 +3611,26 @@ def sample(iterable, k, weights=None, strict=False):
     >>> sample(iterable, 5)  # doctest: +SKIP
     [81, 60, 96, 16, 4]
 
-    An iterable with *weights* may also be given (this is not analagous to
-    :func:`random.sample`'s  ``counts`` parameter):
+    An iterable with *weights* may also be given:
 
     >>> iterable = range(100)
     >>> weights = (i * i + 1 for i in range(100))
     >>> sampled = sample(iterable, 5, weights=weights)  # doctest: +SKIP
     [79, 67, 74, 66, 78]
 
-    The algorithm can also be used to generate weighted random permutations.
-    The relative weight of each item determines the probability that it
-    appears late in the permutation.
+    Weighted selections are made without replacement.
+    After an element is selected, it is removed from the pool and the
+    relative weights of the other elements increase (this
+    does not match the behavior of :func:`random.sample`'s *counts*
+    parameter).
 
-    >>> data = "abcdefgh"
-    >>> weights = range(1, len(data) + 1)
-    >>> sample(data, k=len(data), weights=weights)  # doctest: +SKIP
-    ['c', 'a', 'b', 'e', 'g', 'd', 'h', 'f']
+    If the length of *iterable* is less than *k*,
+    ``ValueError`` is raised if *strict* is ``True`` and
+    all elements are returned (in shuffled order) if *strict* is ``False``.
 
-    If the length of *iterable* is less than *k*:
-    * ``ValueError`` is raised if *strict* is ``True``
-    * All elements arereturned (in shuffled order) if *strict* is ``False``
+    By default, the `Algorithm L <https://w.wiki/ANrM>`__ reservoir sampling
+    technique is used. When *weights* are provided,
+    `Algorithm A-ExpJ <https://w.wiki/ANrS>`__ is used.
     """
     if k < 0:
         raise ValueError('k must be non-negative')
