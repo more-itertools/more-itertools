@@ -3597,9 +3597,10 @@ def _sample_weighted(iterator, k, weights, strict):
         else:
             weights_to_skip -= weight
 
-    # Equivalent to [element for weight_key, element in sorted(reservoir)]
-    shuffle(reservoir)
-    return [heappop(reservoir)[1] for _ in range(k)]
+    # Equivalent to [element for weight_key, element i n sorted(reservoir)]
+    ret = [heappop(reservoir)[1] for _ in range(k)]
+    shuffle(ret)
+    return ret
 
 
 def sample(iterable, k, weights=None, strict=False):
