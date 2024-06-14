@@ -538,10 +538,15 @@ def map_if(
     func: Callable[[Any], Any],
     func_else: Callable[[Any], Any] | None = ...,
 ) -> Iterator[Any]: ...
+def _sample_unweighted(iterator: Iterator[_T], k: int, strict) -> list[_T]: ...
+def _sample_weighted(
+    iterator: Iterator[_T], k: int, weights, strict
+) -> list[_T]: ...
 def sample(
     iterable: Iterable[_T],
     k: int,
     weights: Iterable[float] | None = ...,
+    strict: bool = False,
 ) -> list[_T]: ...
 def is_sorted(
     iterable: Iterable[_T],

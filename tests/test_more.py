@@ -4145,6 +4145,11 @@ class SampleTests(TestCase):
         expected = ['f', 'e']
         self.assertEqual(actual, expected)
 
+    def test_negative(self):
+        data = [1, 2, 3, 4, 5]
+        with self.assertRaises(ValueError):
+            mi.sample(data, k=-1)
+
     def test_length(self):
         """Check that *k* elements are sampled."""
         data = [1, 2, 3, 4, 5]
@@ -4153,6 +4158,12 @@ class SampleTests(TestCase):
             actual = len(sampled)
             expected = min(k, len(data))
             self.assertEqual(actual, expected)
+
+    def test_strict(self):
+        data = ['1', '2', '3', '4', '5']
+        self.assertEqual(set(mi.sample(data, 6, strict=False)), set(data))
+        with self.assertRaises(ValueError):
+            mi.sample(data, 6, strict=True)
 
     def test_sampling_entire_iterable(self):
         """If k=len(iterable), the sample contains the original elements."""
