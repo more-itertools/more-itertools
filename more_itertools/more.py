@@ -4,7 +4,7 @@ import warnings
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
 from functools import cached_property, partial, reduce, wraps
-from heapq import heapify, heapreplace, heappop
+from heapq import heapify, heapreplace
 from itertools import (
     chain,
     combinations,
