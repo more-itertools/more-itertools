@@ -3597,8 +3597,7 @@ def _sample_weighted(iterator, k, weights, strict):
         else:
             weights_to_skip -= weight
 
-    # Equivalent to [element for weight_key, element i n sorted(reservoir)]
-    ret = [heappop(reservoir)[1] for _ in range(k)]
+    ret = [element for weight_key, element in reservoir]
     shuffle(ret)
     return ret
 
