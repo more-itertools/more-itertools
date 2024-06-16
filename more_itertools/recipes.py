@@ -1038,9 +1038,6 @@ def totient(n):
     >>> totient(12)
     4
     """
-    # The itertools docs use unique_justseen instead of set; see
-    # https://github.com/more-itertools/more-itertools/issues/823
-    for p in set(factor(n)):
-        n = n // p * (p - 1)
-
+    for prime in set(factor(n)):
+        n -= n // prime
     return n
