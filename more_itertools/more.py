@@ -2903,7 +2903,7 @@ class run_length:
 
     @staticmethod
     def decode(iterable):
-        return chain.from_iterable(repeat(k, n) for k, n in iterable)
+        return chain.from_iterable(starmap(repeat, iterable))
 
 
 def exactly_n(iterable, n, predicate=bool):
