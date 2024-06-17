@@ -683,6 +683,13 @@ def distinct_permutations(iterable, r=None):
         >>> sorted(distinct_permutations(range(3), r=2))
         [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
 
+    The elements in *iterable* need not be sortable.  If a) sorting is
+    not possible, and b) multiple distinct elements compare equal, forming
+    equivalent group (e.g. [1,True] in [1, True, "love"]), then the
+    particular element in the permutations, representing its equivalent
+    class, is drawn evenly from its class, in the order of appearance
+    in *iterable* (cycled thereafter).
+
     """
 
     # Algorithm: https://w.wiki/Qai
@@ -749,14 +756,44 @@ def distinct_permutations(iterable, r=None):
             i += 1
             head[i:], tail[:] = tail[: r - i], tail[r - i :]
 
-    items = sorted(iterable)
+    items = list(iterable)
+
+    try:
+        items.sort()
+        sortable = True
+    except TypeError:
+        sortable = False
+
+        indices_dict = defaultdict(list)
+
+        for item in items:
+            indices_dict[items.index(item)].append(item)
+
+        indices = [items.index(item) for item in items]
+        indices.sort()
+
+        equivalent_items = {k: cycle(v) for k, v in indices_dict.items()}
+
+        def permuted_items(permuted_indices):
+            return tuple(
+                next(equivalent_items[index]) for index in permuted_indices
+            )
 
     size = len(items)
     if r is None:
         r = size
 
+    # functools.partial(_partial, ... )
+    algorithm = _full if (r == size) else partial(_partial, r=r)
+
     if 0 < r <= size:
-        return _full(items) if (r == size) else _partial(items, r)
+        if sortable:
+            return algorithm(items)
+        else:
+            return (
+                permuted_items(permuted_indices)
+                for permuted_indices in algorithm(indices)
+            )
 
     return iter(() if r else ((),))
 
