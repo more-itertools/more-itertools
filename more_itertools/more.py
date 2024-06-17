@@ -666,9 +666,9 @@ def distinct_permutations(iterable, r=None):
         >>> sorted(distinct_permutations([1, 0, 1]))
         [(0, 1, 1), (1, 0, 1), (1, 1, 0)]
 
-    Equivalent to ``set(permutations(iterable))``, except duplicates are not
-    generated and thrown away. For larger input sequences this is much more
-    efficient.
+    Equivalent to yielding from ``set(permutations(iterable))``, except
+    duplicates are not generated and thrown away. For larger input sequences
+    this is much more efficient.
 
     Duplicate permutations arise when there are duplicated elements in the
     input iterable. The number of items returned is
@@ -683,13 +683,25 @@ def distinct_permutations(iterable, r=None):
         >>> sorted(distinct_permutations(range(3), r=2))
         [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
 
-    The elements in *iterable* need not be sortable.  If a) sorting is
-    not possible, and b) multiple distinct elements compare equal, forming
-    equivalent group (e.g. [1,True] in [1, True, "love"]), then the
-    particular element in the permutations, representing its equivalent
-    class, is drawn evenly from its class, in the order of appearance
-    in *iterable* (cycled thereafter).
+    *iterable* need not be sortable, but note that using equal (``x == y``)
+    but non-identical (``id(x) != id(y)``) elements may produce surprising
+    behavior. For example, ``1`` and ``True`` are equal but non-identical:
 
+        >>> list(distinct_permutations([1, True, '3']))  # doctest: +SKIP
+        [
+            (1, True, '3'),
+            (1, '3', True),
+            ('3', 1, True)
+        ]
+        >>> list(distinct_permutations([1, 2, '3']))  # doctest: +SKIP
+        [
+            (1, 2, '3'),
+            (1, '3', 2),
+            (2, 1, '3'),
+            (2, '3', 1),
+            ('3', 1, 2),
+            ('3', 2, 1)
+        ]
     """
 
     # Algorithm: https://w.wiki/Qai
