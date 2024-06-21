@@ -431,6 +431,9 @@ class peekable:
 
         return self._cache[index]
 
+    def __class_getitem__(cls, key):
+        return cls
+
 
 def consumer(func):
     """Decorator that automatically advances a PEP-342-style "reverse iterator"
