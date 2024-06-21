@@ -27,6 +27,7 @@ from random import random, randrange, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
 from sys import hexversion, maxsize
 from time import monotonic
+from typing import Generic, TypeVar
 
 from .recipes import (
     _marker,
@@ -155,6 +156,10 @@ __all__ = [
     'zip_offset',
 ]
 
+
+_T = TypeVar('_T')
+
+
 # math.sumprod is available for Python 3.12+
 _fsumprod = getattr(math, 'sumprod', lambda x, y: fsum(map(mul, x, y)))
 
@@ -267,7 +272,7 @@ def nth_or_last(iterable, n, default=_marker):
     return last(islice(iterable, n + 1), default=default)
 
 
-class peekable:
+class peekable(Generic[_T]):
     """Wrap an iterator to allow lookahead and prepending elements.
 
     Call :meth:`peek` on the result to get the value that will be returned
