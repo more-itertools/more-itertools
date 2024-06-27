@@ -2810,8 +2810,8 @@ class seekable:
         >>> next(it)
         '0'
 
-    Call :meth:`relative_seek` to seek relative to the source iterator's current
-    position.
+    Call :meth:`relative_seek` to seek relative to the source iterator's
+    current position.
 
         >>> it = seekable((str(n) for n in range(20)))
         >>> next(it), next(it), next(it)
