@@ -2796,8 +2796,6 @@ class seekable:
         >>> it.seek(0)
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
-        >>> next(it)
-        '3'
 
     You can also seek forward:
 
@@ -2805,15 +2803,29 @@ class seekable:
         >>> it.seek(10)
         >>> next(it)
         '10'
-        >>> it.relative_seek(-2)  # Seeking relative to the current position
-        >>> next(it)
-        '9'
         >>> it.seek(20)  # Seeking past the end of the source isn't a problem
         >>> list(it)
         []
         >>> it.seek(0)  # Resetting works even after hitting the end
+        >>> next(it)
+        '0'
+
+    Call :meth:`relative_seek` to seek relative to the source iterator's
+    current position.
+
+        >>> it = seekable((str(n) for n in range(20)))
         >>> next(it), next(it), next(it)
         ('0', '1', '2')
+        >>> it.relative_seek(2)
+        >>> next(it)
+        '5'
+        >>> it.relative_seek(-3)  # Source is at '6', we move back to '3'
+        >>> next(it)
+        '3'
+        >>> it.relative_seek(-3)  # Source is still at '6', we move back to '3'
+        >>> next(it)
+        '3'
+
 
     Call :meth:`peek` to look ahead one item without advancing the iterator:
 
