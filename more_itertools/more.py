@@ -3,6 +3,7 @@ import warnings
 
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
+from contextlib import suppress
 from functools import cached_property, partial, reduce, wraps
 from heapq import heapify, heapreplace
 from itertools import (
@@ -3597,28 +3598,20 @@ def map_if(iterable, pred, func, func_else=lambda x: x):
 
 
 def _sample_unweighted(iterator, k, strict):
-    # Implementation of "Algorithm L" from the 1994 paper by Kim-Hung Li:
+    # Algorithm L in the 1994 paper by Kim-Hung Li:
     # "Reservoir-Sampling Algorithms of Time Complexity O(n(1+log(N/n)))".
 
-    # Fill up the reservoir (collection of samples) with the first `k` samples
-    reservoir = take(k, iterator)
+    reservoir = list(islice(iterator, k))
     if strict and len(reservoir) < k:
         raise ValueError('Sample larger than population')
+    W = 1.0
 
-    # Generate random number that's the largest in a sample of k U(0,1) numbers
-    # Largest order statistic: https://en.wikipedia.org/wiki/Order_statistic
-    W = exp(log(random()) / k)
-
-    # The number of elements to skip before changing the reservoir is a random
-    # number with a geometric distribution. Sample it using random() and logs.
-    next_index = k + floor(log(random()) / log(1 - W))
-
-    for index, element in enumerate(iterator, k):
-        if index == next_index:
-            reservoir[randrange(k)] = element
-            # The new W is the largest in a sample of k U(0, `old_W`) numbers
+    with suppress(StopIteration):
+        while True:
             W *= exp(log(random()) / k)
-            next_index += floor(log(random()) / log(1 - W)) + 1
+            skip = floor(log(random()) / log(1.0 - W))
+            element = next(islice(iterator, skip, None))
+            reservoir[randrange(k)] = element
 
     shuffle(reservoir)
     return reservoir
