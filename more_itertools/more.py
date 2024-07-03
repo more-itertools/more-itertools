@@ -22,7 +22,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, fsum, log, perm, tau
+from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import itemgetter, mul, sub, gt, lt, ge, le
@@ -3609,7 +3609,7 @@ def _sample_unweighted(iterator, k, strict):
     with suppress(StopIteration):
         while True:
             W *= exp(log(random()) / k)
-            skip = floor(log(random()) / log(1.0 - W))
+            skip = floor(log(random()) / log1p(-W))
             element = next(islice(iterator, skip, None))
             reservoir[randrange(k)] = element
 
