@@ -2935,8 +2935,10 @@ class seekable:
             consume(self, remainder)
 
     def relative_seek(self, count):
-        index = len(self._cache)
-        self.seek(max(index + count, 0))
+        if self._index is None:
+            self._index = len(self._cache)
+
+        self.seek(max(self._index + count, 0))
 
 
 class run_length:
