@@ -3349,7 +3349,9 @@ class SeekableTest(PeekableMixinTests, TestCase):
         s.relative_seek(-2)
         self.assertEqual(next(s), '1')
         s.relative_seek(-2)
-        self.assertEqual(next(s), '0')    # Seek relative to current position within the cache
+        self.assertEqual(
+            next(s), '0'
+        )  # Seek relative to current position within the cache
         s.relative_seek(-10)  # Lower bound
         self.assertEqual(next(s), '0')
         s.relative_seek(10)  # Lower bound
