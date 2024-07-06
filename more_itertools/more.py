@@ -3277,6 +3277,19 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     ['b', 'ac']
     ['a', 'b', 'c']
 
+    if *min_size* and/or *max_size* are given, the minimum/maximum size per block in partition is set.
+
+    >>> iterable = 'abc
+    >>> for part in set_partitions(iterable, min_size=2):
+    ...     print([''.join(p) for p in part])
+    ['abc']
+    >>> for part in set_partitions(iterable, max_size=2):
+    ...     print([''.join(p) for p in part])
+    ['a', 'bc']
+    ['ab', 'c']
+    ['b', 'ac']
+    ['a', 'b', 'c']
+
     """
     L = list(iterable)
     n = len(L)
