@@ -3277,9 +3277,10 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     ['b', 'ac']
     ['a', 'b', 'c']
 
-    if *min_size* and/or *max_size* are given, the minimum/maximum size per block in partition is set.
+    if *min_size* and/or *max_size* are given, the minimum and/or maximum size
+    per block in partition is set.
 
-    >>> iterable = 'abc
+    >>> iterable = 'abc'
     >>> for part in set_partitions(iterable, min_size=2):
     ...     print([''.join(p) for p in part])
     ['abc']
@@ -3305,7 +3306,7 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     max_size = max_size if max_size is not None else n
     if min_size > max_size:
         return
-    
+
     def set_partitions_helper(L, k):
         n = len(L)
         if k == 1:
@@ -3322,9 +3323,15 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
 
     if k is None:
         for k in range(1, n + 1):
-            yield from filter(lambda z: all(min_size <= len(bk) <= max_size for bk in z), set_partitions_helper(L, k))
+            yield from filter(
+                lambda z: all(min_size <= len(bk) <= max_size for bk in z),
+                set_partitions_helper(L, k),
+            )
     else:
-        yield from filter(lambda z: all(min_size <= len(bk) <= max_size for bk in z), set_partitions_helper(L, k))
+        yield from filter(
+            lambda z: all(min_size <= len(bk) <= max_size for bk in z),
+            set_partitions_helper(L, k),
+        )
 
 
 class time_limited:
