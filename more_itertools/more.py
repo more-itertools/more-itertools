@@ -3253,7 +3253,7 @@ def partitions(iterable):
         yield [sequence[i:j] for i, j in zip((0,) + i, i + (n,))]
 
 
-def set_partitions(iterable, k=None):
+def set_partitions(iterable, k=None, min_size=None, max_size=None):
     """
     Yield the set partitions of *iterable* into *k* parts. Set partitions are
     not order-preserving.
@@ -3288,6 +3288,11 @@ def set_partitions(iterable, k=None):
         elif k > n:
             return
 
+    min_size = min_size if min_size is not None else 0
+    max_size = max_size if max_size is not None else n
+    if min_size > max_size:
+        return
+    
     def set_partitions_helper(L, k):
         n = len(L)
         if k == 1:
@@ -3304,9 +3309,9 @@ def set_partitions(iterable, k=None):
 
     if k is None:
         for k in range(1, n + 1):
-            yield from set_partitions_helper(L, k)
+            yield from filter(lambda z: all(min_size <= len(bk) <= max_size for bk in z), set_partitions_helper(L, k))
     else:
-        yield from set_partitions_helper(L, k)
+        yield from filter(lambda z: all(min_size <= len(bk) <= max_size for bk in z), set_partitions_helper(L, k))
 
 
 class time_limited:
