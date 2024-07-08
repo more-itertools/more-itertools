@@ -4170,6 +4170,26 @@ class SampleTests(TestCase):
         with self.assertRaises(ValueError):
             mi.sample(data, 6, strict=True)
 
+    def test_counts(self):
+        # Test with counts
+        seed(0)
+        iterable = ['red', 'blue']
+        counts = [4, 2]
+        k = 5
+        actual = list(mi.sample(iterable, counts=counts, k=k))
+
+        # Test without counts
+        seed(0)
+        decoded_iterable = (['red'] * 4) + (['blue'] * 2)
+        expected = list(mi.sample(decoded_iterable, k=k))
+
+        self.assertEqual(actual, expected)
+
+    def test_counts_all(self):
+        actual = Counter(mi.sample('uwxyz', 35, counts=(1, 0, 4, 10, 20)))
+        expected = Counter({'u': 1, 'x': 4, 'y': 10, 'z': 20})
+        self.assertEqual(actual, expected)
+
     def test_sampling_entire_iterable(self):
         """If k=len(iterable), the sample contains the original elements."""
         data = ["a", 2, "a", 4, (1, 2, 3)]
