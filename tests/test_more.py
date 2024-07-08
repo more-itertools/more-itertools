@@ -3526,6 +3526,10 @@ class CircularShiftsTests(TestCase):
         ]
         self.assertEqual(actual, expected)
 
+    def test_steps_zero(self):
+        with self.assertRaises(ValueError):
+            list(mi.circular_shifts(range(5), steps=0))
+
 
 class MakeDecoratorTests(TestCase):
     def test_basic(self):
