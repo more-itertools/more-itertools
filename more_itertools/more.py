@@ -2823,7 +2823,7 @@ class seekable:
         >>> it.relative_seek(-3)  # Source is at '6', we move back to '3'
         >>> next(it)
         '3'
-        >>> it.relative_seek(-3)  # Source is at '3', we move back to '1'
+        >>> it.relative_seek(-3)  # Source is at '4', we move back to '1'
         >>> next(it)
         '1'
 
