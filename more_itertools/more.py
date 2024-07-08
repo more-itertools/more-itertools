@@ -2823,9 +2823,9 @@ class seekable:
         >>> it.relative_seek(-3)  # Source is at '6', we move back to '3'
         >>> next(it)
         '3'
-        >>> it.relative_seek(-3)  # Source is still at '6', we move back to '3'
+        >>> it.relative_seek(-3)  # Source is at '4', we move back to '1'
         >>> next(it)
-        '3'
+        '1'
 
 
     Call :meth:`peek` to look ahead one item without advancing the iterator:
@@ -2935,8 +2935,10 @@ class seekable:
             consume(self, remainder)
 
     def relative_seek(self, count):
-        index = len(self._cache)
-        self.seek(max(index + count, 0))
+        if self._index is None:
+            self._index = len(self._cache)
+
+        self.seek(max(self._index + count, 0))
 
 
 class run_length:
