@@ -3720,12 +3720,16 @@ def is_sorted(iterable, key=None, reverse=False, strict=False):
     False
 
     The function returns ``False`` after encountering the first out-of-order
-    item. If there are no out-of-order items, the iterable is exhausted.
+    item, which means it may produce results that differ from the built-in
+    :func:`sorted` function for objects with unusual comparison dynamics.
+    If there are no out-of-order items, the iterable is exhausted.
     """
+    compare = le if strict else lt
+    it = iterable if (key is None) else map(key, iterable)
+    it_1, it_2 = tee(it)
+    next(it_2 if reverse else it_1, None)
 
-    compare = (le if reverse else ge) if strict else (lt if reverse else gt)
-    it = iterable if key is None else map(key, iterable)
-    return not any(starmap(compare, pairwise(it)))
+    return not any(map(compare, it_1, it_2))
 
 
 class AbortThread(BaseException):
