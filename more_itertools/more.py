@@ -3262,8 +3262,8 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     >>> for part in set_partitions(iterable, 2):
     ...     print([''.join(p) for p in part])
     ['a', 'bc']
+    ['ac', 'b']
     ['ab', 'c']
-    ['b', 'ac']
 
 
     If *k* is not given, every set partition is generated.
@@ -3273,8 +3273,8 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     ...     print([''.join(p) for p in part])
     ['abc']
     ['a', 'bc']
+    ['ac', 'b']
     ['ab', 'c']
-    ['b', 'ac']
     ['a', 'b', 'c']
 
     if *min_size* and/or *max_size* are given, the minimum and/or maximum size
@@ -3287,11 +3287,12 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     >>> for part in set_partitions(iterable, max_size=2):
     ...     print([''.join(p) for p in part])
     ['a', 'bc']
+    ['ac', 'b']
     ['ab', 'c']
-    ['b', 'ac']
     ['a', 'b', 'c']
 
     """
+
     L = list(iterable)
     n = len(L)
     if k is not None:
@@ -3302,36 +3303,34 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
         elif k > n:
             return
 
-    min_size = min_size if min_size is not None else 0
+    min_size = min_size if min_size is not None else 1
     max_size = max_size if max_size is not None else n
     if min_size > max_size:
         return
 
-    def set_partitions_helper(L, k):
-        n = len(L)
-        if k == 1:
-            yield [L]
-        elif n == k:
-            yield [[s] for s in L]
-        else:
-            e, *M = L
-            for p in set_partitions_helper(M, k - 1):
-                yield [[e], *p]
-            for p in set_partitions_helper(M, k):
-                for i in range(len(p)):
-                    yield p[:i] + [[e] + p[i]] + p[i + 1 :]
+    def set_partitions_helper(L, path):
+        stack = [(L, path)]
+
+        while stack:
+            L, path = stack.pop()
+
+            if not L:
+                if all(min_size <= len(bk) <= max_size for bk in path):
+                    yield path
+            else:
+                e, *M = L
+                for i in range(len(path)):
+                    new_path = [bk[:] for bk in path]
+                    new_path[i].append(e)
+                    stack.append((M, new_path))
+                    if not path[i]:
+                        break
 
     if k is None:
         for k in range(1, n + 1):
-            yield from filter(
-                lambda z: all(min_size <= len(bk) <= max_size for bk in z),
-                set_partitions_helper(L, k),
-            )
+            yield from set_partitions_helper(L, [[] for _ in range(k)])
     else:
-        yield from filter(
-            lambda z: all(min_size <= len(bk) <= max_size for bk in z),
-            set_partitions_helper(L, k),
-        )
+        yield from set_partitions_helper(L, [[] for _ in range(k)])
 
 
 class time_limited:
