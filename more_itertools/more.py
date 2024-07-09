@@ -25,7 +25,7 @@ from itertools import (
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
-from operator import itemgetter, mul, sub, gt, lt, ge, le
+from operator import itemgetter, mul, sub, gt, lt, le
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -35,7 +35,6 @@ from .recipes import (
     UnequalIterablesError,
     consume,
     flatten,
-    pairwise,
     powerset,
     take,
     unique_everseen,
