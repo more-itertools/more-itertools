@@ -4243,6 +4243,7 @@ class IsSortedTests(TestCase):
             ([1, 2, 3], {}, True),
             ([1, 1, 2, 3], {}, True),
             ([1, 10, 2, 3], {}, False),
+            ([3, float('nan'), 1, 2], {}, True),
             (['1', '10', '2', '3'], {}, True),
             (['1', '10', '2', '3'], {'key': int}, False),
             ([1, 2, 3], {'reverse': True}, False),
