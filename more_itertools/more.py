@@ -3657,7 +3657,40 @@ def _sample_weighted(iterator, k, weights, strict):
     return ret
 
 
-def sample(iterable, k, weights=None, strict=False):
+def _sample_counted(population, k, counts, strict):
+    element = None
+    remaining = 0
+
+    def feed(i):
+        # Advance *i* steps ahead and consume an element
+        nonlocal element, remaining
+
+        while i + 1 > remaining:
+            i = i - remaining
+            element = next(population)
+            remaining = next(counts)
+        remaining -= i + 1
+        return element
+
+    with suppress(StopIteration):
+        reservoir = []
+        for _ in range(k):
+            reservoir.append(feed(0))
+        if strict and len(reservoir) < k:
+            raise ValueError('Sample larger than population')
+
+        W = 1.0
+        while True:
+            W *= exp(log(random()) / k)
+            skip = floor(log(random()) / log1p(-W))
+            element = feed(skip)
+            reservoir[randrange(k)] = element
+
+    shuffle(reservoir)
+    return reservoir
+
+
+def sample(iterable, k, weights=None, *, counts=None, strict=False):
     """Return a *k*-length list of elements chosen (without replacement)
     from the *iterable*. Similar to :func:`random.sample`, but works on
     iterables of unknown length.
@@ -3666,7 +3699,15 @@ def sample(iterable, k, weights=None, strict=False):
     >>> sample(iterable, 5)  # doctest: +SKIP
     [81, 60, 96, 16, 4]
 
-    An iterable with *weights* may also be given:
+    For iterables with repeated elements, you may supply *counts* to
+    indicate the repeats.
+
+    >>> iterable = ['a', 'b']
+    >>> counts = [3, 4]  # Equivalent to 'a', 'a', 'a', 'b', 'b', 'b', 'b'
+    >>> sample(iterable, k=3, counts=counts)  # doctest: +SKIP
+    ['a', 'a', 'b']
+
+    An iterable with *weights* may be given:
 
     >>> iterable = range(100)
     >>> weights = (i * i + 1 for i in range(100))
@@ -3677,7 +3718,7 @@ def sample(iterable, k, weights=None, strict=False):
     After an element is selected, it is removed from the pool and the
     relative weights of the other elements increase (this
     does not match the behavior of :func:`random.sample`'s *counts*
-    parameter).
+    parameter). Note that *weights* may not be used with *counts*.
 
     If the length of *iterable* is less than *k*,
     ``ValueError`` is raised if *strict* is ``True`` and
@@ -3687,17 +3728,27 @@ def sample(iterable, k, weights=None, strict=False):
     technique is used. When *weights* are provided,
     `Algorithm A-ExpJ <https://w.wiki/ANrS>`__ is used.
     """
+    iterator = iter(iterable)
+
     if k < 0:
         raise ValueError('k must be non-negative')
+
     if k == 0:
         return []
 
-    iterator = iter(iterable)
-    if weights is None:
-        return _sample_unweighted(iterator, k, strict)
-    else:
+    if weights is not None and counts is not None:
+        raise TypeError('weights and counts are mutally exclusive')
+
+    elif weights is not None:
         weights = iter(weights)
         return _sample_weighted(iterator, k, weights, strict)
+
+    elif counts is not None:
+        counts = iter(counts)
+        return _sample_counted(iterator, k, counts, strict)
+
+    else:
+        return _sample_unweighted(iterator, k, strict)
 
 
 def is_sorted(iterable, key=None, reverse=False, strict=False):
