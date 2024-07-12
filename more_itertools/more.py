@@ -2987,14 +2987,33 @@ def exactly_n(iterable, n, predicate=bool):
     return len(take(n + 1, filter(predicate, iterable))) == n
 
 
-def circular_shifts(iterable):
-    """Return a list of circular shifts of *iterable*.
+def circular_shifts(iterable, steps=1):
+    """Yield the circular shifts of *iterable*.
 
-    >>> circular_shifts(range(4))
+    >>> list(circular_shifts(range(4)))
     [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
+
+    Set *steps* to the number of places to rotate to the left
+    (or to the right if negative).  Defaults to 1.
+
+    >>> list(circular_shifts(range(4), 2))
+    [(0, 1, 2, 3), (2, 3, 0, 1)]
+
+    >>> list(circular_shifts(range(4), -1))
+    [(0, 1, 2, 3), (3, 0, 1, 2), (2, 3, 0, 1), (1, 2, 3, 0)]
+
     """
-    lst = list(iterable)
-    return take(len(lst), windowed(cycle(lst), len(lst)))
+    buffer = deque(iterable)
+    if steps == 0:
+        raise ValueError('Steps should be a non-zero integer')
+
+    buffer.rotate(steps)
+    steps = -steps
+    n = len(buffer)
+    n //= math.gcd(n, steps)
+
+    for __ in repeat(None, n):
+        yield buffer.rotate(steps) or tuple(buffer)
 
 
 def make_decorator(wrapping_func, result_index=0):

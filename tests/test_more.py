@@ -3493,16 +3493,42 @@ class CircularShiftsTests(TestCase):
     def test_simple_circular_shifts(self):
         # test the a simple iterator case
         self.assertEqual(
-            mi.circular_shifts(range(4)),
+            list(mi.circular_shifts(range(4))),
             [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)],
         )
 
     def test_duplicates(self):
         # test non-distinct entries
         self.assertEqual(
-            mi.circular_shifts([0, 1, 0, 1]),
+            list(mi.circular_shifts([0, 1, 0, 1])),
             [(0, 1, 0, 1), (1, 0, 1, 0), (0, 1, 0, 1), (1, 0, 1, 0)],
         )
+
+    def test_steps_positive(self):
+        actual = list(mi.circular_shifts(range(5), steps=2))
+        expected = [
+            (0, 1, 2, 3, 4),
+            (2, 3, 4, 0, 1),
+            (4, 0, 1, 2, 3),
+            (1, 2, 3, 4, 0),
+            (3, 4, 0, 1, 2),
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_steps_negative(self):
+        actual = list(mi.circular_shifts(range(5), steps=-2))
+        expected = [
+            (0, 1, 2, 3, 4),
+            (3, 4, 0, 1, 2),
+            (1, 2, 3, 4, 0),
+            (4, 0, 1, 2, 3),
+            (2, 3, 4, 0, 1),
+        ]
+        self.assertEqual(actual, expected)
+
+    def test_steps_zero(self):
+        with self.assertRaises(ValueError):
+            list(mi.circular_shifts(range(5), steps=0))
 
 
 class MakeDecoratorTests(TestCase):
