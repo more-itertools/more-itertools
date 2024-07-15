@@ -799,6 +799,23 @@ def triplewise(iterable):
         yield a, b, c
 
 
+def _sliding_window_islice(iterable, n):
+    # Fast path for small, non-zero values of n.
+    iterators = tee(iterable, n)
+    for i, iterator in enumerate(iterators):
+        next(islice(iterator, i, i), None)
+    return zip(*iterators)
+
+
+def _sliding_window_deque(iterable, n):
+    # Normal path for other values of n.
+    it = iter(iterable)
+    window = deque(islice(it, n - 1), maxlen=n)
+    for x in it:
+        window.append(x)
+        yield tuple(window)
+
+
 def sliding_window(iterable, n):
     """Return a sliding window of width *n* over *iterable*.
 
@@ -812,11 +829,10 @@ def sliding_window(iterable, n):
 
     For a variant with more features, see :func:`windowed`.
     """
-    it = iter(iterable)
-    window = deque(islice(it, n - 1), maxlen=n)
-    for x in it:
-        window.append(x)
-        yield tuple(window)
+    if 0 < n <= 20:
+        return _sliding_window_islice(iterable, n)
+
+    return _sliding_window_deque(iterable, n)
 
 
 def subslices(iterable):
