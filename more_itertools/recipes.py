@@ -829,10 +829,16 @@ def sliding_window(iterable, n):
 
     For a variant with more features, see :func:`windowed`.
     """
-    if 0 < n <= 20:
+    if n > 20:
+        return _sliding_window_deque(iterable, n)
+    elif n > 2:
         return _sliding_window_islice(iterable, n)
-
-    return _sliding_window_deque(iterable, n)
+    elif n == 2:
+        return pairwise(iterable)
+    elif n == 1:
+        return zip(iterable)
+    else:
+        raise ValueError(f'n should be at least one, not {n}')
 
 
 def subslices(iterable):
