@@ -3013,7 +3013,8 @@ def circular_shifts(iterable, steps=1):
     n //= math.gcd(n, steps)
 
     for __ in repeat(None, n):
-        yield buffer.rotate(steps) or tuple(buffer)
+        buffer.rotate(steps)
+        yield tuple(buffer)
 
 
 def make_decorator(wrapping_func, result_index=0):
