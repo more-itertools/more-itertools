@@ -10,29 +10,29 @@ from typing import (
     ContextManager,
     Generic,
     Hashable,
+    Mapping,
     Iterable,
     Iterator,
     Mapping,
+    overload,
     Reversible,
     Sequence,
     Sized,
     Type,
     TypeVar,
-    overload,
     type_check_only,
 )
-
 from typing_extensions import Protocol
 
 # Type and type variable definitions
-_T = TypeVar("_T")
-_T1 = TypeVar("_T1")
-_T2 = TypeVar("_T2")
-_U = TypeVar("_U")
-_V = TypeVar("_V")
-_W = TypeVar("_W")
-_T_co = TypeVar("_T_co", covariant=True)
-_GenFn = TypeVar("_GenFn", bound=Callable[..., Iterator[Any]])
+_T = TypeVar('_T')
+_T1 = TypeVar('_T1')
+_T2 = TypeVar('_T2')
+_U = TypeVar('_U')
+_V = TypeVar('_V')
+_W = TypeVar('_W')
+_T_co = TypeVar('_T_co', covariant=True)
+_GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
 _Raisable = BaseException | Type[BaseException]
 
 @type_check_only
