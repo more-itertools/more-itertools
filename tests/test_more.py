@@ -3916,6 +3916,24 @@ class SetPartitionsTests(TestCase):
     def test_to_many_groups(self):
         self.assertEqual([], list(mi.set_partitions(range(4), 5)))
 
+    def test_min_size(self):
+        it = 'abc'
+        actual = mi.set_partitions(it, min_size=2)
+        expected = [['abc']]
+        self.assertEqual(
+            self._normalize_partitions(expected),
+            self._normalize_partitions(actual),
+        )
+
+    def test_max_size(self):
+        it = 'abc'
+        actual = mi.set_partitions(it, max_size=2)
+        expected = [['a', 'bc'], ['ab', 'c'], ['b', 'ac'], ['a', 'b', 'c']]
+        self.assertEqual(
+            self._normalize_partitions(expected),
+            self._normalize_partitions(actual),
+        )
+
 
 class TimeLimitedTests(TestCase):
     def test_basic(self):
