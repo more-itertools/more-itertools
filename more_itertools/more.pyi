@@ -213,6 +213,7 @@ def stagger(
 class UnequalIterablesError(ValueError):
     def __init__(self, details: tuple[int, int, int] | None = ...) -> None: ...
 
+# zip_equal
 @overload
 def zip_equal(__iter1: Iterable[_T1]) -> Iterator[tuple[_T1]]: ...
 @overload
@@ -226,6 +227,8 @@ def zip_equal(
     __iter3: Iterable[_T],
     *iterables: Iterable[_T],
 ) -> Iterator[tuple[_T, ...]]: ...
+
+# zip_offset
 @overload
 def zip_offset(
     __iter1: Iterable[_T1],
