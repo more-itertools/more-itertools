@@ -28,6 +28,9 @@ from typing_extensions import Protocol
 _T = TypeVar('_T')
 _T1 = TypeVar('_T1')
 _T2 = TypeVar('_T2')
+_T3 = TypeVar('_T3')
+_T4 = TypeVar('_T4')
+_T5 = TypeVar('_T5')
 _U = TypeVar('_U')
 _V = TypeVar('_V')
 _W = TypeVar('_W')
@@ -222,11 +225,30 @@ def zip_equal(
 ) -> Iterator[tuple[_T1, _T2]]: ...
 @overload
 def zip_equal(
-    __iter1: Iterable[_T],
-    __iter2: Iterable[_T],
-    __iter3: Iterable[_T],
-    *iterables: Iterable[_T],
-) -> Iterator[tuple[_T, ...]]: ...
+    __iter1: Iterable[_T1], __iter2: Iterable[_T2], __iter3: Iterable[_T3]
+) -> Iterator[tuple[_T1, _T2, _T3]]: ...
+@overload
+def zip_equal(
+    __iter1: Iterable[_T1], __iter2: Iterable[_T2], __iter3: Iterable[_T3], __iter4: Iterable[_T4]
+) -> Iterator[tuple[_T1, _T2, _T3, _T4]]: ...
+@overload
+def zip_equal(
+    __iter1: Iterable[_T1],
+    __iter2: Iterable[_T2],
+    __iter3: Iterable[_T3],
+    __iter4: Iterable[_T4],
+    __iter5: Iterable[_T5]
+) -> Iterator[tuple[_T1, _T2, _T3, _T4, _T5]]: ...
+@overload
+def zip_equal(
+    __iter1: Iterable[Any],
+    __iter2: Iterable[Any],
+    __iter3: Iterable[Any],
+    __iter4: Iterable[Any],
+    __iter5: Iterable[Any],
+    __iter6: Iterable[Any],
+    *iterables: Iterable[Any],
+) -> Iterator[tuple[Any, ...]]: ...
 
 # zip_offset
 @overload
