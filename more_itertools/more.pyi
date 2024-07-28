@@ -229,7 +229,10 @@ def zip_equal(
 ) -> Iterator[tuple[_T1, _T2, _T3]]: ...
 @overload
 def zip_equal(
-    __iter1: Iterable[_T1], __iter2: Iterable[_T2], __iter3: Iterable[_T3], __iter4: Iterable[_T4]
+    __iter1: Iterable[_T1],
+    __iter2: Iterable[_T2],
+    __iter3: Iterable[_T3],
+    __iter4: Iterable[_T4],
 ) -> Iterator[tuple[_T1, _T2, _T3, _T4]]: ...
 @overload
 def zip_equal(
@@ -237,7 +240,7 @@ def zip_equal(
     __iter2: Iterable[_T2],
     __iter3: Iterable[_T3],
     __iter4: Iterable[_T4],
-    __iter5: Iterable[_T5]
+    __iter5: Iterable[_T5],
 ) -> Iterator[tuple[_T1, _T2, _T3, _T4, _T5]]: ...
 @overload
 def zip_equal(
