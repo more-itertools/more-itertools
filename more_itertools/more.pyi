@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+
 from types import TracebackType
 from typing import (
     Any,
@@ -34,6 +36,12 @@ _W = TypeVar('_W')
 _T_co = TypeVar('_T_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
 _Raisable = BaseException | Type[BaseException]
+
+# The type of isinstance's second argument (from typeshed builtins)
+if sys.version_info >= (3, 10):
+    _ClassInfo = type | UnionType | tuple[_ClassInfo, ...]
+else:
+    _ClassInfo = type | tuple[_ClassInfo, ...]
 
 @type_check_only
 class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]): ...
@@ -135,7 +143,7 @@ def interleave_evenly(
 ) -> Iterator[_T]: ...
 def collapse(
     iterable: Iterable[Any],
-    base_type: type | None = ...,
+    base_type: _ClassInfo | None = ...,
     levels: int | None = ...,
 ) -> Iterator[Any]: ...
 @overload
@@ -290,7 +298,7 @@ def unzip(iterable: Iterable[Sequence[_T]]) -> tuple[Iterator[_T], ...]: ...
 def divide(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
 def always_iterable(
     obj: object,
-    base_type: type | tuple[type | tuple[Any, ...], ...] | None = ...,
+    base_type: _ClassInfo | None = ...,
 ) -> Iterator[Any]: ...
 def adjacent(
     predicate: Callable[[_T], bool],
@@ -627,7 +635,7 @@ class countable(Generic[_T], Iterator[_T]):
 def chunked_even(iterable: Iterable[_T], n: int) -> Iterator[list[_T]]: ...
 def zip_broadcast(
     *objects: _T | Iterable[_T],
-    scalar_types: type | tuple[type | tuple[Any, ...], ...] | None = ...,
+    scalar_types: _ClassInfo | None = ...,
     strict: bool = ...,
 ) -> Iterable[tuple[_T, ...]]: ...
 def unique_in_window(
