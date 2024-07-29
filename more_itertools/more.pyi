@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-import sys, types
+import sys
+
 from types import TracebackType
 from typing import (
     Any,
@@ -38,7 +39,7 @@ _Raisable = BaseException | Type[BaseException]
 
 # The type of isinstance's second argument (from typeshed builtins)
 if sys.version_info >= (3, 10):
-    _ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
+    _ClassInfo = type | UnionType | tuple[_ClassInfo, ...]
 else:
     _ClassInfo = type | tuple[_ClassInfo, ...]
 
