@@ -633,7 +633,59 @@ class countable(Generic[_T], Iterator[_T]):
     items_seen: int
 
 def chunked_even(iterable: Iterable[_T], n: int) -> Iterator[list[_T]]: ...
+@overload
 def zip_broadcast(
+    __obj1: _T | Iterable[_T],
+    *,
+    scalar_types: _ClassInfo | None = ...,
+    strict: bool = ...,
+) -> Iterable[tuple[_T, ...]]: ...
+@overload
+def zip_broadcast(
+    __obj1: _T | Iterable[_T],
+    __obj2: _T | Iterable[_T],
+    *,
+    scalar_types: _ClassInfo | None = ...,
+    strict: bool = ...,
+) -> Iterable[tuple[_T, ...]]: ...
+@overload
+def zip_broadcast(
+    __obj1: _T | Iterable[_T],
+    __obj2: _T | Iterable[_T],
+    __obj3: _T | Iterable[_T],
+    *,
+    scalar_types: _ClassInfo | None = ...,
+    strict: bool = ...,
+) -> Iterable[tuple[_T, ...]]: ...
+@overload
+def zip_broadcast(
+    __obj1: _T | Iterable[_T],
+    __obj2: _T | Iterable[_T],
+    __obj3: _T | Iterable[_T],
+    __obj4: _T | Iterable[_T],
+    *,
+    scalar_types: _ClassInfo | None = ...,
+    strict: bool = ...,
+) -> Iterable[tuple[_T, ...]]: ...
+@overload
+def zip_broadcast(
+    __obj1: _T | Iterable[_T],
+    __obj2: _T | Iterable[_T],
+    __obj3: _T | Iterable[_T],
+    __obj4: _T | Iterable[_T],
+    __obj5: _T | Iterable[_T],
+    *,
+    scalar_types: _ClassInfo | None = ...,
+    strict: bool = ...,
+) -> Iterable[tuple[_T, ...]]: ...
+@overload
+def zip_broadcast(
+    __obj1: _T | Iterable[_T],
+    __obj2: _T | Iterable[_T],
+    __obj3: _T | Iterable[_T],
+    __obj4: _T | Iterable[_T],
+    __obj5: _T | Iterable[_T],
+    __obj6: _T | Iterable[_T],
     *objects: _T | Iterable[_T],
     scalar_types: _ClassInfo | None = ...,
     strict: bool = ...,
