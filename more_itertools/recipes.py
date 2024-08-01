@@ -795,8 +795,13 @@ def triplewise(iterable):
     [('A', 'B', 'C'), ('B', 'C', 'D'), ('C', 'D', 'E')]
 
     """
-    for (a, _), (b, c) in pairwise(pairwise(iterable)):
-        yield a, b, c
+    # This deviates from the itertools documentation reciple - see
+    # https://github.com/more-itertools/more-itertools/issues/889
+    t1, t2, t3 = tee(iterable, 3)
+    next(t3, None)
+    next(t3, None)
+    next(t2, None)
+    return zip(t1, t2, t3)
 
 
 def _sliding_window_islice(iterable, n):
