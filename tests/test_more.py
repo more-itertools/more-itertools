@@ -2173,6 +2173,14 @@ class SortTogetherTest(TestCase):
             ],
         )
 
+    def test_strict(self):
+        self.assertRaises(
+            mi.UnequalIterablesError,
+            lambda: mi.sort_together(
+                [(4, 3, 2, 1), ('a', 'b', 'c')], strict=True
+            ),
+        )
+
 
 class DivideTest(TestCase):
     """Tests for divide()"""
