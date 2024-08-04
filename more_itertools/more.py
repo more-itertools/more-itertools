@@ -1838,10 +1838,6 @@ def sort_together(
     different lengths.
 
     """
-    if strict:
-        if not all_equal(iterables, key=len):
-            raise UnequalIterablesError()
-
     if key is None:
         # if there is no key function, the key argument to sorted is an
         # itemgetter
@@ -1863,8 +1859,9 @@ def sort_together(
                 *get_key_items(zipped_items)
             )
 
+    zipper = zip_equal if strict else zip
     return list(
-        zip(*sorted(zip(*iterables), key=key_argument, reverse=reverse))
+        zipper(*sorted(zipper(*iterables), key=key_argument, reverse=reverse))
     )
 
 
