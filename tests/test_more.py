@@ -2174,6 +2174,7 @@ class SortTogetherTest(TestCase):
         )
 
     def test_strict(self):
+        # Test for list of lists or tuples
         self.assertRaises(
             mi.UnequalIterablesError,
             lambda: mi.sort_together(
@@ -2181,6 +2182,21 @@ class SortTogetherTest(TestCase):
             ),
         )
 
+        # Test for list of iterables
+        self.assertRaises(
+            mi.UnequalIterablesError,
+            lambda: mi.sort_together(
+                [range(4), range(5)], strict=True
+            )
+        )
+
+        # Test for iterable of iterables
+        self.assertRaises(
+            mi.UnequalIterablesError,
+            lambda: mi.sort_together(
+                (range(i) for i in range(4)), strict=True
+            )
+        )
 
 class DivideTest(TestCase):
     """Tests for divide()"""
