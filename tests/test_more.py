@@ -2185,9 +2185,7 @@ class SortTogetherTest(TestCase):
         # Test for list of iterables
         self.assertRaises(
             mi.UnequalIterablesError,
-            lambda: mi.sort_together(
-                [range(4), range(5)], strict=True
-            )
+            lambda: mi.sort_together([range(4), range(5)], strict=True),
         )
 
         # Test for iterable of iterables
@@ -2195,8 +2193,9 @@ class SortTogetherTest(TestCase):
             mi.UnequalIterablesError,
             lambda: mi.sort_together(
                 (range(i) for i in range(4)), strict=True
-            )
+            ),
         )
+
 
 class DivideTest(TestCase):
     """Tests for divide()"""
