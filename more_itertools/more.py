@@ -1792,7 +1792,9 @@ def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     return zip(*staggered)
 
 
-def sort_together(iterables, key_list=(0,), key=None, reverse=False):
+def sort_together(
+    iterables, key_list=(0,), key=None, reverse=False, strict=False
+):
     """Return the input iterables sorted together, with *key_list* as the
     priority for sorting. All iterables are trimmed to the length of the
     shortest one.
@@ -1831,6 +1833,10 @@ def sort_together(iterables, key_list=(0,), key=None, reverse=False):
         >>> sort_together([(1, 2, 3), ('c', 'b', 'a')], reverse=True)
         [(3, 2, 1), ('a', 'b', 'c')]
 
+    If the *strict* keyword argument is ``True``, then
+    ``UnequalIterablesError`` will be raised if any of the iterables have
+    different lengths.
+
     """
     if key is None:
         # if there is no key function, the key argument to sorted is an
@@ -1853,8 +1859,9 @@ def sort_together(iterables, key_list=(0,), key=None, reverse=False):
                 *get_key_items(zipped_items)
             )
 
+    zipper = zip_equal if strict else zip
     return list(
-        zip(*sorted(zip(*iterables), key=key_argument, reverse=reverse))
+        zipper(*sorted(zipper(*iterables), key=key_argument, reverse=reverse))
     )
 
 
