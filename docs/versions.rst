@@ -12,6 +12,7 @@ Version History
     * :func:`circular_shifts` now accepts a ``steps`` parameter (thanks to rhettinger)
     * :func:`distinct_permutations` now accepts iterables with non-comparable items (thanks to hgustafsson, JamesParrott, and pochmann3)
     * :class:`run_length`, :func:`totient`, :func:`sliding_window`, and :func:`triplewise` were optimized (thanks to rhettinger)
+    * :class:`ilen` was optimized (thanks to pochmann3 and rhettinger)
     * :func:`sample` was improved, and now accepts ``counts`` and ``strict`` parameters (thanks to rhettinger)
     * :func:`set_partitions` now accepts ``min_size`` and ``max_size`` parameters (thanks to Pandede)
     * :func:`seekable`'s ``relative_seek`` method remembers previous calls (thanks to dkrikun)
