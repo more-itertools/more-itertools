@@ -20,7 +20,7 @@ Version History
 
 * Other changes
     * The docs for :func:`is_sorted` and :func:`strictly_n` were improved (thanks to pochmann3 and fakuivan)
-    * The typing information for :func:`windowed_complete`, :func:`zip_broadcast`, and and :func:`zip_equal` were improved (thanks to m472, eyalho, akisatoon1, and Pandede)
+    * The typing information for :func:`windowed_complete`, :func:`zip_broadcast`, and and :func:`zip_equal` were improved (thanks to m472, eyalho, akisatoon1, jbosboom, and Pandede)
 
 10.3.0
 ------
