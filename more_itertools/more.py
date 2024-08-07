@@ -473,12 +473,10 @@ def ilen(iterable):
     This consumes the iterable, so handle with care.
 
     """
-    # This approach was selected because benchmarks showed it's likely the
-    # fastest of the known implementations at the time of writing.
-    # See GitHub tracker: #236, #230.
-    counter = count()
-    deque(zip(iterable, counter), maxlen=0)
-    return next(counter)
+    # This is the "most beautiful of the fast variants" of this function.
+    # If you think you can improve on it, please ensure that your version
+    # is both 10x faster and 10x more beautiful.
+    return sum(compress(repeat(1), zip(iterable)))
 
 
 def iterate(func, start):

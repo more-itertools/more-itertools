@@ -5,6 +5,23 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.4.0
+------
+
+* Changes to existing functions
+    * :func:`circular_shifts` now accepts a ``steps`` parameter (thanks to rhettinger)
+    * :func:`distinct_permutations` now accepts iterables with non-comparable items (thanks to hgustafsson, JamesParrott, and pochmann3)
+    * :class:`run_length`, :func:`totient`, :func:`sliding_window`, and :func:`triplewise` were optimized (thanks to rhettinger)
+    * :class:`ilen` was optimized (thanks to pochmann3 and rhettinger)
+    * :func:`sample` was improved, and now accepts ``counts`` and ``strict`` parameters (thanks to rhettinger)
+    * :func:`set_partitions` now accepts ``min_size`` and ``max_size`` parameters (thanks to Pandede)
+    * :func:`seekable`'s ``relative_seek`` method remembers previous calls (thanks to dkrikun)
+    * :func:`sort_together` now accepts a ``strict`` parameter (thanks to rhettinger and Pandede)
+
+* Other changes
+    * The docs for :func:`is_sorted` and :func:`strictly_n` were improved (thanks to pochmann3 and fakuivan)
+    * The typing information for :func:`windowed_complete`, :func:`zip_broadcast`, and and :func:`zip_equal` were improved (thanks to m472, eyalho, akisatoon1, and Pandede)
+
 10.3.0
 ------
 
