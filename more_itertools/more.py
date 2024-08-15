@@ -159,6 +159,19 @@ __all__ = [
 _fsumprod = getattr(math, 'sumprod', lambda x, y: fsum(map(mul, x, y)))
 
 
+class _NeverEqual:
+    "A helper object that compares equal to nothing."
+
+    def __eq__(self, other):
+        return False
+
+    def __ne__(self, other):
+        return True
+
+    def __repr__(self):
+        return '<NeverEqual>'
+
+
 def chunked(iterable, n, strict=False):
     """Break *iterable* into lists of length *n*:
 
@@ -3538,7 +3551,9 @@ def iequals(*iterables):
     elements of iterable are equal to each other.
 
     """
-    return all(map(all_equal, zip_longest(*iterables, fillvalue=object())))
+    return all(
+        map(all_equal, zip_longest(*iterables, fillvalue=_NeverEqual()))
+    )
 
 
 def distinct_combinations(iterable, r):

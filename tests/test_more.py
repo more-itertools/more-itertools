@@ -31,6 +31,7 @@ from sys import version_info
 from time import sleep
 from traceback import format_exc
 from unittest import skipIf, TestCase
+from unittest.mock import ANY
 
 import more_itertools as mi
 
@@ -5519,7 +5520,10 @@ class IequalsTests(TestCase):
         self.assertFalse(mi.iequals([1, 2], [None, 1, 2]))
 
     def test_not_identical_but_equal(self):
-        self.assertTrue([1, True], [1.0, complex(1, 0)])
+        self.assertTrue(mi.iequals([1, True], [1.0, complex(1, 0)]))
+
+    def test_contrived_objects(self):
+        self.assertFalse(mi.iequals([], [ANY]))
 
 
 class ConstrainedBatchesTests(TestCase):
