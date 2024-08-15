@@ -218,13 +218,11 @@ def all_equal(iterable, key=None):
         True
 
     """
-    iterator = groupby(iterable, key=key)
-    try:
-        next(iterator)
-        next(iterator)
-    except StopIteration:
-        return True
-    return False
+    iterator = groupby(iterable, key)
+    for first in iterator:
+        for second in iterator:
+            return False
+    return True
 
 
 def quantify(iterable, pred=bool):
