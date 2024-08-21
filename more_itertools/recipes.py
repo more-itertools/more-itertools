@@ -222,6 +222,7 @@ def all_equal(iterable, key=None):
     for first in iterator:
         for second in iterator:
             return False
+        return True
     return True
 
 
