@@ -5,6 +5,15 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.5.0
+------
+
+* Bug fixes
+    * A missing symbol in ``more.pyi`` was fixed (thanks to eberts-google and nathanielmanistaatgoogle)
+
+* Other changes
+    * :func:`all_equal` was optimized (thanks to pochmann3 and rhettinger)
+
 10.4.0
 ------
 
