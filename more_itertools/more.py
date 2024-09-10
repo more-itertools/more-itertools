@@ -1118,10 +1118,8 @@ def spy(iterable, n=1):
         [1, 2, 3, 4, 5]
 
     """
-    it = iter(iterable)
-    head = take(n, it)
-
-    return head.copy(), chain(head, it)
+    p, q = tee(iterable)
+    return take(n, q), p
 
 
 def interleave(*iterables):
