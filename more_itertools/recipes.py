@@ -13,7 +13,7 @@ import operator
 
 from collections import deque
 from collections.abc import Sized
-from functools import partial, reduce
+from functools import partial
 from itertools import (
     chain,
     combinations,
@@ -872,8 +872,10 @@ def polynomial_from_roots(roots):
     >>> polynomial_from_roots(roots)  # x^3 - 4 * x^2 - 17 * x + 60
     [1, -4, -17, 60]
     """
-    factors = zip(repeat(1), map(operator.neg, roots))
-    return list(reduce(convolve, factors, [1]))
+    poly = [1]
+    for root in roots:
+        poly = list(convolve(poly, (1, -root)))
+    return poly
 
 
 def iter_index(iterable, value, start=0, stop=None):
