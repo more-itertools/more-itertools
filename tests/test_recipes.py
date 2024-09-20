@@ -4,7 +4,7 @@ from fractions import Fraction
 from functools import reduce
 from itertools import combinations, count, groupby, permutations
 from operator import mul
-from math import factorial
+from math import comb, factorial
 from sys import version_info
 from unittest import TestCase, skipIf
 from unittest.mock import patch
@@ -922,6 +922,12 @@ class PolynomialFromRootsTests(TestCase):
             with self.subTest(roots=roots):
                 actual = mi.polynomial_from_roots(roots)
                 self.assertEqual(actual, expected)
+
+    def test_large(self):
+        n = 1_500
+        actual = mi.polynomial_from_roots([-1] * n)
+        expected = [comb(n, k) for k in range(n + 1)]
+        self.assertEqual(actual, expected)
 
 
 class PolynomialEvalTests(TestCase):
