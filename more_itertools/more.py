@@ -3820,7 +3820,8 @@ def is_sorted(iterable, key=None, reverse=False, strict=False):
     The function returns ``False`` after encountering the first out-of-order
     item, which means it may produce results that differ from the built-in
     :func:`sorted` function for objects with unusual comparison dynamics
-    (like ``math.nan``). If there are no out-of-order items, the iterable is exhausted.
+    (like ``math.nan``). If there are no out-of-order items, the iterable is
+    exhausted.
     """
     it = iterable if (key is None) else map(key, iterable)
     a, b = tee(it)
