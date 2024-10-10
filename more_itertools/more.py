@@ -25,7 +25,7 @@ from itertools import (
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
-from operator import itemgetter, mul, sub, gt, lt, le
+from operator import itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -3819,15 +3819,16 @@ def is_sorted(iterable, key=None, reverse=False, strict=False):
 
     The function returns ``False`` after encountering the first out-of-order
     item, which means it may produce results that differ from the built-in
-    :func:`sorted` function for objects with unusual comparison dynamics.
-    If there are no out-of-order items, the iterable is exhausted.
+    :func:`sorted` function for objects with unusual comparison dynamics
+    (like ``math.nan``). If there are no out-of-order items, the iterable is
+    exhausted.
     """
-    compare = le if strict else lt
     it = iterable if (key is None) else map(key, iterable)
-    it_1, it_2 = tee(it)
-    next(it_2 if reverse else it_1, None)
-
-    return not any(map(compare, it_1, it_2))
+    a, b = tee(it)
+    next(b, None)
+    if reverse:
+        b, a = a, b
+    return all(map(lt, a, b)) if strict else not any(map(lt, b, a))
 
 
 class AbortThread(BaseException):

@@ -4330,7 +4330,6 @@ class IsSortedTests(TestCase):
             ([1, 2, 3], {}, True),
             ([1, 1, 2, 3], {}, True),
             ([1, 10, 2, 3], {}, False),
-            ([3, float('nan'), 1, 2], {}, True),
             (['1', '10', '2', '3'], {}, True),
             (['1', '10', '2', '3'], {'key': int}, False),
             ([1, 2, 3], {'reverse': True}, False),
@@ -4361,17 +4360,6 @@ class IsSortedTests(TestCase):
                 ['3', '2', '10', '1'],
                 {'strict': True, 'key': int, 'reverse': True},
                 False,
-            ),
-            # We'll do the same weird thing as Python here
-            (['nan', 0, 'nan', 0], {'key': float}, True),
-            ([0, 'nan', 0, 'nan'], {'key': float}, True),
-            (['nan', 0, 'nan', 0], {'key': float, 'reverse': True}, True),
-            ([0, 'nan', 0, 'nan'], {'key': float, 'reverse': True}, True),
-            ([0, 'nan', 0, 'nan'], {'strict': True, 'key': float}, True),
-            (
-                ['nan', 0, 'nan', 0],
-                {'strict': True, 'key': float, 'reverse': True},
-                True,
             ),
         ]:
             key = kwargs.get('key', None)
