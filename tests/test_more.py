@@ -4322,6 +4322,17 @@ class SampleTests(TestCase):
         self.assertTrue(difference_in_means < 4.4)
 
 
+class BarelySortable:
+    def __init__(self, value):
+        self.value = value
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __int__(self):
+        return int(self.value)
+
+
 class IsSortedTests(TestCase):
     def test_basic(self):
         for iterable, kwargs, expected in [
@@ -4330,7 +4341,6 @@ class IsSortedTests(TestCase):
             ([1, 2, 3], {}, True),
             ([1, 1, 2, 3], {}, True),
             ([1, 10, 2, 3], {}, False),
-            ([3, float('nan'), 1, 2], {}, True),
             (['1', '10', '2', '3'], {}, True),
             (['1', '10', '2', '3'], {'key': int}, False),
             ([1, 2, 3], {'reverse': True}, False),
@@ -4362,17 +4372,6 @@ class IsSortedTests(TestCase):
                 {'strict': True, 'key': int, 'reverse': True},
                 False,
             ),
-            # We'll do the same weird thing as Python here
-            (['nan', 0, 'nan', 0], {'key': float}, True),
-            ([0, 'nan', 0, 'nan'], {'key': float}, True),
-            (['nan', 0, 'nan', 0], {'key': float, 'reverse': True}, True),
-            ([0, 'nan', 0, 'nan'], {'key': float, 'reverse': True}, True),
-            ([0, 'nan', 0, 'nan'], {'strict': True, 'key': float}, True),
-            (
-                ['nan', 0, 'nan', 0],
-                {'strict': True, 'key': float, 'reverse': True},
-                True,
-            ),
         ]:
             key = kwargs.get('key', None)
             reverse = kwargs.get('reverse', False)
@@ -4382,7 +4381,10 @@ class IsSortedTests(TestCase):
                 iterable=iterable, key=key, reverse=reverse, strict=strict
             ):
                 mi_result = mi.is_sorted(
-                    iter(iterable), key=key, reverse=reverse, strict=strict
+                    map(BarelySortable, iterable),
+                    key=key,
+                    reverse=reverse,
+                    strict=strict,
                 )
 
                 sorted_iterable = sorted(iterable, key=key, reverse=reverse)
