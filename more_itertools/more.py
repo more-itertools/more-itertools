@@ -4821,8 +4821,8 @@ def outer_product(func, xs, ys, *args, **kwargs):
 
     >>> xs = ['A', 'B', 'A', 'A', 'B', 'B', 'A', 'A', 'B', 'B']
     >>> ys = ['X', 'X', 'X', 'Y', 'Z', 'Z', 'Y', 'Y', 'Z', 'Z']
-    >>> rows = list(zip(xs, ys))
-    >>> count_rows = lambda x, y: rows.count((x, y))
+    >>> pair_counts = Counter(zip(xs, ys))
+    >>> count_rows = lambda x, y: pair_counts[x, y]
     >>> list(outer_product(count_rows, sorted(set(xs)), sorted(set(ys))))
     [(2, 3, 0), (1, 0, 4)]
 
