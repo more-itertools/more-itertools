@@ -4322,6 +4322,17 @@ class SampleTests(TestCase):
         self.assertTrue(difference_in_means < 4.4)
 
 
+class BarelySortable:
+    def __init__(self, value):
+        self.value = value
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __int__(self):
+        return int(self.value)
+
+
 class IsSortedTests(TestCase):
     def test_basic(self):
         for iterable, kwargs, expected in [
@@ -4370,7 +4381,10 @@ class IsSortedTests(TestCase):
                 iterable=iterable, key=key, reverse=reverse, strict=strict
             ):
                 mi_result = mi.is_sorted(
-                    iter(iterable), key=key, reverse=reverse, strict=strict
+                    map(BarelySortable, iterable),
+                    key=key,
+                    reverse=reverse,
+                    strict=strict,
                 )
 
                 sorted_iterable = sorted(iterable, key=key, reverse=reverse)
