@@ -13,6 +13,7 @@ from itertools import (
     count,
     cycle,
     dropwhile,
+    filterfalse,
     groupby,
     islice,
     repeat,
@@ -4455,28 +4456,42 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         else:
             return False
 
-    size = len(objects)
-    if not size:
+    if not objects:
         return
 
-    new_item = [None] * size
-    iterables, iterable_positions = [], []
-    for i, obj in enumerate(objects):
-        if is_scalar(obj):
-            new_item[i] = obj
-        else:
-            iterables.append(iter(obj))
-            iterable_positions.append(i)
+    iterables = list(filterfalse(is_scalar, objects))
 
     if not iterables:
         yield tuple(objects)
         return
 
-    zipper = _zip_equal if strict else zip
-    for item in zipper(*iterables):
-        for i, new_item[i] in zip(iterable_positions, item):
-            pass
-        yield tuple(new_item)
+    emitters = map_if(objects, is_scalar, repeat)
+
+    if not strict:
+        yield from zip(*emitters)
+        return
+
+    # If all true iterables are equal on len, use default zip
+    try:
+        first_size = len(iterables[0])
+        for i, it in enumerate(iterables[1:], 1):
+            size = len(it)
+            if size != first_size:
+                raise UnequalIterablesError(details=(first_size, i, size))
+
+        yield from zip(*emitters)
+
+    # If any one of the iterables didn't have a length, start reading
+    # them until one runs out.
+    except TypeError:
+        for combo in zip_longest(*emitters, fillvalue=_marker):
+            markers = sum(1 for c in combo if c is _marker)
+            if markers == 0:
+                yield combo
+            elif markers == len(iterables):
+                break
+            else:
+                raise UnequalIterablesError()
 
 
 def unique_in_window(iterable, n, key=None):
