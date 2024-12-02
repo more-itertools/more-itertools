@@ -1215,3 +1215,26 @@ class TotientTests(TestCase):
         ):
             with self.subTest(n=n):
                 self.assertEqual(mi.totient(n), expected)
+
+
+class IsPrimeTests(TestCase):
+    def test_pseudoprimes(self):
+        for n in (341, 561, 645, 1105, 1387, 1729, 1905, 2047, 2465, 2701):
+            with self.subTest(n=n):
+                self.assertFalse(mi.is_prime(n))
+
+    def test_primes(self):
+        for n in (
+            2,
+            15_485_863,
+            15_485_867,
+            32_452_843,
+            32_452_867,
+            49_979_687,
+            49_979_693,
+            67_867_967,
+            67_867_979,
+            86_028_121,
+        ):
+            with self.subTest(n=n):
+                self.assertTrue(mi.is_prime(n))
