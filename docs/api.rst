@@ -280,6 +280,7 @@ Math
 
 .. autofunction:: dft
 .. autofunction:: idft
+.. autofunction:: nth_prime
 
 ----
 
@@ -294,7 +295,6 @@ Math
 .. autofunction:: polynomial_eval
 .. autofunction:: sieve
 .. autofunction:: is_prime
-.. autofunction:: nth_prime
 .. autofunction:: sum_of_squares
 .. autofunction:: totient
 
