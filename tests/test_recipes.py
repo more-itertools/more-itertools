@@ -1219,6 +1219,11 @@ class TotientTests(TestCase):
 
 class PrimeFunctionTests(TestCase):
     def test_is_prime_pseudoprimes(self):
+        # Carmichael number that strong pseudoprime to prime bases < 307
+        # https://doi.org/10.1006/jsco.1995.1042
+        p = 29674495668685510550154174642905332730771991799853043350995075531276838753171770199594238596428121188033664754218345562493168782883  # noqa:E501
+        gnarly_carmichael = (313 * (p - 1) + 1) * (353 * (p - 1) + 1)
+
         for n in (
             # Least Carmichael number with n prime factors:
             # https://oeis.org/A006931
@@ -1327,7 +1332,7 @@ class PrimeFunctionTests(TestCase):
             3477707481751,
             18996486073489,
             55712149574381,
-            118670087467,
+            gnarly_carmichael
         ):
             with self.subTest(n=n):
                 self.assertFalse(mi.is_prime(n))
