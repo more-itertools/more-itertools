@@ -4982,10 +4982,10 @@ def doublestarmap(func, iterable):
         yield func(**item)
 
 
-def _nth_prime_ub(n: int) -> float:
+def _nth_prime_ub(n):
     "Upper bound for the nth prime (counting from 1)."
     # https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
-    return n * math.log(n * math.log(n)) if n >= 6 else 11.1
+    return n * log(n * log(n)) if n >= 6 else 11.1
 
 
 def nth_prime(n):

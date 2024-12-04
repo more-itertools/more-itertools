@@ -1086,8 +1086,6 @@ _perfect_tests = [
     (1122004669633, (2, 13, 23, 1662803)),
     (2152302898747, (2, 3, 5, 7, 11)),
     (3474749660383, (2, 3, 5, 7, 11, 13)),
-    (341550071728321, (2, 3, 5, 7, 11, 13, 17)),
-    (3825123056546413051, (2, 3, 5, 7, 11, 13, 17, 19, 23)),
     (18446744073709551616, (2, 325, 9375, 28178, 450775, 9780504, 1795265022)),
     (
         3317044064679887385961981,
@@ -1106,10 +1104,9 @@ def _shift_to_odd(n):
 
 
 def _strong_probable_prime(n, base):
-    assert n > 2 and n & 1
+    assert (n > 2) and (n & 1) and (2 <= base < n)
 
     s, d = _shift_to_odd(n - 1)
-    assert 2 <= base < n
 
     x = pow(base, d, n)
     if x == 1 or x == n - 1:
@@ -1133,7 +1130,7 @@ def is_prime(n):
     >> is_prime(18_446_744_073_709_551_557)
     True
 
-    This function uses the Miller-Rabin primality test, which can return falae
+    This function uses the Miller-Rabin primality test, which can return false
     positives for very large inputs. For values of *n* below 10**24
     there are no false positives. For larger values, there is less than
     a 1 in 2**64 false positive rate. Multiple tests can reduce the chance
