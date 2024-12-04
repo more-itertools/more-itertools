@@ -1332,7 +1332,7 @@ class PrimeFunctionTests(TestCase):
             3477707481751,
             18996486073489,
             55712149574381,
-            gnarly_carmichael
+            gnarly_carmichael,
         ):
             with self.subTest(n=n):
                 self.assertFalse(mi.is_prime(n))
