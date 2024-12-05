@@ -1374,4 +1374,6 @@ class PrimeFunctionTests(TestCase):
 
 class LoopsTests:
     def test_basic(self):
-        self.asserTrue(all(list(loops(n)) == [None] * n for n in range(-10, 10)))
+        self.asserTrue(
+            all(list(mi.loops(n)) == [None] * n for n in range(-10, 10))
+        )
