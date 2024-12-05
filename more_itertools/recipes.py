@@ -1151,7 +1151,7 @@ def is_prime(n):
 
 def loops(n):
     """Returns an iterable with *n* elements for efficient looping.
-    Like ``range(n)``, but doesn't create integegers.
+    Like ``range(n)`` but doesn't create integers.
 
     >>> i = 0
     >>> for _ in loops(5):

@@ -1372,8 +1372,8 @@ class PrimeFunctionTests(TestCase):
                 self.assertTrue(mi.is_prime(n))
 
 
-class LoopsTests:
+class LoopsTests(TestCase):
     def test_basic(self):
-        self.asserTrue(
+        self.assertTrue(
             all(list(mi.loops(n)) == [None] * n for n in range(-10, 10))
         )
