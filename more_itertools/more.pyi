@@ -587,7 +587,7 @@ def _sample_counted(
     population: Iterator[_T], k: int, counts: Iterable[int], strict: bool
 ) -> list[_T]: ...
 def _sample_weighted(
-    iterator: Iterator[_T], k: int, weights, strict
+    iterator: Iterator[_T], k: int, weights: Iterator[float], strict: bool
 ) -> list[_T]: ...
 def sample(
     iterable: Iterable[_T],
