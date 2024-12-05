@@ -13,7 +13,7 @@ import operator
 
 from collections import deque
 from collections.abc import Sized
-from functools import partial
+from functools import lru_cache, partial
 from itertools import (
     chain,
     combinations,
@@ -42,6 +42,7 @@ __all__ = [
     'factor',
     'flatten',
     'grouper',
+    'is_prime',
     'iter_except',
     'iter_index',
     'matmul',
@@ -1075,3 +1076,73 @@ def totient(n):
     for prime in set(factor(n)):
         n -= n // prime
     return n
+
+
+# Miller–Rabin primality test: https://oeis.org/A014233
+_perfect_tests = [
+    (2047, (2,)),
+    (9080191, (31, 73)),
+    (4759123141, (2, 7, 61)),
+    (1122004669633, (2, 13, 23, 1662803)),
+    (2152302898747, (2, 3, 5, 7, 11)),
+    (3474749660383, (2, 3, 5, 7, 11, 13)),
+    (18446744073709551616, (2, 325, 9375, 28178, 450775, 9780504, 1795265022)),
+    (
+        3317044064679887385961981,
+        (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41),
+    ),
+]
+
+
+@lru_cache
+def _shift_to_odd(n):
+    'Return s, d such that 2**s * d == n'
+    s = ((n - 1) ^ n).bit_length() - 1
+    d = n >> s
+    assert (1 << s) * d == n and d & 1 and s >= 0
+    return s, d
+
+
+def _strong_probable_prime(n, base):
+    assert (n > 2) and (n & 1) and (2 <= base < n)
+
+    s, d = _shift_to_odd(n - 1)
+
+    x = pow(base, d, n)
+    if x == 1 or x == n - 1:
+        return True
+
+    for _ in range(s - 1):
+        x = x * x % n
+        if x == n - 1:
+            return True
+
+    return False
+
+
+def is_prime(n):
+    """Return ``True`` if *n* is prime and ``False`` otherwise.
+
+    >> is_prime(37)
+    True
+    >> is_prime(3 * 13)
+    False
+    >> is_prime(18_446_744_073_709_551_557)
+    True
+
+    This function uses the Miller-Rabin primality test, which can return false
+    positives for very large inputs. For values of *n* below 10**24
+    there are no false positives. For larger values, there is less than
+    a 1 in 2**64 false positive rate. Multiple tests can reduce the chance
+    of a false positive.
+    """
+    if n < 17:
+        return n in {2, 3, 5, 7, 11, 13}
+    if not (n & 1 and n % 3 and n % 5 and n % 7 and n % 11 and n % 13):
+        return False
+    for limit, bases in _perfect_tests:
+        if n < limit:
+            break
+    else:
+        bases = [randrange(2, n - 1) for i in range(32)]
+    return all(_strong_probable_prime(n, base) for base in bases)

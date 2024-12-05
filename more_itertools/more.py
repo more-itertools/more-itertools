@@ -35,7 +35,9 @@ from .recipes import (
     UnequalIterablesError,
     consume,
     flatten,
+    nth,
     powerset,
+    sieve,
     take,
     unique_everseen,
     all_equal,
@@ -104,6 +106,7 @@ __all__ = [
     'minmax',
     'nth_or_last',
     'nth_permutation',
+    'nth_prime',
     'nth_product',
     'nth_combination_with_replacement',
     'numeric_range',
@@ -4977,3 +4980,23 @@ def doublestarmap(func, iterable):
     """
     for item in iterable:
         yield func(**item)
+
+
+def _nth_prime_ub(n):
+    "Upper bound for the nth prime (counting from 1)."
+    # https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
+    return n * log(n * log(n)) if n >= 6 else 11.1
+
+
+def nth_prime(n):
+    """Return the nth prime (counting from 0).
+
+    >>> nth_prime(0)
+    2
+    >>> nth_prime(100)
+    547
+    """
+    if n < 0:
+        raise ValueError
+    limit = math.ceil(_nth_prime_ub(n + 1))
+    return nth(sieve(limit), n)
