@@ -45,6 +45,7 @@ __all__ = [
     'is_prime',
     'iter_except',
     'iter_index',
+    'loops',
     'matmul',
     'ncycles',
     'nth',
@@ -1146,3 +1147,17 @@ def is_prime(n):
     else:
         bases = [randrange(2, n - 1) for i in range(32)]
     return all(_strong_probable_prime(n, base) for base in bases)
+
+
+def loops(n):
+    """Returns an iterable with *n* elements for efficient looping.
+    Like ``range(n)`` but doesn't create integers.
+
+    >>> i = 0
+    >>> for _ in loops(5):
+    ...     i += 1
+    >>> i
+    5
+
+    """
+    return repeat(None, n)

@@ -328,3 +328,4 @@ Others
 .. autofunction:: tabulate
 .. autofunction:: repeatfunc
 .. autofunction:: reshape
+.. autofunction:: loops
