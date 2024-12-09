@@ -26,7 +26,7 @@ import more_itertools
 # to readthedocs.io for display on github.com, but those links can be
 # relative when being built for Sphinx.
 
-with open('../README.rst', 'rt') as source:
+with open('../README.rst') as source:
     readme_file = source.readlines()
 
 build_dir = '_build'
@@ -35,7 +35,7 @@ os.makedirs(build_dir, exist_ok=True)
 rtd_path = 'https://more-itertools.readthedocs.io/en/stable/'
 table_width = 200
 in_table = False
-with open(os.path.join('.', build_dir, 'README.pprst'), 'wt') as target:
+with open(os.path.join('.', build_dir, 'README.pprst'), 'w') as target:
     for line in readme_file:
         old_len = len(line)
         if line.startswith('|') and line.endswith('|\n'):  # Inside table
