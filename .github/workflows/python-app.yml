@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy-3.10"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy-3.10"]
 
     steps:
     - uses: actions/checkout@v4
@@ -22,16 +22,16 @@ jobs:
     - name: Run tests
       run: make coverage
     - name: Static checks
-      if: "matrix.python-version == '3.8'"
+      if: "matrix.python-version == '3.9'"
       run: make check
     - name: Build docs with sphinx
-      if: "matrix.python-version == '3.8'"
+      if: "matrix.python-version == '3.9'"
       run: make docs
     - name: Build packages
-      if: "matrix.python-version == '3.8'"
+      if: "matrix.python-version == '3.9'"
       run: make package
     - name: Upload packages
-      if: "matrix.python-version == '3.8'"
+      if: "matrix.python-version == '3.9'"
       uses: actions/upload-artifact@v4
       with:
         name: more-itertools-packages
