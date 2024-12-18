@@ -218,8 +218,8 @@ def first(iterable, default=_marker):
         return item
     if default is _marker:
         raise ValueError(
-            "first() was called on an empty iterable, "
-            "and no default value was provided."
+            'first() was called on an empty iterable, '
+            'and no default value was provided.'
         )
     return default
 
@@ -246,8 +246,8 @@ def last(iterable, default=_marker):
     except (IndexError, TypeError, StopIteration):
         if default is _marker:
             raise ValueError(
-                "last() was called on an empty iterable, "
-                "and no default value was provided."
+                'last() was called on an empty iterable, '
+                'and no default value was provided.'
             )
         return default
 
