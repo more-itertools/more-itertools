@@ -218,8 +218,8 @@ def first(iterable, default=_marker):
         return item
     if default is _marker:
         raise ValueError(
-            'first() was called on an empty iterable, and no '
-            'default value was provided.'
+            'first() was called on an empty iterable, '
+            'and no default value was provided.'
         )
     return default
 
@@ -240,15 +240,14 @@ def last(iterable, default=_marker):
         if isinstance(iterable, Sequence):
             return iterable[-1]
         # Work around https://bugs.python.org/issue38525
-        elif hasattr(iterable, '__reversed__') and (hexversion != 0x030800F0):
+        if hasattr(iterable, '__reversed__'):
             return next(reversed(iterable))
-        else:
-            return deque(iterable, maxlen=1)[-1]
+        return deque(iterable, maxlen=1)[-1]
     except (IndexError, TypeError, StopIteration):
         if default is _marker:
             raise ValueError(
-                'last() was called on an empty iterable, and no default was '
-                'provided.'
+                'last() was called on an empty iterable, '
+                'and no default value was provided.'
             )
         return default
 
