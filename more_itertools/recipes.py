@@ -1009,12 +1009,8 @@ def matmul(m1, m2):
     return batched(starmap(_sumprod, product(m1, transpose(m2))), n)
 
 
-def factor(n):
-    """Yield the prime factors of n.
-
-    >>> list(factor(360))
-    [2, 2, 2, 3, 3, 5]
-    """
+def _factor_trial(n):
+    # Factor using trial division, used for small inputs
     for prime in sieve(math.isqrt(n) + 1):
         while not n % prime:
             yield prime
@@ -1023,6 +1019,44 @@ def factor(n):
                 return
     if n > 1:
         yield n
+
+
+def _factor_pollard(n):
+    # Return a factor of n using Pollard's rho algorithm
+    for b in range(1, n - 2):
+        x = y = 2
+        d = 1
+        while d == 1:
+            x = (x * x + b) % n
+            y = (y * y + b) % n
+            y = (y * y + b) % n
+            d = math.gcd(x - y, n)
+        if d != n:
+            return d
+    raise ValueError('prime or under 5')
+
+
+def factor(n):
+    """Yield the prime factors of n.
+
+    >>> list(factor(360))
+    [2, 2, 2, 3, 3, 5]
+
+    This function uses trial division for when *n* is less than 1000 and
+    Pollard's rho algorithm for larger inputs.
+    """
+    todo = [n] if n > 1 else []
+    factors = []
+    while todo:
+        n = todo.pop()
+        if is_prime(n):
+            factors += [n]
+        elif n < 1000:
+            factors += _factor_trial(n)
+        else:
+            fact = _factor_pollard(n)
+            todo += (n // fact, fact)
+    return iter(sorted(factors))
 
 
 def polynomial_eval(coefficients, x):
