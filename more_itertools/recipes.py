@@ -31,54 +31,54 @@ from random import choice, randrange, sample
 from sys import hexversion
 
 __all__ = [
-    "all_equal",
-    "batched",
-    "before_and_after",
-    "consume",
-    "convolve",
-    "dotproduct",
-    "first_true",
-    "factor",
-    "flatten",
-    "grouper",
-    "is_prime",
-    "iter_except",
-    "iter_index",
-    "loops",
-    "matmul",
-    "ncycles",
-    "nth",
-    "nth_combination",
-    "padnone",
-    "pad_none",
-    "pairwise",
-    "partition",
-    "polynomial_eval",
-    "polynomial_from_roots",
-    "polynomial_derivative",
-    "powerset",
-    "prepend",
-    "quantify",
-    "reshape",
-    "random_combination_with_replacement",
-    "random_combination",
-    "random_permutation",
-    "random_product",
-    "repeatfunc",
-    "roundrobin",
-    "sieve",
-    "sliding_window",
-    "subslices",
-    "sum_of_squares",
-    "tabulate",
-    "tail",
-    "take",
-    "totient",
-    "transpose",
-    "triplewise",
-    "unique",
-    "unique_everseen",
-    "unique_justseen",
+    'all_equal',
+    'batched',
+    'before_and_after',
+    'consume',
+    'convolve',
+    'dotproduct',
+    'first_true',
+    'factor',
+    'flatten',
+    'grouper',
+    'is_prime',
+    'iter_except',
+    'iter_index',
+    'loops',
+    'matmul',
+    'ncycles',
+    'nth',
+    'nth_combination',
+    'padnone',
+    'pad_none',
+    'pairwise',
+    'partition',
+    'polynomial_eval',
+    'polynomial_from_roots',
+    'polynomial_derivative',
+    'powerset',
+    'prepend',
+    'quantify',
+    'reshape',
+    'random_combination_with_replacement',
+    'random_combination',
+    'random_permutation',
+    'random_product',
+    'repeatfunc',
+    'roundrobin',
+    'sieve',
+    'sliding_window',
+    'subslices',
+    'sum_of_squares',
+    'tabulate',
+    'tail',
+    'take',
+    'totient',
+    'transpose',
+    'triplewise',
+    'unique',
+    'unique_everseen',
+    'unique_justseen',
 ]
 
 _marker = object()
@@ -93,7 +93,7 @@ else:
     _zip_strict = partial(zip, strict=True)
 
 # math.sumprod is available for Python 3.12+
-_sumprod = getattr(math, "sumprod", lambda x, y: dotproduct(x, y))
+_sumprod = getattr(math, 'sumprod', lambda x, y: dotproduct(x, y))
 
 
 def take(n, iterable):
@@ -341,9 +341,9 @@ else:
 
 class UnequalIterablesError(ValueError):
     def __init__(self, details=None):
-        msg = "Iterables have different lengths"
+        msg = 'Iterables have different lengths'
         if details is not None:
-            msg += (": index 0 has length {}; index {} has length {}").format(
+            msg += (': index 0 has length {}; index {} has length {}').format(
                 *details
             )
 
@@ -374,7 +374,7 @@ def _zip_equal(*iterables):
         return _zip_equal_generator(iterables)
 
 
-def grouper(iterable, n, incomplete="fill", fillvalue=None):
+def grouper(iterable, n, incomplete='fill', fillvalue=None):
     """Group elements from *iterable* into fixed-length groups of length *n*.
 
     >>> list(grouper('ABCDEF', 3))
@@ -404,14 +404,14 @@ def grouper(iterable, n, incomplete="fill", fillvalue=None):
 
     """
     args = [iter(iterable)] * n
-    if incomplete == "fill":
+    if incomplete == 'fill':
         return zip_longest(*args, fillvalue=fillvalue)
-    if incomplete == "strict":
+    if incomplete == 'strict':
         return _zip_equal(*args)
-    if incomplete == "ignore":
+    if incomplete == 'ignore':
         return zip(*args)
     else:
-        raise ValueError("Expected fill, strict, or ignore")
+        raise ValueError('Expected fill, strict, or ignore')
 
 
 def roundrobin(*iterables):
@@ -849,7 +849,7 @@ def sliding_window(iterable, n):
     elif n == 1:
         return zip(iterable)
     else:
-        raise ValueError(f"n should be at least one, not {n}")
+        raise ValueError(f'n should be at least one, not {n}')
 
 
 def subslices(iterable):
@@ -904,7 +904,7 @@ def iter_index(iterable, value, start=0, stop=None):
     associated with particular values.
 
     """
-    seq_index = getattr(iterable, "index", None)
+    seq_index = getattr(iterable, 'index', None)
     if seq_index is None:
         # Slow path for general iterables
         it = islice(iterable, start, stop)
@@ -952,11 +952,11 @@ def _batched(iterable, n, *, strict=False):
     On Python 3.13 and above, this is an alias for :func:`itertools.batched`.
     """
     if n < 1:
-        raise ValueError("n must be at least one")
+        raise ValueError('n must be at least one')
     it = iter(iterable)
     while batch := tuple(islice(it, n)):
         if strict and len(batch) != n:
-            raise ValueError("batched(): incomplete batch")
+            raise ValueError('batched(): incomplete batch')
         yield batch
 
 

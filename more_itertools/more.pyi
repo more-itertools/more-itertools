@@ -27,17 +27,17 @@ from typing import (
 from typing_extensions import Protocol
 
 # Type and type variable definitions
-_T = TypeVar("_T")
-_T1 = TypeVar("_T1")
-_T2 = TypeVar("_T2")
-_T3 = TypeVar("_T3")
-_T4 = TypeVar("_T4")
-_T5 = TypeVar("_T5")
-_U = TypeVar("_U")
-_V = TypeVar("_V")
-_W = TypeVar("_W")
-_T_co = TypeVar("_T_co", covariant=True)
-_GenFn = TypeVar("_GenFn", bound=Callable[..., Iterator[Any]])
+_T = TypeVar('_T')
+_T1 = TypeVar('_T1')
+_T2 = TypeVar('_T2')
+_T3 = TypeVar('_T3')
+_T4 = TypeVar('_T4')
+_T5 = TypeVar('_T5')
+_U = TypeVar('_U')
+_V = TypeVar('_V')
+_W = TypeVar('_W')
+_T_co = TypeVar('_T_co', covariant=True)
+_GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
 _Raisable = BaseException | type[BaseException]
 
 # The type of isinstance's second argument (from typeshed builtins)
@@ -731,7 +731,7 @@ def classify_unique(
 class _SupportsLessThan(Protocol):
     def __lt__(self, __other: Any) -> bool: ...
 
-_SupportsLessThanT = TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)
+_SupportsLessThanT = TypeVar('_SupportsLessThanT', bound=_SupportsLessThan)
 
 @overload
 def minmax(

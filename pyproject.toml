@@ -59,7 +59,7 @@ ignore = ["B904", "B028", "F841", "E741"]
 
 [tool.ruff.format]
 indent-style = "space"
-quote-style = "double"
+quote-style = "single"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]

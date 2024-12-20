@@ -11,10 +11,10 @@ from typing import (
 )
 
 # Type and type variable definitions
-_T = TypeVar("_T")
-_T1 = TypeVar("_T1")
-_T2 = TypeVar("_T2")
-_U = TypeVar("_U")
+_T = TypeVar('_T')
+_T1 = TypeVar('_T1')
+_T2 = TypeVar('_T2')
+_U = TypeVar('_U')
 
 def take(n: int, iterable: Iterable[_T]) -> list[_T]: ...
 def tabulate(
