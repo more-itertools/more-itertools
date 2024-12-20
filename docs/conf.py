@@ -16,7 +16,7 @@ import sys
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
 
 import more_itertools
 
@@ -25,22 +25,22 @@ import more_itertools
 # to readthedocs.io for display on github.com, but those links can be
 # relative when being built for Sphinx.
 
-with open('../README.rst') as source:
+with open("../README.rst") as source:
     readme_file = source.readlines()
 
-build_dir = '_build'
+build_dir = "_build"
 os.makedirs(build_dir, exist_ok=True)
 
-rtd_path = 'https://more-itertools.readthedocs.io/en/stable/'
+rtd_path = "https://more-itertools.readthedocs.io/en/stable/"
 table_width = 200
 in_table = False
-with open(os.path.join('.', build_dir, 'README.pprst'), 'w') as target:
+with open(os.path.join(".", build_dir, "README.pprst"), "w") as target:
     for line in readme_file:
         old_len = len(line)
-        if line.startswith('|') and line.endswith('|\n'):  # Inside table
-            line = line.replace(rtd_path, '').rstrip(' |\n')
-            spaces = ' ' * (table_width - len(line) - 1)
-            line = f'{line}{spaces}|\n'
+        if line.startswith("|") and line.endswith("|\n"):  # Inside table
+            line = line.replace(rtd_path, "").rstrip(" |\n")
+            spaces = " " * (table_width - len(line) - 1)
+            line = f"{line}{spaces}|\n"
 
         target.write(line)
 
@@ -51,23 +51,23 @@ with open(os.path.join('.', build_dir, 'README.pprst'), 'w') as target:
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'toctree'
+master_doc = "toctree"
 
 # General information about the project.
-project = 'more-itertools'
-copyright = '2012, Erik Rose'
+project = "more-itertools"
+copyright = "2012, Erik Rose"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -107,7 +107,7 @@ exclude_patterns = [build_dir]
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -117,7 +117,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -146,7 +146,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 html_css_files = ["_static/theme_overrides.css"]
 
@@ -192,7 +192,7 @@ html_css_files = ["_static/theme_overrides.css"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'more-itertoolsdoc'
+htmlhelp_basename = "more-itertoolsdoc"
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -210,11 +210,11 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     (
-        'index',
-        'more-itertools.tex',
-        'more-itertools Documentation',
-        'Erik Rose',
-        'manual',
+        "index",
+        "more-itertools.tex",
+        "more-itertools Documentation",
+        "Erik Rose",
+        "manual",
     ),
 ]
 
@@ -245,10 +245,10 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (
-        'index',
-        'more-itertools',
-        'more-itertools Documentation',
-        ['Erik Rose'],
+        "index",
+        "more-itertools",
+        "more-itertools Documentation",
+        ["Erik Rose"],
         1,
     )
 ]
@@ -264,13 +264,13 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (
-        'index',
-        'more-itertools',
-        'more-itertools Documentation',
-        'Erik Rose',
-        'more-itertools',
-        'One line description of project.',
-        'Miscellaneous',
+        "index",
+        "more-itertools",
+        "more-itertools Documentation",
+        "Erik Rose",
+        "more-itertools",
+        "One line description of project.",
+        "Miscellaneous",
     ),
 ]
 
