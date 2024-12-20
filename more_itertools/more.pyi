@@ -4,25 +4,27 @@ from __future__ import annotations
 
 import sys
 import types
-
-from typing import (
-    Any,
-    Callable,
+from collections.abc import (
     Container,
-    ContextManager,
-    Generic,
     Hashable,
     Iterable,
     Iterator,
     Mapping,
-    overload,
     Reversible,
     Sequence,
     Sized,
+)
+from typing import (
+    Any,
+    Callable,
+    ContextManager,
+    Generic,
     Type,
     TypeVar,
+    overload,
     type_check_only,
 )
+
 from typing_extensions import Protocol
 
 # Type and type variable definitions

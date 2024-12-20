@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator, Sequence
 from typing import (
     Any,
     Callable,
-    Iterable,
-    Iterator,
-    overload,
-    Sequence,
     Type,
     TypeVar,
+    overload,
 )
 
 # Type and type variable definitions

@@ -10,7 +10,6 @@ Some backward-compatible usability improvements have been made.
 
 import math
 import operator
-
 from collections import deque
 from collections.abc import Sized
 from functools import lru_cache, partial
@@ -28,7 +27,7 @@ from itertools import (
     tee,
     zip_longest,
 )
-from random import randrange, sample, choice
+from random import choice, randrange, sample
 from sys import hexversion
 
 __all__ = [
