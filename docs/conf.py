@@ -10,9 +10,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
-
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -26,7 +25,7 @@ import more_itertools
 # to readthedocs.io for display on github.com, but those links can be
 # relative when being built for Sphinx.
 
-with open('../README.rst', 'rt') as source:
+with open('../README.rst') as source:
     readme_file = source.readlines()
 
 build_dir = '_build'
@@ -35,7 +34,7 @@ os.makedirs(build_dir, exist_ok=True)
 rtd_path = 'https://more-itertools.readthedocs.io/en/stable/'
 table_width = 200
 in_table = False
-with open(os.path.join('.', build_dir, 'README.pprst'), 'wt') as target:
+with open(os.path.join('.', build_dir, 'README.pprst'), 'w') as target:
     for line in readme_file:
         old_len = len(line)
         if line.startswith('|') and line.endswith('|\n'):  # Inside table
@@ -149,7 +148,7 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_css_files = ["_static/theme_overrides.css"]
+html_css_files = ['_static/theme_overrides.css']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
