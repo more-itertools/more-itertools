@@ -14,12 +14,11 @@ from collections.abc import (
     Sequence,
     Sized,
 )
+from contextlib import AbstractContextManager
 from typing import (
     Any,
     Callable,
-    ContextManager,
     Generic,
-    Type,
     TypeVar,
     overload,
     type_check_only,
@@ -28,18 +27,18 @@ from typing import (
 from typing_extensions import Protocol
 
 # Type and type variable definitions
-_T = TypeVar('_T')
-_T1 = TypeVar('_T1')
-_T2 = TypeVar('_T2')
-_T3 = TypeVar('_T3')
-_T4 = TypeVar('_T4')
-_T5 = TypeVar('_T5')
-_U = TypeVar('_U')
-_V = TypeVar('_V')
-_W = TypeVar('_W')
-_T_co = TypeVar('_T_co', covariant=True)
-_GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
-_Raisable = BaseException | Type[BaseException]
+_T = TypeVar("_T")
+_T1 = TypeVar("_T1")
+_T2 = TypeVar("_T2")
+_T3 = TypeVar("_T3")
+_T4 = TypeVar("_T4")
+_T5 = TypeVar("_T5")
+_U = TypeVar("_U")
+_V = TypeVar("_V")
+_W = TypeVar("_W")
+_T_co = TypeVar("_T_co", covariant=True)
+_GenFn = TypeVar("_GenFn", bound=Callable[..., Iterator[Any]])
+_Raisable = BaseException | type[BaseException]
 
 # The type of isinstance's second argument (from typeshed builtins)
 if sys.version_info >= (3, 10):
@@ -92,7 +91,7 @@ def consumer(func: _GenFn) -> _GenFn: ...
 def ilen(iterable: Iterable[_T]) -> int: ...
 def iterate(func: Callable[[_T], _T], start: _T) -> Iterator[_T]: ...
 def with_iter(
-    context_manager: ContextManager[Iterable[_T]],
+    context_manager: AbstractContextManager[Iterable[_T]],
 ) -> Iterator[_T]: ...
 def one(
     iterable: Iterable[_T],
@@ -411,7 +410,7 @@ class numeric_range(Generic[_T, _U], Sequence[_T], Hashable, Reversible[_T]):
     def __len__(self) -> int: ...
     def __reduce__(
         self,
-    ) -> tuple[Type[numeric_range[_T, _U]], tuple[_T, _T, _U]]: ...
+    ) -> tuple[type[numeric_range[_T, _U]], tuple[_T, _T, _U]]: ...
     def __repr__(self) -> str: ...
     def __reversed__(self) -> Iterator[_T]: ...
     def count(self, value: _T) -> int: ...
@@ -568,12 +567,12 @@ def distinct_combinations(
 def filter_except(
     validator: Callable[[Any], object],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException],
+    *exceptions: type[BaseException],
 ) -> Iterator[_T]: ...
 def map_except(
     function: Callable[[Any], _U],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException],
+    *exceptions: type[BaseException],
 ) -> Iterator[_U]: ...
 def map_if(
     iterable: Iterable[Any],
@@ -618,7 +617,7 @@ class callback_iter(Generic[_T], Iterator[_T]):
     def __enter__(self) -> callback_iter[_T]: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: types.TracebackType | None,
     ) -> bool | None: ...
@@ -645,15 +644,11 @@ def nth_permutation(
 ) -> tuple[_T, ...]: ...
 def value_chain(*args: _T | Iterable[_T]) -> Iterable[_T]: ...
 def product_index(element: Iterable[_T], *args: Iterable[_T]) -> int: ...
-def combination_index(
-    element: Iterable[_T], iterable: Iterable[_T]
-) -> int: ...
+def combination_index(element: Iterable[_T], iterable: Iterable[_T]) -> int: ...
 def combination_with_replacement_index(
     element: Iterable[_T], iterable: Iterable[_T]
 ) -> int: ...
-def permutation_index(
-    element: Iterable[_T], iterable: Iterable[_T]
-) -> int: ...
+def permutation_index(element: Iterable[_T], iterable: Iterable[_T]) -> int: ...
 def repeat_each(iterable: Iterable[_T], n: int = ...) -> Iterator[_T]: ...
 
 class countable(Generic[_T], Iterator[_T]):
@@ -798,7 +793,7 @@ def outer_product(
 ) -> Iterator[tuple[_V, ...]]: ...
 def iter_suppress(
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException],
+    *exceptions: type[BaseException],
 ) -> Iterator[_T]: ...
 def filter_map(
     func: Callable[[_T], _V | None],
@@ -806,7 +801,7 @@ def filter_map(
 ) -> Iterator[_V]: ...
 def powerset_of_sets(iterable: Iterable[_T]) -> Iterator[set[_T]]: ...
 def join_mappings(
-    **field_to_map: Mapping[_T, _V]
+    **field_to_map: Mapping[_T, _V],
 ) -> dict[_T, dict[str, _V]]: ...
 def doublestarmap(
     func: Callable[..., _T],

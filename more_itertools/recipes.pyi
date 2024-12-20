@@ -6,16 +6,15 @@ from collections.abc import Iterable, Iterator, Sequence
 from typing import (
     Any,
     Callable,
-    Type,
     TypeVar,
     overload,
 )
 
 # Type and type variable definitions
-_T = TypeVar('_T')
-_T1 = TypeVar('_T1')
-_T2 = TypeVar('_T2')
-_U = TypeVar('_U')
+_T = TypeVar("_T")
+_T1 = TypeVar("_T1")
+_T2 = TypeVar("_T2")
+_U = TypeVar("_U")
 
 def take(n: int, iterable: Iterable[_T]) -> list[_T]: ...
 def tabulate(
@@ -67,13 +66,13 @@ def unique(
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException] | tuple[Type[BaseException], ...],
+    exception: type[BaseException] | tuple[type[BaseException], ...],
     first: None = ...,
 ) -> Iterator[_T]: ...
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException] | tuple[Type[BaseException], ...],
+    exception: type[BaseException] | tuple[type[BaseException], ...],
     first: Callable[[], _U],
 ) -> Iterator[_T | _U]: ...
 @overload
