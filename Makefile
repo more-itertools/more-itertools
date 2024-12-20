@@ -9,7 +9,6 @@ requirements:
 .PHONY: check
 check:
 	ruff check .
-	flake8 more_itertools tests
 	stubtest more_itertools.more more_itertools.recipes
 
 .PHONY: format
