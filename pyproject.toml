@@ -63,4 +63,6 @@ quote-style = "double"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
+"__init__.py" = ["F401", "F403"]
+"__init__.pyi" = ["F401", "F403"]
+"*.py" = ["E731"]
