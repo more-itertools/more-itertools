@@ -8,13 +8,12 @@ requirements:
 
 .PHONY: check
 check:
-	black --check .
-	flake8 more_itertools tests
-	stubtest more_itertools.more more_itertools.recipes
+	ruff check .
+#	stubtest more_itertools.more more_itertools.recipes
 
 .PHONY: format
 format:
-	black .
+	ruff format .
 
 .PHONY: coverage
 coverage:
