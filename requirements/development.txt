@@ -2,7 +2,7 @@ black
 coverage
 flake8
 flit
-mypy
+mypy==1.13
 setuptools
 sphinx
 sphinx_rtd_theme
