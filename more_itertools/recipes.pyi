@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator, Sequence
 from typing import (
     Any,
     Callable,
-    Iterable,
-    Iterator,
-    overload,
-    Sequence,
-    Type,
     TypeVar,
+    overload,
 )
 
 # Type and type variable definitions
@@ -69,13 +66,13 @@ def unique(
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException] | tuple[Type[BaseException], ...],
+    exception: type[BaseException] | tuple[type[BaseException], ...],
     first: None = ...,
 ) -> Iterator[_T]: ...
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException] | tuple[Type[BaseException], ...],
+    exception: type[BaseException] | tuple[type[BaseException], ...],
     first: Callable[[], _U],
 ) -> Iterator[_T | _U]: ...
 @overload
