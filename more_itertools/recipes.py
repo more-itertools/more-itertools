@@ -1168,8 +1168,8 @@ def is_prime(n):
     This function uses the Miller-Rabin primality test, which can return false
     positives for very large inputs. For values of *n* below 10**24
     there are no false positives. For larger values, there is less than
-    a 1 in 2**64 false positive rate. Multiple tests can reduce the chance
-    of a false positive.
+    a 1 in 2**128 false positive rate. Multiple tests can further reduce the
+    chance of a false positive.
     """
     if n < 17:
         return n in {2, 3, 5, 7, 11, 13}
@@ -1179,7 +1179,7 @@ def is_prime(n):
         if n < limit:
             break
     else:
-        bases = [randrange(2, n - 1) for i in range(32)]
+        bases = [randrange(2, n - 1) for i in range(64)]
     return all(_strong_probable_prime(n, base) for base in bases)
 
 
