@@ -922,59 +922,6 @@ def distinct_derangements(int_iterable, r=None):
         yield p
 
 
-def random_derangement_int(n, r=None, k=1, early=True):
-    """Return *k* random *r* length permutation of the elements in range(*n*).
-
-        For more details, see ``random_derangement``.
-        """
-    return random_derangement(range(n), r=r, k=k, early=True)
-
-
-def random_derangement(int_iterable, r=None, k=1, early=True):
-    """Return *k* random *r* length permutation of the elements in *iterable*.
-
-        If *r* is not specified or is ``None``, then *r* defaults to the length of
-        *int_iterable*. It is also reduced to the length of *int_iterable* if the
-        specified value is too big.
-        If *k* is not specified, then *k* defaults to 1.
-
-            >>> random_derangement(range(5), k=2)  # doctest:+SKIP
-            [(2, 3, 0, 4, 1), (4, 3, 1, 0, 2)]
-
-            >>> random_derangement(range(5), 3, k=3)  # doctest:+SKIP
-            [(2, 4, 1), (1, 3, 4), (3, 4, 1)]
-
-        For *r*=None, this is equivalent to taking a random selection from
-        ``derangements(int_iterable)``, *k* times. In case of
-        *r* < len(*int_iterable*), *early* toggles exit behavior: either
-        yield early when *r* elements have succesfully been generated, or
-        continue to get all len(*int_iterable*) and then trim to first
-        *r* elements. This can impact the probability of each option:
-
-        >>> Counter(random_derangement([0, 0, 1, 2], r=2, k=10000, early=False))  # doctest:+SKIP
-        Counter({(2, 0): 4924, (1, 0): 2542, (1, 2): 2534})
-        >>> Counter(random_derangement([0, 0, 1, 2], r=2, k=10000, early=True))  # doctest:+SKIP
-        Counter({(2, 0): 4030, (1, 0): 3960, (1, 2): 2010})
-
-        """
-    n = len(int_iterable)
-    if r is None or r > n:
-        r = n
-    n_success = 0
-    while n_success < k:
-        v = list(int_iterable)
-        for j in range(r if early else n):
-            p = randint(j, n - 1)
-            if v[p] == j:
-                break
-            else:
-                v[j], v[p] = v[p], v[j]
-        else:
-            if (v[r-1] != r - 1) if early else (v[n-1] != n-1):
-                yield tuple(v[:r])
-                n_success += 1
-
-
 def intersperse(e, iterable, n=1):
     """Intersperse filler element *e* among the items in *iterable*, leaving
     *n* items between each filler element.
