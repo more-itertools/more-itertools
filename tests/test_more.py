@@ -33,7 +33,6 @@ from traceback import format_exc
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
-from more_itertools.more import derangements
 
 
 def load_tests(loader, tests, ignore):

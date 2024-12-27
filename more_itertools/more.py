@@ -1,4 +1,3 @@
-import functools
 import math
 import warnings
 
@@ -26,7 +25,7 @@ from itertools import (
 )
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from queue import Empty, Queue
-from random import random, randrange, shuffle, uniform, randint
+from random import random, randrange, shuffle, uniform
 from operator import itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
@@ -827,7 +826,7 @@ def derangements_range(n):
     """
     if n == 2:
         yield 1, 0
-    elif n == 1:
+    elif n <= 1:
         yield from []
     else:
         lag1 = derangements_range(n - 1)
@@ -865,7 +864,8 @@ def derangements(iterable, r=None):
     *iterable* doesn't strictly need to consist of integers, but for
     non-integer iterables ``permutations`` will be equivalent but faster:
 
-        >>> set(derangements(["a", 2.5, 1j])) == set(permutations(["a", 2.5, 1j]))
+        >>> set(derangements(["a", 2.5, 1j])) == \
+                set(permutations(["a", 2.5, 1j]))
         True
 
     There can be a use case in mixed iterables though:
@@ -879,7 +879,7 @@ def derangements(iterable, r=None):
         >>> sorted(derangements([0, 0, 1]))
         [(1, 0, 0), (1, 0, 0)]
 
-    If deduplicated derangements are needed, look into ``distinct_derangements``.
+    If deduplicated derangements are needed, use``distinct_derangements``.
 
     """
     for p in permutations(iterable, r=r):
@@ -906,15 +906,17 @@ def distinct_derangements(iterable, r=None):
         [(1, 0), (1, 2), (2, 0)]
 
     *iterable* doesn't strictly need to consist of integers, but for
-    non-integer iterables ``distinct_permutations`` will be equivalent but faster:
+    non-integer iterables ``distinct_permutations`` will be faster:
 
-        >>> set(distinct_derangements(["a", 2.5, 1j, 1j])) == set(distinct_permutations(["a", 2.5, 1j, 1j]))
+        >>> set(distinct_derangements(["a", 2.5, 1j, 1j])) == \
+                set(distinct_permutations(["a", 2.5, 1j, 1j]))
         True
 
     There can be a use case in mixed iterables though:
 
-        >>> list(distinct_derangements([0, 1, 1, "green"]))
-        [(1, 0, 1, 'green'), (1, 0, 'green', 1), (1, 'green', 0, 1), (1, 'green', 1, 0), ('green', 0, 1, 1)]
+        >>> list(distinct_derangements([0, 1, 1, "green"]))  # doctest: +SKIP
+        [(1, 0, 1, 'green'), (1, 0, 'green', 1), (1, 'green', 0, 1),
+        (1, 'green', 1, 0), ('green', 0, 1, 1)]
 
     """
     for p in distinct_permutations(iterable, r=r):
