@@ -833,15 +833,17 @@ def derangements_range(n):
         lag1 = derangements_range(n - 1)
         for lag in lag1:
             for split in range(len(lag)):
-                yield lag[0:split] + (n-1,) + lag[split+1:] + (lag[split],)
+                yield lag[0:split] + (n - 1,) + lag[split + 1 :] + (
+                    lag[split],
+                )
 
         lag2 = derangements_range(n - 2)
         for lag in lag2:
             yield lag + (n - 1, n - 2)
             for k in range(n - 3, -1, -1):
                 i = lag.index(k)
-                lag = lag[:i] + (k+1,) + lag[i+1:]
-                yield lag[:k] + (n-1,) + lag[k:] + (k,)
+                lag = lag[:i] + (k + 1,) + lag[i + 1 :]
+                yield lag[:k] + (n - 1,) + lag[k:] + (k,)
 
 
 def derangements(iterable, r=None):
@@ -881,7 +883,8 @@ def derangements(iterable, r=None):
 
     """
     for p in permutations(iterable, r=r):
-        if any(x == i for i,x in enumerate(p)): continue
+        if any(x == i for i, x in enumerate(p)):
+            continue
         yield p
 
 
@@ -915,7 +918,8 @@ def distinct_derangements(iterable, r=None):
 
     """
     for p in distinct_permutations(iterable, r=r):
-        if any(x == i for i,x in enumerate(p)): continue
+        if any(x == i for i, x in enumerate(p)):
+            continue
         yield p
 
 
