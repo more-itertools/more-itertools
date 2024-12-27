@@ -844,13 +844,13 @@ def derangements_range(n):
                 yield lag[:k] + (n-1,) + lag[k:] + (k,)
 
 
-def derangements(int_iterable, r=None):
-    """Yield successive derangements of the elements in *int_iterable*.
+def derangements(iterable, r=None):
+    """Yield successive derangements of the elements in *iterable*.
 
             >>> sorted(derangements([0, 1, 2]))
             [(1, 2, 0), (2, 0, 1)]
 
-    Equivalent to yielding from ``permutations(int_iterable)``, except all
+    Equivalent to yielding from ``permutations(iterable)``, except all
     permutations removed that have at least one integer k assigned at index k.
 
     If *r* is given, only the *r*-length derangements are yielded.
@@ -860,7 +860,7 @@ def derangements(int_iterable, r=None):
         >>> sorted(derangements([0, 2, 3], 2))
         [(2, 0), (2, 3), (3, 0), (3, 2)]
 
-    *int_iterable* doesn't strictly need to consist of integers, but for
+    *iterable* doesn't strictly need to consist of integers, but for
     non-integer iterables ``permutations`` will be equivalent but faster:
 
         >>> set(derangements(["a", 2.5, 1j])) == set(permutations(["a", 2.5, 1j]))
@@ -880,18 +880,18 @@ def derangements(int_iterable, r=None):
     If deduplicated derangements are needed, look into ``distinct_derangements``.
 
     """
-    for p in permutations(int_iterable, r=r):
+    for p in permutations(iterable, r=r):
         if any(x == i for i,x in enumerate(p)): continue
         yield p
 
 
-def distinct_derangements(int_iterable, r=None):
-    """Yield successive distinct derangements of the elements in *int_iterable*.
+def distinct_derangements(iterable, r=None):
+    """Yield successive distinct derangements of the elements in *iterable*.
 
         >>> sorted(distinct_derangements([0, 0, 1, 2]))
         [(1, 0, 0, 2), (1, 2, 0, 0), (2, 0, 0, 1), (2, 0, 1, 0)]
 
-    Equivalent to yielding from ``set(derangements(int_iterable))``, except
+    Equivalent to yielding from ``set(derangements(iterable))``, except
     duplicates are not generated and thrown away. For larger input sequences
     this is much more efficient.
 
@@ -902,7 +902,7 @@ def distinct_derangements(int_iterable, r=None):
         >>> sorted(distinct_derangements([0, 0, 1, 2], 2))
         [(1, 0), (1, 2), (2, 0)]
 
-    *int_iterable* doesn't strictly need to consist of integers, but for
+    *iterable* doesn't strictly need to consist of integers, but for
     non-integer iterables ``distinct_permutations`` will be equivalent but faster:
 
         >>> set(distinct_derangements(["a", 2.5, 1j, 1j])) == set(distinct_permutations(["a", 2.5, 1j, 1j]))
@@ -914,7 +914,7 @@ def distinct_derangements(int_iterable, r=None):
         [(1, 0, 1, 'green'), (1, 0, 'green', 1), (1, 'green', 0, 1), (1, 'green', 1, 0), ('green', 0, 1, 1)]
 
     """
-    for p in distinct_permutations(int_iterable, r=r):
+    for p in distinct_permutations(iterable, r=r):
         if any(x == i for i,x in enumerate(p)): continue
         yield p
 
