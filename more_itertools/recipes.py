@@ -1045,18 +1045,77 @@ def factor(n):
     This function uses trial division for when *n* is less than 1000 and
     Pollard's rho algorithm for larger inputs.
     """
+    small_primes = (
+        2,
+        3,
+        5,
+        7,
+        11,
+        13,
+        17,
+        19,
+        23,
+        29,
+        31,
+        37,
+        41,
+        43,
+        47,
+        53,
+        59,
+        61,
+        67,
+        71,
+        73,
+        79,
+        83,
+        89,
+        97,
+        101,
+        103,
+        107,
+        109,
+        113,
+        127,
+        131,
+        137,
+        139,
+        149,
+        151,
+        157,
+        163,
+        167,
+        173,
+        179,
+        181,
+        191,
+        193,
+        197,
+        199,
+    )
+
+    trial_division_boundary = 211**2
+
+    # Corner case reduction
+    if n < 1:
+        return
+
+    # Trial division reduction
+    for prime in small_primes:
+        while not n % prime:
+            yield prime
+            n //= prime
+
+    # Pollard's rho reduction
+    primes = []
     todo = [n] if n > 1 else []
-    factors = []
-    while todo:
-        n = todo.pop()
-        if is_prime(n):
-            factors += [n]
-        elif n < 1000:
-            factors += _factor_trial(n)
+    for n in todo:
+        if n < trial_division_boundary or is_prime(n):
+            primes.append(n)
         else:
             fact = _factor_pollard(n)
-            todo += (n // fact, fact)
-    return iter(sorted(factors))
+            todo += (fact, n // fact)
+    yield from sorted(primes)
 
 
 def polynomial_eval(coefficients, x):
