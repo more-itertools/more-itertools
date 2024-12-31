@@ -842,43 +842,6 @@ class DistinctDerangementsTests(TestCase):
                 self.assertCountEqual(actual, expected)
 
 
-class DerangementsRangeTests(TestCase):
-
-    RANGE_NUM = 8
-
-    def test_range_manual(self):
-        actual = sorted(mi.derangements_range(4))
-        expected = [
-            (1, 0, 3, 2),
-            (1, 2, 3, 0),
-            (1, 3, 0, 2),
-            (2, 0, 3, 1),
-            (2, 3, 0, 1),
-            (2, 3, 1, 0),
-            (3, 0, 1, 2),
-            (3, 2, 0, 1),
-            (3, 2, 1, 0),
-        ]
-        self.assertListEqual(actual, expected)
-
-    def test_range(self):
-        range_in = range(self.RANGE_NUM)
-        actual = set(mi.derangements_range(self.RANGE_NUM))
-        expected = set(
-            [
-                x
-                for x in permutations(range_in)
-                if not any(x[i] == i for i in range_in)
-            ]
-        )
-        self.assertSetEqual(actual, expected)
-
-    def test_ref_impl(self):
-        actual = set(mi.derangements_range(self.RANGE_NUM))
-        expected = set(mi.derangements(range(self.RANGE_NUM)))
-        self.assertSetEqual(actual, expected)
-
-
 class IlenTests(TestCase):
     def test_ilen(self):
         """Sanity-checks for ``ilen()``."""
