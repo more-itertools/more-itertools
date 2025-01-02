@@ -1045,7 +1045,8 @@ def factor(n):
     This function uses trial division for when *n* is less than 1000 and
     Pollard's rho algorithm for larger inputs.
     """
-    small_primes = (
+    # tuple(sieve(211))
+    small_primes
         2,
         3,
         5,
