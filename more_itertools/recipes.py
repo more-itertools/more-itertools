@@ -1046,7 +1046,7 @@ def factor(n):
     Pollard's rho algorithm for larger inputs.
     """
     # tuple(sieve(211))
-    small_primes
+    small_primes = (
         2,
         3,
         5,
