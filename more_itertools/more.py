@@ -15,6 +15,7 @@ from itertools import (
     dropwhile,
     groupby,
     islice,
+    permutations,
     repeat,
     starmap,
     takewhile,
@@ -65,9 +66,11 @@ __all__ = [
     'consumer',
     'count_cycle',
     'countable',
+    'derangements',
     'dft',
     'difference',
     'distinct_combinations',
+    'distinct_derangements',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -808,6 +811,86 @@ def distinct_permutations(iterable, r=None):
             )
 
     return iter(() if r else ((),))
+
+
+def derangements(iterable, r=None):
+    """Yield successive derangements of the elements in *iterable*.
+
+            >>> sorted(derangements([0, 1, 2]))
+            [(1, 2, 0), (2, 0, 1)]
+
+    Equivalent to yielding from ``permutations(iterable)``, except all
+    permutations removed that have at least one integer k assigned at index k.
+
+    If *r* is given, only the *r*-length derangements are yielded.
+
+        >>> sorted(derangements(range(3), 2))
+        [(1, 0), (1, 2), (2, 0)]
+        >>> sorted(derangements([0, 2, 3], 2))
+        [(2, 0), (2, 3), (3, 0), (3, 2)]
+
+    *iterable* doesn't strictly need to consist of integers, but for
+    non-integer iterables ``permutations`` will be equivalent but faster:
+
+        >>> set(derangements(["a", 2.5, 1j])) == \
+                set(permutations(["a", 2.5, 1j]))
+        True
+
+    There can be a use case in mixed iterables though:
+
+        >>> list(derangements([0, 1, "green"]))
+        [(1, 0, 'green'), (1, 'green', 0), ('green', 0, 1)]
+
+    Note that in case of duplicates in input, these are treated as separate
+    entries with the same restriction in the derangements. For example:
+
+        >>> sorted(derangements([0, 0, 1]))
+        [(1, 0, 0), (1, 0, 0)]
+
+    If deduplicated derangements are needed, use``distinct_derangements``.
+
+    """
+    for p in permutations(iterable, r=r):
+        if any(x == i for i, x in enumerate(p)):
+            continue
+        yield p
+
+
+def distinct_derangements(iterable, r=None):
+    """Yield successive distinct derangements of the elements in *iterable*.
+
+        >>> sorted(distinct_derangements([0, 0, 1, 2]))
+        [(1, 0, 0, 2), (1, 2, 0, 0), (2, 0, 0, 1), (2, 0, 1, 0)]
+
+    Equivalent to yielding from ``set(derangements(iterable))``, except
+    duplicates are not generated and thrown away. For larger input sequences
+    this is much more efficient.
+
+    If *r* is given, only the *r*-length derangements are yielded.
+
+        >>> sorted(distinct_derangements([0, 0, 1, 2], 3))
+        [(1, 0, 0), (1, 2, 0), (2, 0, 0), (2, 0, 1)]
+        >>> sorted(distinct_derangements([0, 0, 1, 2], 2))
+        [(1, 0), (1, 2), (2, 0)]
+
+    *iterable* doesn't strictly need to consist of integers, but for
+    non-integer iterables ``distinct_permutations`` will be faster:
+
+        >>> set(distinct_derangements(["a", 2.5, 1j, 1j])) == \
+                set(distinct_permutations(["a", 2.5, 1j, 1j]))
+        True
+
+    There can be a use case in mixed iterables though:
+
+        >>> list(distinct_derangements([0, 1, 1, "green"]))  # doctest: +SKIP
+        [(1, 0, 1, 'green'), (1, 0, 'green', 1), (1, 'green', 0, 1),
+        (1, 'green', 1, 0), ('green', 0, 1, 1)]
+
+    """
+    for p in distinct_permutations(iterable, r=r):
+        if any(x == i for i, x in enumerate(p)):
+            continue
+        yield p
 
 
 def intersperse(e, iterable, n=1):
