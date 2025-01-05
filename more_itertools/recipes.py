@@ -1039,8 +1039,6 @@ def factor(n):
     smaller factors with Pollard's rho algorithm.
     """
 
-    trial_division_boundary = 211**2
-
     # Corner case reduction
     if n < 1:
         return
@@ -1055,7 +1053,7 @@ def factor(n):
     primes = []
     todo = [n] if n > 1 else []
     for n in todo:
-        if n < trial_division_boundary or is_prime(n):
+        if n < 211**2 or is_prime(n):
             primes.append(n)
         else:
             fact = _factor_pollard(n)
