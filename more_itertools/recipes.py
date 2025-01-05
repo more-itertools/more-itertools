@@ -1034,8 +1034,8 @@ def factor(n):
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
 
-    This function uses trial division for when *n* is less than 1000 and
-    Pollard's rho algorithm for larger inputs.
+    Finds small factors with trial division and
+    large factors with Pollard's rho algorithm.
     """
 
     trial_division_boundary = 211**2
