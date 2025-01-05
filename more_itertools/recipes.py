@@ -1034,8 +1034,9 @@ def factor(n):
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
 
-    Finds small factors with trial division and
-    large factors with Pollard's rho algorithm.
+    Finds small factors with trial division.  Larger factors are
+    either verified as prime with ``is_prime`` or split into
+    smaller factors with Pollard's rho algorithm.
     """
 
     trial_division_boundary = 211**2
