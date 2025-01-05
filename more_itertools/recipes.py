@@ -1025,6 +1025,9 @@ def _factor_pollard(n):
     raise ValueError('prime or under 5')
 
 
+_small_primes = tuple(sieve(211))
+
+
 def factor(n):
     """Yield the prime factors of n.
 
@@ -1034,55 +1037,6 @@ def factor(n):
     This function uses trial division for when *n* is less than 1000 and
     Pollard's rho algorithm for larger inputs.
     """
-    # tuple(sieve(211))
-    small_primes = (
-        2,
-        3,
-        5,
-        7,
-        11,
-        13,
-        17,
-        19,
-        23,
-        29,
-        31,
-        37,
-        41,
-        43,
-        47,
-        53,
-        59,
-        61,
-        67,
-        71,
-        73,
-        79,
-        83,
-        89,
-        97,
-        101,
-        103,
-        107,
-        109,
-        113,
-        127,
-        131,
-        137,
-        139,
-        149,
-        151,
-        157,
-        163,
-        167,
-        173,
-        179,
-        181,
-        191,
-        193,
-        197,
-        199,
-    )
 
     trial_division_boundary = 211**2
 
@@ -1091,7 +1045,7 @@ def factor(n):
         return
 
     # Trial division reduction
-    for prime in small_primes:
+    for prime in _small_primes:
         while not n % prime:
             yield prime
             n //= prime
