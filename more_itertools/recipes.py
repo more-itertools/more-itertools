@@ -1023,6 +1023,7 @@ def _factor_trial(n):
 
 def _factor_pollard(n):
     # Return a factor of n using Pollard's rho algorithm
+    gcd = math.gcd
     for b in range(1, n - 2):
         x = y = 2
         d = 1
@@ -1030,7 +1031,7 @@ def _factor_pollard(n):
             x = (x * x + b) % n
             y = (y * y + b) % n
             y = (y * y + b) % n
-            d = math.gcd(x - y, n)
+            d = gcd(x - y, n)
         if d != n:
             return d
     raise ValueError('prime or under 5')
