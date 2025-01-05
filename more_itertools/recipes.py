@@ -1025,7 +1025,7 @@ def _factor_pollard(n):
     raise ValueError('prime or under 5')
 
 
-_small_primes = tuple(sieve(211))
+_primes_below_211 = tuple(sieve(211))
 
 
 def factor(n):
@@ -1045,7 +1045,7 @@ def factor(n):
         return
 
     # Trial division reduction
-    for prime in _small_primes:
+    for prime in _primes_below_211:
         while not n % prime:
             yield prime
             n //= prime
