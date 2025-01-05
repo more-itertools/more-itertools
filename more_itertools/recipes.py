@@ -1009,18 +1009,6 @@ def matmul(m1, m2):
     return batched(starmap(_sumprod, product(m1, transpose(m2))), n)
 
 
-def _factor_trial(n):
-    # Factor using trial division, used for small inputs
-    for prime in sieve(math.isqrt(n) + 1):
-        while not n % prime:
-            yield prime
-            n //= prime
-            if n == 1:
-                return
-    if n > 1:
-        yield n
-
-
 def _factor_pollard(n):
     # Return a factor of n using Pollard's rho algorithm
     gcd = math.gcd
