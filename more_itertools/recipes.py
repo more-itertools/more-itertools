@@ -1040,7 +1040,7 @@ def factor(n):
     """
 
     # Corner case reduction
-    if n < 1:
+    if n < 2:
         return
 
     # Trial division reduction
