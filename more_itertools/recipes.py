@@ -1009,20 +1009,9 @@ def matmul(m1, m2):
     return batched(starmap(_sumprod, product(m1, transpose(m2))), n)
 
 
-def _factor_trial(n):
-    # Factor using trial division, used for small inputs
-    for prime in sieve(math.isqrt(n) + 1):
-        while not n % prime:
-            yield prime
-            n //= prime
-            if n == 1:
-                return
-    if n > 1:
-        yield n
-
-
 def _factor_pollard(n):
     # Return a factor of n using Pollard's rho algorithm
+    gcd = math.gcd
     for b in range(1, n - 2):
         x = y = 2
         d = 1
@@ -1030,10 +1019,13 @@ def _factor_pollard(n):
             x = (x * x + b) % n
             y = (y * y + b) % n
             y = (y * y + b) % n
-            d = math.gcd(x - y, n)
+            d = gcd(x - y, n)
         if d != n:
             return d
     raise ValueError('prime or under 5')
+
+
+_primes_below_211 = tuple(sieve(211))
 
 
 def factor(n):
@@ -1042,67 +1034,17 @@ def factor(n):
     >>> list(factor(360))
     [2, 2, 2, 3, 3, 5]
 
-    This function uses trial division for when *n* is less than 1000 and
-    Pollard's rho algorithm for larger inputs.
+    Finds small factors with trial division.  Larger factors are
+    either verified as prime with ``is_prime`` or split into
+    smaller factors with Pollard's rho algorithm.
     """
-    # tuple(sieve(211))
-    small_primes = (
-        2,
-        3,
-        5,
-        7,
-        11,
-        13,
-        17,
-        19,
-        23,
-        29,
-        31,
-        37,
-        41,
-        43,
-        47,
-        53,
-        59,
-        61,
-        67,
-        71,
-        73,
-        79,
-        83,
-        89,
-        97,
-        101,
-        103,
-        107,
-        109,
-        113,
-        127,
-        131,
-        137,
-        139,
-        149,
-        151,
-        157,
-        163,
-        167,
-        173,
-        179,
-        181,
-        191,
-        193,
-        197,
-        199,
-    )
-
-    trial_division_boundary = 211**2
 
     # Corner case reduction
-    if n < 1:
+    if n < 2:
         return
 
     # Trial division reduction
-    for prime in small_primes:
+    for prime in _primes_below_211:
         while not n % prime:
             yield prime
             n //= prime
@@ -1111,7 +1053,7 @@ def factor(n):
     primes = []
     todo = [n] if n > 1 else []
     for n in todo:
-        if n < trial_division_boundary or is_prime(n):
+        if n < 211**2 or is_prime(n):
             primes.append(n)
         else:
             fact = _factor_pollard(n)
