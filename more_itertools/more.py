@@ -2360,13 +2360,10 @@ class numeric_range(abc.Sequence, abc.Hashable):
 
     def __repr__(self):
         if self._step == 1:
-            return "numeric_range({}, {})".format(
-                repr(self._start), repr(self._stop)
-            )
-        else:
-            return "numeric_range({}, {}, {})".format(
-                repr(self._start), repr(self._stop), repr(self._step)
-            )
+            return "numeric_range({self._start!r}, {self._stop!r})"
+        return (
+            f"numeric_range({self._start!r}, {self._stop!r}, {self._step!r})"
+        )
 
     def __reversed__(self):
         return iter(
@@ -2864,7 +2861,7 @@ class SequenceView(Sequence):
         return len(self._target)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({repr(self._target)})'
+        return f'{self.__class__.__name__}({self._target!r})'
 
 
 class seekable:
