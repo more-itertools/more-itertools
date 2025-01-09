@@ -2844,8 +2844,6 @@ class NumericRangeTests(TestCase):
                 'numeric_range expected at most 3 arguments, got 4',
             ),
         ]:
-            print(f"LATA = {args} -> {message}")
-            # print(f"ANS = {mi.numeric_range(*args)}")
             with self.assertRaisesRegex(TypeError, message):
                 mi.numeric_range(*args)
 
