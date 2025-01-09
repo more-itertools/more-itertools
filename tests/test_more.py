@@ -553,61 +553,51 @@ class DerangementsTests(TestCase):
     def test_range(self):
         range_in = range(self.RANGE_NUM)
         actual = set(mi.derangements(range_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(range_in)
                 if not any(x[i] == i for i in range_in)
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_list_range(self):
         list_in = list(range(self.RANGE_NUM))
         actual = set(mi.derangements(list_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(list_in)
                 if not any(x[i] == i for i in list_in)
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_tuple_range(self):
         tuple_in = tuple(range(self.RANGE_NUM))
         actual = set(mi.derangements(tuple_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(tuple_in)
                 if not any(x[i] == i for i in tuple_in)
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_set_range(self):
         set_in = set(range(self.RANGE_NUM))
         actual = set(mi.derangements(set_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(set_in)
                 if not any(x[i] == i for i in range(self.RANGE_NUM))
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_list_ints_non_duplicated(self):
         list_in = list(mi.sieve(20))  # [2, 3, 5, 7, 11, 13, 17, 19]
         actual = set(mi.derangements(list_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(list_in)
                 if not any(k == i for i, k in enumerate(x))
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_list_ints_duplicated(self):
@@ -653,13 +643,11 @@ class DerangementsTests(TestCase):
     def test_boolean_equivalence(self):
         list_in = [True, 1, 0, False]
         actual = set(mi.derangements(list_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(list_in)
                 if not any(k == i for i, k in enumerate(x))
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_r(self):
@@ -706,74 +694,62 @@ class DistinctDerangementsTests(TestCase):
     def test_range(self):
         range_in = range(self.RANGE_NUM)
         actual = set(mi.distinct_derangements(range_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(range_in)
                 if not any(x[i] == i for i in range_in)
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_list_range(self):
         list_in = list(range(self.RANGE_NUM))
         actual = set(mi.distinct_derangements(list_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(list_in)
                 if not any(x[i] == i for i in list_in)
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_tuple_range(self):
         tuple_in = tuple(range(self.RANGE_NUM))
         actual = set(mi.distinct_derangements(tuple_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(tuple_in)
                 if not any(x[i] == i for i in tuple_in)
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_set_range(self):
         set_in = set(range(self.RANGE_NUM))
         actual = set(mi.distinct_derangements(set_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(set_in)
                 if not any(x[i] == i for i in range(self.RANGE_NUM))
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_list_ints_non_duplicated(self):
         list_in = list(mi.sieve(20))  # [2, 3, 5, 7, 11, 13, 17, 19]
         actual = set(mi.distinct_derangements(list_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in permutations(list_in)
                 if not any(k == i for i, k in enumerate(x))
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_list_ints_duplicated(self):
         list_in = list(mi.factor(360))  # [2, 2, 2, 3, 3, 5]
         actual = sorted(mi.distinct_derangements(list_in))
         expected = sorted(
-            set(
-                [
+            {
                     x
                     for x in permutations(list_in)
                     if not any(k == i for i, k in enumerate(x))
-                ]
-            )
+            }
         )
         self.assertListEqual(actual, expected)
 
@@ -802,13 +778,11 @@ class DistinctDerangementsTests(TestCase):
     def test_boolean_equivalence(self):
         list_in = [True, 1, 0, False]
         actual = set(mi.distinct_derangements(list_in))
-        expected = set(
-            [
+        expected = {
                 x
                 for x in mi.distinct_permutations(list_in)
                 if not any(k == i for i, k in enumerate(x))
-            ]
-        )
+        }
         self.assertSetEqual(actual, expected)
 
     def test_r(self):
