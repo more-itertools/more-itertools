@@ -574,8 +574,8 @@ def one(iterable, too_short=None, too_long=None):
         pass
     else:
         msg = (
-            'Expected exactly one item in iterable, but got {!r}, {!r}, '
-            'and perhaps more.'.format(first_value, second_value)
+            f'Expected exactly one item in iterable, but got {first_value!r}, '
+            f'{second_value!r}, and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
@@ -2250,13 +2250,11 @@ class numeric_range(abc.Sequence, abc.Hashable):
             self._start, self._stop, self._step = args
         elif argc == 0:
             raise TypeError(
-                'numeric_range expected at least '
-                '1 argument, got {}'.format(argc)
+                f'numeric_range expected at least 1 argument, got {argc}'
             )
         else:
             raise TypeError(
-                'numeric_range expected at most '
-                '3 arguments, got {}'.format(argc)
+                f'numeric_range expected at most 3 arguments, got {argc}'
             )
 
         self._zero = type(self._step)(0)
@@ -2319,7 +2317,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
         else:
             raise TypeError(
                 'numeric range indices must be '
-                'integers or slices, not {}'.format(type(key).__name__)
+                f'integers or slices, not {type(key).__name__}'
             )
 
     def __hash__(self):
@@ -2360,7 +2358,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
 
     def __repr__(self):
         if self._step == 1:
-            return "numeric_range({self._start!r}, {self._stop!r})"
+            return f"numeric_range({self._start!r}, {self._stop!r})"
         return (
             f"numeric_range({self._start!r}, {self._stop!r}, {self._step!r})"
         )
@@ -3523,8 +3521,8 @@ def only(iterable, default=None, too_long=None):
         pass
     else:
         msg = (
-            'Expected exactly one item in iterable, but got {!r}, {!r}, '
-            'and perhaps more.'.format(first_value, second_value)
+            f'Expected exactly one item in iterable, but got {first_value!r}, '
+            f'{second_value!r}, and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
