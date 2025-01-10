@@ -15,7 +15,6 @@ from itertools import (
     dropwhile,
     groupby,
     islice,
-    permutations,
     repeat,
     starmap,
     takewhile,
