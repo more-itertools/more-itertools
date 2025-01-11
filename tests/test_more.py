@@ -4637,15 +4637,17 @@ class SampleTests(TestCase):
 
         # weights and counts are mutally exclusive
         with self.assertRaises(TypeError):
-            mi.sample('abcde', 3, weights=[1,2,3,4,5], counts=[1,2,3,4,5])
+            mi.sample(
+                'abcde', 3, weights=[1, 2, 3, 4, 5], counts=[1, 2, 3, 4, 5]
+            )
 
         # Weighted sample larger than population
         with self.assertRaises(ValueError):
-            mi.sample('abcde', 10, weights=[1,2,3,4,5], strict=True)
+            mi.sample('abcde', 10, weights=[1, 2, 3, 4, 5], strict=True)
 
         # Counted sample larger than population
         with self.assertRaises(ValueError):
-            mi.sample('abcde', 10, counts=[1,1,1,1,1], strict=True)
+            mi.sample('abcde', 10, counts=[1, 1, 1, 1, 1], strict=True)
 
 
 class BarelySortable:
