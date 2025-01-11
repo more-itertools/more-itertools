@@ -13,15 +13,16 @@ Version History
     * :func:`loops` was added (thanks to rhettinger)
 
 * Changes to existing functions:
-    * :func:`factor` and :func:`spy` were optimized (thanks to rhettinger)
-    * :func:`polynomial_from_roots` was optimized (thanks to pochmann3 and rhettinger)
+    * :func:`factor` was optimized to handle larger inputs and use less memory (thanks to rhettinger)
+    * :func:`spy` was optimized to enable nested calls (thanks to rhettinger)
+    * :func:`polynomial_from_roots` was made non-recursive and able to handle larger numbers of roots (thanks to pochmann3 and rhettinger)
     * :func:`is_sorted` now only relies on less than comparisons (thanks to rhettinger)
     * The docstring for :func:`outer_product` was improved (thanks to rhettinger)
-    * The typoe annotations for :func:`sample` were improved (thanks to rhettinger)
+    * The type annotations for :func:`sample` were improved (thanks to rhettinger)
     
 * Other changes:
     * Python 3.13 is officially supported. Python 3.8 is no longer officially supported. (thanks to hugovk and stankudrow)
-    * `mypy` checks were fixed. (thanks to  JamesParrott)
+    * `mypy` checks were fixed (thanks to  JamesParrott)
 
 10.5.0
 ------
