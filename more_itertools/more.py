@@ -3726,9 +3726,11 @@ def _sample_counted(population, k, counts, strict):
         reservoir = []
         for _ in range(k):
             reservoir.append(feed(0))
-        if strict and len(reservoir) < k:
-            raise ValueError('Sample larger than population')
 
+    if strict and len(reservoir) < k:
+        raise ValueError('Sample larger than population')
+
+    with suppress(StopIteration):
         W = 1.0
         while True:
             W *= exp(log(random()) / k)
