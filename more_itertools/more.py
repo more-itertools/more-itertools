@@ -3809,8 +3809,6 @@ def _sample_counted(population, k, counts, strict):
         reservoir = []
         for _ in range(k):
             reservoir.append(feed(0))
-        if strict and len(reservoir) < k:
-            raise ValueError('Sample larger than population')
 
         W = 1.0
         while True:
@@ -3819,6 +3817,8 @@ def _sample_counted(population, k, counts, strict):
             element = feed(skip)
             reservoir[randrange(k)] = element
 
+    if strict and len(reservoir) < k:
+        raise ValueError('Sample larger than population')
     shuffle(reservoir)
     return reservoir
 
