@@ -1,4 +1,5 @@
 import math
+import operator
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
@@ -813,7 +814,7 @@ def distinct_permutations(iterable, r=None):
     return iter(() if r else ((),))
 
 
-def derangements(iterable, r=None):
+def derangements(iterable, r=None, by_index=True):
     """Yield successive derangements of the elements in *iterable*.
 
             >>> sorted(derangements([0, 1, 2]))
@@ -850,10 +851,23 @@ def derangements(iterable, r=None):
     If deduplicated derangements are needed, use``distinct_derangements``.
 
     """
-    for p in permutations(iterable, r=r):
-        if any(x == i for i, x in enumerate(p)):
-            continue
-        yield p
+    pool = tuple(iterable)
+    if by_index:
+        pool_unique = list(set(pool))
+        pool_ind = tuple([pool_unique.index(x) for x in pool])
+        indices = pool_ind
+    else:
+        pool_ind = pool
+        indices = tuple(range(len(pool)))
+    return compress(
+        permutations(pool, r=r),
+        map(all, map(
+            map,
+            repeat(operator.ne),
+            repeat(indices),
+            permutations(pool_ind, r=r)
+        ))
+    )
 
 
 def distinct_derangements(iterable, r=None):
