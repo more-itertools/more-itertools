@@ -870,7 +870,7 @@ def derangements(iterable, r=None, by_index=True):
     )
 
 
-def distinct_derangements(iterable, r=None):
+def distinct_derangements(iterable, r=None, by_index=True):
     """Yield successive distinct derangements of the elements in *iterable*.
 
         >>> sorted(distinct_derangements([0, 0, 1, 2]))
@@ -901,10 +901,13 @@ def distinct_derangements(iterable, r=None):
         (1, 'green', 1, 0), ('green', 0, 1, 1)]
 
     """
-    for p in distinct_permutations(iterable, r=r):
-        if any(x == i for i, x in enumerate(p)):
+    pool = tuple(iterable)
+    xs = tuple(zip(pool))
+    indices = xs if by_index else tuple(zip(range(len(pool))))
+    for ys in distinct_permutations(xs, r=r):
+        if any(map(operator.eq, indices, ys)):
             continue
-        yield p
+        yield tuple(y[0] for y in ys)
 
 
 def intersperse(e, iterable, n=1):

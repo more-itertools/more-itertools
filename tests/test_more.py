@@ -699,8 +699,17 @@ class DistinctDerangementsTests(TestCase):
 
     def test_list_manual(self):
         list_in = [0, 0, 1, 2]
-        actual = sorted(mi.distinct_derangements(list_in))
+        actual = sorted(mi.distinct_derangements(list_in, by_index=False))
         expected = [(1, 0, 0, 2), (1, 2, 0, 0), (2, 0, 0, 1), (2, 0, 1, 0)]
+        self.assertListEqual(actual, expected)
+        actual = sorted(mi.distinct_derangements(list_in, by_index=True))
+        expected = [(1, 2, 0, 0), (2, 1, 0, 0)]
+        self.assertListEqual(actual, expected)
+
+    def test_list_manual_string(self):
+        string_in = "ABAB"
+        actual = sorted(mi.distinct_derangements(string_in))
+        expected = [("B", "A", "B", "A")]
         self.assertListEqual(actual, expected)
 
     def test_range(self):
