@@ -874,12 +874,15 @@ def derangements(iterable, r=None, by_index=True):
         indices = tuple(range(len(pool)))
     return compress(
         permutations(pool, r=r),
-        map(all, map(
-            map,
-            repeat(operator.ne),
-            repeat(indices),
-            permutations(pool_ind, r=r)
-        ))
+        map(
+            all,
+            map(
+                map,
+                repeat(operator.ne),
+                repeat(indices),
+                permutations(pool_ind, r=r),
+            ),
+        ),
     )
 
 

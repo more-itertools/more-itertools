@@ -818,7 +818,6 @@ class DistinctDerangementsTests(TestCase):
         actual = set(mi.distinct_derangements(range_in))
         self.assertSetEqual(actual, expected)
 
-
     def test_list_range(self):
         list_in = list(range(self.RANGE_NUM))
 
@@ -927,7 +926,6 @@ class DistinctDerangementsTests(TestCase):
         )
         self.assertListEqual(actual, expected)
 
-
     def test_list_ints_duplicated_lower_count(self):
         list_in = list(mi.factor(360))  # [2, 2, 2, 3, 3, 5]
         actual = list(mi.distinct_derangements(list_in))
@@ -1013,7 +1011,9 @@ class DistinctDerangementsTests(TestCase):
                         if not any(x[i] == i for i in range(r))
                     ]
                 )
-                actual = list(mi.distinct_derangements(iterable, r, by_index=False))
+                actual = list(
+                    mi.distinct_derangements(iterable, r, by_index=False)
+                )
                 self.assertCountEqual(actual, expected)
 
                 expected = list(
