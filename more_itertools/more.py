@@ -817,38 +817,51 @@ def distinct_permutations(iterable, r=None):
 def derangements(iterable, r=None, by_index=True):
     """Yield successive derangements of the elements in *iterable*.
 
-            >>> sorted(derangements([0, 1, 2]))
-            [(1, 2, 0), (2, 0, 1)]
+    A derangement is a permutation in which no element appears at its original
+    index. Suppose Alice, Bob, Carol, and Dave are playing Secret Santa.
+    The code below outputs all of the different ways to assign gift recipients
+    such that nobody is assigned to himself or herself:
 
-    Equivalent to yielding from ``permutations(iterable)``, except all
-    permutations removed that have at least one integer k assigned at index k.
+        >>> for d in derangements(['Alice', 'Bob', 'Carol', 'Dave']):
+        ...    print(', '.join(d))
+        Bob, Alice, Dave, Carol
+        Bob, Carol, Dave, Alice
+        Bob, Dave, Alice, Carol
+        Carol, Alice, Dave, Bob
+        Carol, Dave, Alice, Bob
+        Carol, Dave, Bob, Alice
+        Dave, Alice, Bob, Carol
+        Dave, Carol, Alice, Bob
+        Dave, Carol, Bob, Alice
+
+    For numeric inputs, the input *by_index* can be used to either restrict by
+    original input index, or by value of the element
+
+        >>> sorted(derangements([1, 0, 2]))
+        [(0, 2, 1), (2, 1, 0)]
+        >>> sorted(derangements([0, 1, 2], by_index=False))
+        [(1, 2, 0), (2, 0, 1)]
 
     If *r* is given, only the *r*-length derangements are yielded.
 
         >>> sorted(derangements(range(3), 2))
         [(1, 0), (1, 2), (2, 0)]
-        >>> sorted(derangements([0, 2, 3], 2))
+        >>> sorted(derangements([0, 2, 3], 2, by_index=False))
         [(2, 0), (2, 3), (3, 0), (3, 2)]
-
-    *iterable* doesn't strictly need to consist of integers, but for
-    non-integer iterables ``permutations`` will be equivalent but faster:
-
-        >>> set(derangements(["a", 2.5, 1j])) == \
-                set(permutations(["a", 2.5, 1j]))
-        True
-
-    There can be a use case in mixed iterables though:
-
-        >>> list(derangements([0, 1, "green"]))
-        [(1, 0, 'green'), (1, 'green', 0), ('green', 0, 1)]
 
     Note that in case of duplicates in input, these are treated as separate
     entries with the same restriction in the derangements. For example:
 
-        >>> sorted(derangements([0, 0, 1]))
-        [(1, 0, 0), (1, 0, 0)]
+        >>> for d in derangements(['Alice', 'Bob', 'Carol', 'Alice']):
+        ...    print(', '.join(d))
+        Bob, Alice, Alice, Carol
+        Bob, Alice, Alice, Carol
+        Carol, Alice, Alice, Bob
+        Carol, Alice, Alice, Bob
 
-    If deduplicated derangements are needed, use``distinct_derangements``.
+    Here Alice is excluded from both original positions of Alice, and also
+    the results are duplicated because of switching Alice around. If
+    deduplicated derangements are needed, use``distinct_derangements``.
 
     """
     pool = tuple(iterable)
@@ -873,32 +886,29 @@ def derangements(iterable, r=None, by_index=True):
 def distinct_derangements(iterable, r=None, by_index=True):
     """Yield successive distinct derangements of the elements in *iterable*.
 
+        >>> for d in distinct_derangements(['Alice', 'Bob', 'Carol', 'Alice']):
+        ...    print(', '.join(d))
+        Bob, Alice, Alice, Carol
+        Carol, Alice, Alice, Bob
+
+    For numeric inputs, the input *by_index* can be used to either restrict by
+    original input index, or by value of the element
+
         >>> sorted(distinct_derangements([0, 0, 1, 2]))
+        [(1, 2, 0, 0), (2, 1, 0, 0)]
+        >>> sorted(distinct_derangements([0, 0, 1, 2], by_index=False))
         [(1, 0, 0, 2), (1, 2, 0, 0), (2, 0, 0, 1), (2, 0, 1, 0)]
 
     Equivalent to yielding from ``set(derangements(iterable))``, except
     duplicates are not generated and thrown away. For larger input sequences
-    this is much more efficient.
+    this is more efficient.
 
     If *r* is given, only the *r*-length derangements are yielded.
 
         >>> sorted(distinct_derangements([0, 0, 1, 2], 3))
-        [(1, 0, 0), (1, 2, 0), (2, 0, 0), (2, 0, 1)]
-        >>> sorted(distinct_derangements([0, 0, 1, 2], 2))
+        [(1, 2, 0), (2, 1, 0)]
+        >>> sorted(distinct_derangements([0, 0, 1, 2], 2, by_index=False))
         [(1, 0), (1, 2), (2, 0)]
-
-    *iterable* doesn't strictly need to consist of integers, but for
-    non-integer iterables ``distinct_permutations`` will be faster:
-
-        >>> set(distinct_derangements(["a", 2.5, 1j, 1j])) == \
-                set(distinct_permutations(["a", 2.5, 1j, 1j]))
-        True
-
-    There can be a use case in mixed iterables though:
-
-        >>> list(distinct_derangements([0, 1, 1, "green"]))  # doctest: +SKIP
-        [(1, 0, 1, 'green'), (1, 0, 'green', 1), (1, 'green', 0, 1),
-        (1, 'green', 1, 0), ('green', 0, 1, 1)]
 
     """
     pool = tuple(iterable)
