@@ -1347,6 +1347,10 @@ class PrimeFunctionTests(TestCase):
                 self.assertTrue(mi.is_prime(n))
                 self.assertEqual(mi.nth_prime(i), n)
 
+        self.assertFalse(mi.is_prime(-1))
+        with self.assertRaises(ValueError):
+            mi.nth_prime(-1)
+
     def test_special_primes(self):
         for n in (
             # Mersenee primes:
