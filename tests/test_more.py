@@ -536,7 +536,7 @@ class DerangementsTests(TestCase):
 
     def test_range_manual(self):
         range_in = range(4)
-        actual = sorted(mi.derangements(range_in))
+        actual = sorted(mi.derangements(range_in, by_index=False))
         expected = [
             (1, 0, 3, 2),
             (1, 2, 3, 0),
@@ -550,9 +550,12 @@ class DerangementsTests(TestCase):
         ]
         self.assertListEqual(actual, expected)
 
+        actual = sorted(mi.derangements(range_in))
+        self.assertListEqual(actual, expected)
+
     def test_range(self):
         range_in = range(self.RANGE_NUM)
-        actual = set(mi.derangements(range_in))
+        actual = set(mi.derangements(range_in, by_index=False))
         expected = set(
             [
                 x
@@ -562,9 +565,12 @@ class DerangementsTests(TestCase):
         )
         self.assertSetEqual(actual, expected)
 
+        actual = set(mi.derangements(range_in))
+        self.assertSetEqual(actual, expected)
+
     def test_list_range(self):
         list_in = list(range(self.RANGE_NUM))
-        actual = set(mi.derangements(list_in))
+        actual = set(mi.derangements(list_in, by_index=False))
         expected = set(
             [
                 x
@@ -574,9 +580,12 @@ class DerangementsTests(TestCase):
         )
         self.assertSetEqual(actual, expected)
 
+        actual = set(mi.derangements(list_in))
+        self.assertSetEqual(actual, expected)
+
     def test_tuple_range(self):
         tuple_in = tuple(range(self.RANGE_NUM))
-        actual = set(mi.derangements(tuple_in))
+        actual = set(mi.derangements(tuple_in, by_index=False))
         expected = set(
             [
                 x
@@ -586,9 +595,12 @@ class DerangementsTests(TestCase):
         )
         self.assertSetEqual(actual, expected)
 
+        actual = set(mi.derangements(tuple_in))
+        self.assertSetEqual(actual, expected)
+
     def test_set_range(self):
         set_in = set(range(self.RANGE_NUM))
-        actual = set(mi.derangements(set_in))
+        actual = set(mi.derangements(set_in, by_index=False))
         expected = set(
             [
                 x
@@ -598,9 +610,12 @@ class DerangementsTests(TestCase):
         )
         self.assertSetEqual(actual, expected)
 
+        actual = set(mi.derangements(set_in))
+        self.assertSetEqual(actual, expected)
+
     def test_list_ints_non_duplicated(self):
         list_in = list(mi.sieve(20))  # [2, 3, 5, 7, 11, 13, 17, 19]
-        actual = set(mi.derangements(list_in))
+        actual = set(mi.derangements(list_in, by_index=False))
         expected = set(
             [
                 x
@@ -610,14 +625,34 @@ class DerangementsTests(TestCase):
         )
         self.assertSetEqual(actual, expected)
 
+        actual = set(mi.derangements(list_in))
+        expected = set(
+            [
+                x
+                for x in permutations(list_in)
+                if not any(k == list_in[i] for i, k in enumerate(x))
+            ]
+        )
+        self.assertSetEqual(actual, expected)
+
     def test_list_ints_duplicated(self):
         list_in = list(mi.factor(360))  # [2, 2, 2, 3, 3, 5]
-        actual = list(mi.derangements(list_in))
+        actual = list(mi.derangements(list_in, by_index=False))
         expected = list(
             [
                 x
                 for x in permutations(list_in)
                 if not any(k == i for i, k in enumerate(x))
+            ]
+        )
+        self.assertListEqual(actual, expected)
+
+        actual = list(mi.derangements(list_in))
+        expected = list(
+            [
+                x
+                for x in permutations(list_in)
+                if not any(k == list_in[i] for i, k in enumerate(x))
             ]
         )
         self.assertListEqual(actual, expected)
@@ -628,9 +663,23 @@ class DerangementsTests(TestCase):
         compared = list(mi.derangements(set(list_in)))
         self.assertLess(len(compared), len(actual))
 
+        actual = list(mi.derangements(list_in, by_index=False))
+        compared = list(mi.derangements(set(list_in), by_index=False))
+        self.assertLess(len(compared), len(actual))
+
     def test_list_unsortable(self):
         list_in = ['1', 2, 2, 3, 3, 3]
         actual = list(mi.derangements(list_in))
+        expected = list(
+            [
+                x
+                for x in permutations(list_in)
+                if not any(k == list_in[i] for i, k in enumerate(x))
+            ]
+        )
+        self.assertListEqual(actual, expected)
+
+        actual = list(mi.derangements(list_in, by_index=False))
         expected = list(
             [
                 x
@@ -646,6 +695,14 @@ class DerangementsTests(TestCase):
         expected = [
             x
             for x in permutations(list_in)
+            if not any(k == list_in[i] for i, k in enumerate(x))
+        ]
+        self.assertListEqual(actual, expected)
+
+        actual = list(mi.derangements(list_in, by_index=False))
+        expected = [
+            x
+            for x in permutations(list_in)
             if not any(k == i for i, k in enumerate(x))
         ]
         self.assertListEqual(actual, expected)
@@ -653,6 +710,16 @@ class DerangementsTests(TestCase):
     def test_boolean_equivalence(self):
         list_in = [True, 1, 0, False]
         actual = set(mi.derangements(list_in))
+        expected = set(
+            [
+                x
+                for x in permutations(list_in)
+                if not any(k == list_in[i] for i, k in enumerate(x))
+            ]
+        )
+        self.assertSetEqual(actual, expected)
+
+        actual = set(mi.derangements(list_in, by_index=False))
         expected = set(
             [
                 x
@@ -686,10 +753,20 @@ class DerangementsTests(TestCase):
                     [
                         x
                         for x in permutations(iterable, r)
-                        if not any(x[i] == i for i in range(r))
+                        if not any(iterable[i] == k for i, k in enumerate(x))
                     ]
                 )
                 actual = list(mi.derangements(iterable, r))
+                self.assertCountEqual(actual, expected)
+
+                expected = list(
+                    [
+                        x
+                        for x in permutations(iterable, r)
+                        if not any(x[i] == i for i in range(r))
+                    ]
+                )
+                actual = list(mi.derangements(iterable, r, by_index=False))
                 self.assertCountEqual(actual, expected)
 
 
@@ -739,13 +816,6 @@ class DistinctDerangementsTests(TestCase):
 
         # Derange by index - no difference for a range input
         actual = set(mi.distinct_derangements(range_in))
-        expected = set(
-            [
-                x
-                for x in permutations(range_in)
-                if not any(x[i] == i for i in range_in)
-            ]
-        )
         self.assertSetEqual(actual, expected)
 
 
@@ -765,13 +835,6 @@ class DistinctDerangementsTests(TestCase):
 
         # Derange by index - no difference for a range input
         actual = set(mi.distinct_derangements(list_in))
-        expected = set(
-            [
-                x
-                for x in permutations(list_in)
-                if not any(x[i] == i for i in list_in)
-            ]
-        )
         self.assertSetEqual(actual, expected)
 
     def test_tuple_range(self):
@@ -790,13 +853,6 @@ class DistinctDerangementsTests(TestCase):
 
         # Derange by index - no difference for a range input
         actual = set(mi.distinct_derangements(tuple_in))
-        expected = set(
-            [
-                x
-                for x in permutations(tuple_in)
-                if not any(x[i] == i for i in tuple_in)
-            ]
-        )
         self.assertSetEqual(actual, expected)
 
     def test_set_range(self):
@@ -815,13 +871,6 @@ class DistinctDerangementsTests(TestCase):
 
         # Derange by index - no difference for a range input
         actual = set(mi.distinct_derangements(set_in))
-        expected = set(
-            [
-                x
-                for x in permutations(set_in)
-                if not any(x[i] == i for i in range(self.RANGE_NUM))
-            ]
-        )
         self.assertSetEqual(actual, expected)
 
     def test_list_ints_non_duplicated(self):
