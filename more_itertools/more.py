@@ -853,7 +853,7 @@ def derangements(iterable, r=None, by_index=True):
     """
     pool = tuple(iterable)
     if by_index:
-        pool_unique = list(set(pool))
+        pool_unique = tuple(unique_everseen(pool))
         pool_ind = tuple([pool_unique.index(x) for x in pool])
         indices = pool_ind
     else:
