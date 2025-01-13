@@ -865,25 +865,12 @@ def derangements(iterable, r=None, by_index=True):
     are needed, use ``distinct_derangements``.
     """
     pool = tuple(iterable)
-    if by_index:
-        pool_unique = tuple(unique_everseen(pool))
-        pool_ind = tuple([pool_unique.index(x) for x in pool])
-        indices = pool_ind
-    else:
-        pool_ind = pool
-        indices = tuple(range(len(pool)))
-    return compress(
-        permutations(pool, r=r),
-        map(
-            all,
-            map(
-                map,
-                repeat(operator.ne),
-                repeat(indices),
-                permutations(pool_ind, r=r),
-            ),
-        ),
-    )
+    xs = tuple(zip(pool))
+    indices = xs if by_index else tuple(zip(range(len(pool))))
+    for ys in permutations(xs, r=r):
+        if any(map(operator.eq, indices, ys)):
+            continue
+        yield tuple(y[0] for y in ys)
 
 
 def distinct_derangements(iterable, r=None, by_index=True):
