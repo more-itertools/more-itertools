@@ -860,9 +860,9 @@ def derangements(iterable, r=None, by_index=True):
         Carol, Alice, Alice, Bob
 
     Here Alice is excluded from both original positions of Alice, and also
-    the results are duplicated because of switching Alice around. If
-    deduplicated derangements are needed, use``distinct_derangements``.
-
+    the results are duplicated which is in line with how duplicates are
+    handled by ``itertools.permutations``. If deduplicated derangements
+    are needed, use ``distinct_derangements``.
     """
     pool = tuple(iterable)
     if by_index:
