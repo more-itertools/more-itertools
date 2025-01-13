@@ -5,22 +5,23 @@ from __future__ import annotations
 import sys
 import types
 
-from typing import (
-    Any,
-    Callable,
+from collections.abc import (
     Container,
-    ContextManager,
-    Generic,
     Hashable,
     Iterable,
     Iterator,
     Mapping,
-    overload,
     Reversible,
     Sequence,
     Sized,
-    Type,
+)
+from contextlib import AbstractContextManager
+from typing import (
+    Any,
+    Callable,
+    Generic,
     TypeVar,
+    overload,
     type_check_only,
 )
 from typing_extensions import Protocol
@@ -151,7 +152,7 @@ _V = TypeVar('_V')
 _W = TypeVar('_W')
 _T_co = TypeVar('_T_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
-_Raisable = BaseException | Type[BaseException]
+_Raisable = BaseException | type[BaseException]
 
 # The type of isinstance's second argument (from typeshed builtins)
 if sys.version_info >= (3, 10):
@@ -204,7 +205,7 @@ def consumer(func: _GenFn) -> _GenFn: ...
 def ilen(iterable: Iterable[_T]) -> int: ...
 def iterate(func: Callable[[_T], _T], start: _T) -> Iterator[_T]: ...
 def with_iter(
-    context_manager: ContextManager[Iterable[_T]],
+    context_manager: AbstractContextManager[Iterable[_T]],
 ) -> Iterator[_T]: ...
 def one(
     iterable: Iterable[_T],
@@ -523,7 +524,7 @@ class numeric_range(Generic[_T, _U], Sequence[_T], Hashable, Reversible[_T]):
     def __len__(self) -> int: ...
     def __reduce__(
         self,
-    ) -> tuple[Type[numeric_range[_T, _U]], tuple[_T, _T, _U]]: ...
+    ) -> tuple[type[numeric_range[_T, _U]], tuple[_T, _T, _U]]: ...
     def __repr__(self) -> str: ...
     def __reversed__(self) -> Iterator[_T]: ...
     def count(self, value: _T) -> int: ...
@@ -680,12 +681,12 @@ def distinct_combinations(
 def filter_except(
     validator: Callable[[Any], object],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException],
+    *exceptions: type[BaseException],
 ) -> Iterator[_T]: ...
 def map_except(
     function: Callable[[Any], _U],
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException],
+    *exceptions: type[BaseException],
 ) -> Iterator[_U]: ...
 def map_if(
     iterable: Iterable[Any],
@@ -730,7 +731,7 @@ class callback_iter(Generic[_T], Iterator[_T]):
     def __enter__(self) -> callback_iter[_T]: ...
     def __exit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: types.TracebackType | None,
     ) -> bool | None: ...
@@ -910,7 +911,7 @@ def outer_product(
 ) -> Iterator[tuple[_V, ...]]: ...
 def iter_suppress(
     iterable: Iterable[_T],
-    *exceptions: Type[BaseException],
+    *exceptions: type[BaseException],
 ) -> Iterator[_T]: ...
 def filter_map(
     func: Callable[[_T], _V | None],
