@@ -3836,7 +3836,7 @@ class _FrozenMultiset(Set):
         return hash(self._collection)
 
     def __repr__(self):
-        return "FrozenSet([{}]".format(", ".join(repr(x) for x in iter(self)))
+        return f'FrozenSet([{", ".join(repr(x) for x in iter(self))}]'
 
 
 class SetPartitionsTests(TestCase):
