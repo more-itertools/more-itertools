@@ -22,7 +22,7 @@ Version History
     
 * Other changes:
     * Python 3.13 is officially supported. Python 3.8 is no longer officially supported. (thanks to hugovk, JamesParrott, and stankudrow)
-    * `mypy` checks were fixed (thanks to  JamesParrott)
+    * `mypy` checks were fixed (thanks to JamesParrott)
 
 10.5.0
 ------
