@@ -21,7 +21,7 @@ Version History
     * The type annotations for :func:`sample` were improved (thanks to rhettinger)
     
 * Other changes:
-    * Python 3.13 is officially supported. Python 3.8 is no longer officially supported. (thanks to hugovk and stankudrow)
+    * Python 3.13 is officially supported. Python 3.8 is no longer officially supported. (thanks to hugovk, JamesParrott, and stankudrow)
     * `mypy` checks were fixed (thanks to  JamesParrott)
 
 10.5.0
