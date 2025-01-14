@@ -15,7 +15,6 @@ from itertools import (
     dropwhile,
     groupby,
     islice,
-    permutations,
     repeat,
     starmap,
     takewhile,
@@ -66,11 +65,9 @@ __all__ = [
     'consumer',
     'count_cycle',
     'countable',
-    'derangements',
     'dft',
     'difference',
     'distinct_combinations',
-    'distinct_derangements',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -574,8 +571,8 @@ def one(iterable, too_short=None, too_long=None):
         pass
     else:
         msg = (
-            'Expected exactly one item in iterable, but got {!r}, {!r}, '
-            'and perhaps more.'.format(first_value, second_value)
+            f'Expected exactly one item in iterable, but got {first_value!r}, '
+            f'{second_value!r}, and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
@@ -636,13 +633,13 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
     if too_short is None:
         too_short = lambda item_count: raise_(
             ValueError,
-            'Too few items in iterable (got {})'.format(item_count),
+            f'Too few items in iterable (got {item_count})',
         )
 
     if too_long is None:
         too_long = lambda item_count: raise_(
             ValueError,
-            'Too many items in iterable (got at least {})'.format(item_count),
+            f'Too many items in iterable (got at least {item_count})',
         )
 
     it = iter(iterable)
@@ -811,86 +808,6 @@ def distinct_permutations(iterable, r=None):
             )
 
     return iter(() if r else ((),))
-
-
-def derangements(iterable, r=None):
-    """Yield successive derangements of the elements in *iterable*.
-
-            >>> sorted(derangements([0, 1, 2]))
-            [(1, 2, 0), (2, 0, 1)]
-
-    Equivalent to yielding from ``permutations(iterable)``, except all
-    permutations removed that have at least one integer k assigned at index k.
-
-    If *r* is given, only the *r*-length derangements are yielded.
-
-        >>> sorted(derangements(range(3), 2))
-        [(1, 0), (1, 2), (2, 0)]
-        >>> sorted(derangements([0, 2, 3], 2))
-        [(2, 0), (2, 3), (3, 0), (3, 2)]
-
-    *iterable* doesn't strictly need to consist of integers, but for
-    non-integer iterables ``permutations`` will be equivalent but faster:
-
-        >>> set(derangements(["a", 2.5, 1j])) == \
-                set(permutations(["a", 2.5, 1j]))
-        True
-
-    There can be a use case in mixed iterables though:
-
-        >>> list(derangements([0, 1, "green"]))
-        [(1, 0, 'green'), (1, 'green', 0), ('green', 0, 1)]
-
-    Note that in case of duplicates in input, these are treated as separate
-    entries with the same restriction in the derangements. For example:
-
-        >>> sorted(derangements([0, 0, 1]))
-        [(1, 0, 0), (1, 0, 0)]
-
-    If deduplicated derangements are needed, use``distinct_derangements``.
-
-    """
-    for p in permutations(iterable, r=r):
-        if any(x == i for i, x in enumerate(p)):
-            continue
-        yield p
-
-
-def distinct_derangements(iterable, r=None):
-    """Yield successive distinct derangements of the elements in *iterable*.
-
-        >>> sorted(distinct_derangements([0, 0, 1, 2]))
-        [(1, 0, 0, 2), (1, 2, 0, 0), (2, 0, 0, 1), (2, 0, 1, 0)]
-
-    Equivalent to yielding from ``set(derangements(iterable))``, except
-    duplicates are not generated and thrown away. For larger input sequences
-    this is much more efficient.
-
-    If *r* is given, only the *r*-length derangements are yielded.
-
-        >>> sorted(distinct_derangements([0, 0, 1, 2], 3))
-        [(1, 0, 0), (1, 2, 0), (2, 0, 0), (2, 0, 1)]
-        >>> sorted(distinct_derangements([0, 0, 1, 2], 2))
-        [(1, 0), (1, 2), (2, 0)]
-
-    *iterable* doesn't strictly need to consist of integers, but for
-    non-integer iterables ``distinct_permutations`` will be faster:
-
-        >>> set(distinct_derangements(["a", 2.5, 1j, 1j])) == \
-                set(distinct_permutations(["a", 2.5, 1j, 1j]))
-        True
-
-    There can be a use case in mixed iterables though:
-
-        >>> list(distinct_derangements([0, 1, 1, "green"]))  # doctest: +SKIP
-        [(1, 0, 1, 'green'), (1, 0, 'green', 1), (1, 'green', 0, 1),
-        (1, 'green', 1, 0), ('green', 0, 1, 1)]
-
-    """
-    for p in distinct_permutations(iterable, r=r):
-        if any(x == i for i, x in enumerate(p)):
-            continue
-        yield p
 
 
 def intersperse(e, iterable, n=1):
@@ -1641,8 +1558,8 @@ def split_into(iterable, sizes):
         [[1], [2, 3], [4], []]
 
     When a ``None`` object is encountered in *sizes*, the returned list will
-    contain items up to the end of *iterable* the same way that itertools.slice
-    does:
+    contain items up to the end of *iterable* the same way that
+    :func:`itertools.slice` does:
 
         >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
         [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
@@ -2250,13 +2167,11 @@ class numeric_range(abc.Sequence, abc.Hashable):
             self._start, self._stop, self._step = args
         elif argc == 0:
             raise TypeError(
-                'numeric_range expected at least '
-                '1 argument, got {}'.format(argc)
+                f'numeric_range expected at least 1 argument, got {argc}'
             )
         else:
             raise TypeError(
-                'numeric_range expected at most '
-                '3 arguments, got {}'.format(argc)
+                f'numeric_range expected at most 3 arguments, got {argc}'
             )
 
         self._zero = type(self._step)(0)
@@ -2319,7 +2234,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
         else:
             raise TypeError(
                 'numeric range indices must be '
-                'integers or slices, not {}'.format(type(key).__name__)
+                f'integers or slices, not {type(key).__name__}'
             )
 
     def __hash__(self):
@@ -2360,13 +2275,10 @@ class numeric_range(abc.Sequence, abc.Hashable):
 
     def __repr__(self):
         if self._step == 1:
-            return "numeric_range({}, {})".format(
-                repr(self._start), repr(self._stop)
-            )
-        else:
-            return "numeric_range({}, {}, {})".format(
-                repr(self._start), repr(self._stop), repr(self._step)
-            )
+            return f"numeric_range({self._start!r}, {self._stop!r})"
+        return (
+            f"numeric_range({self._start!r}, {self._stop!r}, {self._step!r})"
+        )
 
     def __reversed__(self):
         return iter(
@@ -2390,7 +2302,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
                 if r == self._zero:
                     return int(q)
 
-        raise ValueError("{} is not in numeric range".format(value))
+        raise ValueError(f"{value} is not in numeric range")
 
     def _get_by_index(self, i):
         if i < 0:
@@ -2864,7 +2776,7 @@ class SequenceView(Sequence):
         return len(self._target)
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self._target))
+        return f'{self.__class__.__name__}({self._target!r})'
 
 
 class seekable:
@@ -3526,8 +3438,8 @@ def only(iterable, default=None, too_long=None):
         pass
     else:
         msg = (
-            'Expected exactly one item in iterable, but got {!r}, {!r}, '
-            'and perhaps more.'.format(first_value, second_value)
+            f'Expected exactly one item in iterable, but got {first_value!r}, '
+            f'{second_value!r}, and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
@@ -3809,9 +3721,11 @@ def _sample_counted(population, k, counts, strict):
         reservoir = []
         for _ in range(k):
             reservoir.append(feed(0))
-        if strict and len(reservoir) < k:
-            raise ValueError('Sample larger than population')
 
+    if strict and len(reservoir) < k:
+        raise ValueError('Sample larger than population')
+
+    with suppress(StopIteration):
         W = 1.0
         while True:
             W *= exp(log(random()) / k)

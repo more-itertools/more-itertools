@@ -2,16 +2,64 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator, Sequence
 from typing import (
     Any,
     Callable,
-    Iterable,
-    Iterator,
-    overload,
-    Sequence,
-    Type,
     TypeVar,
+    overload,
 )
+
+__all__ = [
+    'all_equal',
+    'batched',
+    'before_and_after',
+    'consume',
+    'convolve',
+    'dotproduct',
+    'first_true',
+    'factor',
+    'flatten',
+    'grouper',
+    'is_prime',
+    'iter_except',
+    'iter_index',
+    'loops',
+    'matmul',
+    'ncycles',
+    'nth',
+    'nth_combination',
+    'padnone',
+    'pad_none',
+    'pairwise',
+    'partition',
+    'polynomial_eval',
+    'polynomial_from_roots',
+    'polynomial_derivative',
+    'powerset',
+    'prepend',
+    'quantify',
+    'reshape',
+    'random_combination_with_replacement',
+    'random_combination',
+    'random_permutation',
+    'random_product',
+    'repeatfunc',
+    'roundrobin',
+    'sieve',
+    'sliding_window',
+    'subslices',
+    'sum_of_squares',
+    'tabulate',
+    'tail',
+    'take',
+    'totient',
+    'transpose',
+    'triplewise',
+    'unique',
+    'unique_everseen',
+    'unique_justseen',
+]
 
 # Type and type variable definitions
 _T = TypeVar('_T')
@@ -69,13 +117,13 @@ def unique(
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException] | tuple[Type[BaseException], ...],
+    exception: type[BaseException] | tuple[type[BaseException], ...],
     first: None = ...,
 ) -> Iterator[_T]: ...
 @overload
 def iter_except(
     func: Callable[[], _T],
-    exception: Type[BaseException] | tuple[Type[BaseException], ...],
+    exception: type[BaseException] | tuple[type[BaseException], ...],
     first: Callable[[], _U],
 ) -> Iterator[_T | _U]: ...
 @overload
