@@ -2563,7 +2563,7 @@ def _islice_helper(it, s):
             if n <= 0:
                 return
 
-            for index, item in islice(cache, 0, n, step):  # noqa: B007
+            for _, item in islice(cache, 0, n, step):
                 yield item
         elif (stop is not None) and (stop < 0):
             # Advance to the start position
@@ -2598,7 +2598,7 @@ def _islice_helper(it, s):
             else:
                 i, j = min(start - len_iter, -1), None
 
-            for index, item in list(cache)[i:j:step]:  # noqa: B007
+            for _, item in list(cache)[i:j:step]:
                 yield item
         else:
             # Advance to the stop position

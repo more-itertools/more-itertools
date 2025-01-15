@@ -16,6 +16,10 @@ check:
 format:
 	ruff format .
 
+.PHONY: lint
+lint:
+	ruff check --fix .
+
 .PHONY: coverage
 coverage:
 	coverage run --include="more_itertools/*.py" -m unittest
