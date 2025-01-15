@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 import types
-
 from collections.abc import (
     Container,
     Hashable,
@@ -24,6 +23,7 @@ from typing import (
     overload,
     type_check_only,
 )
+
 from typing_extensions import Protocol
 
 __all__ = [
@@ -758,15 +758,11 @@ def nth_permutation(
 ) -> tuple[_T, ...]: ...
 def value_chain(*args: _T | Iterable[_T]) -> Iterable[_T]: ...
 def product_index(element: Iterable[_T], *args: Iterable[_T]) -> int: ...
-def combination_index(
-    element: Iterable[_T], iterable: Iterable[_T]
-) -> int: ...
+def combination_index(element: Iterable[_T], iterable: Iterable[_T]) -> int: ...
 def combination_with_replacement_index(
     element: Iterable[_T], iterable: Iterable[_T]
 ) -> int: ...
-def permutation_index(
-    element: Iterable[_T], iterable: Iterable[_T]
-) -> int: ...
+def permutation_index(element: Iterable[_T], iterable: Iterable[_T]) -> int: ...
 def repeat_each(iterable: Iterable[_T], n: int = ...) -> Iterator[_T]: ...
 
 class countable(Generic[_T], Iterator[_T]):
@@ -849,7 +845,7 @@ def classify_unique(
 class _SupportsLessThan(Protocol):
     def __lt__(self, __other: Any) -> bool: ...
 
-_SupportsLessThanT = TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)
+_SupportsLessThanT = TypeVar('_SupportsLessThanT', bound=_SupportsLessThan)
 
 @overload
 def minmax(
@@ -919,7 +915,7 @@ def filter_map(
 ) -> Iterator[_V]: ...
 def powerset_of_sets(iterable: Iterable[_T]) -> Iterator[set[_T]]: ...
 def join_mappings(
-    **field_to_map: Mapping[_T, _V]
+    **field_to_map: Mapping[_T, _V],
 ) -> dict[_T, dict[str, _V]]: ...
 def doublestarmap(
     func: Callable[..., _T],

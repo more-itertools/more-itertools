@@ -34,11 +34,17 @@ _build
 env/
 venv/
 
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
 # IDE files
 .idea
 .vscode
+
+# MacOS stuff
 .DS_Store
 
-# Mypy
-.mypy_cache
-.dmypy.json
+# ruff stuff
+.ruff_cache

@@ -10,7 +10,6 @@ Some backward-compatible usability improvements have been made.
 
 import math
 import operator
-
 from collections import deque
 from collections.abc import Sized
 from functools import lru_cache, partial
@@ -28,7 +27,7 @@ from itertools import (
     tee,
     zip_longest,
 )
-from random import randrange, sample, choice
+from random import choice, randrange, sample
 from sys import hexversion
 
 __all__ = [
@@ -221,8 +220,8 @@ def all_equal(iterable, key=None):
 
     """
     iterator = groupby(iterable, key)
-    for first in iterator:
-        for second in iterator:
+    for _ in iterator:
+        for _ in iterator:
             return False
         return True
     return True
@@ -1133,7 +1132,7 @@ _perfect_tests = [
 
 @lru_cache
 def _shift_to_odd(n):
-    'Return s, d such that 2**s * d == n'
+    "Return s, d such that 2**s * d == n"
     s = ((n - 1) ^ n).bit_length() - 1
     d = n >> s
     assert (1 << s) * d == n and d & 1 and s >= 0
@@ -1177,7 +1176,7 @@ def is_prime(n):
         return n in {2, 3, 5, 7, 11, 13}
     if not (n & 1 and n % 3 and n % 5 and n % 7 and n % 11 and n % 13):
         return False
-    for limit, bases in _perfect_tests:
+    for limit, bases in _perfect_tests:  # noqa: B007
         if n < limit:
             break
     else:

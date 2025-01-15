@@ -1,6 +1,5 @@
 import cmath
 import warnings
-
 from collections import Counter, abc
 from collections.abc import Set
 from datetime import datetime, timedelta
@@ -22,15 +21,15 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter
-from pickle import loads, dumps
+from operator import add, itemgetter, mul
+from pickle import dumps, loads
 from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
 from sys import version_info
 from time import sleep
 from traceback import format_exc
-from unittest import skipIf, TestCase
+from unittest import TestCase, skipIf
 
 import more_itertools as mi
 
@@ -84,7 +83,7 @@ class ChunkedTests(TestCase):
         def f():
             return list(mi.chunked('ABCDE', 3, strict=True))
 
-        self.assertRaisesRegex(ValueError, "iterable is not divisible by n", f)
+        self.assertRaisesRegex(ValueError, 'iterable is not divisible by n', f)
         self.assertEqual(
             list(mi.chunked('ABCDEF', 3, strict=True)),
             [['A', 'B', 'C'], ['D', 'E', 'F']],
@@ -100,7 +99,7 @@ class ChunkedTests(TestCase):
             return list(mi.chunked('ABCDE', None, strict=True))
 
         self.assertRaisesRegex(
-            ValueError, "n must not be None when using strict mode.", f
+            ValueError, 'n must not be None when using strict mode.', f
         )
 
 
@@ -534,9 +533,7 @@ class IlenTests(TestCase):
     def test_ilen(self):
         """Sanity-checks for ``ilen()``."""
         # Non-empty
-        self.assertEqual(
-            mi.ilen(filter(lambda x: x % 10 == 0, range(101))), 11
-        )
+        self.assertEqual(mi.ilen(filter(lambda x: x % 10 == 0, range(101))), 11)
 
         # Empty
         self.assertEqual(mi.ilen(x for x in range(0)), 0)
@@ -575,9 +572,7 @@ class MinMaxTests(TestCase):
 
     def test_iterables(self):
         self.assertTupleEqual(mi.minmax(x for x in [0, 1, 2, 3]), (0, 3))
-        self.assertTupleEqual(
-            mi.minmax(map(str, [3, 5.5, 'a', 2])), ('2', 'a')
-        )
+        self.assertTupleEqual(mi.minmax(map(str, [3, 5.5, 'a', 2])), ('2', 'a'))
         self.assertTupleEqual(
             mi.minmax(filter(None, [0, 3, '', None, 10])), (3, 10)
         )
@@ -646,9 +641,9 @@ class OneTests(TestCase):
         it = count()
         self.assertRaisesRegex(
             ValueError,
-            "Expected exactly one item in "
-            "iterable, but got 0, 1, and "
-            "perhaps more.",
+            'Expected exactly one item in '
+            'iterable, but got 0, 1, and '
+            'perhaps more.',
             lambda: mi.one(it),
         )
 
@@ -658,9 +653,7 @@ class IntersperseTest(TestCase):
 
     def test_even(self):
         iterable = (x for x in '01')
-        self.assertEqual(
-            list(mi.intersperse(None, iterable)), ['0', None, '1']
-        )
+        self.assertEqual(list(mi.intersperse(None, iterable)), ['0', None, '1'])
 
     def test_odd(self):
         iterable = (x for x in '012')
@@ -711,7 +704,7 @@ class UniqueToEachTests(TestCase):
     def test_duplicates(self):
         """When there are duplicates in any of the input iterables that aren't
         in the rest, those duplicates should be emitted."""
-        iterables = ["mississippi", "missouri"]
+        iterables = ['mississippi', 'missouri']
         self.assertEqual(
             mi.unique_to_each(*iterables), [['p', 'p'], ['o', 'u', 'r']]
         )
@@ -1069,11 +1062,11 @@ class InterleaveEvenlyTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_three_iters(self):
-        a = ["a1", "a2", "a3", "a4", "a5"]
-        b = ["b1", "b2", "b3"]
-        c = ["c1"]
+        a = ['a1', 'a2', 'a3', 'a4', 'a5']
+        b = ['b1', 'b2', 'b3']
+        c = ['c1']
         actual = list(mi.interleave_evenly([a, b, c]))
-        expected = ["a1", "b1", "a2", "c1", "a3", "b2", "a4", "b3", "a5"]
+        expected = ['a1', 'b1', 'a2', 'c1', 'a3', 'b2', 'a4', 'b3', 'a5']
         self.assertEqual(actual, expected)
 
     def test_many_iters(self):
@@ -1083,7 +1076,7 @@ class InterleaveEvenlyTests(TestCase):
         iterables = []
         for ch in ascii_letters:
             length = rng.randint(0, 100)
-            iterable = [f"{ch}{i}" for i in range(length)]
+            iterable = [f'{ch}{i}' for i in range(length)]
             iterables.append(iterable)
 
         interleaved = list(mi.interleave_evenly(iterables))
@@ -1138,13 +1131,13 @@ class TestCollapse(TestCase):
         self.assertEqual(list(mi.collapse(l)), [1, 2, 3, 4, 5])
 
     def test_collapse_to_string(self):
-        l = [["s1"], "s2", [["s3"], "s4"], [[["s5"]]]]
-        self.assertEqual(list(mi.collapse(l)), ["s1", "s2", "s3", "s4", "s5"])
+        l = [['s1'], 's2', [['s3'], 's4'], [[['s5']]]]
+        self.assertEqual(list(mi.collapse(l)), ['s1', 's2', 's3', 's4', 's5'])
 
     def test_collapse_to_bytes(self):
-        l = [[b"s1"], b"s2", [[b"s3"], b"s4"], [[[b"s5"]]]]
+        l = [[b's1'], b's2', [[b's3'], b's4'], [[[b's5']]]]
         self.assertEqual(
-            list(mi.collapse(l)), [b"s1", b"s2", b"s3", b"s4", b"s5"]
+            list(mi.collapse(l)), [b's1', b's2', b's3', b's4', b's5']
         )
 
     def test_collapse_flatten(self):
@@ -1296,7 +1289,7 @@ class SplitAtTests(TestCase):
         ]:
             with self.subTest(iterable=iterable, separator=separator):
                 it = iter(iterable)
-                pred = lambda x: x == separator
+                pred = lambda x: x == separator  # noqa: B023
                 actual = [''.join(x) for x in mi.split_at(it, pred)]
                 expected = iterable.split(separator)
                 self.assertEqual(actual, expected)
@@ -1742,9 +1735,7 @@ class PaddedTest(TestCase):
         self.assertEqual(list(mi.padded(seq, n=5)), [1, 2, 3, 4, 5])
 
         # No fillvalue
-        self.assertEqual(
-            list(mi.padded(seq, n=7)), [1, 2, 3, 4, 5, None, None]
-        )
+        self.assertEqual(list(mi.padded(seq, n=7)), [1, 2, 3, 4, 5, None, None])
 
         # With fillvalue
         self.assertEqual(
@@ -1915,7 +1906,7 @@ class ZipEqualTest(TestCase):
             )
 
         (warning,) = caught
-        assert warning.category == DeprecationWarning
+        assert warning.category is DeprecationWarning
 
     def test_equal(self):
         lists = [0, 1, 2], [2, 3, 4]
@@ -2191,9 +2182,7 @@ class SortTogetherTest(TestCase):
         # Test for iterable of iterables
         self.assertRaises(
             mi.UnequalIterablesError,
-            lambda: mi.sort_together(
-                (range(i) for i in range(4)), strict=True
-            ),
+            lambda: mi.sort_together((range(i) for i in range(4)), strict=True),
         )
 
 
@@ -2266,9 +2255,7 @@ class TestAlwaysIterable(TestCase):
         self.assertEqual(
             list(mi.always_iterable([0, 1], base_type=list)), [[0, 1]]
         )
-        self.assertEqual(
-            list(mi.always_iterable(iter('foo'))), ['f', 'o', 'o']
-        )
+        self.assertEqual(list(mi.always_iterable(iter('foo'))), ['f', 'o', 'o'])
         self.assertEqual(list(mi.always_iterable([])), [])
 
     def test_none(self):
@@ -2387,9 +2374,7 @@ class AdjacentTests(TestCase):
         self.assertRaises(
             ValueError, lambda: mi.adjacent(pred, range(1000), -1)
         )
-        self.assertRaises(
-            ValueError, lambda: mi.adjacent(pred, range(10), -10)
-        )
+        self.assertRaises(ValueError, lambda: mi.adjacent(pred, range(10), -10))
 
     def test_grouping(self):
         """Test interaction of adjacent() with groupby_transform()"""
@@ -2515,11 +2500,11 @@ class NumericRangeTests(TestCase):
             ((0.1, 0.30000000000000001, 0.2), [0.1]),  # IEE 754 !
             (
                 (
-                    Decimal("0.1"),
-                    Decimal("0.30000000000000001"),
-                    Decimal("0.2"),
+                    Decimal('0.1'),
+                    Decimal('0.30000000000000001'),
+                    Decimal('0.2'),
                 ),
-                [Decimal("0.1"), Decimal("0.3")],
+                [Decimal('0.1'), Decimal('0.3')],
             ),  # okay with Decimal
             (
                 (
@@ -2570,7 +2555,7 @@ class NumericRangeTests(TestCase):
                 timedelta(minutes=0),
             ),
             (1.0, 2.0, 0.0),
-            (Decimal("1.0"), Decimal("2.0"), Decimal("0.0")),
+            (Decimal('1.0'), Decimal('2.0'), Decimal('0.0')),
             (Fraction(2, 2), Fraction(4, 2), Fraction(0, 2)),
         ]:
             with self.assertRaises(ValueError):
@@ -2586,8 +2571,8 @@ class NumericRangeTests(TestCase):
             ((2.0, 1.0, -1.5), True),
             ((1.0, 1.0, -1.5), False),
             ((0.0, 1.0, -1.5), False),
-            ((Decimal("1.0"), Decimal("2.0"), Decimal("1.5")), True),
-            ((Decimal("1.0"), Decimal("0.0"), Decimal("1.5")), False),
+            ((Decimal('1.0'), Decimal('2.0'), Decimal('1.5')), True),
+            ((Decimal('1.0'), Decimal('0.0'), Decimal('1.5')), False),
             ((Fraction(2, 2), Fraction(4, 2), Fraction(3, 2)), True),
             ((Fraction(2, 2), Fraction(0, 2), Fraction(3, 2)), False),
             (
@@ -2615,16 +2600,16 @@ class NumericRangeTests(TestCase):
             ((1.0, 9.9, 1.5), (1.0, 2.5, 4.0, 5.5, 7.0, 8.5), (0.9,)),
             ((9.0, 1.0, -1.5), (1.5, 3.0, 4.5, 6.0, 7.5, 9.0), (0.0, 0.9)),
             (
-                (Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('9.9'), Decimal('1.5')),
                 (
-                    Decimal("1.0"),
-                    Decimal("2.5"),
-                    Decimal("4.0"),
-                    Decimal("5.5"),
-                    Decimal("7.0"),
-                    Decimal("8.5"),
+                    Decimal('1.0'),
+                    Decimal('2.5'),
+                    Decimal('4.0'),
+                    Decimal('5.5'),
+                    Decimal('7.0'),
+                    Decimal('8.5'),
                 ),
-                (Decimal("0.9"),),
+                (Decimal('0.9'),),
             ),
             (
                 (Fraction(0, 1), Fraction(5, 1), Fraction(1, 2)),
@@ -2657,8 +2642,8 @@ class NumericRangeTests(TestCase):
             ((8.5, 0.0, -1.5), (8.5, 0.7, -1.5)),
             ((7.0, 0.0, 1.0), (17.0, 7.0, 0.5)),
             (
-                (Decimal("1.0"), Decimal("9.9"), Decimal("1.5")),
-                (Decimal("1.0"), Decimal("8.6"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('9.9'), Decimal('1.5')),
+                (Decimal('1.0'), Decimal('8.6'), Decimal('1.5')),
             ),
             (
                 (Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
@@ -2677,9 +2662,7 @@ class NumericRangeTests(TestCase):
                 ),
             ),
         ]:
-            self.assertEqual(
-                mi.numeric_range(*args1), mi.numeric_range(*args2)
-            )
+            self.assertEqual(mi.numeric_range(*args1), mi.numeric_range(*args2))
 
         for args1, args2 in [
             ((0, 5, 2), (0, 7, 2)),
@@ -2691,8 +2674,8 @@ class NumericRangeTests(TestCase):
             ((8.5, 0.0, -1.5), (8.5, 0.0, -1.4)),
             ((0.0, 7.0, 1.0), (7.0, 0.0, 1.0)),
             (
-                (Decimal("1.0"), Decimal("10.0"), Decimal("1.5")),
-                (Decimal("1.0"), Decimal("10.5"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('10.0'), Decimal('1.5')),
+                (Decimal('1.0'), Decimal('10.5'), Decimal('1.5')),
             ),
             (
                 (Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
@@ -2716,7 +2699,7 @@ class NumericRangeTests(TestCase):
             )
 
         self.assertNotEqual(mi.numeric_range(7.0), 1)
-        self.assertNotEqual(mi.numeric_range(7.0), "abc")
+        self.assertNotEqual(mi.numeric_range(7.0), 'abc')
 
     def test_get_item_by_index(self):
         for args, index, expected in [
@@ -2728,9 +2711,9 @@ class NumericRangeTests(TestCase):
             ((1.0, 6.0, 1.5), -1, 5.5),
             ((1.0, 6.0, 1.5), -2, 4.0),
             (
-                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('9.0'), Decimal('1.5')),
                 -1,
-                Decimal("8.5"),
+                Decimal('8.5'),
             ),
             (
                 (Fraction(1, 1), Fraction(10, 1), Fraction(3, 2)),
@@ -2754,7 +2737,7 @@ class NumericRangeTests(TestCase):
             ((1.0, 6.0, 1.5), -5),
             ((6.0, 1.0, 1.5), 0),
             ((6.0, 1.0, 1.5), -1),
-            ((Decimal("1.0"), Decimal("9.0"), Decimal("-1.5")), -1),
+            ((Decimal('1.0'), Decimal('9.0'), Decimal('-1.5')), -1),
             ((Fraction(1, 1), Fraction(2, 1), Fraction(3, 2)), 2),
             (
                 (
@@ -2781,9 +2764,9 @@ class NumericRangeTests(TestCase):
             ((1.0, 9.0, 1.5), slice(None, -10, 3), (1.0, 1.0, 4.5)),
             ((1.0, 9.0, 1.5), slice(None, 10, 3), (1.0, 9.0, 4.5)),
             (
-                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('9.0'), Decimal('1.5')),
                 slice(1, -1, None),
-                (Decimal("2.5"), Decimal("8.5"), Decimal("1.5")),
+                (Decimal('2.5'), Decimal('8.5'), Decimal('1.5')),
             ),
             (
                 (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
@@ -2817,8 +2800,8 @@ class NumericRangeTests(TestCase):
             ((1.5, 1.0, 1.5), hash(range(0, 0))),
             ((1.5, 1.5, 1.5), hash(range(0, 0))),
             (
-                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
-                hash((Decimal("1.0"), Decimal("8.5"), Decimal("1.5"))),
+                (Decimal('1.0'), Decimal('9.0'), Decimal('1.5')),
+                hash((Decimal('1.0'), Decimal('8.5'), Decimal('1.5'))),
             ),
             (
                 (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
@@ -2858,13 +2841,13 @@ class NumericRangeTests(TestCase):
             ((0.1, 0.30000000000000001, 0.2), 1),  # IEE 754 !
             (
                 (
-                    Decimal("0.1"),
-                    Decimal("0.30000000000000001"),
-                    Decimal("0.2"),
+                    Decimal('0.1'),
+                    Decimal('0.30000000000000001'),
+                    Decimal('0.2'),
                 ),
                 2,
             ),  # works with Decimal
-            ((Decimal("1.0"), Decimal("9.0"), Decimal("1.5")), 6),
+            ((Decimal('1.0'), Decimal('9.0'), Decimal('1.5')), 6),
             ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)), 3),
             (
                 (
@@ -2879,11 +2862,11 @@ class NumericRangeTests(TestCase):
 
     def test_repr(self):
         for args, *expected in [
-            ((7.0,), "numeric_range(0.0, 7.0)"),
-            ((1.0, 7.0), "numeric_range(1.0, 7.0)"),
-            ((7.0, 1.0, -1.5), "numeric_range(7.0, 1.0, -1.5)"),
+            ((7.0,), 'numeric_range(0.0, 7.0)'),
+            ((1.0, 7.0), 'numeric_range(1.0, 7.0)'),
+            ((7.0, 1.0, -1.5), 'numeric_range(7.0, 1.0, -1.5)'),
             (
-                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('9.0'), Decimal('1.5')),
                 (
                     "numeric_range(Decimal('1.0'), Decimal('9.0'), "
                     "Decimal('1.5'))"
@@ -2892,8 +2875,8 @@ class NumericRangeTests(TestCase):
             (
                 (Fraction(7, 7), Fraction(10, 2), Fraction(3, 2)),
                 (
-                    "numeric_range(Fraction(1, 1), Fraction(5, 1), "
-                    "Fraction(3, 2))"
+                    'numeric_range(Fraction(1, 1), Fraction(5, 1), '
+                    'Fraction(3, 2))'
                 ),
             ),
             (
@@ -2902,12 +2885,12 @@ class NumericRangeTests(TestCase):
                     datetime(2019, 3, 30),
                     timedelta(hours=10),
                 ),
-                "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
-                "datetime.datetime(2019, 3, 30, 0, 0), "
-                "datetime.timedelta(seconds=36000))",
-                "numeric_range(datetime.datetime(2019, 3, 29, 0, 0), "
-                "datetime.datetime(2019, 3, 30, 0, 0), "
-                "datetime.timedelta(0, 36000))",
+                'numeric_range(datetime.datetime(2019, 3, 29, 0, 0), '
+                'datetime.datetime(2019, 3, 30, 0, 0), '
+                'datetime.timedelta(seconds=36000))',
+                'numeric_range(datetime.datetime(2019, 3, 29, 0, 0), '
+                'datetime.datetime(2019, 3, 30, 0, 0), '
+                'datetime.timedelta(0, 36000))',
             ),
         ]:
             with self.subTest(args=args):
@@ -2920,7 +2903,7 @@ class NumericRangeTests(TestCase):
             ((7.0, 1.0, -1.5), [2.5, 4.0, 5.5, 7.0]),
             ((7.0, 0.9, -1.5), [1.0, 2.5, 4.0, 5.5, 7.0]),
             (
-                (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('5.0'), Decimal('1.5')),
                 [Decimal('4.0'), Decimal('2.5'), Decimal('1.0')],
             ),
             (
@@ -2950,7 +2933,7 @@ class NumericRangeTests(TestCase):
             ((7.0,), 7.0, 0),
             ((7.0,), 10.0, 0),
             (
-                (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('5.0'), Decimal('1.5')),
                 Decimal('4.0'),
                 1,
             ),
@@ -2978,7 +2961,7 @@ class NumericRangeTests(TestCase):
             ((7.0, 0.0, -1.0), 7.0, 0),
             ((7.0, 0.0, -1.0), 1.0, 6),
             (
-                (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+                (Decimal('1.0'), Decimal('5.0'), Decimal('1.5')),
                 Decimal('4.0'),
                 2,
             ),
@@ -3007,7 +2990,7 @@ class NumericRangeTests(TestCase):
             ((7.0, 0.0, -1.0), 0.0),
             ((7.0, 0.0, -1.0), 10.0),
             ((7.0, 0.0), 5.0),
-            ((Decimal("1.0"), Decimal("5.0"), Decimal("1.5")), Decimal('4.5')),
+            ((Decimal('1.0'), Decimal('5.0'), Decimal('1.5')), Decimal('4.5')),
             ((Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)), Fraction(5, 3)),
             (
                 (
@@ -3048,7 +3031,7 @@ class NumericRangeTests(TestCase):
             (7.0, 5.0),
             (7.0, 5.0, 4.0),
             (7.0, 5.0, -1.0),
-            (Decimal("1.0"), Decimal("5.0"), Decimal("1.5")),
+            (Decimal('1.0'), Decimal('5.0'), Decimal('1.5')),
             (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
             (datetime(2019, 3, 29), datetime(2019, 3, 30)),
         ]:
@@ -3384,18 +3367,18 @@ class SeekableTest(PeekableMixinTests, TestCase):
 class SequenceViewTests(TestCase):
     def test_init(self):
         view = mi.SequenceView((1, 2, 3))
-        self.assertEqual(repr(view), "SequenceView((1, 2, 3))")
+        self.assertEqual(repr(view), 'SequenceView((1, 2, 3))')
         self.assertRaises(TypeError, lambda: mi.SequenceView({}))
 
     def test_update(self):
         seq = [1, 2, 3]
         view = mi.SequenceView(seq)
         self.assertEqual(len(view), 3)
-        self.assertEqual(repr(view), "SequenceView([1, 2, 3])")
+        self.assertEqual(repr(view), 'SequenceView([1, 2, 3])')
 
         seq.pop()
         self.assertEqual(len(view), 2)
-        self.assertEqual(repr(view), "SequenceView([1, 2])")
+        self.assertEqual(repr(view), 'SequenceView([1, 2])')
 
     def test_indexing(self):
         seq = ('a', 'b', 'c', 'd', 'e', 'f')
@@ -3677,7 +3660,7 @@ class RlocateTests(TestCase):
     def test_window_size_large(self):
         iterable = [1, 2, 3, 4]
         pred = lambda a, b, c, d, e: True
-        for it in (iterable, iter(iterable)):
+        for _ in (iterable, iter(iterable)):
             actual = list(mi.rlocate(iterable, pred, window_size=5))
             expected = [0]
             self.assertEqual(actual, expected)
@@ -3685,7 +3668,7 @@ class RlocateTests(TestCase):
     def test_window_size_zero(self):
         iterable = [1, 2, 3, 4]
         pred = lambda: True
-        for it in (iterable, iter(iterable)):
+        for _ in (iterable, iter(iterable)):
             with self.assertRaises(ValueError):
                 list(mi.locate(iterable, pred, window_size=0))
 
@@ -4012,7 +3995,7 @@ class OnlyTests(TestCase):
     def test_default_exception_message(self):
         self.assertRaisesRegex(
             ValueError,
-            "Expected exactly one item in iterable, "
+            'Expected exactly one item in iterable, '
             "but got 'foo', 'bar', and perhaps more",
             lambda: mi.only(['foo', 'bar', 'baz']),
         )
@@ -4137,7 +4120,7 @@ class FilterExceptTests(TestCase):
             list(mi.filter_except(int, iterable))
 
     def test_raise(self):
-        iterable = ['0', '1' '2', 'three', None]
+        iterable = ['0', '12', 'three', None]
         with self.assertRaises(TypeError):
             list(mi.filter_except(int, iterable, ValueError))
 
@@ -4169,7 +4152,7 @@ class MapExceptTests(TestCase):
             list(mi.map_except(int, iterable))
 
     def test_raise(self):
-        iterable = ['0', '1' '2', 'three', None]
+        iterable = ['0', '12', 'three', None]
         with self.assertRaises(TypeError):
             list(mi.map_except(int, iterable, ValueError))
 
@@ -4210,7 +4193,7 @@ class SampleTests(TestCase):
         # If the algorithm is changed (e.g. to a more naive implementation)
         # this test will fail, but the algorithm might be correct.
         # Also, this test can pass and the algorithm can be completely wrong.
-        data = "abcdef"
+        data = 'abcdef'
         weights = list(range(1, len(data) + 1))
         seed(123)
         actual = mi.sample(data, k=2, weights=weights)
@@ -4259,7 +4242,7 @@ class SampleTests(TestCase):
 
     def test_sampling_entire_iterable(self):
         """If k=len(iterable), the sample contains the original elements."""
-        data = ["a", 2, "a", 4, (1, 2, 3)]
+        data = ['a', 2, 'a', 4, (1, 2, 3)]
         actual = set(mi.sample(data, k=len(data)))
         expected = set(data)
         self.assertEqual(actual, expected)
@@ -4267,7 +4250,7 @@ class SampleTests(TestCase):
     def test_scale_invariance_of_weights(self):
         """The probability of choosing element a_i is w_i / sum(weights).
         Scaling weights should not change the probability or outcome."""
-        data = "abcdef"
+        data = 'abcdef'
 
         weights = list(range(1, len(data) + 1))
         seed(123)
@@ -4311,8 +4294,7 @@ class SampleTests(TestCase):
             mean(mi.sample(data, k=50, weights=data)) for _ in range(10)
         ]
         data_rev_means = [
-            mean(mi.sample(data_rev, k=50, weights=data_rev))
-            for _ in range(10)
+            mean(mi.sample(data_rev, k=50, weights=data_rev)) for _ in range(10)
         ]
 
         # The difference in the means should be low, i.e. little bias
@@ -4322,7 +4304,6 @@ class SampleTests(TestCase):
         self.assertTrue(difference_in_means < 4.4)
 
     def test_error_cases(self):
-
         # weights and counts are mutally exclusive
         with self.assertRaises(TypeError):
             mi.sample(
@@ -4476,13 +4457,13 @@ class CallbackIterTests(TestCase):
             self.assertEqual(next(it), ((1, 'a'), {'intermediate_total': 1}))
 
         with self.assertRaises(mi.AbortThread):
-            it.result
+            it.result  # noqa: B018
 
     def test_no_result(self):
         func = lambda callback=None: self._target(cb=callback)
         with mi.callback_iter(func) as it:
             with self.assertRaises(RuntimeError):
-                it.result
+                it.result  # noqa: B018
 
     def test_exception(self):
         func = lambda callback=None: self._target(cb=callback, exc=ValueError)
@@ -4493,7 +4474,7 @@ class CallbackIterTests(TestCase):
             )
 
             with self.assertRaises(ValueError):
-                it.result
+                it.result  # noqa: B018
 
 
 class WindowedCompleteTests(TestCase):
@@ -4564,12 +4545,8 @@ class AllUniqueTests(TestCase):
 
     def test_partially_hashable(self):
         self.assertEqual(mi.all_unique([[1, 2], [3, 4], (5, 6)]), True)
-        self.assertEqual(
-            mi.all_unique([[1, 2], [3, 4], (5, 6), [1, 2]]), False
-        )
-        self.assertEqual(
-            mi.all_unique([[1, 2], [3, 4], (5, 6), (5, 6)]), False
-        )
+        self.assertEqual(mi.all_unique([[1, 2], [3, 4], (5, 6), [1, 2]]), False)
+        self.assertEqual(mi.all_unique([[1, 2], [3, 4], (5, 6), (5, 6)]), False)
 
     def test_key(self):
         iterable = ['A', 'B', 'C', 'b']
@@ -4910,7 +4887,7 @@ class ChunkedEvenTests(TestCase):
             def count_with_assert():
                 for i in count():
                     # Look-ahead should be less than n^2
-                    self.assertLessEqual(i, n * k + n * n)
+                    self.assertLessEqual(i, n * k + n * n)  # noqa: B023
                     yield i
 
             ls = mi.chunked_even(count_with_assert(), n)
@@ -5207,9 +5184,7 @@ class DuplicatesJustSeenTests(TestCase):
         self.assertEqual(list(mi.duplicates_justseen([[1, 2], [3, 4]])), [])
         self.assertEqual(
             list(
-                mi.duplicates_justseen(
-                    [[1, 2], [3, 4], [3, 4], [3, 4], [1, 2]]
-                )
+                mi.duplicates_justseen([[1, 2], [3, 4], [3, 4], [3, 4], [1, 2]])
             ),
             [[3, 4], [3, 4]],
         )
@@ -5220,17 +5195,13 @@ class DuplicatesJustSeenTests(TestCase):
         )
         self.assertEqual(
             list(
-                mi.duplicates_justseen(
-                    [[1, 2], [3, 4], (5, 6), [1, 2], [1, 2]]
-                )
+                mi.duplicates_justseen([[1, 2], [3, 4], (5, 6), [1, 2], [1, 2]])
             ),
             [[1, 2]],
         )
         self.assertEqual(
             list(
-                mi.duplicates_justseen(
-                    [[1, 2], [3, 4], (5, 6), (5, 6), (5, 6)]
-                )
+                mi.duplicates_justseen([[1, 2], [3, 4], (5, 6), (5, 6), (5, 6)])
             ),
             [(5, 6), (5, 6)],
         )
@@ -5436,9 +5407,7 @@ class ClassifyUniqueTests(TestCase):
             e for e, j, u in mi.classify_unique(input, str.lower) if not u
         ]
         self.assertEqual(output, list('heHEhe'))
-        self.assertEqual(
-            list(mi.duplicates_everseen(input, str.lower)), output
-        )
+        self.assertEqual(list(mi.duplicates_everseen(input, str.lower)), output)
 
     def test_vs_duplicates_justseen(self):
         input = [1, 2, 3, 3, 2, 2]
@@ -5452,9 +5421,7 @@ class ClassifyUniqueTests(TestCase):
             e for e, j, u in mi.classify_unique(input, str.lower) if not j
         ]
         self.assertEqual(output, list('HHheEe'))
-        self.assertEqual(
-            list(mi.duplicates_justseen(input, str.lower)), output
-        )
+        self.assertEqual(list(mi.duplicates_justseen(input, str.lower)), output)
 
 
 class LongestCommonPrefixTests(TestCase):
@@ -5506,30 +5473,30 @@ class LongestCommonPrefixTests(TestCase):
 
 class IequalsTests(TestCase):
     def test_basic(self):
-        self.assertTrue(mi.iequals("abc", iter("abc")))
+        self.assertTrue(mi.iequals('abc', iter('abc')))
         self.assertTrue(mi.iequals(range(3), [0, 1, 2]))
-        self.assertFalse(mi.iequals("abc", [0, 1, 2]))
+        self.assertFalse(mi.iequals('abc', [0, 1, 2]))
 
     def test_no_iterables(self):
         self.assertTrue(mi.iequals())
 
     def test_one_iterable(self):
-        self.assertTrue(mi.iequals("abc"))
+        self.assertTrue(mi.iequals('abc'))
 
     def test_more_than_two_iterable(self):
-        self.assertTrue(mi.iequals("abc", iter("abc"), ['a', 'b', 'c']))
-        self.assertFalse(mi.iequals("abc", iter("abc"), ['a', 'b', 'd']))
+        self.assertTrue(mi.iequals('abc', iter('abc'), ['a', 'b', 'c']))
+        self.assertFalse(mi.iequals('abc', iter('abc'), ['a', 'b', 'd']))
 
     def test_order_matters(self):
-        self.assertFalse(mi.iequals("abc", "acb"))
+        self.assertFalse(mi.iequals('abc', 'acb'))
 
     def test_not_equal_lengths(self):
-        self.assertFalse(mi.iequals("abc", "ab"))
-        self.assertFalse(mi.iequals("abc", "bc"))
-        self.assertFalse(mi.iequals("aaa", "aaaa"))
+        self.assertFalse(mi.iequals('abc', 'ab'))
+        self.assertFalse(mi.iequals('abc', 'bc'))
+        self.assertFalse(mi.iequals('aaa', 'aaaa'))
 
     def test_empty_iterables(self):
-        self.assertTrue(mi.iequals([], ""))
+        self.assertTrue(mi.iequals([], ''))
 
     def test_none_is_not_a_sentinel(self):
         # See https://stackoverflow.com/a/900444
@@ -5645,7 +5612,7 @@ class GrayProductTests(TestCase):
     def test_basic(self):
         self.assertEqual(
             tuple(mi.gray_product(('a', 'b', 'c'), range(1, 3))),
-            (("a", 1), ("b", 1), ("c", 1), ("c", 2), ("b", 2), ("a", 2)),
+            (('a', 1), ('b', 1), ('c', 1), ('c', 2), ('b', 2), ('a', 2)),
         )
         out = mi.gray_product(('foo', 'bar'), (3, 4, 5, 6), ['quz', 'baz'])
         self.assertEqual(next(out), ('foo', 3, 'quz'))
@@ -5680,11 +5647,11 @@ class GrayProductTests(TestCase):
 
     def test_vs_product(self):
         iters = (
-            ("a", "b"),
+            ('a', 'b'),
             range(3, 6),
             [None, None],
-            {"i", "j", "k", "l"},
-            "XYZ",
+            {'i', 'j', 'k', 'l'},
+            'XYZ',
         )
         self.assertEqual(
             sorted(product(*iters)), sorted(mi.gray_product(*iters))

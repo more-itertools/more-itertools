@@ -43,7 +43,26 @@ Documentation = "https://more-itertools.readthedocs.io/en/stable/"
 [tool.flit.module]
 name = "more_itertools"
 
-[tool.black]
-line-length = 79
-target-version = ["py39"]
-skip-string-normalization = true
+[project.optional-dependencies]
+lint = [
+    "ruff >= 0.8",
+]
+
+[tool.ruff]
+indent-width = 4
+line-length = 80
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+ignore = ["B904", "B028", "F841", "E741"]
+
+[tool.ruff.format]
+indent-style = "space"
+quote-style = "single"
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"__init__.pyi" = ["F401", "F403"]
+"*.py" = ["E731"]

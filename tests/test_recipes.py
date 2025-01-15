@@ -3,8 +3,8 @@ from doctest import DocTestSuite
 from fractions import Fraction
 from functools import reduce
 from itertools import combinations, count, groupby, permutations
-from operator import mul
 from math import comb, factorial
+from operator import mul
 from sys import version_info
 from unittest import TestCase, skipIf
 from unittest.mock import patch
@@ -127,7 +127,7 @@ class NthTests(TestCase):
     def test_default(self):
         """Ensure a default value is returned when nth item not found"""
         l = range(3)
-        self.assertEqual(mi.nth(l, 100, "zebra"), "zebra")
+        self.assertEqual(mi.nth(l, 100, 'zebra'), 'zebra')
 
     def test_negative_item_raises(self):
         """Ensure asking for a negative item raises an exception"""
@@ -206,11 +206,9 @@ class NcyclesTests(TestCase):
 
     def test_happy_path(self):
         """cycle a sequence three times"""
-        r = ["a", "b", "c"]
+        r = ['a', 'b', 'c']
         n = mi.ncycles(r, 3)
-        self.assertEqual(
-            ["a", "b", "c", "a", "b", "c", "a", "b", "c"], list(n)
-        )
+        self.assertEqual(['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'], list(n))
 
     def test_null_case(self):
         """asking for 0 cycles should return an empty iterator"""
@@ -279,7 +277,7 @@ class PairwiseTests(TestCase):
 
     def test_short_case(self):
         """ensure an empty iterator if there's not enough values to pair"""
-        p = mi.pairwise("a")
+        p = mi.pairwise('a')
         self.assertRaises(StopIteration, lambda: next(p))
 
     def test_coverage(self):
@@ -531,9 +529,7 @@ class FirstTrueTests(TestCase):
 
     def test_pred(self):
         """Test with a custom predicate"""
-        self.assertEqual(
-            mi.first_true([2, 4, 6], pred=lambda x: x % 3 == 0), 6
-        )
+        self.assertEqual(mi.first_true([2, 4, 6], pred=lambda x: x % 3 == 0), 6)
 
 
 class RandomProductTests(TestCase):
@@ -593,7 +589,7 @@ class RandomPermutationTests(TestCase):
         r = mi.random_permutation(i)
         self.assertEqual(set(i), set(r))
         if i == r:
-            raise AssertionError("Values were not permuted")
+            raise AssertionError('Values were not permuted')
 
     def test_partial_permutation(self):
         """ensure all returned items are from the iterable, that the returned
@@ -651,7 +647,7 @@ class RandomCombinationWithReplacementTests(TestCase):
         combo = mi.random_combination_with_replacement(items, len(items) * 2)
         self.assertEqual(2 * len(items), len(combo))
         if len(set(combo)) == len(combo):
-            raise AssertionError("Combination contained no duplicates")
+            raise AssertionError('Combination contained no duplicates')
 
     def test_pseudorandomness(self):
         """ensure different subsets of the iterable get returned over many
@@ -815,7 +811,7 @@ class BeforeAndAfterTests(TestCase):
                 operation = next(events)
             except StopIteration:
                 break
-            assert operation in ["SUM", "MULTIPLY"]
+            assert operation in ['SUM', 'MULTIPLY']
 
             # Here, the remainder `events` is passed into `before_and_after`
             # again, which would be problematic if the remainder is a
@@ -828,14 +824,14 @@ class BeforeAndAfterTests(TestCase):
             yield (operation, numbers)
 
     def test_nested_remainder(self):
-        events = ["SUM", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
-        events += ["MULTIPLY", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
+        events = ['SUM', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
+        events += ['MULTIPLY', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] * 1000
 
         for operation, numbers in self._group_events(events):
-            if operation == "SUM":
+            if operation == 'SUM':
                 res = sum(numbers)
                 self.assertEqual(res, 55)
-            elif operation == "MULTIPLY":
+            elif operation == 'MULTIPLY':
                 res = reduce(lambda a, b: a * b, numbers)
                 self.assertEqual(res, 3628800)
 
@@ -1171,9 +1167,7 @@ class FactorTests(TestCase):
             all(set(mi.factor(n)) <= set(mi.sieve(n + 1)) for n in range(2000))
         )
         self.assertTrue(
-            all(
-                list(mi.factor(n)) == sorted(mi.factor(n)) for n in range(2000)
-            )
+            all(list(mi.factor(n)) == sorted(mi.factor(n)) for n in range(2000))
         )
 
 

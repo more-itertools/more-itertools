@@ -1,8 +1,7 @@
-black
 coverage
-flake8
 flit
 mypy
+ruff
 setuptools
 sphinx
 sphinx_rtd_theme
