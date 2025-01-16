@@ -54,8 +54,20 @@ line-length = 80
 target-version = "py39"
 
 [tool.ruff.lint]
-select = ["B", "E", "F", "I", "UP"]
-ignore = ["B904", "B028", "F841", "E741"]
+# https://docs.astral.sh/ruff/rules/
+select = [
+    "B",  # flake8-bugbear
+    "E",  # pycodestyle errors
+    "ERA",  # eradicate
+    "F",  # pyflakes
+    "I",  # isort
+    "RET",  # flake8-return
+    "SLF",  # flake8-self
+    "TID",  # flake8-tidy-imports
+    "UP",  # pyupgrade
+]
+ignore = ["B904", "B028", "E741"]
+fixable = ["I", "TID"]
 
 [tool.ruff.format]
 indent-style = "space"
@@ -66,3 +78,5 @@ skip-magic-trailing-comma = false
 "__init__.py" = ["F401", "F403"]
 "__init__.pyi" = ["F401", "F403"]
 "*.py" = ["E731"]
+"tests/*.py" = ["SLF001"]
+"docs/*.py" = ["ERA001"]
