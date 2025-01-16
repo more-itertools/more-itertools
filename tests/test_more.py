@@ -1915,7 +1915,7 @@ class ZipEqualTest(TestCase):
             )
 
         (warning,) = caught
-        assert warning.category == DeprecationWarning
+        assert isinstance(warning.category, DeprecationWarning)
 
     def test_equal(self):
         lists = [0, 1, 2], [2, 3, 4]
@@ -4322,7 +4322,6 @@ class SampleTests(TestCase):
         self.assertTrue(difference_in_means < 4.4)
 
     def test_error_cases(self):
-
         # weights and counts are mutally exclusive
         with self.assertRaises(TypeError):
             mi.sample(
