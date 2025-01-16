@@ -192,8 +192,7 @@ def chunked(iterable, n, strict=False):
                 yield chunk
 
         return iter(ret())
-    else:
-        return iterator
+    return iterator
 
 
 def first(iterable, default=_marker):
@@ -572,9 +571,6 @@ def one(iterable, too_short=None, too_long=None):
         msg = (
             f'Expected exactly one item in iterable, but got {first_value!r}, '
             f'{second_value!r}, and perhaps more.'
-            f'Expected exactly one item in iterable, '
-            f'but got {first_value!r}, {second_value!r}, '
-            'and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
@@ -797,17 +793,15 @@ def distinct_permutations(iterable, r=None):
     if r is None:
         r = size
 
-    # functools.partial(_partial, ... )
     algorithm = _full if (r == size) else partial(_partial, r=r)
 
     if 0 < r <= size:
         if sortable:
             return algorithm(items)
-        else:
-            return (
-                permuted_items(permuted_indices)
-                for permuted_indices in algorithm(indices)
-            )
+        return (
+            permuted_items(permuted_indices)
+            for permuted_indices in algorithm(indices)
+        )
 
     return iter(() if r else ((),))
 
@@ -825,17 +819,16 @@ def intersperse(e, iterable, n=1):
     """
     if n == 0:
         raise ValueError('n must be > 0')
-    elif n == 1:
+    if n == 1:
         # interleave(repeat(e), iterable) -> e, x_0, e, x_1, e, x_2...
         # islice(..., 1, None) -> x_0, e, x_1, e, x_2...
         return islice(interleave(repeat(e), iterable), 1, None)
-    else:
-        # interleave(filler, chunks) -> [e], [x_0, x_1], [e], [x_2, x_3]...
-        # islice(..., 1, None) -> [x_0, x_1], [e], [x_2, x_3]...
-        # flatten(...) -> x_0, x_1, e, x_2, x_3...
-        filler = repeat([e])
-        chunks = chunked(iterable, n)
-        return flatten(islice(interleave(filler, chunks), 1, None))
+    # interleave(filler, chunks) -> [e], [x_0, x_1], [e], [x_2, x_3]...
+    # islice(..., 1, None) -> [x_0, x_1], [e], [x_2, x_3]...
+    # flatten(...) -> x_0, x_1, e, x_2, x_3...
+    filler = repeat([e])
+    chunks = chunked(iterable, n)
+    return flatten(islice(interleave(filler, chunks), 1, None))
 
 
 def unique_to_each(*iterables):
@@ -1029,7 +1022,7 @@ class bucket:
         self._it = iter(iterable)
         self._key = key
         self._cache = defaultdict(deque)
-        self._validator = validator or (lambda x: True)
+        self._validator = validator or (lambda _: True)
 
     def __contains__(self, value):
         if not self._validator(value):
@@ -1214,7 +1207,7 @@ def interleave_evenly(iterables, lengths=None):
         errors = [e - delta for e, delta in zip(errors, deltas_secondary)]
 
         # those iterables for which the error is negative are yielded
-        # ("diagonal step" in Bresenham)
+        # ("diagonal step" in Bresenham)  # noqa: ERA001
         for i, e_ in enumerate(errors):
             if e_ < 0:
                 yield next(iters_secondary[i])
@@ -1373,8 +1366,7 @@ def sliced(seq, n, strict=False):
                 yield _slice
 
         return iter(ret())
-    else:
-        return iterator
+    return iterator
 
 
 def split_at(iterable, pred, maxsplit=-1, keep_separator=False):
@@ -1613,9 +1605,9 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
 
     if n is None:
         return iterable_with_repeat
-    elif n < 1:
+    if n < 1:
         raise ValueError('n must be at least 1')
-    elif next_multiple:
+    if next_multiple:
 
         def slice_generator():
             for first in iterable:
@@ -1624,9 +1616,8 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
 
         # While elements exist produce slices of size n
         return chain.from_iterable(slice_generator())
-    else:
-        # Ensure the first batch is at least size n then iterate
-        return chain(islice(iterable_with_repeat, n), iterable)
+    # Ensure the first batch is at least size n then iterate
+    return chain(islice(iterable_with_repeat, n), iterable)
 
 
 def repeat_each(iterable, n=2):
@@ -1899,7 +1890,7 @@ def unzip(iterable):
                 return obj[i]
             except IndexError:
                 # basically if we have an iterable like
-                # iter([(1, 2, 3), (4, 5), (6,)])
+                # iter([(1, 2, 3), (4, 5), (6,)])  # noqa: ERA001
                 # the second unzipped iterable would fail at the third tuple
                 # since it would try to access tup[1]
                 # same with the third unzipped iterable and the second tuple
@@ -2184,8 +2175,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
     def __bool__(self):
         if self._growing:
             return self._start < self._stop
-        else:
-            return self._start > self._stop
+        return self._start > self._stop
 
     def __contains__(self, elem):
         if self._growing:
@@ -2203,19 +2193,17 @@ class numeric_range(abc.Sequence, abc.Hashable):
             empty_other = not bool(other)
             if empty_self or empty_other:
                 return empty_self and empty_other  # True if both empty
-            else:
-                return (
-                    self._start == other._start
-                    and self._step == other._step
-                    and self._get_by_index(-1) == other._get_by_index(-1)
-                )
-        else:
-            return False
+            return (
+                self._start == other._start
+                and self._step == other._step
+                and self._get_by_index(-1) == other._get_by_index(-1)
+            )
+        return False
 
     def __getitem__(self, key):
         if isinstance(key, int):
             return self._get_by_index(key)
-        elif isinstance(key, slice):
+        if isinstance(key, slice):
             step = self._step if key.step is None else key.step * self._step
 
             if key.start is None or key.start <= -self._len:
@@ -2233,24 +2221,22 @@ class numeric_range(abc.Sequence, abc.Hashable):
                 stop = self._get_by_index(key.stop)
 
             return numeric_range(start, stop, step)
-        else:
-            raise TypeError(
-                'numeric range indices must be '
-                f'integers or slices, not {type(key).__name__}'
-            )
+
+        raise TypeError(
+            'numeric range indices must be '
+            f'integers or slices, not {type(key).__name__}'
+        )
 
     def __hash__(self):
         if self:
             return hash((self._start, self._get_by_index(-1), self._step))
-        else:
-            return self._EMPTY_HASH
+        return self._EMPTY_HASH
 
     def __iter__(self):
         values = (self._start + (n * self._step) for n in count())
         if self._growing:
             return takewhile(partial(gt, self._stop), values)
-        else:
-            return takewhile(partial(lt, self._stop), values)
+        return takewhile(partial(lt, self._stop), values)
 
     def __len__(self):
         return self._len
@@ -2268,9 +2254,9 @@ class numeric_range(abc.Sequence, abc.Hashable):
         distance = stop - start
         if distance <= self._zero:
             return 0
-        else:  # distance > 0 and step > 0: regular euclidean division
-            q, r = divmod(distance, step)
-            return int(q) + int(r != self._zero)
+        # distance > 0 and step > 0: regular euclidean division
+        q, r = divmod(distance, step)
+        return int(q) + int(r != self._zero)
 
     def __reduce__(self):
         return numeric_range, (self._start, self._stop, self._step)
@@ -2303,7 +2289,6 @@ class numeric_range(abc.Sequence, abc.Hashable):
                 if r == self._zero:
                     return int(q)
 
-        raise ValueError(f'{value} is not in numeric range')
         raise ValueError(f'{value} is not in numeric range')
 
     def _get_by_index(self, i):
@@ -3442,9 +3427,6 @@ def only(iterable, default=None, too_long=None):
         msg = (
             f'Expected exactly one item in iterable, but got {first_value!r}, '
             f'{second_value!r}, and perhaps more.'
-            'Expected exactly one item in iterable, '
-            f'but got {first_value!r}, {second_value!r}, '
-            'and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
@@ -3791,16 +3773,13 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
     if weights is not None and counts is not None:
         raise TypeError('weights and counts are mutally exclusive')
 
-    elif weights is not None:
+    if weights is not None:
         weights = iter(weights)
         return _sample_weighted(iterator, k, weights, strict)
-
-    elif counts is not None:
+    if counts is not None:
         counts = iter(counts)
         return _sample_counted(iterator, k, counts, strict)
-
-    else:
-        return _sample_unweighted(iterator, k, strict)
+    return _sample_unweighted(iterator, k, strict)
 
 
 def is_sorted(iterable, key=None, reverse=False, strict=False):
@@ -4247,8 +4226,7 @@ def combination_index(element, iterable):
             tmp, y = next(element, (None, None))
             if tmp is None:
                 break
-            else:
-                k = tmp
+            k = tmp
     else:
         raise ValueError('element is not a combination of iterable')
 
@@ -4295,8 +4273,7 @@ def combination_with_replacement_index(element, iterable):
             tmp, y = next(element, (None, None))
             if tmp is None:
                 break
-            else:
-                k = tmp
+            k = tmp
         if y is None:
             break
     else:

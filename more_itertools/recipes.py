@@ -410,8 +410,7 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
         return _zip_equal(*args)
     if incomplete == 'ignore':
         return zip(*args)
-    else:
-        raise ValueError('Expected fill, strict, or ignore')
+    raise ValueError('Expected fill, strict, or ignore')
 
 
 def roundrobin(*iterables):
@@ -842,7 +841,7 @@ def sliding_window(iterable, n):
     """
     if n > 20:
         return _sliding_window_deque(iterable, n)
-    elif n > 2:
+    elif n > 2:  # noqa: RET505
         return _sliding_window_islice(iterable, n)
     elif n == 2:
         return pairwise(iterable)
