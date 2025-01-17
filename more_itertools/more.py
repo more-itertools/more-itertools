@@ -68,10 +68,12 @@ __all__ = [
     'count_cycle',
     'countable',
     'derangements',
+    'derangements_by_value',
     'dft',
     'difference',
     'distinct_combinations',
     'distinct_derangements',
+    'distinct_derangements_by_value'
     'distinct_permutations',
     'distribute',
     'divide',
