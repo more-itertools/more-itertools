@@ -73,7 +73,7 @@ __all__ = [
     'difference',
     'distinct_combinations',
     'distinct_derangements',
-    'distinct_derangements_by_value'
+    'distinct_derangements_by_value',
     'distinct_permutations',
     'distribute',
     'divide',
