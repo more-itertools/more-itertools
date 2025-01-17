@@ -1915,7 +1915,7 @@ class ZipEqualTest(TestCase):
             )
 
         (warning,) = caught
-        assert isinstance(warning.category, DeprecationWarning)
+        self.assertTrue(warning.category is DeprecationWarning)
 
     def test_equal(self):
         lists = [0, 1, 2], [2, 3, 4]
@@ -4137,7 +4137,7 @@ class FilterExceptTests(TestCase):
             list(mi.filter_except(int, iterable))
 
     def test_raise(self):
-        iterable = ['0', '1' '2', 'three', None]
+        iterable = ['0', '12', 'three', None]
         with self.assertRaises(TypeError):
             list(mi.filter_except(int, iterable, ValueError))
 
@@ -4169,7 +4169,7 @@ class MapExceptTests(TestCase):
             list(mi.map_except(int, iterable))
 
     def test_raise(self):
-        iterable = ['0', '1' '2', 'three', None]
+        iterable = ['0', '12', 'three', None]
         with self.assertRaises(TypeError):
             list(mi.map_except(int, iterable, ValueError))
 
