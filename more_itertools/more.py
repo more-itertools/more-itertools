@@ -919,6 +919,13 @@ def derangements_by_value(iterable, r=None):
         >>> sorted(derangements_by_value([0, 2, 3], 2))
         [(2, 0), (2, 3), (3, 0), (3, 2)]
 
+    Note that in case of non-integer inputs, the result will be the same
+    as pure ``itertools.permutations``:
+
+        >>> sorted(derangements_by_value(["A", "B", "C"])) ==
+        >>>     sorted(permutations(["A", "B", "C"]))
+        True
+
     Note that in case of duplicates in input, these lead to duplicated
     results:
 
