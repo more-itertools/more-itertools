@@ -911,7 +911,7 @@ def derangements_by_value(iterable, r=None):
     Contrast this to the index-based implementation which skips the outcome
     in which classes 0 and 1 are swapped and the new teacher gets class 2:
 
-        >>> sorted(derangements([0, 1, 3])
+        >>> sorted(derangements([0, 1, 3]))
         [(1, 3, 0), (3, 0, 1)]
 
     If *r* is given, only the *r*-length derangements by value are yielded.
@@ -922,9 +922,14 @@ def derangements_by_value(iterable, r=None):
     Note that in case of non-integer inputs, the result will be the same
     as pure ``itertools.permutations``:
 
-        >>> sorted(derangements_by_value(["A", "B", "C"])) ==
-        >>>     sorted(permutations(["A", "B", "C"]))
-        True
+        >>> for d in sorted(derangements_by_value(["A", "B", "C"])):
+        ...    print(', '.join(d))
+        A, B, C
+        A, C, B
+        B, A, C
+        B, C, A
+        C, A, B
+        C, B, A
 
     Note that in case of duplicates in input, these lead to duplicated
     results:
