@@ -23,6 +23,7 @@ pip-log.txt
 .noseids
 htmlcov/
 coverage.xml
+.pytest_cache
 
 # Docs by Sphinx
 _build

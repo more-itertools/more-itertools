@@ -577,8 +577,8 @@ def one(iterable, too_short=None, too_long=None):
         pass
     else:
         msg = (
-            'Expected exactly one item in iterable, but got {!r}, {!r}, '
-            'and perhaps more.'.format(first_value, second_value)
+            f'Expected exactly one item in iterable, but got {first_value!r}, '
+            f'{second_value!r}, and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
@@ -639,13 +639,13 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
     if too_short is None:
         too_short = lambda item_count: raise_(
             ValueError,
-            'Too few items in iterable (got {})'.format(item_count),
+            f'Too few items in iterable (got {item_count})',
         )
 
     if too_long is None:
         too_long = lambda item_count: raise_(
             ValueError,
-            'Too many items in iterable (got at least {})'.format(item_count),
+            f'Too many items in iterable (got at least {item_count})',
         )
 
     it = iter(iterable)
@@ -1724,8 +1724,8 @@ def split_into(iterable, sizes):
         [[1], [2, 3], [4], []]
 
     When a ``None`` object is encountered in *sizes*, the returned list will
-    contain items up to the end of *iterable* the same way that itertools.slice
-    does:
+    contain items up to the end of *iterable* the same way that
+    :func:`itertools.slice` does:
 
         >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
         [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
@@ -2333,13 +2333,11 @@ class numeric_range(abc.Sequence, abc.Hashable):
             self._start, self._stop, self._step = args
         elif argc == 0:
             raise TypeError(
-                'numeric_range expected at least '
-                '1 argument, got {}'.format(argc)
+                f'numeric_range expected at least 1 argument, got {argc}'
             )
         else:
             raise TypeError(
-                'numeric_range expected at most '
-                '3 arguments, got {}'.format(argc)
+                f'numeric_range expected at most 3 arguments, got {argc}'
             )
 
         self._zero = type(self._step)(0)
@@ -2402,7 +2400,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
         else:
             raise TypeError(
                 'numeric range indices must be '
-                'integers or slices, not {}'.format(type(key).__name__)
+                f'integers or slices, not {type(key).__name__}'
             )
 
     def __hash__(self):
@@ -2443,13 +2441,10 @@ class numeric_range(abc.Sequence, abc.Hashable):
 
     def __repr__(self):
         if self._step == 1:
-            return "numeric_range({}, {})".format(
-                repr(self._start), repr(self._stop)
-            )
-        else:
-            return "numeric_range({}, {}, {})".format(
-                repr(self._start), repr(self._stop), repr(self._step)
-            )
+            return f"numeric_range({self._start!r}, {self._stop!r})"
+        return (
+            f"numeric_range({self._start!r}, {self._stop!r}, {self._step!r})"
+        )
 
     def __reversed__(self):
         return iter(
@@ -2473,7 +2468,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
                 if r == self._zero:
                     return int(q)
 
-        raise ValueError("{} is not in numeric range".format(value))
+        raise ValueError(f"{value} is not in numeric range")
 
     def _get_by_index(self, i):
         if i < 0:
@@ -2947,7 +2942,7 @@ class SequenceView(Sequence):
         return len(self._target)
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self._target))
+        return f'{self.__class__.__name__}({self._target!r})'
 
 
 class seekable:
@@ -3609,8 +3604,8 @@ def only(iterable, default=None, too_long=None):
         pass
     else:
         msg = (
-            'Expected exactly one item in iterable, but got {!r}, {!r}, '
-            'and perhaps more.'.format(first_value, second_value)
+            f'Expected exactly one item in iterable, but got {first_value!r}, '
+            f'{second_value!r}, and perhaps more.'
         )
         raise too_long or ValueError(msg)
 
@@ -3892,9 +3887,11 @@ def _sample_counted(population, k, counts, strict):
         reservoir = []
         for _ in range(k):
             reservoir.append(feed(0))
-        if strict and len(reservoir) < k:
-            raise ValueError('Sample larger than population')
 
+    if strict and len(reservoir) < k:
+        raise ValueError('Sample larger than population')
+
+    with suppress(StopIteration):
         W = 1.0
         while True:
             W *= exp(log(random()) / k)

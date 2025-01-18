@@ -1160,11 +1160,11 @@ def _strong_probable_prime(n, base):
 def is_prime(n):
     """Return ``True`` if *n* is prime and ``False`` otherwise.
 
-    >> is_prime(37)
+    >>> is_prime(37)
     True
-    >> is_prime(3 * 13)
+    >>> is_prime(3 * 13)
     False
-    >> is_prime(18_446_744_073_709_551_557)
+    >>> is_prime(18_446_744_073_709_551_557)
     True
 
     This function uses the Miller-Rabin primality test, which can return false
