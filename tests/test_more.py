@@ -1011,9 +1011,7 @@ class DistinctDerangementsTests(TestCase):
                         if not any(x[i] == i for i in range(r))
                     ]
                 )
-                actual = list(
-                    mi.distinct_derangements_by_value(iterable, r)
-                )
+                actual = list(mi.distinct_derangements_by_value(iterable, r))
                 self.assertCountEqual(actual, expected)
 
                 expected = list(
