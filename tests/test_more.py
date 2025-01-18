@@ -4331,7 +4331,7 @@ class _FrozenMultiset(Set):
         return hash(self._collection)
 
     def __repr__(self):
-        return "FrozenSet([{}]".format(", ".join(repr(x) for x in iter(self)))
+        return f'FrozenSet([{", ".join(repr(x) for x in iter(self))}]'
 
 
 class SetPartitionsTests(TestCase):
@@ -4815,6 +4815,22 @@ class SampleTests(TestCase):
 
         # The observed largest difference in 10,000 simulations was 4.337999
         self.assertTrue(difference_in_means < 4.4)
+
+    def test_error_cases(self):
+
+        # weights and counts are mutally exclusive
+        with self.assertRaises(TypeError):
+            mi.sample(
+                'abcde', 3, weights=[1, 2, 3, 4, 5], counts=[1, 2, 3, 4, 5]
+            )
+
+        # Weighted sample larger than population
+        with self.assertRaises(ValueError):
+            mi.sample('abcde', 10, weights=[1, 2, 3, 4, 5], strict=True)
+
+        # Counted sample larger than population
+        with self.assertRaises(ValueError):
+            mi.sample('abcde', 10, counts=[1, 1, 1, 1, 1], strict=True)
 
 
 class BarelySortable:
