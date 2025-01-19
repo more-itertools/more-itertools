@@ -2154,6 +2154,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
 
     def __init__(self, *args):
         argc = len(args)
+        cls_name = self.__class__.__name__
         if argc == 1:
             (self._stop,) = args
             self._start = type(self._stop)(0)
@@ -2165,16 +2166,16 @@ class numeric_range(abc.Sequence, abc.Hashable):
             self._start, self._stop, self._step = args
         elif argc == 0:
             raise TypeError(
-                f'numeric_range expected at least 1 argument, got {argc}'
+                f'{cls_name} expected at least 1 argument, got {argc}'
             )
         else:
             raise TypeError(
-                f'numeric_range expected at most 3 arguments, got {argc}'
+                f'{cls_name} expected at most 3 arguments, got {argc}'
             )
 
         self._zero = type(self._step)(0)
         if self._step == self._zero:
-            raise ValueError('numeric_range() arg 3 must not be zero')
+            raise ValueError('{cls_name}() arg 3 must not be zero')
         self._growing = self._step > self._zero
 
     def __bool__(self):
@@ -2272,11 +2273,10 @@ class numeric_range(abc.Sequence, abc.Hashable):
         return numeric_range, (self._start, self._stop, self._step)
 
     def __repr__(self):
+        cls_name = self.__class__.__name__
         if self._step == 1:
-            return f"numeric_range({self._start!r}, {self._stop!r})"
-        return (
-            f"numeric_range({self._start!r}, {self._stop!r}, {self._step!r})"
-        )
+            return f"{cls_name}({self._start!r}, {self._stop!r})"
+        return f"{cls_name}({self._start!r}, {self._stop!r}, {self._step!r})"
 
     def __reversed__(self):
         return iter(
