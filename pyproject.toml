@@ -60,8 +60,8 @@ select = [
     "UP",  # pyupgrade
 ]
 ignore = [
-    "E731",
-    "E741",
+    "E731",  # lambda-assignment
+    "E741",  # ambiguous-variable-name
     "N801",  # CapWords convention
     "N802",  # function name should be lowercase
     "N803",  # argument name should be lowercase
