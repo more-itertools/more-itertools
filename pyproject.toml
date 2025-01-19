@@ -53,6 +53,7 @@ quote-style = "preserve"
 
 [tool.ruff.lint]
 select = [
+    "A",  # flake8-builtins
     "E",  # pycodestyle
     "ERA",  # eradicate
     "F",  # pyflakes
