@@ -1,3 +1,5 @@
+TARGET_DIRS := more_itertools tests
+
 .PHONY: all-checks
 all-checks: requirements coverage check docs package
 
@@ -8,18 +10,23 @@ requirements:
 
 .PHONY: check
 check:
-	ruff format --check .
-	ruff check more_itertools tests
+	ruff format --check ${TARGET_DIRS}
+	ruff check ${TARGET_DIRS}
 	stubtest more_itertools.more more_itertools.recipes
 
 .PHONY: format
 format:
-	ruff format .
+	ruff format ${TARGET_DIRS}
 
 .PHONY: coverage
 coverage:
 	coverage run --include="more_itertools/*.py" -m unittest
 	coverage report --show-missing --fail-under=99
+
+.PHONY: lint
+lint:
+	ruff format ${TARGET_DIRS}
+	ruff check --fix ${TARGET_DIRS}
 
 .PHONY: test
 test:
