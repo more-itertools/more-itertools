@@ -889,56 +889,58 @@ class SubstringsIndexesTests(TestCase):
 class BucketTests(TestCase):
     def test_basic(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
-        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        bucket = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
 
         # In-order access
-        self.assertEqual(list(D[10]), [10, 11, 12])
-
+        self.assertEqual(list(bucket[10]), [10, 11, 12])
         # Out of order access
-        self.assertEqual(list(D[30]), [30, 31, 33])
-        self.assertEqual(list(D[20]), [20, 21, 22, 23])
-
-        self.assertEqual(list(D[40]), [])  # Nothing in here!
+        self.assertEqual(list(bucket[30]), [30, 31, 33])
+        self.assertEqual(list(bucket[20]), [20, 21, 22, 23])
+        # Nothing in here!
+        self.assertEqual(list(bucket[40]), [])
 
     def test_in(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
-        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        bucket = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
 
-        self.assertIn(10, D)
-        self.assertNotIn(40, D)
-        self.assertIn(20, D)
-        self.assertNotIn(21, D)
+        self.assertIn(10, bucket)
+        self.assertNotIn(40, bucket)
+        self.assertIn(20, bucket)
+        self.assertNotIn(21, bucket)
 
         # Checking in-ness shouldn't advance the iterator
-        self.assertEqual(next(D[10]), 10)
+        self.assertEqual(next(bucket[10]), 10)
 
     def test_validator(self):
         iterable = count(0)
         key = lambda x: int(str(x)[0])  # First digit of each number
         validator = lambda x: 0 < x < 10  # No leading zeros
-        D = mi.bucket(iterable, key, validator=validator)
-        self.assertEqual(mi.take(3, D[1]), [1, 10, 11])
-        self.assertNotIn(0, D)  # Non-valid entries don't return True
-        self.assertNotIn(0, D._cache)  # Don't store non-valid entries
-        self.assertEqual(list(D[0]), [])
+        bucket = mi.bucket(iterable, key, validator=validator)
+
+        self.assertEqual(mi.take(3, bucket[1]), [1, 10, 11])
+        self.assertNotIn(0, bucket)  # Non-valid entries don't return True
+        self.assertNotIn(0, bucket._cache)  # Don't store non-valid entries
+        self.assertEqual(list(bucket[0]), [])
 
     def test_list(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
-        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
-        self.assertEqual(list(D[10]), [10, 11, 12])
-        self.assertEqual(list(D[20]), [20, 21, 22, 23])
-        self.assertEqual(list(D[30]), [30, 31, 33])
-        self.assertEqual(set(D), {10, 20, 30})
+        bucket = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+
+        self.assertEqual(list(bucket[10]), [10, 11, 12])
+        self.assertEqual(list(bucket[20]), [20, 21, 22, 23])
+        self.assertEqual(list(bucket[30]), [30, 31, 33])
+        self.assertEqual(set(bucket), {10, 20, 30})
 
     def test_list_validator(self):
         iterable = [10, 20, 30, 11, 21, 31, 12, 22, 23, 33]
         key = lambda x: 10 * (x // 10)
         validator = lambda x: x != 20
-        D = mi.bucket(iterable, key, validator=validator)
-        self.assertEqual(set(D), {10, 30})
-        self.assertEqual(list(D[10]), [10, 11, 12])
-        self.assertEqual(list(D[20]), [])
-        self.assertEqual(list(D[30]), [30, 31, 33])
+        bucket = mi.bucket(iterable, key, validator=validator)
+
+        self.assertEqual(set(bucket), {10, 30})
+        self.assertEqual(list(bucket[10]), [10, 11, 12])
+        self.assertEqual(list(bucket[20]), [])
+        self.assertEqual(list(bucket[30]), [30, 31, 33])
 
 
 class SpyTests(TestCase):
@@ -4912,17 +4914,17 @@ class ChunkedEvenTests(TestCase):
                 k += 1
 
     def test_evenness(self):
-        for N in range(1, 50):
-            for n in range(1, N + 2):
+        for n in range(1, 50):
+            for m in range(1, n + 2):
                 lengths = []
                 items = []
-                for l in mi.chunked_even(range(N), n):
-                    L = len(l)
-                    self.assertLessEqual(L, n)
-                    self.assertGreaterEqual(L, 1)
-                    lengths.append(L)
+                for l in mi.chunked_even(range(n), m):
+                    size = len(l)
+                    self.assertLessEqual(size, m)
+                    self.assertGreaterEqual(size, 1)
+                    lengths.append(size)
                     items.extend(l)
-                self.assertEqual(items, list(range(N)))
+                self.assertEqual(items, list(range(n)))
                 self.assertLessEqual(max(lengths) - min(lengths), 1)
 
 
@@ -5890,10 +5892,10 @@ class PowersetOfSetsTests(TestCase):
         hash_count = 0
 
         class Str(str):
-            def __hash__(true_self):
+            def __hash__(self):
                 nonlocal hash_count
                 hash_count += 1
-                return super.__hash__(true_self)
+                return super.__hash__(self)
 
         iterable = map(Str, 'ABBBCDD')
         self.assertEqual(len(list(mi.powerset_of_sets(iterable))), 128)
@@ -5926,16 +5928,16 @@ class DiscreteFourierTransformTests(TestCase):
         # Example calculation from:
         # https://en.wikipedia.org/wiki/Discrete_Fourier_transform#Example
         xarr = [1, 2 - 1j, -1j, -1 + 2j]
-        Xarr = [2, -2 - 2j, -2j, 4 + 4j]
-        self.assertTrue(all(map(cmath.isclose, mi.dft(xarr), Xarr)))
-        self.assertTrue(all(map(cmath.isclose, mi.idft(Xarr), xarr)))
+        xarr2 = [2, -2 - 2j, -2j, 4 + 4j]
+        self.assertTrue(all(map(cmath.isclose, mi.dft(xarr), xarr2)))
+        self.assertTrue(all(map(cmath.isclose, mi.idft(xarr2), xarr)))
 
     def test_roundtrip(self):
         for _ in range(1_000):
-            N = randrange(35)
-            xarr = [complex(random(), random()) for i in range(N)]
-            Xarr = list(mi.dft(xarr))
-            assert all(map(cmath.isclose, mi.idft(Xarr), xarr))
+            n = randrange(35)
+            xarr = [complex(random(), random()) for _ in range(n)]
+            xarr_dft = list(mi.dft(xarr))
+            assert all(map(cmath.isclose, mi.idft(xarr_dft), xarr))
 
 
 class DoubleStarMapTests(TestCase):

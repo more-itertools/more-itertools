@@ -164,7 +164,7 @@ class AllEqualTests(TestCase):
         next_count = 0
 
         class _groupby(groupby):
-            def __next__(true_self):
+            def __next__(self):
                 nonlocal next_count
                 next_count += 1
                 return super().__next__()
@@ -492,26 +492,28 @@ class IterExceptTests(TestCase):
     def test_multiple(self):
         """ensure can catch multiple exceptions"""
 
-        class Fiz(Exception):
+        class FizzError(Exception):
             pass
 
-        class Buzz(Exception):
+        class BuzzError(Exception):
             pass
 
         i = 0
 
-        def fizbuzz():
+        def fizzbuzz():
             nonlocal i
             i += 1
             if i % 3 == 0:
-                raise Fiz
+                raise FizzError
             if i % 5 == 0:
-                raise Buzz
+                raise BuzzError
             return i
 
         expected = ([1, 2], [4], [], [7, 8], [])
         for x in expected:
-            self.assertEqual(list(mi.iter_except(fizbuzz, (Fiz, Buzz))), x)
+            self.assertEqual(
+                list(mi.iter_except(fizzbuzz, (FizzError, BuzzError))), x
+            )
 
 
 class FirstTrueTests(TestCase):

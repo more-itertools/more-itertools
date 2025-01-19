@@ -3312,8 +3312,8 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     ['a', 'b', 'c']
 
     """
-    L = list(iterable)
-    n = len(L)
+    lst = list(iterable)
+    n = len(lst)
     if k is not None:
         if k < 1:
             raise ValueError(
@@ -3334,10 +3334,10 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
         elif n == k:
             yield [[s] for s in L]
         else:
-            e, *M = L
-            for p in set_partitions_helper(M, k - 1):
+            e, *m = L
+            for p in set_partitions_helper(m, k - 1):
                 yield [[e], *p]
-            for p in set_partitions_helper(M, k):
+            for p in set_partitions_helper(m, k):
                 for i in range(len(p)):
                     yield p[:i] + [[e] + p[i]] + p[i + 1 :]
 
@@ -3345,12 +3345,12 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
         for k in range(1, n + 1):
             yield from filter(
                 lambda z: all(min_size <= len(bk) <= max_size for bk in z),
-                set_partitions_helper(L, k),
+                set_partitions_helper(lst, k),
             )
     else:
         yield from filter(
             lambda z: all(min_size <= len(bk) <= max_size for bk in z),
-            set_partitions_helper(L, k),
+            set_partitions_helper(lst, k),
         )
 
 
@@ -3649,12 +3649,12 @@ def _sample_unweighted(iterator, k, strict):
     reservoir = list(islice(iterator, k))
     if strict and len(reservoir) < k:
         raise ValueError('Sample larger than population')
-    W = 1.0
+    w = 1.0
 
     with suppress(StopIteration):
         while True:
-            W *= exp(log(random()) / k)
-            skip = floor(log(random()) / log1p(-W))
+            w *= exp(log(random()) / k)
+            skip = floor(log(random()) / log1p(-w))
             element = next(islice(iterator, skip, None))
             reservoir[randrange(k)] = element
 
@@ -3725,10 +3725,10 @@ def _sample_counted(population, k, counts, strict):
         raise ValueError('Sample larger than population')
 
     with suppress(StopIteration):
-        W = 1.0
+        w = 1.0
         while True:
-            W *= exp(log(random()) / k)
-            skip = floor(log(random()) / log1p(-W))
+            w *= exp(log(random()) / k)
+            skip = floor(log(random()) / log1p(-w))
             element = feed(skip)
             reservoir[randrange(k)] = element
 
@@ -4932,10 +4932,10 @@ def dft(xarr):
 
     See :func:`idft` for the inverse Discrete Fourier Transform.
     """
-    N = len(xarr)
-    roots_of_unity = [e ** (n / N * tau * -1j) for n in range(N)]
-    for k in range(N):
-        coeffs = [roots_of_unity[k * n % N] for n in range(N)]
+    l = len(xarr)
+    roots_of_unity = [e ** (n / l * tau * -1j) for n in range(l)]
+    for k in range(l):
+        coeffs = [roots_of_unity[k * m % l] for m in range(l)]
         yield _complex_sumprod(xarr, coeffs)
 
 
@@ -4952,11 +4952,11 @@ def idft(Xarr):
 
     See :func:`dft` for the Discrete Fourier Transform.
     """
-    N = len(Xarr)
-    roots_of_unity = [e ** (n / N * tau * 1j) for n in range(N)]
-    for k in range(N):
-        coeffs = [roots_of_unity[k * n % N] for n in range(N)]
-        yield _complex_sumprod(Xarr, coeffs) / N
+    l = len(Xarr)
+    roots_of_unity = [e ** (n / l * tau * 1j) for n in range(l)]
+    for k in range(l):
+        coeffs = [roots_of_unity[k * m % l] for m in range(l)]
+        yield _complex_sumprod(Xarr, coeffs) / l
 
 
 def doublestarmap(func, iterable):
