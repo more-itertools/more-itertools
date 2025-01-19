@@ -1908,14 +1908,10 @@ class StaggerTest(TestCase):
 class ZipEqualTest(TestCase):
     @skipIf(version_info[:2] < (3, 10), 'zip_equal deprecated for 3.10+')
     def test_deprecation(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter('always')
+        with self.assertWarns(DeprecationWarning):
             self.assertEqual(
                 list(mi.zip_equal([1, 2], [3, 4])), [(1, 3), (2, 4)]
             )
-
-        (warning,) = caught
-        self.assertTrue(warning.category is DeprecationWarning)
 
     def test_equal(self):
         lists = [0, 1, 2], [2, 3, 4]
