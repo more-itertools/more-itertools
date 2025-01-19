@@ -56,8 +56,16 @@ select = [
     "E",  # pycodestyle
     "F",  # pyflakes
     "I",  # isort
+    "N",  # pep8-naming
+    "UP",  # pyupgrade
 ]
-ignore = ["E731", "E741"]
+ignore = [
+    "E731",
+    "E741",
+    "N801",  # CapWords convention
+    "N802",  # function name should be lowercase
+    "N803",  # argument name should be lowercase
+]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F403"]
