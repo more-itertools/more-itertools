@@ -43,7 +43,17 @@ Documentation = "https://more-itertools.readthedocs.io/en/stable/"
 [tool.flit.module]
 name = "more_itertools"
 
-[tool.black]
+[tool.ruff]
+indent-width = 4
 line-length = 79
-target-version = ["py39"]
-skip-string-normalization = true
+target-version = "py39"
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.ruff.lint]
+ignore = ["E731", "E741"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F403"]
+"__init__.pyi" = ["F403"]

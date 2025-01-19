@@ -1,5 +1,4 @@
 import cmath
-import warnings
 
 from collections import Counter, abc
 from collections.abc import Set
@@ -1908,14 +1907,10 @@ class StaggerTest(TestCase):
 class ZipEqualTest(TestCase):
     @skipIf(version_info[:2] < (3, 10), 'zip_equal deprecated for 3.10+')
     def test_deprecation(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter('always')
+        with self.assertWarns(DeprecationWarning):
             self.assertEqual(
                 list(mi.zip_equal([1, 2], [3, 4])), [(1, 3), (2, 4)]
             )
-
-        (warning,) = caught
-        assert warning.category == DeprecationWarning
 
     def test_equal(self):
         lists = [0, 1, 2], [2, 3, 4]
@@ -4137,7 +4132,7 @@ class FilterExceptTests(TestCase):
             list(mi.filter_except(int, iterable))
 
     def test_raise(self):
-        iterable = ['0', '1' '2', 'three', None]
+        iterable = ['0', '12', 'three', None]
         with self.assertRaises(TypeError):
             list(mi.filter_except(int, iterable, ValueError))
 
@@ -4169,7 +4164,7 @@ class MapExceptTests(TestCase):
             list(mi.map_except(int, iterable))
 
     def test_raise(self):
-        iterable = ['0', '1' '2', 'three', None]
+        iterable = ['0', '12', 'three', None]
         with self.assertRaises(TypeError):
             list(mi.map_except(int, iterable, ValueError))
 
@@ -4322,7 +4317,6 @@ class SampleTests(TestCase):
         self.assertTrue(difference_in_means < 4.4)
 
     def test_error_cases(self):
-
         # weights and counts are mutally exclusive
         with self.assertRaises(TypeError):
             mi.sample(

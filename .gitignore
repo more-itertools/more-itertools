@@ -42,3 +42,6 @@ venv/
 # Mypy
 .mypy_cache
 .dmypy.json
+
+# Ruff
+.ruff_cache/
