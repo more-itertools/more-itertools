@@ -2810,8 +2810,8 @@ class NumericRangeTests(TestCase):
             ((1.0, 7.0, 1.5), hash((1.0, 5.5, 1.5))),
             ((1.0, 7.5, 1.5), hash((1.0, 7.0, 1.5))),
             ((1.0, 1.5, 1.5), hash((1.0, 1.0, 1.5))),
-            ((1.5, 1.0, 1.5), hash(range(0, 0))),
-            ((1.5, 1.5, 1.5), hash(range(0, 0))),
+            ((1.5, 1.0, 1.5), hash(range(0))),
+            ((1.5, 1.5, 1.5), hash(range(0))),
             (
                 (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
                 hash((Decimal("1.0"), Decimal("8.5"), Decimal("1.5"))),
