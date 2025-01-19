@@ -62,6 +62,7 @@ select = [
     "ISC",  # flake8-implicit-str-concat
     "N",  # pep8-naming
     "PIE",  # flake8-pie
+    "T20",  # flake8-(p)print
     "UP",  # pyupgrade
 ]
 ignore = [
