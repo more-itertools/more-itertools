@@ -794,7 +794,6 @@ def distinct_permutations(iterable, r=None):
     if r is None:
         r = size
 
-    # functools.partial(_partial, ... )
     algorithm = _full if (r == size) else partial(_partial, r=r)
 
     if 0 < r <= size:
@@ -1211,7 +1210,7 @@ def interleave_evenly(iterables, lengths=None):
         errors = [e - delta for e, delta in zip(errors, deltas_secondary)]
 
         # those iterables for which the error is negative are yielded
-        # ("diagonal step" in Bresenham)
+        # ("diagonal step" in Bresenham)  # noqa: ERA001
         for i, e_ in enumerate(errors):
             if e_ < 0:
                 yield next(iters_secondary[i])
@@ -1896,7 +1895,7 @@ def unzip(iterable):
                 return obj[i]
             except IndexError:
                 # basically if we have an iterable like
-                # iter([(1, 2, 3), (4, 5), (6,)])
+                # iter([(1, 2, 3), (4, 5), (6,)])  # noqa: ERA001
                 # the second unzipped iterable would fail at the third tuple
                 # since it would try to access tup[1]
                 # same with the third unzipped iterable and the second tuple
