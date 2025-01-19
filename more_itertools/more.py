@@ -1,7 +1,6 @@
 import math
 import warnings
-
-from collections import Counter, defaultdict, deque, abc
+from collections import Counter, abc, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
 from functools import cached_property, partial, reduce, wraps
@@ -15,24 +14,26 @@ from itertools import (
     dropwhile,
     groupby,
     islice,
+    product,
     repeat,
     starmap,
     takewhile,
     tee,
     zip_longest,
-    product,
 )
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from operator import gt, itemgetter, lt, mul, sub
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
-from operator import itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
 
 from .recipes import (
+    UnequalIterablesError,
     _marker,
     _zip_equal,
-    UnequalIterablesError,
+    all_equal,
+    batched,
     consume,
     flatten,
     nth,
@@ -40,8 +41,6 @@ from .recipes import (
     sieve,
     take,
     unique_everseen,
-    all_equal,
-    batched,
 )
 
 __all__ = [

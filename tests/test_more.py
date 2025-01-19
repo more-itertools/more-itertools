@@ -1,5 +1,4 @@
 import cmath
-
 from collections import Counter, abc
 from collections.abc import Set
 from datetime import datetime, timedelta
@@ -21,15 +20,15 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter
-from pickle import loads, dumps
+from operator import add, itemgetter, mul
+from pickle import dumps, loads
 from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
 from sys import version_info
 from time import sleep
 from traceback import format_exc
-from unittest import skipIf, TestCase
+from unittest import TestCase, skipIf
 
 import more_itertools as mi
 

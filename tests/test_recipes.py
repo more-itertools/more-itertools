@@ -3,8 +3,8 @@ from doctest import DocTestSuite
 from fractions import Fraction
 from functools import reduce
 from itertools import combinations, count, groupby, permutations
-from operator import mul
 from math import comb, factorial
+from operator import mul
 from sys import version_info
 from unittest import TestCase, skipIf
 from unittest.mock import patch
