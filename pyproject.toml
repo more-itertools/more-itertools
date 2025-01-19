@@ -58,6 +58,7 @@ select = [
     "ERA",  # eradicate
     "F",  # pyflakes
     "I",  # isort
+    "ICN",  # flake8-import-conventions
     "N",  # pep8-naming
     "UP",  # pyupgrade
 ]
