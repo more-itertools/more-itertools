@@ -5396,59 +5396,59 @@ class ClassifyUniqueTests(TestCase):
         )
 
     def test_vs_unique_everseen(self):
-        input = 'AAAABBBBCCDAABBB'
-        output = [e for e, j, u in mi.classify_unique(input) if u]
+        input_ = 'AAAABBBBCCDAABBB'
+        output = [e for e, j, u in mi.classify_unique(input_) if u]
         self.assertEqual(output, ['A', 'B', 'C', 'D'])
-        self.assertEqual(list(mi.unique_everseen(input)), output)
+        self.assertEqual(list(mi.unique_everseen(input_)), output)
 
     def test_vs_unique_everseen_key(self):
-        input = 'aAbACCc'
-        output = [e for e, j, u in mi.classify_unique(input, str.lower) if u]
+        input_ = 'aAbACCc'
+        output = [e for e, j, u in mi.classify_unique(input_, str.lower) if u]
         self.assertEqual(output, list('abC'))
-        self.assertEqual(list(mi.unique_everseen(input, str.lower)), output)
+        self.assertEqual(list(mi.unique_everseen(input_, str.lower)), output)
 
     def test_vs_unique_justseen(self):
-        input = 'AAAABBBCCDABB'
-        output = [e for e, j, u in mi.classify_unique(input) if j]
+        input_ = 'AAAABBBCCDABB'
+        output = [e for e, j, u in mi.classify_unique(input_) if j]
         self.assertEqual(output, list('ABCDAB'))
-        self.assertEqual(list(mi.unique_justseen(input)), output)
+        self.assertEqual(list(mi.unique_justseen(input_)), output)
 
     def test_vs_unique_justseen_key(self):
-        input = 'AABCcAD'
-        output = [e for e, j, u in mi.classify_unique(input, str.lower) if j]
+        input_ = 'AABCcAD'
+        output = [e for e, j, u in mi.classify_unique(input_, str.lower) if j]
         self.assertEqual(output, list('ABCAD'))
-        self.assertEqual(list(mi.unique_justseen(input, str.lower)), output)
+        self.assertEqual(list(mi.unique_justseen(input_, str.lower)), output)
 
     def test_vs_duplicates_everseen(self):
-        input = [1, 2, 1, 2]
-        output = [e for e, j, u in mi.classify_unique(input) if not u]
+        input_ = [1, 2, 1, 2]
+        output = [e for e, j, u in mi.classify_unique(input_) if not u]
         self.assertEqual(output, [1, 2])
-        self.assertEqual(list(mi.duplicates_everseen(input)), output)
+        self.assertEqual(list(mi.duplicates_everseen(input_)), output)
 
     def test_vs_duplicates_everseen_key(self):
-        input = 'HEheHEhe'
+        input_ = 'HEheHEhe'
         output = [
-            e for e, j, u in mi.classify_unique(input, str.lower) if not u
+            e for e, j, u in mi.classify_unique(input_, str.lower) if not u
         ]
         self.assertEqual(output, list('heHEhe'))
         self.assertEqual(
-            list(mi.duplicates_everseen(input, str.lower)), output
+            list(mi.duplicates_everseen(input_, str.lower)), output
         )
 
     def test_vs_duplicates_justseen(self):
-        input = [1, 2, 3, 3, 2, 2]
-        output = [e for e, j, u in mi.classify_unique(input) if not j]
+        input_ = [1, 2, 3, 3, 2, 2]
+        output = [e for e, j, u in mi.classify_unique(input_) if not j]
         self.assertEqual(output, [3, 2])
-        self.assertEqual(list(mi.duplicates_justseen(input)), output)
+        self.assertEqual(list(mi.duplicates_justseen(input_)), output)
 
     def test_vs_duplicates_justseen_key(self):
-        input = 'HEheHHHhEheeEe'
+        input_ = 'HEheHHHhEheeEe'
         output = [
-            e for e, j, u in mi.classify_unique(input, str.lower) if not j
+            e for e, j, u in mi.classify_unique(input_, str.lower) if not j
         ]
         self.assertEqual(output, list('HHheEe'))
         self.assertEqual(
-            list(mi.duplicates_justseen(input, str.lower)), output
+            list(mi.duplicates_justseen(input_, str.lower)), output
         )
 
 
