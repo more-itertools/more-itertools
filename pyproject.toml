@@ -54,6 +54,7 @@ quote-style = "preserve"
 [tool.ruff.lint]
 select = [
     "E",  # pycodestyle
+    "ERA",  # eradicate
     "F",  # pyflakes
     "I",  # isort
     "N",  # pep8-naming
