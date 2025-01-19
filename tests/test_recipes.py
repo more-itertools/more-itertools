@@ -582,10 +582,10 @@ class RandomProductTests(TestCase):
 
 
 class RandomPermutationTests(TestCase):
-    """Tests for ``random_permutation()``"""
+    """Tests for ``random_permutation()``."""
 
     def test_full_permutation(self):
-        """ensure every item from the iterable is returned in a new ordering
+        """Ensure every item from the iterable is returned in a new ordering.
 
         15 elements have a 1 in 1.3 * 10e12 of appearing in sorted order, so
         we fix a seed value just to be sure.
@@ -598,7 +598,7 @@ class RandomPermutationTests(TestCase):
             raise AssertionError("Values were not permuted")
 
     def test_partial_permutation(self):
-        """ensure all returned items are from the iterable, that the returned
+        """Ensure all returned items are from the iterable, that the returned
         permutation is of the desired length, and that all items eventually
         get returned.
 
@@ -621,11 +621,11 @@ class RandomPermutationTests(TestCase):
 
 
 class RandomCombinationTests(TestCase):
-    """Tests for ``random_combination()``"""
+    """Tests for ``random_combination()``."""
 
     def test_pseudorandomness(self):
-        """ensure different subsets of the iterable get returned over many
-        samplings of random combinations"""
+        """Ensure different subsets of the iterable get returned over many
+        samplings of random combinations."""
         items = range(15)
         all_items = set()
         for _ in range(50):
@@ -634,7 +634,7 @@ class RandomCombinationTests(TestCase):
         self.assertEqual(all_items, set(items))
 
     def test_no_replacement(self):
-        """ensure that elements are sampled without replacement"""
+        """Ensure that elements are sampled without replacement."""
         items = range(15)
         for _ in range(50):
             combination = mi.random_combination(items, len(items))
@@ -645,10 +645,10 @@ class RandomCombinationTests(TestCase):
 
 
 class RandomCombinationWithReplacementTests(TestCase):
-    """Tests for ``random_combination_with_replacement()``"""
+    """Tests for ``random_combination_with_replacement()``."""
 
     def test_replacement(self):
-        """ensure that elements are sampled with replacement"""
+        """Ensure that elements are sampled with replacement."""
         items = range(5)
         combo = mi.random_combination_with_replacement(items, len(items) * 2)
         self.assertEqual(2 * len(items), len(combo))
@@ -656,8 +656,8 @@ class RandomCombinationWithReplacementTests(TestCase):
             raise AssertionError("Combination contained no duplicates")
 
     def test_pseudorandomness(self):
-        """ensure different subsets of the iterable get returned over many
-        samplings of random combinations"""
+        """Ensure different subsets of the iterable get returned over many
+        samplings of random combinations."""
         items = range(15)
         all_items = set()
         for _ in range(50):
