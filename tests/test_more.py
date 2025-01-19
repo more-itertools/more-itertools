@@ -1,5 +1,4 @@
 import cmath
-import warnings
 
 from collections import Counter, abc
 from collections.abc import Set
