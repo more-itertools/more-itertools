@@ -1105,10 +1105,21 @@ def polynomial_derivative(coefficients):
 def totient(n):
     """Return the count of natural numbers up to *n* that are coprime with *n*.
 
-    >>> totient(9)
+    Euler's totient function φ(n) gives the number of totatives.
+    Totative are integers k in the range 1 ≤ k ≤ n such that gcd(n, k) = 1.
+
+    >>> n = 9
+    >>> totient(n)
     6
-    >>> totient(12)
-    4
+
+    >>> totatives = [x for x in range(1, n) if math.gcd(n, x) == 1]
+    >>> totatives
+    [1, 2, 4, 5, 7, 8]
+    >>> len(totatives)
+    6
+
+    Reference:  https://en.wikipedia.org/wiki/Euler%27s_totient_function
+
     """
     for prime in set(factor(n)):
         n -= n // prime
