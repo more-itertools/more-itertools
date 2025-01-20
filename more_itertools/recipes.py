@@ -895,8 +895,8 @@ def subslices(iterable):
 def polynomial_from_roots(roots):
     """Compute a polynomial's coefficients from its roots.
 
-    >>> roots = [5, -4, 3]  # (x - 5) * (x + 4) * (x - 3)
-    >>> polynomial_from_roots(roots)  # x^3 - 4 * x^2 - 17 * x + 60
+    >>> roots = [5, -4, 3]            # (x - 5) * (x + 4) * (x - 3)
+    >>> polynomial_from_roots(roots)  # x³ - 4 x² - 17 x + 60
     [1, -4, -17, 60]
     """
     poly = [1]
@@ -1089,7 +1089,7 @@ def factor(n):
 def polynomial_eval(coefficients, x):
     """Evaluate a polynomial at a specific value.
 
-    Example: evaluating x^3 - 4 * x^2 - 17 * x + 60 at x = 2.5:
+    Evaluate ``x^3 - 4 * x^2 - 17 * x + 60`` at ``x = 2.5``:
 
     >>> coefficients = [1, -4, -17, 60]
     >>> x = 2.5
@@ -1115,7 +1115,7 @@ def sum_of_squares(it):
 def polynomial_derivative(coefficients):
     """Compute the first derivative of a polynomial.
 
-    Example: evaluating the derivative of x^3 - 4 * x^2 - 17 * x + 60
+    Evaluate the derivative of ``x³ - 4 x² - 17 x + 60``:
 
     >>> coefficients = [1, -4, -17, 60]
     >>> derivative_coefficients = polynomial_derivative(coefficients)
