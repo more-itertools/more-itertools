@@ -1167,7 +1167,7 @@ def is_prime(n):
     >>> is_prime(18_446_744_073_709_551_557)
     True
 
-    Generate random primes, up to 200 bits and up to 60 decimal digits:
+    Generate random primes up to 200 bits and up to 60 decimal digits:
 
     >>> from random import seed, randrange, getrandbits
     >>> seed(18675309)
