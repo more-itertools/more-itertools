@@ -745,34 +745,34 @@ def prepend(value, iterator):
 
 def convolve(signal, kernel):
     """Discrete linear convolution of two iterables.
-    Equivalent to polynomial multiplication.
+        Equivalent to polynomial multiplication.
 
-    For example, multiplying ``(x² -x - 20)`` by ``(x - 3)``
-    gives ``(x³ -4x² -17x + 60)``.
+        For example, multiplying ``(x² -x - 20)`` by ``(x - 3)``
+        gives ``(x³ -4x² -17x + 60)``.
 
-    >>> list(convolve([1, -1, -20], [1, -3]))
-    [1, -4, -17, 60]
+        >>> list(convolve([1, -1, -20], [1, -3]))
+        [1, -4, -17, 60]
 
-    Examples of popular kinds of kernels:
+        Examples of popular kinds of kernels:
 
-    *  The kernel ``[0.25, 0.25, 0.25, 0.25]`` computes a moving average.
-       For image data, this blurs the image and reduces noise.
+        *  The kernel ``[0.25, 0.25, 0.25, 0.25]`` computes a moving average.
+           For image data, this blurs the image and reduces noise.
 
-    * The kernel ``[1/2, 0, -1/2]`` estimates the first derivative of
-      a function evaluated at evenly spaced inputs.
+        * The kernel ``[1/2, 0, -1/2]`` estimates the first derivative of
+          a function evaluated at evenly spaced inputs.
 
-    * The kernel ``[1, -2, 1]`` estimates the second derivative of a
-      function evaluated at evenly spaced inputs.
-.
-    Convolutions are mathematically commutative; however, the inputs are
-    evaluated differently.  The signal is consumed lazily and can be
-    infinite. The kernel is fully consumed before the calculations begin.
+        * The kernel ``[1, -2, 1]`` estimates the second derivative of a
+          function evaluated at evenly spaced inputs.
+    .
+        Convolutions are mathematically commutative; however, the inputs are
+        evaluated differently.  The signal is consumed lazily and can be
+        infinite. The kernel is fully consumed before the calculations begin.
 
-    References
-    ----------
+        References
+        ----------
 
-    * Article:    https://betterexplained.com/articles/intuitive-convolution/
-    * 3B1B video: https://www.youtube.com/watch?v=KuXjwB4LzSA
+        * Article:    https://betterexplained.com/articles/intuitive-convolution/
+        * 3B1B video: https://www.youtube.com/watch?v=KuXjwB4LzSA
 
     """
     # This implementation comes from an older version of the itertools
@@ -895,7 +895,7 @@ def subslices(iterable):
 def polynomial_from_roots(roots):
     """Compute a polynomial's coefficients from its roots.
 
-    >>> roots = [5, -4, 3]  # (x - 5) * (x + 4) * (x - 3)
+    >>> roots = [5, -4, 3]            # (x - 5) * (x + 4) * (x - 3)
     >>> polynomial_from_roots(roots)  # x³ - 4 x² - 17 x + 60
     [1, -4, -17, 60]
     """
