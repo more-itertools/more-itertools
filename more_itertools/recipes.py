@@ -895,7 +895,7 @@ def subslices(iterable):
 def polynomial_from_roots(roots):
     """Compute a polynomial's coefficients from its roots.
 
-    >>> roots = [5, -4, 3]            # (x - 5) * (x + 4) * (x - 3)
+    >>> roots = [5, -4, 3]  # (x - 5) * (x + 4) * (x - 3)
     >>> polynomial_from_roots(roots)  # x³ - 4 x² - 17 x + 60
     [1, -4, -17, 60]
     """
