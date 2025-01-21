@@ -750,8 +750,8 @@ def convolve(signal, kernel):
     For example, multiplying ``(x² -x - 20)`` by ``(x - 3)``
     gives ``(x³ -4x² -17x + 60)``.
 
-    >>> list(convolve([1, -1, -20], [1, -3]))
-    [1, -4, -17, 60]
+        >>> list(convolve([1, -1, -20], [1, -3]))
+        [1, -4, -17, 60]
 
     Examples of popular kinds of kernels:
 
@@ -768,8 +768,8 @@ def convolve(signal, kernel):
 
     References:
 
-    * Article: https://betterexplained.com/articles/intuitive-convolution/
-    * Video:   https://www.youtube.com/watch?v=KuXjwB4LzSA
+    * Article:  https://betterexplained.com/articles/intuitive-convolution/
+    * Video by 3Blue1Brown:  https://www.youtube.com/watch?v=KuXjwB4LzSA
 
     """
     # This implementation comes from an older version of the itertools
