@@ -268,9 +268,12 @@ def ncycles(iterable, n):
 def dotproduct(vec1, vec2):
     """Returns the dot product of the two iterables.
 
-    >>> dotproduct([10, 10], [20, 20])
-    400
+    >>> dotproduct([10, 15, 12], [0.65, 0.80, 1.25])
+    33.5
+    >>> 10 * 0.65 + 15 * 0.80 + 12 * 1.25
+    33.5
 
+    In Python 3.12 and later, use ``math.sumprod()`` instead.
     """
     return sum(map(operator.mul, vec1, vec2))
 
@@ -741,19 +744,38 @@ def prepend(value, iterator):
 
 
 def convolve(signal, kernel):
-    """Convolve the iterable *signal* with the iterable *kernel*.
+    """Discrete linear convolution of two iterables.
+    Equivalent to polynomial multiplication.
 
-        >>> signal = (1, 2, 3, 4, 5)
-        >>> kernel = [3, 2, 1]
-        >>> list(convolve(signal, kernel))
-        [3, 8, 14, 20, 26, 14, 5]
+    For example, multiplying ``(x² -x - 20)`` by ``(x - 3)``
+    gives ``(x³ -4x² -17x + 60)``.
 
-    Note: the input arguments are not interchangeable, as the *kernel*
-    is immediately consumed and stored.
+        >>> list(convolve([1, -1, -20], [1, -3]))
+        [1, -4, -17, 60]
+
+    Examples of popular kinds of kernels:
+
+    * The kernel ``[0.25, 0.25, 0.25, 0.25]`` computes a moving average.
+      For image data, this blurs the image and reduces noise.
+    * The kernel ``[1/2, 0, -1/2]`` estimates the first derivative of
+      a function evaluated at evenly spaced inputs.
+    * The kernel ``[1, -2, 1]`` estimates the second derivative of a
+      function evaluated at evenly spaced inputs.
+
+    Convolutions are mathematically commutative; however, the inputs are
+    evaluated differently.  The signal is consumed lazily and can be
+    infinite. The kernel is fully consumed before the calculations begin.
+
+    References:
+
+    * Article:  https://betterexplained.com/articles/intuitive-convolution/
+    * Video by 3Blue1Brown:  https://www.youtube.com/watch?v=KuXjwB4LzSA
 
     """
-    # This implementation intentionally doesn't match the one in the itertools
-    # documentation.
+    # This implementation comes from an older version of the itertools
+    # documentation.  While the newer implementation is a bit clearer,
+    # this one was kept because the inlined window logic is faster
+    # and it avoids an unnecessary deque-to-tuple conversion.
     kernel = tuple(kernel)[::-1]
     n = len(kernel)
     window = deque([0], maxlen=n) * n
@@ -870,8 +892,8 @@ def subslices(iterable):
 def polynomial_from_roots(roots):
     """Compute a polynomial's coefficients from its roots.
 
-    >>> roots = [5, -4, 3]  # (x - 5) * (x + 4) * (x - 3)
-    >>> polynomial_from_roots(roots)  # x^3 - 4 * x^2 - 17 * x + 60
+    >>> roots = [5, -4, 3]            # (x - 5) * (x + 4) * (x - 3)
+    >>> polynomial_from_roots(roots)  # x³ - 4 x² - 17 x + 60
     [1, -4, -17, 60]
     """
     poly = [1]
@@ -1064,7 +1086,7 @@ def factor(n):
 def polynomial_eval(coefficients, x):
     """Evaluate a polynomial at a specific value.
 
-    Example: evaluating x^3 - 4 * x^2 - 17 * x + 60 at x = 2.5:
+    Evaluate ``x^3 - 4 * x^2 - 17 * x + 60`` at ``x = 2.5``:
 
     >>> coefficients = [1, -4, -17, 60]
     >>> x = 2.5
@@ -1090,7 +1112,7 @@ def sum_of_squares(it):
 def polynomial_derivative(coefficients):
     """Compute the first derivative of a polynomial.
 
-    Example: evaluating the derivative of x^3 - 4 * x^2 - 17 * x + 60
+    Evaluate the derivative of ``x³ - 4 x² - 17 x + 60``:
 
     >>> coefficients = [1, -4, -17, 60]
     >>> derivative_coefficients = polynomial_derivative(coefficients)
@@ -1105,10 +1127,21 @@ def polynomial_derivative(coefficients):
 def totient(n):
     """Return the count of natural numbers up to *n* that are coprime with *n*.
 
-    >>> totient(9)
+    Euler's totient function φ(n) gives the number of totatives.
+    Totative are integers k in the range 1 ≤ k ≤ n such that gcd(n, k) = 1.
+
+    >>> n = 9
+    >>> totient(n)
     6
-    >>> totient(12)
-    4
+
+    >>> totatives = [x for x in range(1, n) if math.gcd(n, x) == 1]
+    >>> totatives
+    [1, 2, 4, 5, 7, 8]
+    >>> len(totatives)
+    6
+
+    Reference:  https://en.wikipedia.org/wiki/Euler%27s_totient_function
+
     """
     for prime in set(factor(n)):
         n -= n // prime
@@ -1166,6 +1199,17 @@ def is_prime(n):
     False
     >>> is_prime(18_446_744_073_709_551_557)
     True
+
+    Generate random primes up to 200 bits and up to 60 decimal digits:
+
+    >>> from random import seed, randrange, getrandbits
+    >>> seed(18675309)
+
+    >>> next(filter(is_prime, map(getrandbits, repeat(200))))
+    893303929355758292373272075469392561129886005037663238028407
+
+    >>> next(filter(is_prime, map(randrange, repeat(10**60))))
+    851317320294163988202233202692837661547244591391507110582671
 
     This function uses the Miller-Rabin primality test, which can return false
     positives for very large inputs. For values of *n* below 10**24
