@@ -756,13 +756,13 @@ def convolve(signal, kernel):
         Examples of popular kinds of kernels:
 
         *  The kernel ``[0.25, 0.25, 0.25, 0.25]`` computes a moving average.
-           For image data, this blurs the image and reduces noise.
+        For image data, this blurs the image and reduces noise.
 
         * The kernel ``[1/2, 0, -1/2]`` estimates the first derivative of
-          a function evaluated at evenly spaced inputs.
+        a function evaluated at evenly spaced inputs.
 
         * The kernel ``[1, -2, 1]`` estimates the second derivative of a
-          function evaluated at evenly spaced inputs.
+        function evaluated at evenly spaced inputs.
     .
         Convolutions are mathematically commutative; however, the inputs are
         evaluated differently.  The signal is consumed lazily and can be
