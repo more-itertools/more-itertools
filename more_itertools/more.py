@@ -632,21 +632,19 @@ def strictly_n(iterable, n, too_short=None, too_long=None):
         )
 
     it = iter(iterable)
-    for i in range(n):
-        try:
-            item = next(it)
-        except StopIteration:
-            too_short(i)
-            return
-        else:
-            yield item
 
-    try:
-        next(it)
-    except StopIteration:
-        pass
-    else:
+    sent = 0
+    for item in islice(it, n):
+        yield item
+        sent += 1
+
+    if sent < n:
+        too_short(sent)
+        return
+
+    for item in it:
         too_long(n + 1)
+        return
 
 
 def distinct_permutations(iterable, r=None):
