@@ -556,27 +556,16 @@ def one(iterable, too_short=None, too_long=None):
     contents less destructively.
 
     """
-    it = iter(iterable)
-
-    try:
-        first_value = next(it)
-    except StopIteration as exc:
-        raise (
-            too_short or ValueError('too few items in iterable (expected 1)')
-        ) from exc
-
-    try:
-        second_value = next(it)
-    except StopIteration:
-        pass
-    else:
-        msg = (
-            f'Expected exactly one item in iterable, but got {first_value!r}, '
-            f'{second_value!r}, and perhaps more.'
-        )
-        raise too_long or ValueError(msg)
-
-    return first_value
+    iterator = iter(iterable)
+    for first in iterator:
+        for second in iterator:
+            msg = (
+                f'Expected exactly one item in iterable, but got {first!r}, '
+                f'{second!r}, and perhaps more.'
+            )
+            raise too_long or ValueError(msg)
+        return first
+    raise too_short or ValueError('too few items in iterable (expected 1)')
 
 
 def raise_(exception, *args):
