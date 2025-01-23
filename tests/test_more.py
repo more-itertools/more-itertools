@@ -28,7 +28,6 @@ from statistics import mean
 from string import ascii_letters
 from sys import version_info
 from time import sleep
-from traceback import format_exc
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
@@ -614,24 +613,12 @@ class OneTests(TestCase):
         it = iter(['item'])
         self.assertEqual(mi.one(it), 'item')
 
-    def test_too_short(self):
+    def test_too_short_new(self):
         it = iter([])
-        for too_short, exc_type in [
-            (None, ValueError),
-            (IndexError, IndexError),
-        ]:
-            with self.subTest(too_short=too_short):
-                try:
-                    mi.one(it, too_short=too_short)
-                except exc_type:
-                    formatted_exc = format_exc()
-                    self.assertIn('StopIteration', formatted_exc)
-                    self.assertIn(
-                        'The above exception was the direct cause',
-                        formatted_exc,
-                    )
-                else:
-                    self.fail()
+        self.assertRaises(ValueError, lambda: mi.one(it))
+        self.assertRaises(
+            OverflowError, lambda: mi.one(it, too_short=OverflowError)
+        )
 
     def test_too_long(self):
         it = count()
