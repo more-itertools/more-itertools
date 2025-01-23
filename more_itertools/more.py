@@ -489,12 +489,10 @@ def iterate(func, start):
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
     """
-    while True:
-        yield start
-        try:
+    with suppress(StopIteration):
+        while True:
+            yield start
             start = func(start)
-        except StopIteration:
-            break
 
 
 def with_iter(context_manager):
