@@ -3438,16 +3438,12 @@ def _ichunk(iterable, n):
     chunk = islice(iterable, n)
 
     def generator():
-        while True:
-            if cache:
-                yield cache.popleft()
-            else:
-                try:
-                    item = next(chunk)
-                except StopIteration:
-                    return
+        with suppress(StopIteration):
+            while True:
+                if cache:
+                    yield cache.popleft()
                 else:
-                    yield item
+                    yield next(chunk)
 
     def materialize_next(n=1):
         # if n not specified materialize everything
