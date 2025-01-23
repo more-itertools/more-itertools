@@ -3415,22 +3415,18 @@ def only(iterable, default=None, too_long=None):
     Note that :func:`only` attempts to advance *iterable* twice to ensure there
     is only one item.  See :func:`spy` or :func:`peekable` to check
     iterable contents less destructively.
+
     """
-    it = iter(iterable)
-    first_value = next(it, default)
-
-    try:
-        second_value = next(it)
-    except StopIteration:
-        pass
-    else:
-        msg = (
-            f'Expected exactly one item in iterable, but got {first_value!r}, '
-            f'{second_value!r}, and perhaps more.'
-        )
-        raise too_long or ValueError(msg)
-
-    return first_value
+    iterator = iter(iterable)
+    for first in iterator:
+        for second in iterator:
+            msg = (
+                f'Expected exactly one item in iterable, but got {first!r}, '
+                f'{second!r}, and perhaps more.'
+            )
+            raise too_long or ValueError(msg)
+        return first
+    return default
 
 
 def _ichunk(iterable, n):
