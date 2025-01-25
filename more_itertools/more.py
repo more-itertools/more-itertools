@@ -3431,36 +3431,6 @@ def only(iterable, default=None, too_long=None):
     return first_value
 
 
-def _ichunk(iterable, n):
-    cache = deque()
-    chunk = islice(iterable, n)
-
-    def generator():
-        with suppress(StopIteration):
-            while True:
-                if cache:
-                    yield cache.popleft()
-                else:
-                    yield next(chunk)
-
-    def materialize_next(n=1):
-        # if n not specified materialize everything
-        if n is None:
-            cache.extend(chunk)
-            return len(cache)
-
-        to_cache = n - len(cache)
-
-        # materialize up to n
-        if to_cache > 0:
-            cache.extend(islice(chunk, to_cache))
-
-        # return number materialized up to n
-        return min(n, len(cache))
-
-    return (generator(), materialize_next)
-
-
 def ichunked(iterable, n):
     """Break *iterable* into sub-iterables with *n* elements each.
     :func:`ichunked` is like :func:`chunked`, but it yields iterables
@@ -3482,19 +3452,13 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-    iterable = iter(iterable)
+    [main_iterator] = tee(iterable, 1)
     while True:
-        # Create new chunk
-        chunk, materialize_next = _ichunk(iterable, n)
-
-        # Check to see whether we're at the end of the source iterable
-        if not materialize_next():
+        main_iterator, lookahead, chunk_iterator = tee(main_iterator, 3)
+        if not list(islice(lookahead, 1)):
             return
-
-        yield chunk
-
-        # Fill previous chunk's cache
-        materialize_next(None)
+        yield islice(chunk_iterator, n)
+        next(islice(main_iterator, n, n), None)
 
 
 def iequals(*iterables):
