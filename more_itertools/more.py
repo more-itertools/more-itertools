@@ -3452,7 +3452,7 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-    [main_iterator] = tee(iterable, 1)
+    main_iterator = iter(iterable)
     while True:
         main_iterator, lookahead, chunk_iterator = tee(main_iterator, 3)
         if not list(islice(lookahead, 1)):
