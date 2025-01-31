@@ -159,7 +159,34 @@ __all__ = [
 ]
 
 # math.sumprod is available for Python 3.12+
-_fsumprod = getattr(math, 'sumprod', lambda x, y: fsum(map(mul, x, y)))
+try:
+    from math import sumprod as _fsumprod
+
+except ImportError:
+    # Extended precision algorithms from T. J. Dekker,
+    # "A Floating-Point Technique for Extending the Available Precision"
+    # https://csclub.uwaterloo.ca/~pbarfuss/dekker1971.pdf
+    # Formulas: (5.5) (5.6) and (5.8).  Code: mul12()
+
+    def dl_split(x: float):
+        "Split a float into two half-precision components."
+        t = x * 134217729.0  # Veltkamp constant = 2.0 ** 27 + 1
+        hi = t - (t - x)
+        lo = x - hi
+        return hi, lo
+
+    def dl_mul(x, y):
+        "Lossless multiplication."
+        xx_hi, xx_lo = dl_split(x)
+        yy_hi, yy_lo = dl_split(y)
+        p = xx_hi * yy_hi
+        q = xx_hi * yy_lo + xx_lo * yy_hi
+        z = p + q
+        zz = p - z + q + xx_lo * yy_lo
+        return z, zz
+
+    def _fsumprod(p, q):
+        return math.fsum(chain.from_iterable(map(dl_mul, p, q)))
 
 
 def chunked(iterable, n, strict=False):
