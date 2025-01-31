@@ -162,7 +162,7 @@ __all__ = [
 try:
     from math import sumprod as _fsumprod
 
-except ImportError:
+except ImportError:  # pragma: no cover
     # Extended precision algorithms from T. J. Dekker,
     # "A Floating-Point Technique for Extending the Available Precision"
     # https://csclub.uwaterloo.ca/~pbarfuss/dekker1971.pdf
@@ -186,7 +186,7 @@ except ImportError:
         return z, zz
 
     def _fsumprod(p, q):
-        return math.fsum(chain.from_iterable(map(dl_mul, p, q)))
+        return fsum(chain.from_iterable(map(dl_mul, p, q)))
 
 
 def chunked(iterable, n, strict=False):
