@@ -144,9 +144,9 @@ def tail(n, iterable):
     # either islice or deque will throw a TypeError. This is why we don't
     # check if it is Iterable.
     if isinstance(iterable, Sized):
-        yield from islice(iterable, max(0, len(iterable) - n), None)
+        return islice(iterable, max(0, len(iterable) - n), None)
     else:
-        yield from iter(deque(iterable, maxlen=n))
+        return iter(deque(iterable, maxlen=n))
 
 
 def consume(iterator, n=None):
