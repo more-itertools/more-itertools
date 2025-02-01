@@ -1086,7 +1086,7 @@ class bucket:
             if self._validator(item_value):
                 self._cache[item_value].append(item)
 
-        yield from self._cache.keys()
+        return iter(self._cache)
 
     def __getitem__(self, value):
         if not self._validator(value):
@@ -4891,8 +4891,10 @@ def powerset_of_sets(iterable):
     of hash operations performed.
     """
     sets = tuple(map(set, dict.fromkeys(map(frozenset, zip(iterable)))))
-    for r in range(len(sets) + 1):
-        yield from starmap(set().union, combinations(sets, r))
+    return chain.from_iterable(
+        starmap(set().union, combinations(sets, r))
+        for r in range(len(sets) + 1)
+    )
 
 
 def join_mappings(**field_to_map):
