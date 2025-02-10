@@ -1426,7 +1426,7 @@ class MultinomialTests(TestCase):
                 )
                 self.assertEqual(
                     multinomial(*Counter(word).values()),
-                    mi.ilen(set(permutations(word))),
+                    len(set(permutations(word))),
                 )
 
         # Error cases
