@@ -1417,12 +1417,17 @@ class MultinomialTests(TestCase):
         self.assertEqual(multinomial(5, 7), comb(12, 5))
         self.assertEqual(multinomial(1, 1, 1, 1, 1, 1, 1), factorial(7))
 
-        # Relationship to distinct_permuations
-        word = 'coffee'
-        self.assertEqual(
-            multinomial(*Counter(word).values()),
-            mi.ilen(mi.distinct_permutations(word)),
-        )
+        # Relationship to distinct_permuations() and permutations()
+        for word in ['plain', 'pizza', 'coffee', 'honolulu', 'assists']:
+            with self.subTest(word=word):
+                self.assertEqual(
+                    multinomial(*Counter(word).values()),
+                    mi.ilen(mi.distinct_permutations(word)),
+                )
+                self.assertEqual(
+                    multinomial(*Counter(word).values()),
+                    mi.ilen(set(permutations(word))),
+                )
 
         # Error cases
         with self.assertRaises(ValueError):
