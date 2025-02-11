@@ -1253,13 +1253,13 @@ def multinomial(*counts):
     interpretations:
 
     * In the expansion of ``(a + b + c)⁹``, the coefficient of the
-    ``a³b⁴c²`` term is 1260.
+      ``a³b⁴c²`` term is 1260.
 
     * There are 1260 distinct ways to arrange 9 balls consisting of 3 reds, 4
-    greens, and 2 blues.
+      greens, and 2 blues.
 
     * There are 1260 unique ways to place 9 distinct objects into three bins
-    with sizes 3, 4, and 2.
+      with sizes 3, 4, and 2.
 
     The :func:`multinomial` function computes the length of
     :func:`distinct_permutations`.  For example, there are 83,160 distinct

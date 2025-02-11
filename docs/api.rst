@@ -290,6 +290,7 @@ Math
 .. autofunction:: dotproduct
 .. autofunction:: factor
 .. autofunction:: matmul
+.. autofunction:: multinomial
 .. autofunction:: polynomial_from_roots
 .. autofunction:: polynomial_derivative
 .. autofunction:: polynomial_eval
