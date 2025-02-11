@@ -8,10 +8,8 @@ Some backward-compatible usability improvements have been made.
 
 """
 
-import math
-import operator
-
 from collections import deque
+from contextlib import suppress
 from collections.abc import Sized
 from functools import lru_cache, partial
 from itertools import (
@@ -29,7 +27,8 @@ from itertools import (
     tee,
     zip_longest,
 )
-from math import comb, prod
+from math import prod, comb, isqrt, gcd
+from operator import mul, not_, itemgetter, getitem
 from random import randrange, sample, choice
 from sys import hexversion
 
@@ -96,12 +95,16 @@ except TypeError:
 else:
     _zip_strict = partial(zip, strict=True)
 
+
 # math.sumprod is available for Python 3.12+
-_sumprod = getattr(math, 'sumprod', lambda x, y: dotproduct(x, y))
+try:
+    from math import sumprod as _sumprod
+except ImportError:
+    _sumprod = lambda x, y: dotproduct(x, y)
 
 
 def take(n, iterable):
-    """Return first *n* items of the iterable as a list.
+    """Return first *n* items of the *iterable* as a list.
 
         >>> take(3, range(10))
         [0, 1, 2]
@@ -278,10 +281,10 @@ def dotproduct(vec1, vec2):
 
     In Python 3.12 and later, use ``math.sumprod()`` instead.
     """
-    return sum(map(operator.mul, vec1, vec2))
+    return sum(map(mul, vec1, vec2))
 
 
-def flatten(listOfLists):
+def flatten(list_of_lists):
     """Return an iterator flattening one level of nesting in a list of lists.
 
         >>> list(flatten([[0, 1], [2, 3]]))
@@ -290,10 +293,10 @@ def flatten(listOfLists):
     See also :func:`collapse`, which can flatten multiple levels of nesting.
 
     """
-    return chain.from_iterable(listOfLists)
+    return chain.from_iterable(list_of_lists)
 
 
-def repeatfunc(func, times=None, *args):
+def repeatfunc(function, times=None, *args):
     """Call *func* with *args* repeatedly, returning an iterable over the
     results.
 
@@ -316,8 +319,8 @@ def repeatfunc(func, times=None, *args):
 
     """
     if times is None:
-        return starmap(func, repeat(args))
-    return starmap(func, repeat(args, times))
+        return starmap(function, repeat(args))
+    return starmap(function, repeat(args, times))
 
 
 def _pairwise(iterable):
@@ -403,26 +406,26 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
 
     When *incomplete* is `'strict'`, a subclass of `ValueError` will be raised.
 
-    >>> it = grouper('ABCDEFG', 3, incomplete='strict')
-    >>> list(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    >>> iterator = grouper('ABCDEFG', 3, incomplete='strict')
+    >>> list(iterator)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     UnequalIterablesError
 
     """
-    args = [iter(iterable)] * n
+    iterators = [iter(iterable)] * n
     if incomplete == 'fill':
-        return zip_longest(*args, fillvalue=fillvalue)
+        return zip_longest(*iterators, fillvalue=fillvalue)
     if incomplete == 'strict':
-        return _zip_equal(*args)
+        return _zip_equal(*iterators)
     if incomplete == 'ignore':
-        return zip(*args)
+        return zip(*iterators)
     else:
         raise ValueError('Expected fill, strict, or ignore')
 
 
 def roundrobin(*iterables):
-    """Yields an item from each iterable, alternating between them.
+    """Visit input iterables in a cycle until each is exhausted.
 
         >>> list(roundrobin('ABC', 'D', 'EF'))
         ['A', 'D', 'E', 'B', 'F', 'C']
@@ -464,7 +467,7 @@ def partition(pred, iterable):
 
     t1, t2, p = tee(iterable, 3)
     p1, p2 = tee(map(pred, p))
-    return (compress(t1, map(operator.not_, p1)), compress(t2, p2))
+    return (compress(t1, map(not_, p1)), compress(t2, p2))
 
 
 def powerset(iterable):
@@ -543,9 +546,9 @@ def unique_justseen(iterable, key=None):
 
     """
     if key is None:
-        return map(operator.itemgetter(0), groupby(iterable))
+        return map(itemgetter(0), groupby(iterable))
 
-    return map(next, map(operator.itemgetter(1), groupby(iterable, key)))
+    return map(next, map(itemgetter(1), groupby(iterable, key)))
 
 
 def unique(iterable, key=None, reverse=False):
@@ -564,7 +567,8 @@ def unique(iterable, key=None, reverse=False):
     The elements in *iterable* need not be hashable, but they must be
     comparable for sorting to work.
     """
-    return unique_justseen(sorted(iterable, key=key, reverse=reverse), key=key)
+    sequenced = sorted(iterable, key=key, reverse=reverse)
+    return unique_justseen(sequenced, key=key)
 
 
 def iter_except(func, exception, first=None):
@@ -589,13 +593,11 @@ def iter_except(func, exception, first=None):
         []
 
     """
-    try:
+    with suppress(exception):
         if first is not None:
             yield first()
-        while 1:
+        while True:
             yield func()
-    except exception:
-        pass
 
 
 def first_true(iterable, default=None, pred=None):
@@ -846,9 +848,9 @@ def _sliding_window_islice(iterable, n):
 
 def _sliding_window_deque(iterable, n):
     # Normal path for other values of n.
-    it = iter(iterable)
-    window = deque(islice(it, n - 1), maxlen=n)
-    for x in it:
+    iterator = iter(iterable)
+    window = deque(islice(iterator, n - 1), maxlen=n)
+    for x in iterator:
         window.append(x)
         yield tuple(window)
 
@@ -889,7 +891,7 @@ def subslices(iterable):
     """
     seq = list(iterable)
     slices = starmap(slice, combinations(range(len(seq) + 1), 2))
-    return map(operator.getitem, repeat(seq), slices)
+    return map(getitem, repeat(seq), slices)
 
 
 def polynomial_from_roots(roots):
@@ -899,6 +901,9 @@ def polynomial_from_roots(roots):
     >>> polynomial_from_roots(roots)  # x³ - 4 x² - 17 x + 60
     [1, -4, -17, 60]
     """
+    # This recipe differs from the one in itertools docs in that it
+    # applies list() after each call to convolve().  This avoids
+    # hitting stack limits with nested generators.
     poly = [1]
     for root in roots:
         poly = list(convolve(poly, (1, -root)))
@@ -933,19 +938,17 @@ def iter_index(iterable, value, start=0, stop=None):
     seq_index = getattr(iterable, 'index', None)
     if seq_index is None:
         # Slow path for general iterables
-        it = islice(iterable, start, stop)
-        for i, element in enumerate(it, start):
+        iterator = islice(iterable, start, stop)
+        for i, element in enumerate(iterator, start):
             if element is value or element == value:
                 yield i
     else:
         # Fast path for sequences
         stop = len(iterable) if stop is None else stop
         i = start - 1
-        try:
+        with suppress(ValueError):
             while True:
                 yield (i := seq_index(value, i + 1, stop))
-        except ValueError:
-            pass
 
 
 def sieve(n):
@@ -953,13 +956,16 @@ def sieve(n):
 
     >>> list(sieve(30))
     [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+
     """
+    # This implementation comes from an older version of the itertools
+    # documentation.  The newer implementation is easier to read but is
+    # less lazy.
     if n > 2:
         yield 2
     start = 3
     data = bytearray((0, 1)) * (n // 2)
-    limit = math.isqrt(n) + 1
-    for p in iter_index(data, 1, start, limit):
+    for p in iter_index(data, 1, start, stop=isqrt(n) + 1):
         yield from iter_index(data, 1, start, p * p)
         data[p * p : n : p + p] = bytes(len(range(p * p, n, p + p)))
         start = p * p
@@ -979,14 +985,14 @@ def _batched(iterable, n, *, strict=False):
     """
     if n < 1:
         raise ValueError('n must be at least one')
-    it = iter(iterable)
-    while batch := tuple(islice(it, n)):
+    iterator = iter(iterable)
+    while batch := tuple(islice(iterator, n)):
         if strict and len(batch) != n:
             raise ValueError('batched(): incomplete batch')
         yield batch
 
 
-if hexversion >= 0x30D00A2:
+if hexversion >= 0x30D00A2:  # pragma: no cover
     from itertools import batched as itertools_batched
 
     def batched(iterable, n, *, strict=False):
@@ -998,7 +1004,7 @@ else:
     batched.__doc__ = _batched.__doc__
 
 
-def transpose(it):
+def transpose(matrix):
     """Swap the rows and columns of the input matrix.
 
     >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
@@ -1007,7 +1013,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return _zip_strict(*it)
+    return _zip_strict(*matrix)
 
 
 def reshape(matrix, cols):
@@ -1037,7 +1043,6 @@ def matmul(m1, m2):
 def _factor_pollard(n):
     # Return a factor of n using Pollard's rho algorithm.
     # Efficient when n is odd and composite.
-    gcd = math.gcd
     for b in range(1, n):
         x = y = 2
         d = 1
@@ -1099,18 +1104,18 @@ def polynomial_eval(coefficients, x):
     """
     n = len(coefficients)
     if n == 0:
-        return x * 0  # coerce zero to the type of x
+        return type(x)(0)
     powers = map(pow, repeat(x), reversed(range(n)))
     return _sumprod(coefficients, powers)
 
 
-def sum_of_squares(it):
+def sum_of_squares(iterable):
     """Return the sum of the squares of the input values.
 
     >>> sum_of_squares([10, 20, 30])
     1400
     """
-    return _sumprod(*tee(it))
+    return _sumprod(*tee(iterable))
 
 
 def polynomial_derivative(coefficients):
@@ -1125,7 +1130,7 @@ def polynomial_derivative(coefficients):
     """
     n = len(coefficients)
     powers = reversed(range(1, n))
-    return list(map(operator.mul, coefficients, powers))
+    return list(map(mul, coefficients, powers))
 
 
 def totient(n):
@@ -1138,7 +1143,7 @@ def totient(n):
     >>> totient(n)
     6
 
-    >>> totatives = [x for x in range(1, n) if math.gcd(n, x) == 1]
+    >>> totatives = [x for x in range(1, n) if gcd(n, x) == 1]
     >>> totatives
     [1, 2, 4, 5, 7, 8]
     >>> len(totatives)
