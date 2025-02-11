@@ -686,7 +686,7 @@ def distinct_permutations(iterable, r=None):
     input iterable. The number of items returned is
     `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
     items input, and each `x_i` is the count of a distinct item in the input
-    sequence.
+    sequence. The function :func:`multinomial` computes this directly.
 
     If *r* is given, only the *r*-length permutations are yielded.
 
