@@ -284,7 +284,7 @@ def dotproduct(vec1, vec2):
     return sum(map(mul, vec1, vec2))
 
 
-def flatten(list_of_lists):
+def flatten(listOfLists):
     """Return an iterator flattening one level of nesting in a list of lists.
 
         >>> list(flatten([[0, 1], [2, 3]]))
@@ -293,10 +293,10 @@ def flatten(list_of_lists):
     See also :func:`collapse`, which can flatten multiple levels of nesting.
 
     """
-    return chain.from_iterable(list_of_lists)
+    return chain.from_iterable(listOfLists)
 
 
-def repeatfunc(function, times=None, *args):
+def repeatfunc(func, times=None, *args):
     """Call *func* with *args* repeatedly, returning an iterable over the
     results.
 
@@ -319,8 +319,8 @@ def repeatfunc(function, times=None, *args):
 
     """
     if times is None:
-        return starmap(function, repeat(args))
-    return starmap(function, repeat(args, times))
+        return starmap(func, repeat(args))
+    return starmap(func, repeat(args, times))
 
 
 def _pairwise(iterable):
@@ -1004,7 +1004,7 @@ else:
     batched.__doc__ = _batched.__doc__
 
 
-def transpose(matrix):
+def transpose(it):
     """Swap the rows and columns of the input matrix.
 
     >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
@@ -1013,7 +1013,7 @@ def transpose(matrix):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return _zip_strict(*matrix)
+    return _zip_strict(*it)
 
 
 def reshape(matrix, cols):
@@ -1109,13 +1109,13 @@ def polynomial_eval(coefficients, x):
     return _sumprod(coefficients, powers)
 
 
-def sum_of_squares(iterable):
+def sum_of_squares(it):
     """Return the sum of the squares of the input values.
 
     >>> sum_of_squares([10, 20, 30])
     1400
     """
-    return _sumprod(*tee(iterable))
+    return _sumprod(*tee(it))
 
 
 def polynomial_derivative(coefficients):
