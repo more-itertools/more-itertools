@@ -29,6 +29,7 @@ from itertools import (
     tee,
     zip_longest,
 )
+from math import comb, prod
 from random import randrange, sample, choice
 from sys import hexversion
 
@@ -1288,4 +1289,4 @@ def multinomial(*counts):
     Reference:  https://en.wikipedia.org/wiki/Multinomial_theorem
 
     """
-    return math.prod(map(math.comb, accumulate(counts), counts))
+    return prod(map(comb, accumulate(counts), counts))
