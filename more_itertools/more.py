@@ -4890,7 +4890,7 @@ def powerset_of_sets(iterable):
     :func:`powerset_of_sets` takes care to minimize the number
     of hash operations performed.
     """
-    sets = tuple(map(set, dict.fromkeys(map(frozenset, zip(iterable)))))
+    sets = tuple(dict.fromkeys(map(frozenset, zip(iterable))))
     return chain.from_iterable(
         starmap(set().union, combinations(sets, r))
         for r in range(len(sets) + 1)
