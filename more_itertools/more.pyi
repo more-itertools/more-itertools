@@ -47,9 +47,13 @@ __all__ = [
     'consumer',
     'count_cycle',
     'countable',
+    'derangements',
+    'derangements_by_value',
     'dft',
     'difference',
     'distinct_combinations',
+    'distinct_derangements',
+    'distinct_derangements_by_value',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -221,6 +225,18 @@ def strictly_n(
 ) -> list[_T]: ...
 def distinct_permutations(
     iterable: Iterable[_T], r: int | None = ...
+) -> Iterator[tuple[_T, ...]]: ...
+def derangements(
+    iterable: Iterable[_T], r: int | None = None
+) -> Iterator[tuple[_T, ...]]: ...
+def distinct_derangements(
+    iterable: Iterable[_T], r: int | None = None
+) -> Iterator[tuple[_T, ...]]: ...
+def derangements_by_value(
+    iterable: Iterable[_T], r: int | None = None
+) -> Iterator[tuple[_T, ...]]: ...
+def distinct_derangements_by_value(
+    iterable: Iterable[_T], r: int | None = None
 ) -> Iterator[tuple[_T, ...]]: ...
 def intersperse(
     e: _U, iterable: Iterable[_T], n: int = ...
