@@ -5,6 +5,23 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.7.0
+------
+
+* New functions:
+    * :func:`multinomial` was added (thanks to rhettinger)
+
+* Changes to existing functions:
+    * :func:`ichunk`, :func:`iterate`, :func:`one`, :func:`only`, :func:`powerset_of_sets`, and :func:`strictly_n` were optimized (thanks to rhettinger)
+    * :func:`exactly_n` now uses less memory (thanks to rhettinger)
+    * :func:`dft` and :func:`idft` were optimized for Python versions below 3.12 (thanks to rhettinger)
+    * :func:`is_prime` no longer shares state with the users random number generator (thanks to rhettinger)
+    
+* Other changes:
+    * The :func:`one` docstring was improved (thanks to lpulley)
+    * The ``furo`` theme is now used for docs (thanks to AA-turner) 
+
+
 10.6.0
 ------
 
