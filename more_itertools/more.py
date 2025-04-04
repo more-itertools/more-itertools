@@ -553,7 +553,7 @@ def one(iterable, too_short=None, too_long=None):
         >>> one(it)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
         ...
-        ValueError: too many items in iterable (expected 1)'
+        ValueError: too few items in iterable (expected 1)'
         >>> too_short = IndexError('too few items')
         >>> one(it, too_short=too_short)  # doctest: +IGNORE_EXCEPTION_DETAIL
         Traceback (most recent call last):
