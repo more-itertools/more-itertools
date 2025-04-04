@@ -4,6 +4,6 @@ mypy
 ruff
 setuptools
 sphinx
-sphinx_rtd_theme
+furo>=2024.8
 twine
 wheel
