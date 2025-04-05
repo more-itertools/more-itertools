@@ -511,8 +511,7 @@ def ilen(iterable):
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
 
-    >>> from itertools import islice
-    >>> list(islice(iterate(lambda x: 2*x, 1), 10))
+    >>> take(10, iterate(lambda x: 2*x, 1))
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
     """
