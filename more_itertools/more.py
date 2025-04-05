@@ -511,8 +511,15 @@ def ilen(iterable):
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
 
+    Produces an infinite iterator. Some ways to limit the output
+    are :func:`take` and ``takewhile``.
+
     >>> take(10, iterate(lambda x: 2*x, 1))
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+    >>> collatz = lambda x: 3*x + 1 if x%2==1 else x // 2
+    >>> list(takewhile(lambda x: x!=1, iterate(collatz, 10)))
+    [10, 5, 16, 8, 4, 2]
 
     """
     with suppress(StopIteration):
