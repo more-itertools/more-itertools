@@ -496,10 +496,20 @@ def consumer(func):
 def ilen(iterable):
     """Return the number of items in *iterable*.
 
-        >>> ilen(x for x in range(1000000) if x % 3 == 0)
-        333334
+    For example, there are 168 prime numbers below 1,000:
 
-    This consumes the iterable, so handle with care.
+        >>> ilen(sieve(1000))
+        168
+
+    Equivalent to, but faster than:
+
+        def ilen(iterable):
+            count = 0
+            for _ in iterable:
+                count += 1
+            return count
+
+    This fully consumes the iterable, so handle with care.
 
     """
     # This is the "most beautiful of the fast variants" of this function.
