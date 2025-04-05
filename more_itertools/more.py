@@ -501,7 +501,7 @@ def ilen(iterable):
         >>> ilen(sieve(1000))
         168
 
-    Equivalent to, but faster than:
+    Equivalent to, but faster than::
 
         def ilen(iterable):
             count = 0
