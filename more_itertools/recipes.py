@@ -1097,6 +1097,8 @@ def factor(n):
 def polynomial_eval(coefficients, x):
     """Evaluate a polynomial at a specific value.
 
+    Computes with better numeric stability than Horner's method.
+
     Evaluate ``x^3 - 4 * x^2 - 17 * x + 60`` at ``x = 2.5``:
 
     >>> coefficients = [1, -4, -17, 60]
