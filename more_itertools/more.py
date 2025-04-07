@@ -496,10 +496,20 @@ def consumer(func):
 def ilen(iterable):
     """Return the number of items in *iterable*.
 
-        >>> ilen(x for x in range(1000000) if x % 3 == 0)
-        333334
+    For example, there are 168 prime numbers below 1,000:
 
-    This consumes the iterable, so handle with care.
+        >>> ilen(sieve(1000))
+        168
+
+    Equivalent to, but faster than::
+
+        def ilen(iterable):
+            count = 0
+            for _ in iterable:
+                count += 1
+            return count
+
+    This fully consumes the iterable, so handle with care.
 
     """
     # This is the "most beautiful of the fast variants" of this function.
@@ -511,9 +521,15 @@ def ilen(iterable):
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
 
-    >>> from itertools import islice
-    >>> list(islice(iterate(lambda x: 2*x, 1), 10))
+    Produces an infinite iterator. To add a stopping condition,
+    use :func:`take`, ``takewhile``, or :func:`takewhile_inclusive`:.
+
+    >>> take(10, iterate(lambda x: 2*x, 1))
     [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+    >>> collatz = lambda x: 3*x + 1 if x%2==1 else x // 2
+    >>> list(takewhile_inclusive(lambda x: x!=1, iterate(collatz, 10)))
+    [10, 5, 16, 8, 4, 2, 1]
 
     """
     with suppress(StopIteration):

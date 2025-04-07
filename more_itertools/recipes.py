@@ -773,6 +773,8 @@ def convolve(signal, kernel):
     evaluated differently.  The signal is consumed lazily and can be
     infinite. The kernel is fully consumed before the calculations begin.
 
+    Supports all numeric types: int, float, complex, Decimal, Fraction.
+
     References:
 
     * Article:  https://betterexplained.com/articles/intuitive-convolution/
@@ -902,6 +904,8 @@ def polynomial_from_roots(roots):
     >>> roots = [5, -4, 3]            # (x - 5) * (x + 4) * (x - 3)
     >>> polynomial_from_roots(roots)  # x³ - 4 x² - 17 x + 60
     [1, -4, -17, 60]
+
+    Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
     # This recipe differs from the one in itertools docs in that it
     # applies list() after each call to convolve().  This avoids
@@ -1037,6 +1041,8 @@ def matmul(m1, m2):
 
     The caller should ensure that the dimensions of the input matrices are
     compatible with each other.
+
+    Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
     n = len(m2[0])
     return batched(starmap(_sumprod, product(m1, transpose(m2))), n)
@@ -1097,12 +1103,16 @@ def factor(n):
 def polynomial_eval(coefficients, x):
     """Evaluate a polynomial at a specific value.
 
+    Computes with better numeric stability than Horner's method.
+
     Evaluate ``x^3 - 4 * x^2 - 17 * x + 60`` at ``x = 2.5``:
 
     >>> coefficients = [1, -4, -17, 60]
     >>> x = 2.5
     >>> polynomial_eval(coefficients, x)
     8.125
+
+    Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
     n = len(coefficients)
     if n == 0:
@@ -1116,6 +1126,8 @@ def sum_of_squares(it):
 
     >>> sum_of_squares([10, 20, 30])
     1400
+
+    Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
     return _sumprod(*tee(it))
 
@@ -1129,6 +1141,8 @@ def polynomial_derivative(coefficients):
     >>> derivative_coefficients = polynomial_derivative(coefficients)
     >>> derivative_coefficients
     [3, -8, -17]
+
+    Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
     n = len(coefficients)
     powers = reversed(range(1, n))
