@@ -3804,7 +3804,7 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
         return []
 
     if weights is not None and counts is not None:
-        raise TypeError('weights and counts are mutally exclusive')
+        raise TypeError('weights and counts are mutually exclusive')
 
     elif weights is not None:
         weights = iter(weights)
@@ -4111,7 +4111,7 @@ def nth_permutation(iterable, r, index):
         raise ValueError
     else:
         c = perm(n, r)
-    assert c > 0  # factortial(n)>0, and r<n so perm(n,r) is never zero
+    assert c > 0  # factorial(n)>0, and r<n so perm(n,r) is never zero
 
     if index < 0:
         index += c
@@ -4944,7 +4944,7 @@ def _complex_sumprod(v1, v2):
 
 
 def dft(xarr):
-    """Discrete Fourier Tranform. *xarr* is a sequence of complex numbers.
+    """Discrete Fourier Transform. *xarr* is a sequence of complex numbers.
     Yields the components of the corresponding transformed output vector.
 
     >>> import cmath
@@ -4963,7 +4963,7 @@ def dft(xarr):
 
 
 def idft(Xarr):
-    """Inverse Discrete Fourier Tranform. *Xarr* is a sequence of
+    """Inverse Discrete Fourier Transform. *Xarr* is a sequence of
     complex numbers. Yields the components of the corresponding
     inverse-transformed output vector.
 
