@@ -468,7 +468,7 @@ def groupby_transform(
     keyfunc: None,
     valuefunc: Callable[[_T], _V],
     reducefunc: None,
-) -> Iterator[tuple[_T, Iterable[_V]]]: ...
+) -> Iterator[tuple[_T, Iterator[_V]]]: ...
 @overload
 def groupby_transform(
     iterable: Iterable[_T],
@@ -495,14 +495,14 @@ def groupby_transform(
     iterable: Iterable[_T],
     keyfunc: None,
     valuefunc: Callable[[_T], _V],
-    reducefunc: Callable[[Iterable[_V]], _W],
+    reducefunc: Callable[[Iterator[_V]], _W],
 ) -> Iterator[tuple[_T, _W]]: ...
 @overload
 def groupby_transform(
     iterable: Iterable[_T],
     keyfunc: Callable[[_T], _U],
     valuefunc: Callable[[_T], _V],
-    reducefunc: Callable[[Iterable[_V]], _W],
+    reducefunc: Callable[[Iterator[_V]], _W],
 ) -> Iterator[tuple[_U, _W]]: ...
 
 class numeric_range(Generic[_T, _U], Sequence[_T], Hashable, Reversible[_T]):
