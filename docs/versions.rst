@@ -18,7 +18,8 @@ Version History
     * :func:`is_prime` no longer shares state with the users random number generator (thanks to rhettinger)
     
 * Other changes:
-    * The :func:`one` docstring was improved (thanks to lpulley)
+    * Some docstring issues were fixed (thanks to lpulley and ricbit)
+    * The type hints for :func:`groupby_transform` were improved (thanks to rhettinger)
     * The ``furo`` theme is now used for docs (thanks to AA-turner) 
 
 
