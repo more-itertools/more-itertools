@@ -12,7 +12,7 @@ Version History
     * :func:`multinomial` was added (thanks to rhettinger)
 
 * Changes to existing functions:
-    * :func:`ichunk`, :func:`iterate`, :func:`one`, :func:`only`, :func:`powerset_of_sets`, and :func:`strictly_n` were optimized (thanks to rhettinger)
+    * :func:`ichunked`, :func:`iterate`, :func:`one`, :func:`only`, :func:`powerset_of_sets`, and :func:`strictly_n` were optimized (thanks to rhettinger)
     * :func:`exactly_n` now uses less memory (thanks to rhettinger)
     * :func:`dft` and :func:`idft` were optimized for Python versions below 3.12 (thanks to rhettinger)
     * :func:`is_prime` no longer shares state with the users random number generator (thanks to rhettinger)
