@@ -2541,19 +2541,19 @@ class islice_extended:
     def __init__(self, iterable, *args):
         it = iter(iterable)
         if args:
-            self._iterable = _islice_helper(it, slice(*args))
+            self._iterator = _islice_helper(it, slice(*args))
         else:
-            self._iterable = it
+            self._iterator = it
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        return next(self._iterable)
+        return next(self._iterator)
 
     def __getitem__(self, key):
         if isinstance(key, slice):
-            return islice_extended(_islice_helper(self._iterable, key))
+            return islice_extended(_islice_helper(self._iterator, key))
 
         raise TypeError('islice_extended.__getitem__ argument must be a slice')
 
@@ -4379,14 +4379,14 @@ class countable:
     """
 
     def __init__(self, iterable):
-        self._it = iter(iterable)
+        self._iterator = iter(iterable)
         self.items_seen = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        item = next(self._it)
+        item = next(self._iterator)
         self.items_seen += 1
 
         return item
