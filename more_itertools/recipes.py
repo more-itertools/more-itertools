@@ -759,6 +759,8 @@ def convolve(signal, kernel):
 
         >>> list(convolve([1, -1, -20], [1, -3]))
         [1, -4, -17, 60]
+    
+    Note that polynomial coefficients are specified in descending power order.
 
     Examples of popular kinds of kernels:
 
@@ -904,6 +906,8 @@ def polynomial_from_roots(roots):
     >>> roots = [5, -4, 3]            # (x - 5) * (x + 4) * (x - 3)
     >>> polynomial_from_roots(roots)  # x³ - 4 x² - 17 x + 60
     [1, -4, -17, 60]
+
+    Note that polynomial coefficients are specified in descending power order.
 
     Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
@@ -1112,6 +1116,8 @@ def polynomial_eval(coefficients, x):
     >>> polynomial_eval(coefficients, x)
     8.125
 
+    Note that polynomial coefficients are specified in descending power order.
+
     Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
     n = len(coefficients)
@@ -1141,6 +1147,8 @@ def polynomial_derivative(coefficients):
     >>> derivative_coefficients = polynomial_derivative(coefficients)
     >>> derivative_coefficients
     [3, -8, -17]
+
+    Note that polynomial coefficients are specified in descending power order.
 
     Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
