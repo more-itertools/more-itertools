@@ -932,10 +932,10 @@ def windowed(seq, n, fillvalue=None, step=1):
     if step < 1:
         raise ValueError('step must be >= 1')
 
-    iterable = iter(seq)
+    iterator = iter(seq)
 
     # Generate first window
-    window = deque(islice(iterable, n), maxlen=n)
+    window = deque(islice(iterator, n), maxlen=n)
 
     # Deal with the first window not being full
     if not window:
@@ -948,7 +948,7 @@ def windowed(seq, n, fillvalue=None, step=1):
     # Create the filler for the next windows. The padding ensures
     # we have just enough elements to fill the last window.
     padding = (fillvalue,) * (n - 1 if step >= n else step - 1)
-    filler = map(window.append, chain(iterable, padding))
+    filler = map(window.append, chain(iterator, padding))
 
     # Generate the rest of the windows
     for _ in islice(filler, step - 1, None, step):
@@ -1634,25 +1634,25 @@ def padded(iterable, fillvalue=None, n=None, next_multiple=False):
         [1, 2, 3, 4, 5]
 
     """
-    iterable = iter(iterable)
-    iterable_with_repeat = chain(iterable, repeat(fillvalue))
+    iterator = iter(iterable)
+    iterator_with_repeat = chain(iterator, repeat(fillvalue))
 
     if n is None:
-        return iterable_with_repeat
+        return iterator_with_repeat
     elif n < 1:
         raise ValueError('n must be at least 1')
     elif next_multiple:
 
         def slice_generator():
-            for first in iterable:
+            for first in iterator:
                 yield (first,)
-                yield islice(iterable_with_repeat, n - 1)
+                yield islice(iterator_with_repeat, n - 1)
 
         # While elements exist produce slices of size n
         return chain.from_iterable(slice_generator())
     else:
         # Ensure the first batch is at least size n then iterate
-        return chain(islice(iterable_with_repeat, n), iterable)
+        return chain(islice(iterator_with_repeat, n), iterator)
 
 
 def repeat_each(iterable, n=2):
@@ -2516,8 +2516,8 @@ class islice_extended:
     """An extension of :func:`itertools.islice` that supports negative values
     for *stop*, *start*, and *step*.
 
-        >>> iterable = iter('abcdefgh')
-        >>> list(islice_extended(iterable, -4, -1))
+        >>> iterator = iter('abcdefgh')
+        >>> list(islice_extended(iterator, -4, -1))
         ['e', 'f', 'g']
 
     Slices with negative values require some caching of *iterable*, but this
@@ -2531,8 +2531,8 @@ class islice_extended:
 
     You can also use slice notation directly:
 
-        >>> iterable = map(str, count())
-        >>> it = islice_extended(iterable)[10:20:2]
+        >>> iterator = map(str, count())
+        >>> it = islice_extended(iterator)[10:20:2]
         >>> list(it)
         ['10', '12', '14', '16', '18']
 
@@ -2541,19 +2541,19 @@ class islice_extended:
     def __init__(self, iterable, *args):
         it = iter(iterable)
         if args:
-            self._iterable = _islice_helper(it, slice(*args))
+            self._iterator = _islice_helper(it, slice(*args))
         else:
-            self._iterable = it
+            self._iterator = it
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        return next(self._iterable)
+        return next(self._iterator)
 
     def __getitem__(self, key):
         if isinstance(key, slice):
-            return islice_extended(_islice_helper(self._iterable, key))
+            return islice_extended(_islice_helper(self._iterator, key))
 
         raise TypeError('islice_extended.__getitem__ argument must be a slice')
 
@@ -3190,9 +3190,9 @@ def rlocate(iterable, pred=bool, window_size=None):
     Set *pred* to a custom function to, e.g., find the indexes for a particular
     item:
 
-        >>> iterable = iter('abcb')
+        >>> iterator = iter('abcb')
         >>> pred = lambda x: x == 'b'
-        >>> list(rlocate(iterable, pred))
+        >>> list(rlocate(iterator, pred))
         [3, 1]
 
     If *window_size* is given, then the *pred* function will be called with
@@ -3414,7 +3414,7 @@ class time_limited:
         if limit_seconds < 0:
             raise ValueError('limit_seconds must be positive')
         self.limit_seconds = limit_seconds
-        self._iterable = iter(iterable)
+        self._iterator = iter(iterable)
         self._start_time = monotonic()
         self.timed_out = False
 
@@ -3425,7 +3425,7 @@ class time_limited:
         if self.limit_seconds == 0:
             self.timed_out = True
             raise StopIteration
-        item = next(self._iterable)
+        item = next(self._iterator)
         if monotonic() - self._start_time > self.limit_seconds:
             self.timed_out = True
             raise StopIteration
@@ -3470,9 +3470,9 @@ def only(iterable, default=None, too_long=None):
     return default
 
 
-def _ichunk(iterable, n):
+def _ichunk(iterator, n):
     cache = deque()
-    chunk = islice(iterable, n)
+    chunk = islice(iterator, n)
 
     def generator():
         with suppress(StopIteration):
@@ -3521,10 +3521,10 @@ def ichunked(iterable, n):
     [8, 9, 10, 11]
 
     """
-    iterable = iter(iterable)
+    iterator = iter(iterable)
     while True:
         # Create new chunk
-        chunk, materialize_next = _ichunk(iterable, n)
+        chunk, materialize_next = _ichunk(iterator, n)
 
         # Check to see whether we're at the end of the source iterable
         if not materialize_next():
@@ -4379,14 +4379,14 @@ class countable:
     """
 
     def __init__(self, iterable):
-        self._it = iter(iterable)
+        self._iterator = iter(iterable)
         self.items_seen = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        item = next(self._it)
+        item = next(self._iterator)
         self.items_seen += 1
 
         return item
@@ -4405,15 +4405,15 @@ def chunked_even(iterable, n):
     [[1, 2, 3], [4, 5, 6], [7]]
 
     """
-    iterable = iter(iterable)
+    iterator = iter(iterable)
 
     # Initialize a buffer to process the chunks while keeping
     # some back to fill any underfilled chunks
     min_buffer = (n - 1) * (n - 2)
-    buffer = list(islice(iterable, min_buffer))
+    buffer = list(islice(iterator, min_buffer))
 
     # Append items until we have a completed chunk
-    for _ in islice(map(buffer.append, iterable), n, None, n):
+    for _ in islice(map(buffer.append, iterator), n, None, n):
         yield buffer[:n]
         del buffer[:n]
 
