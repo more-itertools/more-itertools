@@ -1310,15 +1310,15 @@ def multinomial(*counts):
         >>> from collections import Counter
         >>> list(Counter('abracadabra').values())
         [5, 2, 2, 1, 1]
-        >>> multinomial(5, 2, 1, 1, 2)
+        >>> multinomial(5, 2, 2, 1, 1)
         83160
 
     A binomial coefficient is a special case of multinomial where there are
     only two categories.  For example, the number of ways to arrange 12 balls
     with 5 reds and 7 blues is ``multinomial(5, 7)`` or ``math.comb(12, 5)``.
 
-    When the multiplicities are all just 1, :func:`multinomial`
-    is a special case of ``math.factorial`` so that
+    Likewise, factorial is a special case of multinomial where
+    the multiplicities are all just 1 so that
     ``multinomial(1, 1, 1, 1, 1, 1, 1) == math.factorial(7)``.
 
     Reference:  https://en.wikipedia.org/wiki/Multinomial_theorem
