@@ -1,4 +1,5 @@
 import math
+import operator
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
@@ -15,6 +16,7 @@ from itertools import (
     dropwhile,
     groupby,
     islice,
+    permutations,
     repeat,
     starmap,
     takewhile,
@@ -65,9 +67,13 @@ __all__ = [
     'consumer',
     'count_cycle',
     'countable',
+    'derangements',
+    'derangements_by_value',
     'dft',
     'difference',
     'distinct_combinations',
+    'distinct_derangements',
+    'distinct_derangements_by_value',
     'distinct_permutations',
     'distribute',
     'divide',
@@ -836,6 +842,166 @@ def distinct_permutations(iterable, r=None):
             )
 
     return iter(() if r else ((),))
+
+
+def derangements(iterable, r=None):
+    """Yield successive derangements of the elements in *iterable*.
+
+    A derangement is a permutation in which no element appears at its original
+    index. Suppose Alice, Bob, Carol, and Dave are playing Secret Santa.
+    The code below outputs all of the different ways to assign gift recipients
+    such that nobody is assigned to himself or herself:
+
+        >>> for d in derangements(['Alice', 'Bob', 'Carol', 'Dave']):
+        ...    print(', '.join(d))
+        Bob, Alice, Dave, Carol
+        Bob, Carol, Dave, Alice
+        Bob, Dave, Alice, Carol
+        Carol, Alice, Dave, Bob
+        Carol, Dave, Alice, Bob
+        Carol, Dave, Bob, Alice
+        Dave, Alice, Bob, Carol
+        Dave, Carol, Alice, Bob
+        Dave, Carol, Bob, Alice
+
+    If *r* is given, only the *r*-length derangements are yielded.
+
+        >>> sorted(derangements(range(3), 2))
+        [(1, 0), (1, 2), (2, 0)]
+        >>> sorted(derangements([0, 2, 3], 2))
+        [(2, 0), (2, 3), (3, 0)]
+
+    Note that in case of duplicates in input, these are treated as separate
+    entries with the same restriction in the derangements. For example:
+
+        >>> for d in derangements(['Alice', 'Bob', 'Carol', 'Alice']):
+        ...    print(', '.join(d))
+        Bob, Alice, Alice, Carol
+        Bob, Alice, Alice, Carol
+        Carol, Alice, Alice, Bob
+        Carol, Alice, Alice, Bob
+
+    Here Alice is excluded from both original positions of Alice, and also
+    the results are duplicated which is in line with how duplicates are
+    handled by ``itertools.permutations``. If deduplicated derangements
+    are needed, use ``distinct_derangements``.
+    """
+    pool = tuple(iterable)
+    xs = tuple(zip(pool))
+    for ys in permutations(xs, r=r):
+        if any(map(operator.eq, xs, ys)):
+            continue
+        yield tuple(y[0] for y in ys)
+
+
+def distinct_derangements(iterable, r=None):
+    """Yield successive distinct derangements of the elements in *iterable*.
+
+        >>> for d in distinct_derangements(['Alice', 'Bob', 'Carol', 'Alice']):
+        ...    print(', '.join(d))
+        Bob, Alice, Alice, Carol
+        Carol, Alice, Alice, Bob
+
+    Equivalent to yielding from ``set(derangements(iterable))``, except
+    duplicates are not generated and thrown away. For larger input sequences
+    this is more efficient.
+
+    If *r* is given, only the *r*-length derangements are yielded.
+
+        >>> sorted(distinct_derangements([0, 0, 1, 2], 3))
+        [(1, 2, 0), (2, 1, 0)]
+        >>> sorted(distinct_derangements([0, 0, 1, 2], 2))
+        [(1, 2), (2, 1)]
+    """
+    pool = tuple(iterable)
+    xs = tuple(zip(pool))
+    for ys in distinct_permutations(xs, r=r):
+        if any(map(operator.eq, xs, ys)):
+            continue
+        yield tuple(y[0] for y in ys)
+
+
+def derangements_by_value(iterable, r=None):
+    """Yield successive derangements of the elements in *iterable* by value
+    of the elements.
+
+    A derangement by value is a permutation in which no element appears at
+    the index of its value. Suppose three classes 0, 1 and 2 should be
+    assigned to a different teacher than last year, one of which was
+    replaced by a new teacher. These teachers could be indicated by 0, 1
+    and 3, with 0 and 1 being the teachers that stayed and should get a
+    new class, whereas teacher 3 can get any class. Then, the options
+    to assign the classes to the teachers are:
+
+        >>> sorted(derangements_by_value([0, 1, 3]))
+        [(1, 0, 3), (1, 3, 0), (3, 0, 1)]
+
+    Contrast this to the index-based implementation which skips the outcome
+    in which classes 0 and 1 are swapped and the new teacher gets class 2:
+
+        >>> sorted(derangements([0, 1, 3]))
+        [(1, 3, 0), (3, 0, 1)]
+
+    If *r* is given, only the *r*-length derangements by value are yielded.
+
+        >>> sorted(derangements_by_value([0, 2, 3], 2))
+        [(2, 0), (2, 3), (3, 0), (3, 2)]
+
+    Note that in case of non-integer inputs, the result will be the same
+    as pure ``itertools.permutations``:
+
+        >>> for d in sorted(derangements_by_value(["A", "B", "C"])):
+        ...    print(', '.join(d))
+        A, B, C
+        A, C, B
+        B, A, C
+        B, C, A
+        C, A, B
+        C, B, A
+
+    Note that in case of duplicates in input, these lead to duplicated
+    results:
+
+        >>> sorted(derangements_by_value([0, 0, 1]))
+        [(1, 0, 0), (1, 0, 0)]
+
+    This is in line with how duplicates are handled by
+    ``itertools.permutations``. If deduplicated derangements by value3
+    are needed, use ``distinct_derangements_by_value``.
+    """
+    pool = tuple(iterable)
+    xs = tuple(zip(pool))
+    indices = tuple(zip(range(len(pool))))
+    for ys in permutations(xs, r=r):
+        if any(map(operator.eq, indices, ys)):
+            continue
+        yield tuple(y[0] for y in ys)
+
+
+def distinct_derangements_by_value(iterable, r=None):
+    """Yield successive distinct derangements of the elements in *iterable*
+    based on the value of the elements.
+
+        >>> sorted(distinct_derangements_by_value([0, 0, 1, 2]))
+        [(1, 0, 0, 2), (1, 2, 0, 0), (2, 0, 0, 1), (2, 0, 1, 0)]
+
+    Equivalent to yielding from ``set(derangements_by_value(iterable))``,
+    except duplicates are not generated and thrown away. For larger input
+    sequences this is more efficient.
+
+    If *r* is given, only the *r*-length derangements are yielded.
+
+        >>> sorted(distinct_derangements_by_value([0, 0, 1, 2], 2))
+        [(1, 0), (1, 2), (2, 0)]
+
+    """
+    pool = tuple(iterable)
+    xs = tuple(zip(pool))
+    indices = tuple(zip(range(len(pool))))
+    for ys in distinct_permutations(xs, r=r):
+        if any(map(operator.eq, indices, ys)):
+            continue
+        yield tuple(y[0] for y in ys)
 
 
 def intersperse(e, iterable, n=1):
