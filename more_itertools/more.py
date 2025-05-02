@@ -869,39 +869,12 @@ def derangements(iterable, r=None):
         [(2, 0), (2, 3), (3, 0)]
 
     Elements are treated as unique based on their position, not on their value.
-    If the input elements are unique, there will be no repeated values within a permutation.
+    If the input elements are unique, there will be no repeated values within a
+    permutation.
     """
-    pool = tuple(iterable)
-    xs = tuple(zip(pool))
+    xs = tuple(zip(iterable))
     for ys in permutations(xs, r=r):
-        if any(map(operator.eq, xs, ys)):
-            continue
-        yield tuple(y[0] for y in ys)
-
-
-def distinct_derangements(iterable, r=None):
-    """Yield successive distinct derangements of the elements in *iterable*.
-
-        >>> for d in distinct_derangements(['Alice', 'Bob', 'Carol', 'Alice']):
-        ...    print(', '.join(d))
-        Bob, Alice, Alice, Carol
-        Carol, Alice, Alice, Bob
-
-    Equivalent to yielding from ``set(derangements(iterable))``, except
-    duplicates are not generated and thrown away. For larger input sequences
-    this is more efficient.
-
-    If *r* is given, only the *r*-length derangements are yielded.
-
-        >>> sorted(distinct_derangements([0, 0, 1, 2], 3))
-        [(1, 2, 0), (2, 1, 0)]
-        >>> sorted(distinct_derangements([0, 0, 1, 2], 2))
-        [(1, 2), (2, 1)]
-    """
-    pool = tuple(iterable)
-    xs = tuple(zip(pool))
-    for ys in distinct_permutations(xs, r=r):
-        if any(map(operator.eq, xs, ys)):
+        if any(map(operator.is_, xs, ys)):
             continue
         yield tuple(y[0] for y in ys)
 

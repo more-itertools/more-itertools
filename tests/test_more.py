@@ -529,149 +529,85 @@ class DistinctPermutationsTests(TestCase):
 
 
 class DerangementsTests(TestCase):
-    RANGE_NUM = 8
-
-    def test_range(self):
-        range_in = range(self.RANGE_NUM)
-        actual = set(mi.derangements(range_in))
+    def test_unique_values(self):
+        n = 8
         expected = set(
-            [
-                x
-                for x in permutations(range_in)
-                if not any(x[i] == i for i in range_in)
-            ]
-        )
-        self.assertSetEqual(actual, expected)
-
-    def test_list_range(self):
-        list_in = list(range(self.RANGE_NUM))
-        actual = set(mi.derangements(list_in))
-        expected = set(
-            [
-                x
-                for x in permutations(list_in)
-                if not any(x[i] == i for i in list_in)
-            ]
-        )
-        self.assertSetEqual(actual, expected)
-
-    def test_tuple_range(self):
-        tuple_in = tuple(range(self.RANGE_NUM))
-        actual = set(mi.derangements(tuple_in))
-        expected = set(
-            [
-                x
-                for x in permutations(tuple_in)
-                if not any(x[i] == i for i in tuple_in)
-            ]
-        )
-        self.assertSetEqual(actual, expected)
-
-    def test_set_range(self):
-        set_in = set(range(self.RANGE_NUM))
-        actual = set(mi.derangements(set_in))
-        expected = set(
-            [
-                x
-                for x in permutations(set_in)
-                if not any(x[i] == i for i in range(self.RANGE_NUM))
-            ]
-        )
-        self.assertSetEqual(actual, expected)
-
-    def test_list_ints_non_duplicated(self):
-        list_in = list(mi.sieve(20))  # [2, 3, 5, 7, 11, 13, 17, 19]
-        actual = set(mi.derangements(list_in))
-        expected = set(
-            [
-                x
-                for x in permutations(list_in)
-                if not any(k == list_in[i] for i, k in enumerate(x))
-            ]
-        )
-        self.assertSetEqual(actual, expected)
-
-    def test_list_ints_duplicated(self):
-        list_in = list(mi.factor(360))  # [2, 2, 2, 3, 3, 5]
-        actual = list(mi.derangements(list_in))
-        expected = list(
-            [
-                x
-                for x in permutations(list_in)
-                if not any(k == list_in[i] for i, k in enumerate(x))
-            ]
-        )
-        self.assertListEqual(actual, expected)
-
-    def test_list_ints_duplicated_higher_count(self):
-        list_in = list(mi.factor(360))  # [2, 2, 2, 3, 3, 5]
-        actual = list(mi.derangements(list_in))
-        compared = list(mi.derangements(set(list_in)))
-        self.assertLess(len(compared), len(actual))
-
-    def test_list_unsortable(self):
-        list_in = ['1', 2, 2, 3, 3, 3]
-        actual = list(mi.derangements(list_in))
-        expected = list(
-            [
-                x
-                for x in permutations(list_in)
-                if not any(k == list_in[i] for i, k in enumerate(x))
-            ]
-        )
-        self.assertListEqual(actual, expected)
-
-    def test_list_unhashable(self):
-        list_in = ([1], [1], 2)
-        actual = list(mi.derangements(list_in))
-        expected = [
             x
-            for x in permutations(list_in)
-            if not any(k == list_in[i] for i, k in enumerate(x))
-        ]
-        self.assertListEqual(actual, expected)
-
-    def test_boolean_equivalence(self):
-        list_in = [True, 1, 0, False]
-        actual = set(mi.derangements(list_in))
-        expected = set(
-            [
-                x
-                for x in permutations(list_in)
-                if not any(k == list_in[i] for i, k in enumerate(x))
-            ]
+            for x in permutations(range(n))
+            if not any(x[i] == i for i in range(n))
         )
-        self.assertSetEqual(actual, expected)
+        for i, iterable in enumerate(
+            [
+                range(n),
+                list(range(n)),
+                set(range(n)),
+            ]
+        ):
+            actual = set(mi.derangements(iterable))
+            self.assertEqual(actual, expected)
+
+    def test_repeated_values(self):
+        self.assertEqual(
+            [''.join(x) for x in mi.derangements('AACD')],
+            [
+                'AADC',
+                'ACDA',
+                'ADAC',
+                'CADA',
+                'CDAA',
+                'CDAA',
+                'DAAC',
+                'DCAA',
+                'DCAA',
+            ],
+        )
+
+    def test_unsortable_unhashable(self):
+        iterable = (0, True, ['Carol'])
+        actual = list(mi.derangements(iterable))
+        expected = [(True, ['Carol'], 0), (['Carol'], 0, True)]
+        self.assertListEqual(actual, expected)
 
     def test_r(self):
-        for iterable, r in (
-            ('mississippi', 0),
-            ('mississippi', 1),
-            ('mississippi', 6),
-            # ('mississippi', 7),
-            ('mississippi', 12),
-            ([0, 1, 1, 0], 0),
-            ([0, 1, 1, 0], 1),
-            ([0, 1, 1, 0], 2),
-            ([0, 1, 1, 0], 3),
-            ([0, 1, 1, 0], 4),
-            (['a'], 0),
-            (['a'], 1),
-            (['a'], 5),
-            ([], 0),
-            ([], 1),
-            ([], 4),
-        ):
-            with self.subTest(iterable=iterable, r=r):
-                expected = list(
-                    [
-                        x
-                        for x in permutations(iterable, r)
-                        if not any(iterable[i] == k for i, k in enumerate(x))
-                    ]
-                )
-                actual = list(mi.derangements(iterable, r))
-                self.assertCountEqual(actual, expected)
+        s = 'ABCD'
+        for r, expected in [
+            (0, ['']),
+            (1, ['B', 'C', 'D']),
+            (2, ['BA', 'BC', 'BD', 'CA', 'CD', 'DA', 'DC']),
+            (
+                3,
+                [
+                    'BAD',
+                    'BCA',
+                    'BCD',
+                    'BDA',
+                    'CAB',
+                    'CAD',
+                    'CDA',
+                    'CDB',
+                    'DAB',
+                    'DCA',
+                    'DCB',
+                ],
+            ),
+            (
+                4,
+                [
+                    'BADC',
+                    'BCDA',
+                    'BDAC',
+                    'CADB',
+                    'CDAB',
+                    'CDBA',
+                    'DABC',
+                    'DCAB',
+                    'DCBA',
+                ],
+            ),
+        ]:
+            with self.subTest(r=r):
+                actual = [''.join(x) for x in mi.derangements(s, r=r)]
+                self.assertEqual(actual, expected)
 
 
 class IlenTests(TestCase):
