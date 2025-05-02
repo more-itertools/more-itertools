@@ -1,5 +1,4 @@
 import math
-import operator
 import warnings
 
 from collections import Counter, defaultdict, deque, abc
@@ -27,7 +26,7 @@ from itertools import (
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
-from operator import itemgetter, mul, sub, gt, lt
+from operator import is_ as operator_is, itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -874,7 +873,7 @@ def derangements(iterable, r=None):
     """
     xs = tuple(zip(iterable))
     for ys in permutations(xs, r=r):
-        if any(map(operator.is_, xs, ys)):
+        if any(map(operator_is, xs, ys)):
             continue
         yield tuple(y[0] for y in ys)
 
