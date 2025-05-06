@@ -528,6 +528,88 @@ class DistinctPermutationsTests(TestCase):
         self.assertCountEqual(actual, expected)
 
 
+class DerangementsTests(TestCase):
+    def test_unique_values(self):
+        n = 8
+        expected = set(
+            x
+            for x in permutations(range(n))
+            if not any(x[i] == i for i in range(n))
+        )
+        for i, iterable in enumerate(
+            [
+                range(n),
+                list(range(n)),
+                set(range(n)),
+            ]
+        ):
+            actual = set(mi.derangements(iterable))
+            self.assertEqual(actual, expected)
+
+    def test_repeated_values(self):
+        self.assertEqual(
+            [''.join(x) for x in mi.derangements('AACD')],
+            [
+                'AADC',
+                'ACDA',
+                'ADAC',
+                'CADA',
+                'CDAA',
+                'CDAA',
+                'DAAC',
+                'DCAA',
+                'DCAA',
+            ],
+        )
+
+    def test_unsortable_unhashable(self):
+        iterable = (0, True, ['Carol'])
+        actual = list(mi.derangements(iterable))
+        expected = [(True, ['Carol'], 0), (['Carol'], 0, True)]
+        self.assertListEqual(actual, expected)
+
+    def test_r(self):
+        s = 'ABCD'
+        for r, expected in [
+            (0, ['']),
+            (1, ['B', 'C', 'D']),
+            (2, ['BA', 'BC', 'BD', 'CA', 'CD', 'DA', 'DC']),
+            (
+                3,
+                [
+                    'BAD',
+                    'BCA',
+                    'BCD',
+                    'BDA',
+                    'CAB',
+                    'CAD',
+                    'CDA',
+                    'CDB',
+                    'DAB',
+                    'DCA',
+                    'DCB',
+                ],
+            ),
+            (
+                4,
+                [
+                    'BADC',
+                    'BCDA',
+                    'BDAC',
+                    'CADB',
+                    'CDAB',
+                    'CDBA',
+                    'DABC',
+                    'DCAB',
+                    'DCBA',
+                ],
+            ),
+        ]:
+            with self.subTest(r=r):
+                actual = [''.join(x) for x in mi.derangements(s, r=r)]
+                self.assertEqual(actual, expected)
+
+
 class IlenTests(TestCase):
     def test_ilen(self):
         """Sanity-checks for ``ilen()``."""

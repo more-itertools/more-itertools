@@ -47,6 +47,7 @@ __all__ = [
     'consumer',
     'count_cycle',
     'countable',
+    'derangements',
     'dft',
     'difference',
     'distinct_combinations',
@@ -221,6 +222,9 @@ def strictly_n(
 ) -> list[_T]: ...
 def distinct_permutations(
     iterable: Iterable[_T], r: int | None = ...
+) -> Iterator[tuple[_T, ...]]: ...
+def derangements(
+    iterable: Iterable[_T], r: int | None = None
 ) -> Iterator[tuple[_T, ...]]: ...
 def intersperse(
     e: _U, iterable: Iterable[_T], n: int = ...

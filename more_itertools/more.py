@@ -15,6 +15,7 @@ from itertools import (
     dropwhile,
     groupby,
     islice,
+    permutations,
     repeat,
     starmap,
     takewhile,
@@ -25,7 +26,7 @@ from itertools import (
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
-from operator import itemgetter, mul, sub, gt, lt
+from operator import is_ as operator_is, itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -65,6 +66,7 @@ __all__ = [
     'consumer',
     'count_cycle',
     'countable',
+    'derangements',
     'dft',
     'difference',
     'distinct_combinations',
@@ -836,6 +838,44 @@ def distinct_permutations(iterable, r=None):
             )
 
     return iter(() if r else ((),))
+
+
+def derangements(iterable, r=None):
+    """Yield successive derangements of the elements in *iterable*.
+
+    A derangement is a permutation in which no element appears at its original
+    index. Suppose Alice, Bob, Carol, and Dave are playing Secret Santa.
+    The code below outputs all of the different ways to assign gift recipients
+    such that nobody is assigned to himself or herself:
+
+        >>> for d in derangements(['Alice', 'Bob', 'Carol', 'Dave']):
+        ...    print(', '.join(d))
+        Bob, Alice, Dave, Carol
+        Bob, Carol, Dave, Alice
+        Bob, Dave, Alice, Carol
+        Carol, Alice, Dave, Bob
+        Carol, Dave, Alice, Bob
+        Carol, Dave, Bob, Alice
+        Dave, Alice, Bob, Carol
+        Dave, Carol, Alice, Bob
+        Dave, Carol, Bob, Alice
+
+    If *r* is given, only the *r*-length derangements are yielded.
+
+        >>> sorted(derangements(range(3), 2))
+        [(1, 0), (1, 2), (2, 0)]
+        >>> sorted(derangements([0, 2, 3], 2))
+        [(2, 0), (2, 3), (3, 0)]
+
+    Elements are treated as unique based on their position, not on their value.
+    If the input elements are unique, there will be no repeated values within a
+    permutation.
+    """
+    xs = tuple(zip(iterable))
+    for ys in permutations(xs, r=r):
+        if any(map(operator_is, xs, ys)):
+            continue
+        yield tuple(y[0] for y in ys)
 
 
 def intersperse(e, iterable, n=1):
