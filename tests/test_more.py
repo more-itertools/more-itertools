@@ -6051,3 +6051,31 @@ class DoubleStarMapTests(TestCase):
         actual = list(mi.doublestarmap(lambda x: x, []))
         expected = []
         self.assertEqual(actual, expected)
+
+
+class ArgMinArgMaxTests(TestCase):
+    def test_basic(self):
+        for i, iterable, expected_min, expected_max in (
+            (1, [10, 2, 20, 5, 17, 4], 1, 2),
+            (2, [10, -2, -20, 5, 17, 4], 2, 4),
+            (3, [10, 10, 20, 10], 0, 2),
+            (4, [30, 30, 20, 30], 2, 0),
+        ):
+            with self.subTest(i=i):
+                self.assertEqual(mi.argmin(iterable), expected_min)
+                self.assertEqual(mi.argmax(iterable), expected_max)
+
+    def test_key(self):
+        for i, iterable, key, expected_min, expected_max in (
+            (1, [10, -2, -20, 5, 17, 4], abs, 1, 2),
+            (
+                2,
+                [[0] * 10, [0] * 5, [0] * 3, [0] * 12, [0] * 2, [0] * 3],
+                len,
+                4,
+                3,
+            ),
+        ):
+            with self.subTest(i=i):
+                self.assertEqual(mi.argmin(iterable, key=key), expected_min)
+                self.assertEqual(mi.argmax(iterable, key=key), expected_max)
