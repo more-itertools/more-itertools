@@ -53,6 +53,8 @@ __all__ = [
     'all_unique',
     'always_iterable',
     'always_reversible',
+    'argmax',
+    'argmin',
     'bucket',
     'callback_iter',
     'chunked',
@@ -5067,3 +5069,31 @@ def nth_prime(n):
         raise ValueError
     limit = math.ceil(_nth_prime_ub(n + 1))
     return nth(sieve(limit), n)
+
+
+def argmin(iterable, *, key=None):
+    """
+    Index of the first occurence of a minimum value in an iterable.
+
+    >>> argmin('efghabcdijkl')
+    4
+    >>> argmin([3, 2, 1, 0, 4, 2, 1, 0])
+    3
+    """
+    if key is not None:
+        iterable = map(key, iterable)
+    return min(enumerate(iterable), key=itemgetter(1))[0]
+
+
+def argmax(iterable, *, key=None):
+    """
+    Index of the first occurence of a maximum value in an iterable.
+
+    >>> argmax('abcdefghabcd')
+    7
+    >>> argmax([0, 1, 2, 3, 3, 2, 1, 0])
+    3
+    """
+    if key is not None:
+        iterable = map(key, iterable)
+    return max(enumerate(iterable), key=itemgetter(1))[0]
