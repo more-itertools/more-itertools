@@ -5120,7 +5120,7 @@ def argmax(iterable, *, key=None):
     For example, identify the best machine learning model::
 
         >>> models =   ['svm', 'random forest', 'knn', 'naïve bayes']
-        >>> accuracy = [  68,   61,                84,           72 ]
+        >>> accuracy = [  68,        61,          84,       72      ]
 
         # Most accurate model
         >>> models[argmax(accuracy)]
