@@ -5073,12 +5073,31 @@ def nth_prime(n):
 
 def argmin(iterable, *, key=None):
     """
-    Index of the first occurence of a minimum value in an iterable.
+    Index of the first occurrence of a minimum value in an iterable.
 
-    >>> argmin('efghabcdijkl')
-    4
-    >>> argmin([3, 2, 1, 0, 4, 2, 1, 0])
-    3
+        >>> argmin('efghabcdijkl')
+        4
+        >>> argmin([3, 2, 1, 0, 4, 2, 1, 0])
+        3
+
+    For example, look up a label corresponding to the position
+    of a value that minimizes a cost function::
+
+        >>> def cost(x):
+        ...     "Days for a wound to heal given a subject's age."
+        ...     return x**2 - 20*x + 150
+        ...
+        >>> labels =  ['homer', 'marge', 'bart', 'lisa', 'maggie']
+        >>> ages =    [  35,      30,      10,      9,      1    ]
+
+        # Fastest healing family member
+        >>> labels[argmin(ages, key=cost)]
+        'bart'
+
+        # Age with fastest healing
+        >>> min(ages, key=cost)
+        10
+
     """
     if key is not None:
         iterable = map(key, iterable)
@@ -5087,12 +5106,26 @@ def argmin(iterable, *, key=None):
 
 def argmax(iterable, *, key=None):
     """
-    Index of the first occurence of a maximum value in an iterable.
+    Index of the first occurrence of a maximum value in an iterable.
 
-    >>> argmax('abcdefghabcd')
-    7
-    >>> argmax([0, 1, 2, 3, 3, 2, 1, 0])
-    3
+        >>> argmax('abcdefghabcd')
+        7
+        >>> argmax([0, 1, 2, 3, 3, 2, 1, 0])
+        3
+
+    For example, identify the best machine learning model::
+
+        >>> models =   ['svm', 'random forest', 'knn', 'naïve bayes']
+        >>> accuracy = [  68,        61,          84,       72      ]
+
+        # Most accurate model
+        >>> models[argmax(accuracy)]
+        'knn'
+
+        # Best accuracy
+        >>> max(accuracy)
+        84
+
     """
     if key is not None:
         iterable = map(key, iterable)
