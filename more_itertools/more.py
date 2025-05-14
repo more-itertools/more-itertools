@@ -5090,11 +5090,11 @@ def argmin(iterable, *, key=None):
         >>> labels =  ['homer', 'marge', 'bart', 'lisa', 'maggie']
         >>> ages =    [  35,      30,      10,      9,      1    ]
 
-        # Fastest healing family member.
+        # Fastest healing family member
         >>> labels[argmin(ages, key=cost)]
         'bart'
 
-        # What age heals the fastest?
+        # Age with fastest healing
         >>> min(ages, key=cost)
         10
 
