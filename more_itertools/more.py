@@ -5090,17 +5090,13 @@ def argmin(iterable, *, key=None):
         >>> labels =  ['homer', 'marge', 'bart', 'lisa', 'maggie']
         >>> ages =    [  35,      30,      10,      9,      1    ]
 
-        # Name the fastest healing family member.
+        # Fastest healing family member.
         >>> labels[argmin(ages, key=cost)]
         'bart'
 
-        # Which participant age heals the fastest?
+        # What age heals the fastest?
         >>> min(ages, key=cost)
         10
-
-        # Fewest number of days to heal.
-        >>> cost(_)
-        50
 
     """
     if key is not None:
