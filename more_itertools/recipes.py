@@ -635,7 +635,7 @@ def random_product(*args, repeat=1):
         ('a', 2, 'd', 3)
 
     This equivalent to taking a random selection from
-    ``itertools.product(*args, **kwarg)``.
+    ``itertools.product(*args, repeat=repeat)``.
 
     """
     pools = [tuple(pool) for pool in args] * repeat
@@ -835,7 +835,7 @@ def triplewise(iterable):
     [('A', 'B', 'C'), ('B', 'C', 'D'), ('C', 'D', 'E')]
 
     """
-    # This deviates from the itertools documentation reciple - see
+    # This deviates from the itertools documentation recipe - see
     # https://github.com/more-itertools/more-itertools/issues/889
     t1, t2, t3 = tee(iterable, 3)
     next(t3, None)

@@ -1621,7 +1621,7 @@ def split_into(iterable, sizes):
         [[1, 2], [3, 4, 5]]
 
     If the sum of *sizes* is larger than the length of *iterable*, fewer items
-    will be returned in the iteration that overruns *iterable* and further
+    will be returned in the iteration that overruns the *iterable* and further
     lists will be empty:
 
         >>> list(split_into([1,2,3,4], [1,2,3,4]))
@@ -1791,7 +1791,7 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
 
 
 def zip_equal(*iterables):
-    """``zip`` the input *iterables* together, but raise
+    """``zip`` the input *iterables* together but raise
     ``UnequalIterablesError`` if they aren't all the same length.
 
         >>> it_1 = range(3)
@@ -2204,7 +2204,7 @@ class numeric_range(abc.Sequence, abc.Hashable):
         >>> list(numeric_range(3, -1, -1.0))
         [3.0, 2.0, 1.0, 0.0]
 
-    Be aware of the limitations of floating point numbers; the representation
+    Be aware of the limitations of floating-point numbers; the representation
     of the yielded numbers may be surprising.
 
     ``datetime.datetime`` objects can be used for *start* and *stop*, if *step*
@@ -2484,7 +2484,7 @@ def locate(iterable, pred=bool, window_size=None):
 
 
 def longest_common_prefix(iterables):
-    """Yield elements of the longest common prefix amongst given *iterables*.
+    """Yield elements of the longest common prefix among given *iterables*.
 
     >>> ''.join(longest_common_prefix(['abcd', 'abc', 'abf']))
     'ab'
