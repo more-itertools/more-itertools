@@ -178,7 +178,6 @@ These tools yield certain items from an iterable.
 
 **New itertools**
 
-
 .. class:: islice_extended(iterable, stop)
 .. autoclass:: islice_extended(iterable, start, stop[, step])
   :noindex:
