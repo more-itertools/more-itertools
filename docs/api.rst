@@ -275,28 +275,6 @@ consume iterables.
 
 .. autofunction:: iter_except
 
-Integer Math
-============
-
-**New itertools**
-
-The tools focus on math with integers.
-
-----
-
-.. autofunction:: nth_prime
-
-----
-
-**Itertools recipes**
-
-.. autofunction:: factor
-.. autofunction:: is_prime
-.. autofunction:: multinomial
-.. autofunction:: sieve
-.. autofunction:: totient
-
-
 Math
 ====
 
@@ -318,6 +296,28 @@ These tools work with most numeric data types.
 .. autofunction:: polynomial_derivative
 .. autofunction:: polynomial_eval
 .. autofunction:: sum_of_squares
+
+
+Integer Math
+============
+
+**New itertools**
+
+The tools focus on math with integers.
+
+----
+
+.. autofunction:: nth_prime
+
+----
+
+**Itertools recipes**
+
+.. autofunction:: factor
+.. autofunction:: is_prime
+.. autofunction:: multinomial
+.. autofunction:: sieve
+.. autofunction:: totient
 
 
 Others

@@ -117,17 +117,18 @@ Python iterables.
 |                        | `idft <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.idft>`_,                                                                                     |
 |                        | `convolve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.convolve>`_,                                                                             |
 |                        | `dotproduct <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.dotproduct>`_,                                                                         |
-|                        | `factor <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.factor>`_,                                                                                 |
-|                        | `is_prime <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.is_prime>`_,                                                                             |
 |                        | `matmul <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.matmul>`_,                                                                                 |
-|                        | `multinomial <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.multinomial>`_,                                                                       |
-|                        | `nth_prime <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_prime>`_,                                                                           |
 |                        | `polynomial_from_roots <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.polynomial_from_roots>`_,                                                   |
 |                        | `polynomial_derivative <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.polynomial_derivative>`_,                                                   |
 |                        | `polynomial_eval <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.polynomial_eval>`_,                                                               |
-|                        | `sieve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sieve>`_,                                                                                   |
 |                        | `sum_of_squares <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sum_of_squares>`_,                                                                 |
 |                        | `totient <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.totient>`_                                                                                |
++------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Integer math           | `factor <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.factor>`_,                                                                                 |
+|                        | `is_prime <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.is_prime>`_,                                                                             |
+|                        | `multinomial <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.multinomial>`_,                                                                       |
+|                        | `nth_prime <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_prime>`_,                                                                           |
+|                        | `sieve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sieve>`_,                                                                                   |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Combinatorics          | `distinct_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_permutations>`_,                                                   |
 |                        | `distinct_combinations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_combinations>`_,                                                   |
