@@ -178,7 +178,6 @@ These tools yield certain items from an iterable.
 
 **New itertools**
 
-
 .. class:: islice_extended(iterable, stop)
 .. autoclass:: islice_extended(iterable, start, stop[, step])
   :noindex:
@@ -275,14 +274,15 @@ consume iterables.
 
 .. autofunction:: iter_except
 
-
 Math
 ====
+
+These tools work with most numeric data types.
+
 **New itertools**
 
 .. autofunction:: dft
 .. autofunction:: idft
-.. autofunction:: nth_prime
 
 ----
 
@@ -290,15 +290,32 @@ Math
 
 .. autofunction:: convolve
 .. autofunction:: dotproduct
-.. autofunction:: factor
 .. autofunction:: matmul
-.. autofunction:: multinomial
 .. autofunction:: polynomial_from_roots
 .. autofunction:: polynomial_derivative
 .. autofunction:: polynomial_eval
-.. autofunction:: sieve
-.. autofunction:: is_prime
 .. autofunction:: sum_of_squares
+
+
+Integer Math
+============
+
+**New itertools**
+
+The tools focus on math with integers.
+
+----
+
+.. autofunction:: nth_prime
+
+----
+
+**Itertools recipes**
+
+.. autofunction:: factor
+.. autofunction:: is_prime
+.. autofunction:: multinomial
+.. autofunction:: sieve
 .. autofunction:: totient
 
 
