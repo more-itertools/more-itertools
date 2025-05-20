@@ -16,11 +16,11 @@ Version History
     * :func:`exactly_n` now uses less memory (thanks to rhettinger)
     * :func:`dft` and :func:`idft` were optimized for Python versions below 3.12 (thanks to rhettinger)
     * :func:`is_prime` no longer shares state with the users random number generator (thanks to rhettinger)
-    
+
 * Other changes:
     * Some docstring issues were fixed (thanks to lpulley and ricbit)
     * The type hints for :func:`groupby_transform` were improved (thanks to rhettinger)
-    * The ``furo`` theme is now used for docs (thanks to AA-turner) 
+    * The ``furo`` theme is now used for docs (thanks to AA-turner)
 
 
 10.6.0
@@ -37,7 +37,7 @@ Version History
     * :func:`is_sorted` now only relies on less than comparisons (thanks to rhettinger)
     * The docstring for :func:`outer_product` was improved (thanks to rhettinger)
     * The type annotations for :func:`sample` were improved (thanks to rhettinger)
-    
+
 * Other changes:
     * Python 3.13 is officially supported. Python 3.8 is no longer officially supported. (thanks to hugovk, JamesParrott, and stankudrow)
     * `mypy` checks were fixed (thanks to JamesParrott)
@@ -66,7 +66,7 @@ Version History
 
 * Other changes
     * The docs for :func:`is_sorted` and :func:`strictly_n` were improved (thanks to pochmann3 and fakuivan)
-    * The typing information for :func:`windowed_complete`, :func:`zip_broadcast`, and and :func:`zip_equal` were improved (thanks to m472, eyalho, akisatoon1, jbosboom, and Pandede)
+    * The typing information for :func:`windowed_complete`, :func:`zip_broadcast`, and :func:`zip_equal` were improved (thanks to m472, eyalho, akisatoon1, jbosboom, and Pandede)
 
 10.3.0
 ------
@@ -101,9 +101,9 @@ Version History
 
 * Changes to existing functions
     * :func:`factor`, :func:`iter_index`, :func:`sieve`, and :func:`unique_justseen` were updated to match the itertools docs
-    * :func:`first` was was optimized (thanks to pochmann)
-    * :func:`takewhile_inclusive` was was refactored (thanks to eltoder)
-    * :func:`combination_with_replacement_index` was was optimized (thanks to elliotwutingfeng and rhettinger)
+    * :func:`first` was optimized (thanks to pochmann)
+    * :func:`takewhile_inclusive` was refactored (thanks to eltoder)
+    * :func:`combination_with_replacement_index` was optimized (thanks to elliotwutingfeng and rhettinger)
     * :func:`nth_permutation`, :func:`nth_combination_with_replacement`, :func:`combination_index`, and :func:`combination_with_replacement_index` were optimized (thanks to rhettinger)
     * :func:`batched` now accepts a `strict` argument (adapted from itertools docs)
     * :func:`time_limited` was improved for Windows (thanks to haukex)
@@ -167,7 +167,7 @@ Version History
     * :func:`sieve` was updated to match the Python itertools docs
     * :func:`maxsplit` was updated to fix a bug (thanks to abingham)
     * :func:`sliced` had its `type hint <https://github.com/more-itertools/more-itertools/pull/667>`__ updated (thanks to ad-chaos)
-    
+
 
 * Other changes
     * The ``batched`` function is marked as deprecated and will be removed in a future major release. For Python 3.12 and above, use ``itertools.batched`` instead. (thanks to neutrinoceros)
@@ -382,7 +382,7 @@ Version History
 * Changes to existing itertools:
     * :func:`numeric_range` now behaves more like the built-in :func:`range`. (thanks to jferard)
     * :func:`bucket` now allows for enumerating keys. (thanks to alexchandel)
-    * :func:`sliced` now should now work for numpy arrays. (thanks to sswingle)
+    * :func:`sliced` should work for numpy arrays. (thanks to sswingle)
     * :func:`seekable` now has a ``maxlen`` parameter.
 
 8.1.0
