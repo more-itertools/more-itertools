@@ -2631,8 +2631,10 @@ def _islice_helper(it, s):
             if n <= 0:
                 return
 
-            for index, item in islice(cache, 0, n, step):
-                yield item
+            for index in range(n):
+                cached_item = cache.popleft()[1]
+                if index % step == 0:
+                    yield cached_item
         elif (stop is not None) and (stop < 0):
             # Advance to the start position
             next(islice(it, start, start), None)
