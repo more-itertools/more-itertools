@@ -2632,9 +2632,14 @@ def _islice_helper(it, s):
                 return
 
             for index in range(n):
-                cached_item = cache.popleft()[1]
                 if index % step == 0:
-                    yield cached_item
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.popleft()[1]
+                else:
+                    # just pop and discard the item
+                    cache.popleft()
         elif (stop is not None) and (stop < 0):
             # Advance to the start position
             next(islice(it, start, start), None)
