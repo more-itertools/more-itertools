@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import cmath
+import gc
+import platform
 import weakref
 
 from collections import Counter, abc, deque
@@ -3313,6 +3315,10 @@ class IsliceExtendedTests(TestCase):
             mi.islice_extended(count())[13]
 
     def test_elements_lifecycle(self):
+        # CPython does reference counting.
+        # GC is not required when ref counting is supported.
+        refCountSupported = platform.python_implementation() == 'CPython'
+
         class TestCase(NamedTuple):
             initialSize: int
             slice: int
@@ -3420,14 +3426,17 @@ class IsliceExtendedTests(TestCase):
                 islice_iterator = mi.islice_extended(iterator, *testCase.slice)
 
                 aliveStates = []
+                refCountSupported or gc.collect()
                 # initial alive states
                 aliveStates.append(iterator.weakReferencesState())
                 while True:
                     try:
                         next(islice_iterator)
+                        refCountSupported or gc.collect()
                         # intermediate alive states
                         aliveStates.append(iterator.weakReferencesState())
                     except StopIteration:
+                        refCountSupported or gc.collect()
                         # final alive states
                         aliveStates.append(iterator.weakReferencesState())
                         break
