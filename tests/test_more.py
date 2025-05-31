@@ -3265,7 +3265,7 @@ class IteratorWithWeakReferences:
         return self
 
     def __next__(self) -> object:
-        if (len(self._data) == 0):
+        if len(self._data) == 0:
             raise StopIteration
         return self._data.popleft()
 
@@ -3326,6 +3326,7 @@ class IsliceExtendedTests(TestCase):
             # during a complete iteration
             expectedAliveStates: list[list[int]]
 
+        # fmt: off
         testCases = [
             # testcases for: start>0, stop>0, step>0
             TestCase(initialSize=3, slice=(None, None, 1), expectedAliveStates=[  # noqa: E501
@@ -3419,10 +3420,13 @@ class IsliceExtendedTests(TestCase):
             TestCase(initialSize=5, slice=(1, -1, -1), expectedAliveStates=[
                 [1, 1, 1, 1, 1], [0, 0, 0, 0, 0]]),
         ]
+        # fmt: on
 
         for index, testCase in enumerate(testCases):
             with self.subTest(f"{index:02d}", testCase=testCase):
-                iterator = IteratorWithWeakReferences.FROM_SIZE(testCase.initialSize)  # noqa: E501
+                iterator = IteratorWithWeakReferences.FROM_SIZE(
+                    testCase.initialSize
+                )
                 islice_iterator = mi.islice_extended(iterator, *testCase.slice)
 
                 aliveStates = []
