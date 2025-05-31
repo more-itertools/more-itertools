@@ -3360,16 +3360,12 @@ class IsliceExtendedTests(TestCase):
 
             # testcases for: start>0, stop<0, step>0
             TestCase(initialSize=3, slice=(None, -1, 1), expectedAliveStates=[
-                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
                 [1, 1, 1], [0, 1, 1], [0, 0, 1], [0, 0, 0]]),
             TestCase(initialSize=4, slice=(1, -1, 1), expectedAliveStates=[
-                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
                 [1, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]),
             TestCase(initialSize=5, slice=(None, -2, 2), expectedAliveStates=[
-                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
                 [1, 1, 1, 1, 1], [0, 1, 1, 1, 1], [0, 0, 0, 1, 1], [0, 0, 0, 0, 0]]),  # noqa: E501
             TestCase(initialSize=5, slice=(1, -1, 2), expectedAliveStates=[
-                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
                 [1, 1, 1, 1, 1], [0, 0, 1, 1, 1], [0, 0, 0, 0, 1], [0, 0, 0, 0, 0]]),  # noqa: E501
             TestCase(initialSize=5, slice=(4, -5, 2), expectedAliveStates=[
                 [1, 1, 1, 1, 1], [0, 0, 0, 0, 0]]),
