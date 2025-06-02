@@ -1,6 +1,11 @@
-import cmath
+from __future__ import annotations
 
-from collections import Counter, abc
+import cmath
+import gc
+import platform
+import weakref
+
+from collections import Counter, abc, deque
 from collections.abc import Set
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -28,6 +33,7 @@ from statistics import mean
 from string import ascii_letters
 from sys import version_info
 from time import sleep
+from typing import Iterable, Iterator, NamedTuple
 from unittest import skipIf, TestCase
 
 import more_itertools as mi
@@ -3243,6 +3249,30 @@ class StripFunctionTests(TestCase):
         self.assertEqual(list(mi.strip(iterable, pred)), iterable[3:-3])
 
 
+class IteratorWithWeakReferences:
+    class _AnObj:
+        pass
+
+    @classmethod
+    def FROM_SIZE(cls, size: int) -> IteratorWithWeakReferences:
+        return cls([IteratorWithWeakReferences._AnObj() for _ in range(size)])
+
+    def __init__(self, iterable: Iterable):
+        self._data = deque(element for element in iterable)
+        self._weakReferences = [weakref.ref(a) for a in self._data]
+
+    def __iter__(self) -> Iterator:
+        return self
+
+    def __next__(self) -> object:
+        if len(self._data) == 0:
+            raise StopIteration
+        return self._data.popleft()
+
+    def weakReferencesState(self) -> list[bool]:
+        return [wr() is not None for wr in self._weakReferences]
+
+
 class IsliceExtendedTests(TestCase):
     def test_all(self):
         iterable = ['0', '1', '2', '3', '4', '5']
@@ -3283,6 +3313,138 @@ class IsliceExtendedTests(TestCase):
     def test_invalid_slice(self):
         with self.assertRaises(TypeError):
             mi.islice_extended(count())[13]
+
+    def test_elements_lifecycle(self):
+        # CPython does reference counting.
+        # GC is not required when ref counting is supported.
+        refCountSupported = platform.python_implementation() == 'CPython'
+
+        class TestCase(NamedTuple):
+            initialSize: int
+            slice: int
+            # list of expected intermediate elements states (alive or not)
+            # during a complete iteration
+            expectedAliveStates: list[list[int]]
+
+        # fmt: off
+        testCases = [
+            # testcases for: start>0, stop>0, step>0
+            TestCase(initialSize=3, slice=(None, None, 1), expectedAliveStates=[  # noqa: E501
+                [1, 1, 1], [0, 1, 1], [0, 0, 1], [0, 0, 0], [0, 0, 0]]),
+            TestCase(initialSize=3, slice=(0, None, 1), expectedAliveStates=[
+                [1, 1, 1], [0, 1, 1], [0, 0, 1], [0, 0, 0], [0, 0, 0]]),
+            TestCase(initialSize=3, slice=(1, 2, 1), expectedAliveStates=[
+                [1, 1, 1], [0, 0, 1], [0, 0, 1]]),
+            TestCase(initialSize=4, slice=(0, None, 2), expectedAliveStates=[
+                [1, 1, 1, 1], [0, 1, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]),
+            TestCase(initialSize=5, slice=(1, 4, 2), expectedAliveStates=[
+                [1, 1, 1, 1, 1], [0, 0, 1, 1, 1], [0, 0, 0, 0, 1], [0, 0, 0, 0, 1]]),  # noqa: E501
+            TestCase(initialSize=5, slice=(4, 1, 1), expectedAliveStates=[
+                [1, 1, 1, 1, 1], [0, 0, 0, 0, 1]]),
+
+            # FYI: to process a negative start/stop index, we need to iterate
+            # on the whole iterator. All the elements will be consumed
+            # and will ALWAYS be released on full iteration completion.
+
+            # testcases for: start<0, stop>0, step>0
+            TestCase(initialSize=3, slice=(-3, None, 1), expectedAliveStates=[
+                [1, 1, 1], [0, 1, 1], [0, 0, 1], [0, 0, 0], [0, 0, 0]]),
+            TestCase(initialSize=3, slice=(-2, 2, 1), expectedAliveStates=[
+                [1, 1, 1], [0, 0, 1], [0, 0, 0]]),
+            TestCase(initialSize=4, slice=(-4, None, 2), expectedAliveStates=[
+                [1, 1, 1, 1], [0, 1, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]),
+            TestCase(initialSize=5, slice=(-4, 4, 2), expectedAliveStates=[
+                [1, 1, 1, 1, 1], [0, 0, 1, 1, 1], [0, 0, 0, 0, 1], [0, 0, 0, 0, 0]]),  # noqa: E501
+            TestCase(initialSize=3, slice=(-2, 0, 1), expectedAliveStates=[
+                [1, 1, 1], [0, 0, 0]]),
+
+            # testcases for: start>0, stop<0, step>0
+            TestCase(initialSize=3, slice=(None, -1, 1), expectedAliveStates=[
+                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
+                [1, 1, 1], [1, 1, 1], [0, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=4, slice=(1, -1, 1), expectedAliveStates=[
+                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
+                [1, 1, 1, 1], [0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 0]]),
+            TestCase(initialSize=5, slice=(None, -2, 2), expectedAliveStates=[
+                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
+                [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [0, 0, 1, 1, 1], [0, 0, 0, 0, 0]]),  # noqa: E501
+            TestCase(initialSize=5, slice=(1, -1, 2), expectedAliveStates=[
+                # ⚠️could be improved, current element is released just one step too late  # noqa: E501
+                [1, 1, 1, 1, 1], [0, 1, 1, 1, 1], [0, 0, 0, 1, 1], [0, 0, 0, 0, 0]]),  # noqa: E501
+            TestCase(initialSize=5, slice=(4, -5, 2), expectedAliveStates=[
+                [1, 1, 1, 1, 1], [0, 0, 0, 0, 0]]),
+
+            # testcases for: start>0, stop>0, step<0
+            TestCase(initialSize=3, slice=(None, None, -1), expectedAliveStates=[  # noqa: E501
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=3, slice=(2, None, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=3, slice=(None, 0, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1], [0, 1, 1], [0, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=6, slice=(3, 1, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1], [0, 0, 0, 0, 1, 1]]),  # noqa: E501
+            TestCase(initialSize=5, slice=(1, 3, -1), expectedAliveStates=[
+                # ⚠️could be improved. Final state could be [0, 0, 1, 1, 1]
+                [1, 1, 1, 1, 1], [0, 0, 0, 0, 1]]),
+
+            # testcases for: start<0, stop>0, step<0
+            TestCase(initialSize=3, slice=(-1, None, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=3, slice=(-1, 0, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1], [0, 1, 1], [0, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=6, slice=(-2, None, -2), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]]),  # noqa: E501
+            TestCase(initialSize=6, slice=(-2, 1, -2), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]]),  # noqa: E501
+            TestCase(initialSize=6, slice=(-4, 4, -2), expectedAliveStates=[
+                [1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]]),
+
+            # testcases for: start>0, stop<0, step<0
+            TestCase(initialSize=3, slice=(None, -3, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1], [0, 1, 1], [0, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=3, slice=(None, -4, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [0, 0, 0]]),
+            TestCase(initialSize=5, slice=(3, -4, -1), expectedAliveStates=[
+                # ⚠️could be improved, elements are only released on final step
+                [1, 1, 1, 1, 1], [0, 0, 1, 1, 1], [0, 0, 1, 1, 1], [0, 0, 0, 0, 0]]),   # noqa: E501
+            TestCase(initialSize=5, slice=(1, -1, -1), expectedAliveStates=[
+                [1, 1, 1, 1, 1], [0, 0, 0, 0, 0]]),
+        ]
+        # fmt: on
+
+        for index, testCase in enumerate(testCases):
+            with self.subTest(f"{index:02d}", testCase=testCase):
+                iterator = IteratorWithWeakReferences.FROM_SIZE(
+                    testCase.initialSize
+                )
+                islice_iterator = mi.islice_extended(iterator, *testCase.slice)
+
+                aliveStates = []
+                refCountSupported or gc.collect()
+                # initial alive states
+                aliveStates.append(iterator.weakReferencesState())
+                while True:
+                    try:
+                        next(islice_iterator)
+                        refCountSupported or gc.collect()
+                        # intermediate alive states
+                        aliveStates.append(iterator.weakReferencesState())
+                    except StopIteration:
+                        refCountSupported or gc.collect()
+                        # final alive states
+                        aliveStates.append(iterator.weakReferencesState())
+                        break
+                self.assertEqual(aliveStates, testCase.expectedAliveStates)
 
 
 class ConsecutiveGroupsTest(TestCase):
