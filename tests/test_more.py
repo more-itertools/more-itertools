@@ -3974,6 +3974,18 @@ class ReplaceTests(TestCase):
         with self.assertRaises(ValueError):
             list(mi.replace(iterable, pred, substitutes, window_size=0))
 
+    def test_default_arg(self):
+        iterable = range(10)
+        pred = lambda *args: args[-1] == 0
+        substitutes = []
+        actual = list(
+            mi.replace(
+                iterable, pred, substitutes, window_size=3, default_arg=0
+            )
+        )
+        expected = [0, 1, 2, 3, 4, 5, 6, 7]
+        self.assertEqual(actual, expected)
+
     def test_iterable_substitutes(self):
         iterable = range(5)
         pred = lambda x: x % 2 == 0
