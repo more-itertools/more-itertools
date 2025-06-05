@@ -760,8 +760,6 @@ def convolve(signal, kernel):
         >>> list(convolve([1, -1, -20], [1, -3]))
         [1, -4, -17, 60]
 
-    Note that polynomial coefficients are specified in descending power order.
-
     Examples of popular kinds of kernels:
 
     * The kernel ``[0.25, 0.25, 0.25, 0.25]`` computes a moving average.
