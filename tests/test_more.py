@@ -4432,8 +4432,11 @@ class MapIfTests(TestCase):
 class SampleTests(TestCase):
     def test_specific_sample(self):
         """Verify reproducibility."""
-        # Note, this test is fragile because it depends on the quality of
-        # the underlying libmath implementations for log, exp, and log1p.
+
+        # Note, this test is surprisingly robust.  Although it depends on the quality
+        # of the underlying libmath implementations for log, exp, and log1p, the
+        # number of samples and population size are small enough that small errors
+        # in those underlying functions won't affect the sample.
 
         seed(8675309)
         self.assertEqual(
