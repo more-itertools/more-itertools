@@ -3722,9 +3722,8 @@ def _sample_unweighted(iterator, k, strict):
     W = 1.0
 
     with suppress(StopIteration):
-        rk = 1 / k
         while True:
-            W *= random() ** rk
+            W *= random() ** (1 / k)
             skip = floor(log(random()) / log1p(-W))
             element = next(islice(iterator, skip, None))
             reservoir[randrange(k)] = element
@@ -3797,9 +3796,8 @@ def _sample_counted(population, k, counts, strict):
 
     with suppress(StopIteration):
         W = 1.0
-        rk = 1 / k
         while True:
-            W *= random() ** rk
+            W *= random() ** (1 / k)
             skip = floor(log(random()) / log1p(-W))
             element = feed(skip)
             reservoir[randrange(k)] = element
