@@ -4430,6 +4430,21 @@ class MapIfTests(TestCase):
 
 
 class SampleTests(TestCase):
+
+    def test_specific_sample(self):
+        """Verify reproducibility."""
+        seed(8675309)
+        self.assertEqual(list(mi.sample(range(10**5), k=5)),
+                         [16845, 79805, 76057, 58302, 40472])
+
+        seed(8675309)
+        self.assertEqual(list(mi.sample(range(10**5), counts=[1,2] * (10**5 // 2), k=5)),
+                             [87899, 53203, 38868, 11230, 50705])
+
+        seed(8675309)
+        self.assertEqual(list(mi.sample(range(10**5), weights=range(1, 10**5+1), k=5)),
+                             [50915, 33816, 32250, 98284, 43517])
+
     def test_unit_case(self):
         """Test against a fixed case by seeding the random module."""
         # Beware that this test really just verifies random.random() behavior.
