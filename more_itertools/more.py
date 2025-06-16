@@ -2701,20 +2701,36 @@ def _islice_helper(it, s):
                 else:
                     # just pop and discard the item
                     cache.pop()
+        elif start < 0:
+            # Advance to the stop position
+            if stop is not None:
+                m = stop + 1
+                next(islice(it, m, m), None)
+            
+            cache = deque(it)
+
+            # Advance to the start position
+            for _ in range(min(-start-1, len(cache))):
+                cache.pop()
+
+            for index in range(len(cache)):
+                if index % step == 0:
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.pop()
+                else:
+                    # just pop and discard the item
+                    cache.pop()
         else:
             # Advance to the stop position
             if stop is not None:
                 m = stop + 1
                 next(islice(it, m, m), None)
 
-            # stop is positive, so if start is negative they are not comparable
-            # and we need the rest of the items.
-            if start < 0:
-                i = start
-                n = None
             # stop is None and start is positive, so we just need items up to
             # the start index.
-            elif stop is None:
+            if stop is None:
                 i = None
                 n = start + 1
             # Both stop and start are positive, so they are comparable.
