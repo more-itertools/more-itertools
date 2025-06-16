@@ -2688,8 +2688,19 @@ def _islice_helper(it, s):
             else:
                 i = min(start - len_iter, -1)
 
-            for index, item in list(cache)[i::step]:
-                yield item
+            # Advance to the start position
+            for _ in range(min(-i-1, len(cache))):
+                cache.pop()
+
+            for index in range(len(cache)):
+                if index % step == 0:
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.pop()[1]
+                else:
+                    # just pop and discard the item
+                    cache.pop()
         else:
             # Advance to the stop position
             if stop is not None:
