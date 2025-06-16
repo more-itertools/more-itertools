@@ -2684,11 +2684,11 @@ def _islice_helper(it, s):
             # we can just slice. Otherwise we can adjust start to be negative
             # and then slice.
             if start < 0:
-                i, j = start, stop
+                i = start
             else:
-                i, j = min(start - len_iter, -1), None
+                i = min(start - len_iter, -1)
 
-            for index, item in list(cache)[i:j:step]:
+            for index, item in list(cache)[i::step]:
                 yield item
         else:
             # Advance to the stop position
