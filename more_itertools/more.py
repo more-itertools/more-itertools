@@ -26,7 +26,8 @@ from itertools import (
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
-from operator import is_ as operator_is, itemgetter, mul, sub, gt, lt
+from operator import is_ as operator_is, attrgetter, itemgetter
+from operator import neg, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -4985,10 +4986,12 @@ def _complex_sumprod(v1, v2):
     Used by :func:`dft` and :func:`idft`.
     """
 
-    r1 = chain((p.real for p in v1), (-p.imag for p in v1))
-    r2 = chain((q.real for q in v2), (q.imag for q in v2))
-    i1 = chain((p.real for p in v1), (p.imag for p in v1))
-    i2 = chain((q.imag for q in v2), (q.real for q in v2))
+    real = attrgetter('real')
+    imag = attrgetter('imag')
+    r1 = chain(map(real, v1), map(neg, map(imag, v1)))
+    r2 = chain(map(real, v2), map(imag, v2))
+    i1 = chain(map(real, v1), map(imag, v1))
+    i2 = chain(map(imag, v2), map(real, v2))
     return complex(_fsumprod(r1, r2), _fsumprod(i1, i2))
 
 
