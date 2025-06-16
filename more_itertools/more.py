@@ -2731,18 +2731,24 @@ def _islice_helper(it, s):
             # stop is None and start is positive, so we just need items up to
             # the start index.
             if stop is None:
-                i = None
                 n = start + 1
             # Both stop and start are positive, so they are comparable.
             else:
-                i = None
                 n = start - stop
                 if n <= 0:
                     return
 
-            cache = list(islice(it, n))
+            cache = deque(islice(it, n))
 
-            yield from cache[i::step]
+            for index in range(len(cache)):
+                if index % step == 0:
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.pop()
+                else:
+                    # just pop and discard the item
+                    cache.pop()
 
 
 def always_reversible(iterable):
