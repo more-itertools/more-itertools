@@ -2701,44 +2701,30 @@ def _islice_helper(it, s):
                 else:
                     # just pop and discard the item
                     cache.pop()
-        elif start < 0:
-            # Advance to the stop position
-            if stop is not None:
-                m = stop + 1
-                next(islice(it, m, m), None)
-            
-            cache = deque(it)
-
-            # Advance to the start position
-            for _ in range(min(-start-1, len(cache))):
-                cache.pop()
-
-            for index in range(len(cache)):
-                if index % step == 0:
-                    # pop and yield the item.
-                    # We don't want to use an intermediate variable
-                    # it would extend the lifetime of the current item
-                    yield cache.pop()
-                else:
-                    # just pop and discard the item
-                    cache.pop()
         else:
             # Advance to the stop position
             if stop is not None:
                 m = stop + 1
                 next(islice(it, m, m), None)
 
-            # stop is None and start is positive, so we just need items up to
-            # the start index.
-            if stop is None:
-                n = start + 1
-            # Both stop and start are positive, so they are comparable.
-            else:
-                n = start - stop
-                if n <= 0:
-                    return
+            if start < 0:
+                cache = deque(it)
 
-            cache = deque(islice(it, n))
+                # Advance to the start position
+                for _ in range(min(-start-1, len(cache))):
+                    cache.pop()
+            else:
+                # stop is None and start is positive, so we just need items up to
+                # the start index.
+                if stop is None:
+                    n = start + 1
+                # Both stop and start are positive, so they are comparable.
+                else:
+                    n = start - stop
+                    if n <= 0:
+                        return
+
+                cache = deque(islice(it, n))
 
             for index in range(len(cache)):
                 if index % step == 0:
