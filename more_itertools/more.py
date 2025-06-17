@@ -35,7 +35,9 @@ from .recipes import (
     _zip_equal,
     UnequalIterablesError,
     consume,
+    first_true,
     flatten,
+    is_prime,
     nth,
     powerset,
     sieve,
@@ -5070,18 +5072,36 @@ def _nth_prime_ub(n):
     return ub
 
 
-def nth_prime(n):
+def nth_prime(n, *, approximate=False):
     """Return the nth prime (counting from 0).
 
     >>> nth_prime(0)
     2
     >>> nth_prime(100)
     547
+
+    If *approximate* is set to True, will return a prime in the close
+    to the nth prime.  The estimation is much faster than computing
+    an exact result.
+
+    >>> nth_prime(100_000_000, approximate=True)  # Exact result is 2038074751
+    2038374449
+
     """
     if n < 0:
         raise ValueError
+
     limit = math.ceil(_nth_prime_ub(n + 1))
-    return nth(sieve(limit), n)
+
+    if not approximate or n <= 1_000_000:
+        return nth(sieve(limit), n)
+
+    # Round to closest odd within the bounds
+    ub = floor(limit)
+    if not ub & 1:
+        ub -= 1
+
+    return first_true(count(ub, step=-2), pred=is_prime)
 
 
 def argmin(iterable, *, key=None):
