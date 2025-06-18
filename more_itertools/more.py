@@ -4696,6 +4696,16 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
 
     Otherwise ``ValueError`` is raised.
 
+    This function is intended for finding extreme values in the input.
+    It differs the builtin `min` and `max` functions in several ways:
+
+    1) Unlike ``(min(data), max(data))``, it makes a single pass over the input.
+    2) Comparisons only call `__lt__`, unlike the builtin `max` function
+       which calls ``__gt__`` instead.
+    3) Ties are handled differently. The builtin functions always return the
+       first minimum or maximum value found in the input.  In contrast,
+       this function sometimes returns a subsequent tie.
+
     This function is based on the
     `recipe <http://code.activestate.com/recipes/577916/>`__ by
     Raymond Hettinger and takes care to minimize the number of comparisons
