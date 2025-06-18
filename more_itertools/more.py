@@ -4697,7 +4697,7 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
     Otherwise ``ValueError`` is raised.
 
     This function is based on the
-    `recipe <http://code.activestate.com/recipes/577916/>`__ by
+    `recipe <https://code.activestate.com/recipes/577916-fast-minmax-function>`__ by
     Raymond Hettinger and takes care to minimize the number of comparisons
     performed.
     """
