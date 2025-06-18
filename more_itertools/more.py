@@ -223,7 +223,7 @@ def chunked(iterable, n, strict=False):
                     raise ValueError('iterable is not divisible by n.')
                 yield chunk
 
-        return iter(ret())
+        return ret()
     else:
         return iterator
 
@@ -1011,7 +1011,7 @@ def substrings(iterable):
     """
     # The length-1 substrings
     seq = []
-    for item in iter(iterable):
+    for item in iterable:
         seq.append(item)
         yield (item,)
     seq = tuple(seq)
@@ -1440,7 +1440,7 @@ def sliced(seq, n, strict=False):
                     raise ValueError("seq is not divisible by n.")
                 yield _slice
 
-        return iter(ret())
+        return ret()
     else:
         return iterator
 
@@ -1515,7 +1515,7 @@ def split_before(iterable, pred, maxsplit=-1):
         if pred(item) and buf:
             yield buf
             if maxsplit == 1:
-                yield [item] + list(it)
+                yield [item, *it]
                 return
             buf = []
             maxsplit -= 1
@@ -1596,7 +1596,7 @@ def split_when(iterable, pred, maxsplit=-1):
         if pred(cur_item, next_item):
             yield buf
             if maxsplit == 1:
-                yield [next_item] + list(it)
+                yield [next_item, *it]
                 return
             buf = []
             maxsplit -= 1
@@ -1953,7 +1953,7 @@ def unzip(iterable):
     :func:`itertools.tee` and thus may require significant storage.
 
     """
-    head, iterable = spy(iter(iterable))
+    head, iterable = spy(iterable)
     if not head:
         # empty iterable, e.g. zip([], [], [])
         return ()
@@ -2119,7 +2119,7 @@ def adjacent(predicate, iterable, distance=1):
         raise ValueError('distance must be at least 0')
 
     i1, i2 = tee(iterable)
-    padding = [False] * distance
+    padding = repeat(False, distance)
     selected = chain(padding, map(predicate, i1), padding)
     adjacent_to_selected = map(any, windowed(selected, 2 * distance + 1))
     return zip(adjacent_to_selected, i2)
@@ -3307,7 +3307,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
     # Add padding such that the number of windows matches the length of the
     # iterable
-    it = chain(iterable, [_marker] * (window_size - 1))
+    it = chain(iterable, repeat(_marker, window_size - 1))
     windows = windowed(it, window_size)
 
     n = 0
