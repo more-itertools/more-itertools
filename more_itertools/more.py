@@ -4702,7 +4702,7 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
     Note that unlike the builtin ``max`` function, which always returns the first
     item with the maximum value, this function may return another item when there are
     ties.
-    
+
     This function is based on the
     `recipe <https://code.activestate.com/recipes/577916-fast-minmax-function>`__ by
     Raymond Hettinger.
