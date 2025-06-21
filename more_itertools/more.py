@@ -2689,7 +2689,7 @@ def _islice_helper(it, s):
                 i = min(start - len_iter, -1)
 
             # Advance to the start position
-            for _ in range(min(-i-1, len(cache))):
+            for _ in range(min(-i - 1, len(cache))):
                 cache.pop()
 
             for index in range(len(cache)):
@@ -2711,7 +2711,7 @@ def _islice_helper(it, s):
                 cache = deque(it)
 
                 # Advance to the start position
-                for _ in range(min(-start-1, len(cache))):
+                for _ in range(min(-start - 1, len(cache))):
                     cache.pop()
             else:
                 # stop is None and start is positive, so we just need items up to
