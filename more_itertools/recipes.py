@@ -26,6 +26,7 @@ from itertools import (
     product,
     repeat,
     starmap,
+    takewhile,
     tee,
     zip_longest,
 )
@@ -807,23 +808,9 @@ def before_and_after(predicate, it):
     Note that the first iterator must be fully consumed before the second
     iterator can generate valid results.
     """
-    it = iter(it)
-    transition = []
-
-    def true_iterator():
-        for elem in it:
-            if predicate(elem):
-                yield elem
-            else:
-                transition.append(elem)
-                return
-
-    # Note: this is different from itertools recipes to allow nesting
-    # before_and_after remainders into before_and_after again. See tests
-    # for an example.
-    remainder_iterator = chain(transition, it)
-
-    return true_iterator(), remainder_iterator
+    trues, after = tee(it)
+    trues = compress(takewhile(predicate, trues), zip(after))
+    return trues, after
 
 
 def triplewise(iterable):
