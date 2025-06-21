@@ -3372,16 +3372,12 @@ class IsliceExtendedTests(TestCase):
 
             # testcases for: start>0, stop>0, step<0
             TestCase(initialSize=3, slice=(None, None, -1), expectedAliveStates=[  # noqa: E501
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1], [1, 1, 0], [1, 0, 0], [0, 0, 0], [0, 0, 0]]),
             TestCase(initialSize=3, slice=(2, None, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1], [1, 1, 0], [1, 0, 0], [0, 0, 0], [0, 0, 0]]),
             TestCase(initialSize=3, slice=(None, 0, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1], [0, 1, 0], [0, 0, 0], [0, 0, 0]]),
             TestCase(initialSize=6, slice=(3, 1, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1, 1, 1, 1], [0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 1, 1], [0, 0, 0, 0, 1, 1]]),  # noqa: E501
             TestCase(initialSize=5, slice=(1, 3, -1), expectedAliveStates=[
                 # ⚠️could be improved. Final state could be [0, 0, 1, 1, 1]
@@ -3389,29 +3385,22 @@ class IsliceExtendedTests(TestCase):
 
             # testcases for: start<0, stop>0, step<0
             TestCase(initialSize=3, slice=(-1, None, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1], [1, 1, 0], [1, 0, 0], [0, 0, 0], [0, 0, 0]]),
             TestCase(initialSize=3, slice=(-1, 0, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1], [0, 1, 0], [0, 0, 0], [0, 0, 0]]),
             TestCase(initialSize=6, slice=(-2, None, -2), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 0, 0], [1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]),  # noqa: E501
             TestCase(initialSize=6, slice=(-2, 1, -2), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1, 1, 1, 1], [0, 0, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]),  # noqa: E501
             TestCase(initialSize=6, slice=(-4, 4, -2), expectedAliveStates=[
                 [1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]]),
 
             # testcases for: start>0, stop<0, step<0
             TestCase(initialSize=3, slice=(None, -3, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1], [0, 1, 0], [0, 0, 0], [0, 0, 0]]),
             TestCase(initialSize=3, slice=(None, -4, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1], [1, 1, 0], [1, 0, 0], [0, 0, 0], [0, 0, 0]]),
             TestCase(initialSize=5, slice=(3, -4, -1), expectedAliveStates=[
-                # ⚠️could be improved, elements are only released on final step
                 [1, 1, 1, 1, 1], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]),   # noqa: E501
             TestCase(initialSize=5, slice=(1, -1, -1), expectedAliveStates=[
                 [1, 1, 1, 1, 1], [0, 0, 0, 0, 0]]),
