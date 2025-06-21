@@ -2669,38 +2669,57 @@ def _islice_helper(it, s):
             # we can just slice. Otherwise we can adjust start to be negative
             # and then slice.
             if start < 0:
-                i, j = start, stop
+                i = start
             else:
-                i, j = min(start - len_iter, -1), None
+                i = min(start - len_iter, -1)
 
-            for index, item in list(cache)[i:j:step]:
-                yield item
+            # Advance to the start position
+            for _ in range(min(-i - 1, len(cache))):
+                cache.pop()
+
+            for index in range(len(cache)):
+                if index % step == 0:
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.pop()[1]
+                else:
+                    # just pop and discard the item
+                    cache.pop()
         else:
             # Advance to the stop position
             if stop is not None:
                 m = stop + 1
                 next(islice(it, m, m), None)
 
-            # stop is positive, so if start is negative they are not comparable
-            # and we need the rest of the items.
             if start < 0:
-                i = start
-                n = None
-            # stop is None and start is positive, so we just need items up to
-            # the start index.
-            elif stop is None:
-                i = None
-                n = start + 1
-            # Both stop and start are positive, so they are comparable.
+                cache = deque(it)
+
+                # Advance to the start position
+                for _ in range(min(-start - 1, len(cache))):
+                    cache.pop()
             else:
-                i = None
-                n = start - stop
-                if n <= 0:
-                    return
+                # stop is None and start is positive, so we just need items up to
+                # the start index.
+                if stop is None:
+                    n = start + 1
+                # Both stop and start are positive, so they are comparable.
+                else:
+                    n = start - stop
+                    if n <= 0:
+                        return
 
-            cache = list(islice(it, n))
+                cache = deque(islice(it, n))
 
-            yield from cache[i::step]
+            for index in range(len(cache)):
+                if index % step == 0:
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.pop()
+                else:
+                    # just pop and discard the item
+                    cache.pop()
 
 
 def always_reversible(iterable):
