@@ -2721,7 +2721,7 @@ def always_reversible(iterable):
         return reversed(list(iterable))
 
 
-def consecutive_groups(iterable, ordering=lambda x: x):
+def consecutive_groups(iterable, ordering=None):
     """Yield groups of consecutive items using :func:`itertools.groupby`.
     The *ordering* function determines whether two items are adjacent by
     returning their position.
@@ -2763,9 +2763,12 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         [[1, 2], [11, 12], [21, 22]]
 
     """
-    for k, g in groupby(
-        enumerate(iterable), key=lambda x: x[0] - ordering(x[1])
-    ):
+    if ordering is None:
+        key = lambda x: x[0] - x[1]
+    else:
+        key = lambda x: x[0] - ordering(x[1])
+
+    for k, g in groupby(enumerate(iterable), key=key):
         yield map(itemgetter(1), g)
 
 
