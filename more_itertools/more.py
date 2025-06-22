@@ -24,6 +24,7 @@ from itertools import (
     product,
 )
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import ceil
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import is_ as operator_is, itemgetter, mul, sub, gt, lt
@@ -5091,17 +5092,17 @@ def nth_prime(n, *, approximate=False):
     if n < 0:
         raise ValueError
 
-    limit = math.ceil(_nth_prime_ub(n + 1))
+    ub = _nth_prime_ub(n + 1)
 
     if not approximate or n <= 1_000_000:
-        return nth(sieve(limit), n)
+        return nth(sieve(ceil(ub)), n)
 
     # Round to closest odd within the bounds
-    ub = floor(limit)
-    if not ub & 1:
-        ub -= 1
+    odd = floor(ub)
+    if not odd & 1:
+        odd -= 1
 
-    return first_true(count(ub, step=-2), pred=is_prime)
+    return first_true(count(odd, step=-2), pred=is_prime)
 
 
 def argmin(iterable, *, key=None):
