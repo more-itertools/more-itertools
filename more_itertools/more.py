@@ -2738,12 +2738,11 @@ def consecutive_groups(iterable, ordering=None):
         [30, 31, 32, 33]
         [40]
 
-    For finding runs of adjacent letters, try using the :meth:`index` method
-    of a string of letters:
+    To find runs of adjacent letters, apply :func:`ord` function
+    to convert letters to ordinals.
 
-        >>> from string import ascii_lowercase
         >>> iterable = 'abcdfgilmnop'
-        >>> ordering = ascii_lowercase.index
+        >>> ordering = ord
         >>> for group in consecutive_groups(iterable, ordering):
         ...     print(list(group))
         ['a', 'b', 'c', 'd']
