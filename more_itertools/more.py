@@ -3217,20 +3217,17 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     ret = defaultdict(list)
 
     if valuefunc is None:
-
         for item in iterable:
             key = keyfunc(item)
             ret[key].append(item)
 
     else:
-
         for item in iterable:
             key = keyfunc(item)
             value = valuefunc(item)
             ret[key].append(value)
 
     if reducefunc is not None:
-
         for key, value_list in ret.items():
             ret[key] = reducefunc(value_list)
 
@@ -3721,14 +3718,13 @@ def map_if(iterable, pred, func, func_else=None):
     """
 
     if func_else is None:
-
         for item in iterable:
             yield func(item) if pred(item) else item
 
     else:
-
         for item in iterable:
             yield func(item) if pred(item) else func_else(item)
+
 
 def _sample_unweighted(iterator, k, strict):
     # Algorithm L in the 1994 paper by Kim-Hung Li:
