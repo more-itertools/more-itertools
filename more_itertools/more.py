@@ -5061,16 +5061,23 @@ def doublestarmap(func, iterable):
         yield func(**item)
 
 
-def _nth_prime_ub(n):
-    "Upper bound for the nth prime (counting from 1)."
+def _nth_prime_bounds(n):
+    """Bounds for the nth prime (counting from 1): lb <= p_n <= ub."""
+    # At and above 688,383, the lb/ub spread is under 0.003 * n.
+
+    if n < 1:
+        raise ValueError
+
+    if n < 6:
+        return (n, 2.25 * n)
+
     # https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
-    ub = 11.1
-    if n >= 6:
-        ub = n * log(n * log(n))
+    upper_bound = n * log(n * log(n))
+    lower_bound = upper_bound - n
     if n >= 688_383:
-        # Make ub accurate to within n * 0.003
-        ub -= n * (1.0 - (log(log(n)) - 2.0) / log(n))
-    return ub
+        upper_bound -= n * (1.0 - (log(log(n)) - 2.0) / log(n))
+
+    return lower_bound, upper_bound
 
 
 def nth_prime(n, *, approximate=False):
@@ -5085,24 +5092,21 @@ def nth_prime(n, *, approximate=False):
     to the nth prime.  The estimation is much faster than computing
     an exact result.
 
-    >>> nth_prime(100_000_000, approximate=True)  # Exact result is 2038074751
-    2038374449
+    >>> nth_prime(200_000_000, approximate=True)  # Exact result is 4222234763
+    4217820427
 
     """
     if n < 0:
         raise ValueError
 
-    ub = _nth_prime_ub(n + 1)
+    lb, ub = _nth_prime_bounds(n + 1)
 
     if not approximate or n <= 1_000_000:
         return nth(sieve(ceil(ub)), n)
 
-    # Round to closest odd within the bounds
-    odd = floor(ub)
-    if not odd & 1:
-        odd -= 1
-
-    return first_true(count(odd, step=-2), pred=is_prime)
+    # Search from the midpoint and return the first odd prime
+    odd = floor((lb + ub) / 2) | 1
+    return first_true(count(odd, step=2), pred=is_prime)
 
 
 def argmin(iterable, *, key=None):
