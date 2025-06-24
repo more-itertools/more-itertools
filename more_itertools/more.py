@@ -2724,7 +2724,7 @@ def always_reversible(iterable):
         return reversed(list(iterable))
 
 
-def consecutive_groups(iterable, ordering=lambda x: x):
+def consecutive_groups(iterable, ordering=None):
     """Yield groups of consecutive items using :func:`itertools.groupby`.
     The *ordering* function determines whether two items are adjacent by
     returning their position.
@@ -2741,12 +2741,11 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         [30, 31, 32, 33]
         [40]
 
-    For finding runs of adjacent letters, try using the :meth:`index` method
-    of a string of letters:
+    To find runs of adjacent letters, apply :func:`ord` function
+    to convert letters to ordinals.
 
-        >>> from string import ascii_lowercase
         >>> iterable = 'abcdfgilmnop'
-        >>> ordering = ascii_lowercase.index
+        >>> ordering = ord
         >>> for group in consecutive_groups(iterable, ordering):
         ...     print(list(group))
         ['a', 'b', 'c', 'd']
@@ -2766,9 +2765,12 @@ def consecutive_groups(iterable, ordering=lambda x: x):
         [[1, 2], [11, 12], [21, 22]]
 
     """
-    for k, g in groupby(
-        enumerate(iterable), key=lambda x: x[0] - ordering(x[1])
-    ):
+    if ordering is None:
+        key = lambda x: x[0] - x[1]
+    else:
+        key = lambda x: x[0] - ordering(x[1])
+
+    for k, g in groupby(enumerate(iterable), key=key):
         yield map(itemgetter(1), g)
 
 
@@ -3214,13 +3216,19 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     dictionary.
 
     """
-    valuefunc = (lambda x: x) if (valuefunc is None) else valuefunc
 
     ret = defaultdict(list)
-    for item in iterable:
-        key = keyfunc(item)
-        value = valuefunc(item)
-        ret[key].append(value)
+
+    if valuefunc is None:
+        for item in iterable:
+            key = keyfunc(item)
+            ret[key].append(item)
+
+    else:
+        for item in iterable:
+            key = keyfunc(item)
+            value = valuefunc(item)
+            ret[key].append(value)
 
     if reducefunc is not None:
         for key, value_list in ret.items():
@@ -3693,7 +3701,7 @@ def map_except(function, iterable, *exceptions):
             pass
 
 
-def map_if(iterable, pred, func, func_else=lambda x: x):
+def map_if(iterable, pred, func, func_else=None):
     """Evaluate each item from *iterable* using *pred*. If the result is
     equivalent to ``True``, transform the item with *func* and yield it.
     Otherwise, transform the item with *func_else* and yield it.
@@ -3711,8 +3719,14 @@ def map_if(iterable, pred, func, func_else=lambda x: x):
     ... lambda x: f'{sqrt(x):.2f}', lambda x: None))
     [None, None, None, None, None, '0.00', '1.00', '1.41', '1.73', '2.00']
     """
-    for item in iterable:
-        yield func(item) if pred(item) else func_else(item)
+
+    if func_else is None:
+        for item in iterable:
+            yield func(item) if pred(item) else item
+
+    else:
+        for item in iterable:
+            yield func(item) if pred(item) else func_else(item)
 
 
 def _sample_unweighted(iterator, k, strict):
