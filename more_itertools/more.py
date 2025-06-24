@@ -24,6 +24,7 @@ from itertools import (
     product,
 )
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import ceil
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import is_ as operator_is, itemgetter, mul, sub, gt, lt
@@ -35,7 +36,9 @@ from .recipes import (
     _zip_equal,
     UnequalIterablesError,
     consume,
+    first_true,
     flatten,
+    is_prime,
     nth,
     powerset,
     sieve,
@@ -5064,24 +5067,49 @@ def doublestarmap(func, iterable):
         yield func(**item)
 
 
-def _nth_prime_ub(n):
-    "Upper bound for the nth prime (counting from 1)."
+def _nth_prime_bounds(n):
+    """Bounds for the nth prime (counting from 1): lb <= p_n <= ub."""
+    # At and above 688,383, the lb/ub spread is under 0.003 * n.
+
+    if n < 1:
+        raise ValueError
+
+    if n < 6:
+        return (n, 2.25 * n)
+
     # https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
-    return n * log(n * log(n)) if n >= 6 else 11.1
+    upper_bound = n * log(n * log(n))
+    lower_bound = upper_bound - n
+    if n >= 688_383:
+        upper_bound -= n * (1.0 - (log(log(n)) - 2.0) / log(n))
+
+    return lower_bound, upper_bound
 
 
-def nth_prime(n):
+def nth_prime(n, *, approximate=False):
     """Return the nth prime (counting from 0).
 
     >>> nth_prime(0)
     2
     >>> nth_prime(100)
     547
+
+    If *approximate* is set to True, will return a prime in the close
+    to the nth prime.  The estimation is much faster than computing
+    an exact result.
+
+    >>> nth_prime(200_000_000, approximate=True)  # Exact result is 4222234763
+    4217820427
+
     """
-    if n < 0:
-        raise ValueError
-    limit = math.ceil(_nth_prime_ub(n + 1))
-    return nth(sieve(limit), n)
+    lb, ub = _nth_prime_bounds(n + 1)
+
+    if not approximate or n <= 1_000_000:
+        return nth(sieve(ceil(ub)), n)
+
+    # Search from the midpoint and return the first odd prime
+    odd = floor((lb + ub) / 2) | 1
+    return first_true(count(odd, step=2), pred=is_prime)
 
 
 def argmin(iterable, *, key=None):
