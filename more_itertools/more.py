@@ -5096,9 +5096,6 @@ def nth_prime(n, *, approximate=False):
     4217820427
 
     """
-    if n < 0:
-        raise ValueError
-
     lb, ub = _nth_prime_bounds(n + 1)
 
     if not approximate or n <= 1_000_000:
