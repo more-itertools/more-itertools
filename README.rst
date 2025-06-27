@@ -130,28 +130,32 @@ Python iterables.
 |                        | `nth_prime <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_prime>`_,                                                                           |
 |                        | `sieve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sieve>`_,                                                                                   |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Combinatorics          | `derangements <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.derangements>`_,                                                                     |
-|                        | `distinct_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_permutations>`_,                                                   |
-|                        | `distinct_combinations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_combinations>`_,                                                   |
-|                        | `circular_shifts <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.circular_shifts>`_,                                                               |
-|                        | `partitions <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.partitions>`_,                                                                         |
-|                        | `set_partitions <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.set_partitions>`_,                                                                 |
-|                        | `product_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.product_index>`_,                                                                   |
-|                        | `combination_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.combination_index>`_,                                                           |
-|                        | `permutation_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.permutation_index>`_,                                                           |
-|                        | `combination_with_replacement_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.combination_with_replacement_index>`_,                         |
+| Combinatorics          | `circular_shifts <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.circular_shifts>`_,                                                               |
+|                        | `derangements <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.derangements>`_,                                                                     |
 |                        | `gray_product  <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.gray_product>`_,                                                                    |
 |                        | `outer_product  <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.outer_product>`_,                                                                  |
+|                        | `partitions <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.partitions>`_,                                                                         |
+|                        | `set_partitions <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.set_partitions>`_,                                                                 |
 |                        | `powerset <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.powerset>`_,                                                                             |
-|                        | `powerset_of_sets <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.powerset_of_sets>`_,                                                             |
-|                        | `random_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_product>`_,                                                                 |
-|                        | `random_permutation <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_permutation>`_,                                                         |
+|                        | `powerset_of_sets <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.powerset_of_sets>`_                                                              |
+|                        +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                        | `distinct_combinations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_combinations>`_,                                                   |
+|                        | `distinct_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_permutations>`_                                                    |
+|                        +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                        | `combination_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.combination_index>`_,                                                           |
+|                        | `combination_with_replacement_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.combination_with_replacement_index>`_,                         |
+|                        | `permutation_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.permutation_index>`_,                                                           |
+|                        | `product_index <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.product_index>`_                                                                    |
+|                        +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                        | `nth_combination <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_combination>`_,                                                               |
+|                        | `nth_combination_with_replacement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_combination_with_replacement>`_,                             |
+|                        | `nth_permutation <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_permutation>`_,                                                               |
+|                        | `nth_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_product>`_                                                                        |
+|                        +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 |                        | `random_combination <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_combination>`_,                                                         |
 |                        | `random_combination_with_replacement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_combination_with_replacement>`_,                       |
-|                        | `nth_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_product>`_,                                                                       |
-|                        | `nth_permutation <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_permutation>`_,                                                               |
-|                        | `nth_combination <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_combination>`_,                                                               |
-|                        | `nth_combination_with_replacement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_combination_with_replacement>`_                              |
+|                        | `random_permutation <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_permutation>`_,                                                         |
+|                        | `random_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_product>`_                                                                  |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Wrapping               | `always_iterable <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.always_iterable>`_,                                                               |
 |                        | `always_reversible <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.always_reversible>`_,                                                           |
