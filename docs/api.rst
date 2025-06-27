@@ -223,6 +223,7 @@ These tools yield combinatorial arrangements of items from iterables.
 
 **New itertools**
 
+.. autofunction:: derangements
 .. autofunction:: distinct_permutations
 .. autofunction:: distinct_combinations
 .. autofunction:: nth_combination_with_replacement

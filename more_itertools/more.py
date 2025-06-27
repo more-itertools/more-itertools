@@ -850,7 +850,9 @@ def derangements(iterable, r=None):
     """Yield successive derangements of the elements in *iterable*.
 
     A derangement is a permutation in which no element appears at its original
-    index. Suppose Alice, Bob, Carol, and Dave are playing Secret Santa.
+    index. In other words, a derangement is a permutation that has no fixed points.
+
+    Suppose Alice, Bob, Carol, and Dave are playing Secret Santa.
     The code below outputs all of the different ways to assign gift recipients
     such that nobody is assigned to himself or herself:
 
@@ -876,6 +878,10 @@ def derangements(iterable, r=None):
     Elements are treated as unique based on their position, not on their value.
     If the input elements are unique, there will be no repeated values within a
     permutation.
+
+    The number of derangements of a set of size *n* is known as the
+    "subfactorial of n".  For n > 0, the subfactorial is:
+    ``round(math.factorial(n) / math.e)``.
     """
     xs = tuple(zip(iterable))
     for ys in permutations(xs, r=r):
