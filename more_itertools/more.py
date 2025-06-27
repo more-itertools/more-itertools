@@ -2653,9 +2653,14 @@ def _islice_helper(it, s):
             cache = deque(islice(it, -stop), maxlen=-stop)
 
             for index, item in enumerate(it):
-                cached_item = cache.popleft()
                 if index % step == 0:
-                    yield cached_item
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.popleft()
+                else:
+                    # just pop and discard the item
+                    cache.popleft()
                 cache.append(item)
         else:
             # When both start and stop are positive we have the normal case
