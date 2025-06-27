@@ -130,7 +130,8 @@ Python iterables.
 |                        | `nth_prime <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_prime>`_,                                                                           |
 |                        | `sieve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sieve>`_,                                                                                   |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Combinatorics          | `distinct_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_permutations>`_,                                                   |
+| Combinatorics          | `derangements <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.derangements>`_,                                                                     |
+|                        | `distinct_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_permutations>`_,                                                   |
 |                        | `distinct_combinations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distinct_combinations>`_,                                                   |
 |                        | `circular_shifts <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.circular_shifts>`_,                                                               |
 |                        | `partitions <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.partitions>`_,                                                                         |
