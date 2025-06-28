@@ -2680,16 +2680,14 @@ def _islice_helper(it, s):
             cache = deque(enumerate(it, 1), maxlen=n)
             len_iter = cache[-1][0] if cache else 0
 
-            # If start and stop are both negative they are comparable and
-            # we can just slice. Otherwise we can adjust start to be negative
-            # and then slice.
+            # compute how many elements are out of bound
             if start < 0:
-                i = start
+                after_start_elements = min(-start - 1, len(cache))
             else:
-                i = min(start - len_iter, -1)
+                after_start_elements = min(len_iter - (start + 1), len(cache))
 
-            # Advance to the start position
-            for _ in range(min(-i - 1, len(cache))):
+            # Remove any element after start index, they are out of bound
+            for _ in range(after_start_elements):
                 cache.pop()
 
             for index in range(len(cache)):
@@ -2710,12 +2708,13 @@ def _islice_helper(it, s):
             if start < 0:
                 cache = deque(it)
 
-                # Advance to the start position
-                for _ in range(min(-start - 1, len(cache))):
+                # Remove any element after start index, they are out of bound
+                after_start_elements = min(-start - 1, len(cache))
+                for _ in range(after_start_elements):
                     cache.pop()
             else:
-                # stop is None and start is positive, so we just need items up to
-                # the start index.
+                # stop is None and start is positive, so we just need items
+                # up to the start index.
                 if stop is None:
                     n = start + 1
                 # Both stop and start are positive, so they are comparable.
