@@ -2680,42 +2680,60 @@ def _islice_helper(it, s):
             cache = deque(enumerate(it, 1), maxlen=n)
             len_iter = cache[-1][0] if cache else 0
 
-            # If start and stop are both negative they are comparable and
-            # we can just slice. Otherwise we can adjust start to be negative
-            # and then slice.
+            # compute how many elements are out of bound
             if start < 0:
-                i, j = start, stop
+                after_start_elements = min(-start - 1, len(cache))
             else:
-                i, j = min(start - len_iter, -1), None
+                after_start_elements = min(len_iter - (start + 1), len(cache))
 
-            for index, item in list(cache)[i:j:step]:
-                yield item
+            # Remove any element after start index, they are out of bound
+            for _ in range(after_start_elements):
+                cache.pop()
+
+            for index in range(len(cache)):
+                if index % step == 0:
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.pop()[1]
+                else:
+                    # just pop and discard the item
+                    cache.pop()
         else:
             # Advance to the stop position
             if stop is not None:
                 m = stop + 1
                 next(islice(it, m, m), None)
 
-            # stop is positive, so if start is negative they are not comparable
-            # and we need the rest of the items.
             if start < 0:
-                i = start
-                n = None
-            # stop is None and start is positive, so we just need items up to
-            # the start index.
-            elif stop is None:
-                i = None
-                n = start + 1
-            # Both stop and start are positive, so they are comparable.
+                cache = deque(it)
+
+                # Remove any element after start index, they are out of bound
+                after_start_elements = min(-start - 1, len(cache))
+                for _ in range(after_start_elements):
+                    cache.pop()
             else:
-                i = None
-                n = start - stop
-                if n <= 0:
-                    return
+                # stop is None and start is positive, so we just need items
+                # up to the start index.
+                if stop is None:
+                    n = start + 1
+                # Both stop and start are positive, so they are comparable.
+                else:
+                    n = start - stop
+                    if n <= 0:
+                        return
 
-            cache = list(islice(it, n))
+                cache = deque(islice(it, n))
 
-            yield from cache[i::step]
+            for index in range(len(cache)):
+                if index % step == 0:
+                    # pop and yield the item.
+                    # We don't want to use an intermediate variable
+                    # it would extend the lifetime of the current item
+                    yield cache.pop()
+                else:
+                    # just pop and discard the item
+                    cache.pop()
 
 
 def always_reversible(iterable):
