@@ -882,12 +882,28 @@ def derangements(iterable, r=None):
     The number of derangements of a set of size *n* is known as the
     "subfactorial of n".  For n > 0, the subfactorial is:
     ``round(math.factorial(n) / math.e)``.
+
+    References:
+
+    * Article:  https://www.numberanalytics.com/blog/ultimate-guide-to-derangements-in-combinatorics
+    * Sizes:    https://oeis.org/A000166
+
     """
-    xs = tuple(zip(iterable))
-    for ys in permutations(xs, r=r):
-        if any(map(operator_is, xs, ys)):
-            continue
-        yield tuple(y[0] for y in ys)
+    xs = tuple(iterable)
+
+    if all_unique(xs, key=id):
+        # Fast path for the common case without identical elements
+        for ys in permutations(xs, r=r):
+            if not any(map(operator_is, xs, ys)):
+                yield ys
+
+    else:
+        # Slow path with identical elements.
+        xs = tuple(zip(xs))
+        unpack = itemgetter(0)
+        for ys in permutations(xs, r=r):
+            if not any(map(operator_is, xs, ys)):
+                yield tuple(map(unpack, ys))
 
 
 def intersperse(e, iterable, n=1):
