@@ -4702,8 +4702,8 @@ def classify_unique(iterable, key=None):
 
 
 def minmax(iterable_or_value, *others, key=None, default=_marker):
-    """Returns both the smallest and largest items in an iterable
-    or the largest of two or more arguments.
+    """Returns both the smallest and largest items from an iterable
+    or from two or more arguments.
 
         >>> minmax([3, 1, 5])
         (1, 5)
