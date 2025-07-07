@@ -27,9 +27,16 @@ from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
 from math import ceil
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
-from operator import is_ as operator_is, attrgetter, itemgetter
-from operator import neg, mul, sub, gt, lt
-from operator import is_not, itemgetter, mul, sub, gt, lt
+from operator import (
+    attrgetter,
+    is_not,
+    itemgetter,
+    lt,
+    mul,
+    neg,
+    sub,
+    gt,
+)
 from sys import hexversion, maxsize
 from time import monotonic
 
