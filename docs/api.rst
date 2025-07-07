@@ -234,6 +234,7 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: combination_index
 .. autofunction:: permutation_index
 .. autofunction:: combination_with_replacement_index
+.. autofunction:: derangements
 .. autofunction:: gray_product
 .. autofunction:: outer_product
 .. autofunction:: powerset_of_sets

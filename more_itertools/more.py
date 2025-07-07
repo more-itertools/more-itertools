@@ -29,6 +29,7 @@ from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import is_ as operator_is, attrgetter, itemgetter
 from operator import neg, mul, sub, gt, lt
+from operator import is_not, itemgetter, mul, sub, gt, lt
 from sys import hexversion, maxsize
 from time import monotonic
 
@@ -882,12 +883,17 @@ def derangements(iterable, r=None):
     The number of derangements of a set of size *n* is known as the
     "subfactorial of n".  For n > 0, the subfactorial is:
     ``round(math.factorial(n) / math.e)``.
+    References:
+
+    * Article:  https://www.numberanalytics.com/blog/ultimate-guide-to-derangements-in-combinatorics
+    * Sizes:    https://oeis.org/A000166
     """
-    xs = tuple(zip(iterable))
-    for ys in permutations(xs, r=r):
-        if any(map(operator_is, xs, ys)):
-            continue
-        yield tuple(y[0] for y in ys)
+    xs = tuple(iterable)
+    ys = tuple(range(len(xs)))
+    return compress(
+        permutations(xs, r=r),
+        map(all, map(map, repeat(is_not), repeat(ys), permutations(ys, r=r))),
+    )
 
 
 def intersperse(e, iterable, n=1):
