@@ -180,6 +180,16 @@ class LastTests(TestCase):
                 with self.assertRaises(ValueError):
                     mi.last(iterable)
 
+    def test_reversed_is_none(self):
+        # See https://github.com/more-itertools/more-itertools/issues/1001
+        class ReversedIsNone:
+            __reversed__ = None
+
+            def __iter__(self):
+                return iter([1])
+
+        self.assertEqual(mi.last(ReversedIsNone()), 1)
+
 
 class NthOrLastTests(TestCase):
     """Tests for ``nth_or_last()``"""

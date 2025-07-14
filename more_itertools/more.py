@@ -283,7 +283,7 @@ def last(iterable, default=_marker):
         if isinstance(iterable, Sequence):
             return iterable[-1]
         # Work around https://bugs.python.org/issue38525
-        if hasattr(iterable, '__reversed__'):
+        if getattr(iterable, '__reversed__', None):
             return next(reversed(iterable))
         return deque(iterable, maxlen=1)[-1]
     except (IndexError, TypeError, StopIteration):
