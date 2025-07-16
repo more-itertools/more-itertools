@@ -993,10 +993,9 @@ if hexversion >= 0x30D00A2:  # pragma: no cover
     def batched(iterable, n, *, strict=False):
         return itertools_batched(iterable, n, strict=strict)
 
+    batched.__doc__ = _batched.__doc__
 else:
     batched = _batched
-
-    batched.__doc__ = _batched.__doc__
 
 
 def transpose(it):

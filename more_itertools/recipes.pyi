@@ -168,9 +168,12 @@ def iter_index(
     stop: int | None = ...,
 ) -> Iterator[int]: ...
 def sieve(n: int) -> Iterator[int]: ...
-def batched(
+def _batched(
     iterable: Iterable[_T], n: int, *, strict: bool = False
 ) -> Iterator[tuple[_T, ...]]: ...
+
+batched = _batched
+
 def transpose(
     it: Iterable[Iterable[_T]],
 ) -> Iterator[tuple[_T, ...]]: ...
