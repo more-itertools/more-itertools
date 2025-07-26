@@ -5137,6 +5137,8 @@ def nth_prime(n, *, approximate=False):
     >>> nth_prime(200_000_000, approximate=True)  # Exact result is 4222234763
     4217820427
 
+    In the future, more accurate approximations may be returned.
+
     """
     lb, ub = _nth_prime_bounds(n + 1)
 
