@@ -5104,8 +5104,8 @@ def doublestarmap(func, iterable):
 
 
 def _nth_prime_bounds(n):
-    """Bounds for the nth prime (counting from 1): lb <= p_n <= ub."""
-    # At and above 688,383, the lb/ub spread is under 0.003 * n.
+    """Bounds for the nth prime (counting from 1): lb < p_n < ub."""
+    # At and above 688,383, the lb/ub spread is under 0.003 * p_n.
 
     if n < 1:
         raise ValueError
@@ -5136,6 +5136,8 @@ def nth_prime(n, *, approximate=False):
 
     >>> nth_prime(200_000_000, approximate=True)  # Exact result is 4222234763
     4217820427
+
+    In the future, more accurate approximations may be returned.
 
     """
     lb, ub = _nth_prime_bounds(n + 1)
