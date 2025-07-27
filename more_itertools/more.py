@@ -3888,19 +3888,19 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
     Notes on reproducibility:
 
     * The algorithms rely on inexact floating-point functions provided
-    by the underlying math library (e.g. ``log``, ``log1p``, and ``pow``).
-    Those functions can produce slightly different results on different
-    builds.  Accordingly, selections can vary across builds even for the
-    same seed.
+      by the underlying math library (e.g. ``log``, ``log1p``, and ``pow``).
+      Those functions can produce slightly different results on different
+      builds.  Accordingly, selections can vary across builds even for the
+      same seed.
 
     * The algorithms loop over the input and make selections based on
-    ordinal position, so selections from unordered collections (such as
-    sets) won't reproduce across sessions on the same platform using the
-    same seed.  For example, this won't reproduce::
+      ordinal position, so selections from unordered collections (such as
+      sets) won't reproduce across sessions on the same platform using the
+      same seed.  For example, this won't reproduce:
 
-    >> seed(8675309)
-    >> sample(set('abcdefghijklmnopqrstuvwxyz'), 10)
-    ['c', 'p', 'e', 'w', 's', 'a', 'j', 'd', 'n', 't']
+          >> seed(8675309)
+          >> sample(set('abcdefghijklmnopqrstuvwxyz'), 10)
+          ['c', 'p', 'e', 'w', 's', 'a', 'j', 'd', 'n', 't']
 
     """
     iterator = iter(iterable)
