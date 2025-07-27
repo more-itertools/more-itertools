@@ -3845,8 +3845,12 @@ def _sample_counted(population, k, counts, strict):
 
 def sample(iterable, k, weights=None, *, counts=None, strict=False):
     """Return a *k*-length list of elements chosen (without replacement)
-    from the *iterable*. Similar to :func:`random.sample`, but works on
-    iterables of unknown length.
+
+    from the *iterable*.
+
+    Similar to :func:`random.sample`, but works on inputs that aren't
+    indexable (such as sets and dictionaries) and on inputs where the
+    size isn't known in advance (such as generators).
 
     >>> iterable = range(100)
     >>> sample(iterable, 5)  # doctest: +SKIP
@@ -3879,7 +3883,25 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
 
     By default, the `Algorithm L <https://w.wiki/ANrM>`__ reservoir sampling
     technique is used. When *weights* are provided,
-    `Algorithm A-ExpJ <https://w.wiki/ANrS>`__ is used.
+    `Algorithm A-ExpJ <https://w.wiki/ANrS>`__ is used instead.
+
+    Notes on reproducibility:
+
+    * The algorithms rely on inexact floating-point functions provided
+    by the underlying math library (e.g. ``log``, ``log1p``, and ``pow``).
+    Those functions can produce slightly different results on different
+    builds.  Accordingly, selections can vary across builds even for the
+    same seed.
+
+    * The algorithms loop over the input and make selections based on
+    ordinal position, so selections from unordered collections (such as
+    sets) won't reproduce across sessions on the same platform using the
+    same seed.  For example, this won't reproduce::
+
+    >> seed(8675309)
+    >> sample(set('abcdefghijklmnopqrstuvwxyz'), 10)
+    ['c', 'p', 'e', 'w', 's', 'a', 'j', 'd', 'n', 't']
+
     """
     iterator = iter(iterable)
 
