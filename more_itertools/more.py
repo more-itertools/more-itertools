@@ -3896,7 +3896,7 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
     * The algorithms loop over the input and make selections based on
       ordinal position, so selections from unordered collections (such as
       sets) won't reproduce across sessions on the same platform using the
-      same seed.  For example, this won't reproduce:
+      same seed.  For example, this won't reproduce::
 
           >> seed(8675309)
           >> sample(set('abcdefghijklmnopqrstuvwxyz'), 10)
