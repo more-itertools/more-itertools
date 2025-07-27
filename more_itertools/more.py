@@ -3889,9 +3889,10 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
 
     * The algorithms rely on inexact floating-point functions provided
       by the underlying math library (e.g. ``log``, ``log1p``, and ``pow``).
-      Those functions can produce slightly different results on different
-      builds.  Accordingly, selections can vary across builds even for the
-      same seed.
+      Those functions can `produce slightly different results
+      <https://members.loria.fr/PZimmermann/papers/accuracy.pdf>`_ on
+      different builds.  Accordingly, selections can vary across builds
+      even for the same seed.
 
     * The algorithms loop over the input and make selections based on
       ordinal position, so selections from unordered collections (such as
