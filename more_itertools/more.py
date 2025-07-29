@@ -890,6 +890,7 @@ def derangements(iterable, r=None):
     The number of derangements of a set of size *n* is known as the
     "subfactorial of n".  For n > 0, the subfactorial is:
     ``round(math.factorial(n) / math.e)``.
+
     References:
 
     * Article:  https://www.numberanalytics.com/blog/ultimate-guide-to-derangements-in-combinatorics
@@ -3845,7 +3846,6 @@ def _sample_counted(population, k, counts, strict):
 
 def sample(iterable, k, weights=None, *, counts=None, strict=False):
     """Return a *k*-length list of elements chosen (without replacement)
-
     from the *iterable*.
 
     Similar to :func:`random.sample`, but works on inputs that aren't
