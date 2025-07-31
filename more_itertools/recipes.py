@@ -14,6 +14,7 @@ from collections import deque
 from contextlib import suppress
 from collections.abc import Sized
 from functools import lru_cache, partial
+from heapq import heappush, heappushpop
 from itertools import (
     accumulate,
     chain,
@@ -72,6 +73,7 @@ __all__ = [
     'random_product',
     'repeatfunc',
     'roundrobin',
+    'running_median',
     'sieve',
     'sliding_window',
     'subslices',
@@ -104,6 +106,15 @@ try:
     from math import sumprod as _sumprod
 except ImportError:
     _sumprod = lambda x, y: dotproduct(x, y)
+
+
+# heapq max-heap functions are available for Python 3.14+
+try:
+    from heapq import heappush_max, heappushpop_max
+
+    _max_heap_available = True
+except ImportError:
+    _max_heap_available = False
 
 
 def take(n, iterable):
@@ -896,9 +907,11 @@ def polynomial_from_roots(roots):
 
     Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
+
     # This recipe differs from the one in itertools docs in that it
     # applies list() after each call to convolve().  This avoids
     # hitting stack limits with nested generators.
+
     poly = [1]
     for root in roots:
         poly = list(convolve(poly, (1, -root)))
@@ -1049,7 +1062,7 @@ def _factor_pollard(n):
             d = gcd(x - y, n)
         if d != n:
             return d
-    raise ValueError('prime or under 5')
+    raise ValueError('prime or under 5')  # pragma: no cover
 
 
 _primes_below_211 = tuple(sieve(211))
@@ -1317,3 +1330,59 @@ def multinomial(*counts):
 
     """
     return prod(map(comb, accumulate(counts), counts))
+
+
+def running_median(iterable):  # pragma: no cover
+    """Yields the cumulative median of values seen so far.
+
+    For example:
+
+    >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0]))
+    [5.0, 7.0, 5.0, 7.0, 8.0, 8.5]
+
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
+
+    On versions of Python prior to 3.14, max-heaps are simulated with
+    negative values. The negation causes Decimal inputs to apply context
+    rounding, making the results slightly different than that obtained
+    by statistics.median().
+    """
+
+    # This recipe differs from the one in the heapq docs in that
+    # eliminates the len() tests in favor of two updates per loop,
+    # one for the even case and the other for the case where
+    # the lo max-heap has one more element than the hi min-heap.
+
+    read = iter(iterable).__next__
+    lo = []  # max-heap
+    hi = []  # min-heap (same size as or one smaller than lo)
+
+    with suppress(StopIteration):
+        while True:
+            heappush_max(lo, heappushpop(hi, read()))
+            yield lo[0]
+
+            heappush(hi, heappushpop_max(lo, read()))
+            yield (lo[0] + hi[0]) / 2
+
+
+def _running_median_minheap_only(iterable):  # pragma: no cover
+    # Backport of running_median() for Python 3.13 and prior.
+
+    read = iter(iterable).__next__
+    lo = []  # max-heap (actually a minheap with negated values)
+    hi = []  # min-heap (same size as or one smaller than lo)
+
+    with suppress(StopIteration):
+        while True:
+            heappush(lo, -heappushpop(hi, read()))
+            yield -lo[0]
+
+            heappush(hi, -heappushpop(lo, -read()))
+            yield (hi[0] - lo[0]) / 2
+
+
+if not _max_heap_available:
+    _running_median_minheap_only.__doc__ = running_median.__doc__
+    running_median = _running_median_minheap_only

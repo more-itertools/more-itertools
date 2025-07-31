@@ -295,6 +295,7 @@ These tools work with most numeric data types.
 .. autofunction:: polynomial_from_roots
 .. autofunction:: polynomial_derivative
 .. autofunction:: polynomial_eval
+.. autofunction:: running_median
 .. autofunction:: sum_of_squares
 
 

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator, Sequence
+from decimal import Decimal
+from fractions import Fraction
 from typing import (
     Any,
     Callable,
@@ -47,6 +49,7 @@ __all__ = [
     'random_product',
     'repeatfunc',
     'roundrobin',
+    'running_median',
     'sieve',
     'sliding_window',
     'subslices',
@@ -67,6 +70,7 @@ _T = TypeVar('_T')
 _T1 = TypeVar('_T1')
 _T2 = TypeVar('_T2')
 _U = TypeVar('_U')
+_NumberT = TypeVar("_NumberT", float, Decimal, Fraction)
 
 def take(n: int, iterable: Iterable[_T]) -> list[_T]: ...
 def tabulate(
@@ -193,3 +197,4 @@ def _strong_probable_prime(n: int, base: int) -> bool: ...
 def is_prime(n: int) -> bool: ...
 def loops(n: int) -> Iterator[None]: ...
 def multinomial(*counts: int) -> int: ...
+def running_median(iterable: Iterable[_NumberT]) -> Iterator[_NumberT]: ...
