@@ -1451,7 +1451,7 @@ class RunningMedianTests(TestCase):
             # Apply unary plus to force context rounding.
             [+Decimal(random.uniform(-500, 500)) for _ in range(500)],
             [
-                Fraction(random.randrange(-500, 500), random.randrange(1_000))
+                Fraction(random.randrange(-500, 500), random.randrange(1, 500))
                 for _ in range(500)
             ],
         ]:
@@ -1463,13 +1463,37 @@ class RunningMedianTests(TestCase):
 
         self.assertEqual(list(running_median([])), [])  # Empty input
 
+    def test_vs_statistics_median_windowed(self):
+        running_median = mi.running_median
+        size = 10
+
+        for data in [
+            random.choices(range(-500, 500), k=500),
+            # Apply unary plus to force context rounding.
+            [+Decimal(random.uniform(-500, 500)) for _ in range(500)],
+            [
+                Fraction(random.randrange(-500, 500), random.randrange(1, 500))
+                for _ in range(500)
+            ],
+        ]:
+            with self.subTest(data=data):
+                iterator = running_median(iter(data), window=size)
+                for k, rm in enumerate(iterator, start=1):
+                    expected = statistics.median(data[max(0, k - size) : k])
+                    self.assertEqual(rm, expected)
+                    self.assertEqual(type(rm), type(expected))
+
+        self.assertEqual(list(running_median([])), [])  # Empty input
+
     def test_error_cases(self):
         running_median = mi.running_median
         with self.assertRaises(TypeError):
-            list(running_median(1234))  # No iterable input
+            running_median(1234)  # Non-iterable input
+        with self.assertRaises(TypeError):
+            running_median([], window='abc')  # Wrong type for window size
         with self.assertRaises(TypeError):
             list(running_median([3 + 4j, 5 - 7j]))  # Unorderable input type
         with self.assertRaises(TypeError):
             list(
                 running_median(['abc', 'def', 'ghi'])
-            )  # Type that doesn't support division
+            )  # Input type that doesn't support division

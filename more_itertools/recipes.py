@@ -10,6 +10,7 @@ Some backward-compatible usability improvements have been made.
 
 import random
 
+from bisect import bisect_left, insort_left
 from collections import deque
 from contextlib import suppress
 from collections.abc import Sized
@@ -32,7 +33,7 @@ from itertools import (
     zip_longest,
 )
 from math import prod, comb, isqrt, gcd
-from operator import mul, not_, itemgetter, getitem
+from operator import mul, not_, itemgetter, getitem, index
 from random import randrange, sample, choice
 from sys import hexversion
 
@@ -1332,29 +1333,10 @@ def multinomial(*counts):
     return prod(map(comb, accumulate(counts), counts))
 
 
-def running_median(iterable):  # pragma: no cover
-    """Yields the cumulative median of values seen so far.
+def _running_median_minheap_and_maxheap(iterator):  # pragma: no cover
+    "Non-windowed running_median() for Python 3.14+"
 
-    For example:
-
-    >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0]))
-    [5.0, 7.0, 5.0, 7.0, 8.0, 8.5]
-
-    Supports numeric types such as int, float, Decimal, and Fraction,
-    but not complex numbers which are unorderable.
-
-    On versions of Python prior to 3.14, max-heaps are simulated with
-    negative values. The negation causes Decimal inputs to apply context
-    rounding, making the results slightly different than that obtained
-    by statistics.median().
-    """
-
-    # This recipe differs from the one in the heapq docs in that
-    # eliminates the len() tests in favor of two updates per loop,
-    # one for the even case and the other for the case where
-    # the lo max-heap has one more element than the hi min-heap.
-
-    read = iter(iterable).__next__
+    read = iterator.__next__
     lo = []  # max-heap
     hi = []  # min-heap (same size as or one smaller than lo)
 
@@ -1367,10 +1349,10 @@ def running_median(iterable):  # pragma: no cover
             yield (lo[0] + hi[0]) / 2
 
 
-def _running_median_minheap_only(iterable):  # pragma: no cover
-    # Backport of running_median() for Python 3.13 and prior.
+def _running_median_minheap_only(iterator):  # pragma: no cover
+    "Backport of non-windowed running_median() for Python 3.13 and prior."
 
-    read = iter(iterable).__next__
+    read = iterator.__next__
     lo = []  # max-heap (actually a minheap with negated values)
     hi = []  # min-heap (same size as or one smaller than lo)
 
@@ -1383,6 +1365,72 @@ def _running_median_minheap_only(iterable):  # pragma: no cover
             yield (hi[0] - lo[0]) / 2
 
 
-if not _max_heap_available:
-    _running_median_minheap_only.__doc__ = running_median.__doc__
-    running_median = _running_median_minheap_only
+def _sorted_window(iterator, k):  # pragma: no cover
+    "Yield windows in sorted order"
+
+    # This simple implementation is reasonably fast with two O(1) deque
+    # updates and two O(log k) data comparisons per iteration.  However,
+    # it also has two O(k) steps, a list insertion and a list deletion.
+
+    # Grant Jenks' work on SortedCollections showed that those two steps
+    # have a very low constant factor because they are implemented with
+    # highly optimized C memmoves that shift the data pointers without
+    # needing to touch the underlying data with reference counts.
+
+    # This function could be reimplemented with SortedCollections, blist
+    # some other binary tree, or an IndexableSkipList all of which have
+    # O(k) insertions and deletions, albiet with a larger constant
+    # factor. For very large window sizes, this might matter.
+
+    history = deque()
+    window = []
+    for x in iterator:
+        history.append(x)
+        insort_left(window, x)
+        if len(window) > k:
+            i = bisect_left(window, history.popleft())
+            del window[i]
+        yield window
+
+
+def _running_median_windowed(iterable, window):
+    "Yield median of values in a sliding window."
+
+    for data in _sorted_window(iterable, k=window):
+        n = len(data)
+        if n % 2 == 1:
+            yield data[n // 2]
+        else:
+            i = n // 2
+            yield (data[i - 1] + data[i]) / 2
+
+
+def running_median(iterable, *, window=None):  # pragma: no cover
+    """Cumulative median of values seen so far or values in a sliding window.
+
+    For example:
+
+        >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0]))
+        [5.0, 7.0, 5.0, 7.0, 8.0, 8.5]
+        >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0], window=3))
+        [5.0, 7.0, 5.0, 9.0, 8.0, 9.0]
+
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
+
+    On version Python 3.13 and prior, max-heaps are simulated with
+    negative values. The negation causes Decimal inputs to apply context
+    rounding, making the results slightly different than that obtained
+    by statistics.median().
+    """
+
+    iterator = iter(iterable)
+
+    if window is not None:
+        window = index(window)
+        return _running_median_windowed(iterator, window)
+
+    if not _max_heap_available:
+        return _running_median_minheap_only(iterator)
+
+    return _running_median_minheap_and_maxheap(iterator)
