@@ -1365,12 +1365,12 @@ def _running_median_minheap_only(iterator):  # pragma: no cover
             yield (hi[0] - lo[0]) / 2
 
 
-def _sorted_window(iterator, k):  # pragma: no cover
+def _sorted_window(iterator, maxlen):  # pragma: no cover
     "Yield windows in sorted order"
 
     # This simple implementation is reasonably fast with two O(1) deque
-    # updates and two O(log k) data comparisons per iteration.  However,
-    # it also has two O(k) steps, a list insertion and a list deletion.
+    # updates and two O(log n) data comparisons per iteration.  However,
+    # it also has two O(n) steps, a list insertion and a list deletion.
 
     # Grant Jenks' work on SortedCollections showed that those two steps
     # have a very low constant factor because they are implemented with
@@ -1379,7 +1379,7 @@ def _sorted_window(iterator, k):  # pragma: no cover
 
     # This function could be reimplemented with SortedCollections, blist
     # some other binary tree, or an IndexableSkipList all of which have
-    # O(k) insertions and deletions, albeit with a larger constant
+    # O(n) insertions and deletions, albeit with a larger constant
     # factor. For very large window sizes, this might matter.
 
     history = deque()
@@ -1387,16 +1387,16 @@ def _sorted_window(iterator, k):  # pragma: no cover
     for x in iterator:
         history.append(x)
         insort(window, x)
-        if len(window) > k:
+        if len(window) > maxlen:
             i = bisect_left(window, history.popleft())
             del window[i]
         yield window
 
 
-def _running_median_windowed(iterator, k):
+def _running_median_windowed(iterator, maxlen):
     "Yield median of values in a sliding window."
 
-    for data in _sorted_window(iterator, k):
+    for data in _sorted_window(iterator, maxlen):
         n = len(data)
         if n % 2 == 1:
             yield data[n // 2]
