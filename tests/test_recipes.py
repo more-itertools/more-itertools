@@ -1477,20 +1477,22 @@ class RunningMedianTests(TestCase):
             ],
         ]:
             with self.subTest(data=data):
-                iterator = running_median(iter(data), window=size)
+                iterator = running_median(iter(data), maxlen=size)
                 for k, rm in enumerate(iterator, start=1):
                     expected = statistics.median(data[max(0, k - size) : k])
                     self.assertEqual(rm, expected)
                     self.assertEqual(type(rm), type(expected))
 
-        self.assertEqual(list(running_median([])), [])  # Empty input
+        self.assertEqual(list(running_median([], maxlen=1)), [])  # Empty input
 
     def test_error_cases(self):
         running_median = mi.running_median
         with self.assertRaises(TypeError):
             running_median(1234)  # Non-iterable input
         with self.assertRaises(TypeError):
-            running_median([], window='abc')  # Wrong type for window size
+            running_median([], maxlen='abc')  # Wrong type for window size
+        with self.assertRaises(ValueError):
+            running_median([], maxlen=0)  # Invalid window size
         with self.assertRaises(TypeError):
             list(running_median([3 + 4j, 5 - 7j]))  # Unorderable input type
         with self.assertRaises(TypeError):

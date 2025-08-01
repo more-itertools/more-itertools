@@ -10,7 +10,7 @@ Some backward-compatible usability improvements have been made.
 
 import random
 
-from bisect import bisect_left, insort_left
+from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
 from collections.abc import Sized
@@ -1379,24 +1379,24 @@ def _sorted_window(iterator, k):  # pragma: no cover
 
     # This function could be reimplemented with SortedCollections, blist
     # some other binary tree, or an IndexableSkipList all of which have
-    # O(k) insertions and deletions, albiet with a larger constant
+    # O(k) insertions and deletions, albeit with a larger constant
     # factor. For very large window sizes, this might matter.
 
     history = deque()
     window = []
     for x in iterator:
         history.append(x)
-        insort_left(window, x)
+        insort(window, x)
         if len(window) > k:
             i = bisect_left(window, history.popleft())
             del window[i]
         yield window
 
 
-def _running_median_windowed(iterable, window):
+def _running_median_windowed(iterator, k):
     "Yield median of values in a sliding window."
 
-    for data in _sorted_window(iterable, k=window):
+    for data in _sorted_window(iterator, k):
         n = len(data)
         if n % 2 == 1:
             yield data[n // 2]
@@ -1405,14 +1405,18 @@ def _running_median_windowed(iterable, window):
             yield (data[i - 1] + data[i]) / 2
 
 
-def running_median(iterable, *, window=None):  # pragma: no cover
+def running_median(iterable, *, maxlen=None):  # pragma: no cover
     """Cumulative median of values seen so far or values in a sliding window.
+
+    Set *maxlen* to a positive integer to specify the maximum size
+    of the sliding window.  The default of *None* is equivalent to
+    an unbounded window.
 
     For example:
 
         >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0]))
         [5.0, 7.0, 5.0, 7.0, 8.0, 8.5]
-        >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0], window=3))
+        >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0], maxlen=3))
         [5.0, 7.0, 5.0, 9.0, 8.0, 9.0]
 
     Supports numeric types such as int, float, Decimal, and Fraction,
@@ -1426,9 +1430,11 @@ def running_median(iterable, *, window=None):  # pragma: no cover
 
     iterator = iter(iterable)
 
-    if window is not None:
-        window = index(window)
-        return _running_median_windowed(iterator, window)
+    if maxlen is not None:
+        maxlen = index(maxlen)
+        if maxlen <= 0:
+            raise ValueError('Window size should be positive')
+        return _running_median_windowed(iterator, maxlen)
 
     if not _max_heap_available:
         return _running_median_minheap_only(iterator)
