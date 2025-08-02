@@ -1379,11 +1379,8 @@ def _running_median_windowed(iterator, maxlen):
             del ordered[i]
 
         n = len(ordered)
-        if n % 2 == 1:
-            yield ordered[n // 2]
-        else:
-            i = n // 2
-            yield (ordered[i - 1] + ordered[i]) / 2
+        m = n // 2
+        yield ordered[m] if n & 1 else (ordered[m - 1] + ordered[m]) / 2
 
 
 def running_median(iterable, *, maxlen=None):
