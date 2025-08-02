@@ -1485,6 +1485,17 @@ class RunningMedianTests(TestCase):
 
         self.assertEqual(list(running_median([], maxlen=1)), [])  # Empty input
 
+        # Window size of 1 should return the original dataset unchanged
+        data = random.choices(range(-500, 500), k=500)
+        self.assertEqual(list(running_median(data, maxlen=1)), data)
+
+        # A window larger than the dataset should give the same
+        # result as an unbounded running median.
+        data = random.choices(range(-500, 500), k=500)
+        self.assertEqual(
+            list(running_median(data, maxlen=600)), list(running_median(data))
+        )
+
     def test_error_cases(self):
         running_median = mi.running_median
         with self.assertRaises(TypeError):
