@@ -1365,38 +1365,24 @@ def _running_median_minheap_only(iterator):  # pragma: no cover
             yield (hi[0] - lo[0]) / 2
 
 
-def _sorted_window(iterator, maxlen):  # pragma: no cover
-    "Yield windows in sorted order"
-
-    # This simple implementation is reasonably fast with two O(1) deque
-    # updates and two O(log n) data comparisons per iteration.  However,
-    # it also has two O(n) steps, a list insertion and a list deletion.
-
-    # Those two steps have a very low constant factor because they are
-    # implemented with highly optimized C memmoves that shift the data
-    # pointers without having to access the data objects directly.
-
+def _running_median_windowed(iterator, maxlen):
+    "Yield median of values in a sliding window."
     history = deque()
     window = []
+
     for x in iterator:
-        history.append(x)
-        insort(window, x)
+        history.append(x)  # data in arrival order
+        insort(window, x)  # data in sorted order
         if len(window) > maxlen:
             i = bisect_left(window, history.popleft())
             del window[i]
-        yield window
 
-
-def _running_median_windowed(iterator, maxlen):
-    "Yield median of values in a sliding window."
-
-    for data in _sorted_window(iterator, maxlen):
-        n = len(data)
+        n = len(window)
         if n % 2 == 1:
-            yield data[n // 2]
+            yield window[n // 2]
         else:
             i = n // 2
-            yield (data[i - 1] + data[i]) / 2
+            yield (window[i - 1] + window[i]) / 2
 
 
 def running_median(iterable, *, maxlen=None):  # pragma: no cover
