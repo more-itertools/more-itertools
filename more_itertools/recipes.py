@@ -1372,15 +1372,9 @@ def _sorted_window(iterator, maxlen):  # pragma: no cover
     # updates and two O(log n) data comparisons per iteration.  However,
     # it also has two O(n) steps, a list insertion and a list deletion.
 
-    # Grant Jenks' work on SortedCollections showed that those two steps
-    # have a very low constant factor because they are implemented with
-    # highly optimized C memmoves that shift the data pointers without
-    # needing to touch the underlying data with reference counts.
-
-    # This function could be reimplemented with SortedCollections, blist
-    # some other binary tree, or an IndexableSkipList all of which have
-    # O(n) insertions and deletions, albeit with a larger constant
-    # factor. For very large window sizes, this might matter.
+    # Those two steps have a very low constant factor because they are
+    # implemented with highly optimized C memmoves that shift the data
+    # pointers without having to access the data objects directly.
 
     history = deque()
     window = []
