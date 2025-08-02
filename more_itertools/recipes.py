@@ -981,7 +981,7 @@ def sieve(n):
     yield from iter_index(data, 1, start)
 
 
-def _batched(iterable, n, *, strict=False):
+def _batched(iterable, n, *, strict=False):  # pragma: no cover
     """Batch data into tuples of length *n*. If the number of items in
     *iterable* is not divisible by *n*:
     * The last batch will be shorter if *strict* is ``False``.
@@ -1373,6 +1373,7 @@ def _running_median_windowed(iterator, maxlen):
     for x in iterator:
         history.append(x)  # data in arrival order
         insort(window, x)  # data in sorted order
+
         if len(window) > maxlen:
             i = bisect_left(window, history.popleft())
             del window[i]
@@ -1385,7 +1386,7 @@ def _running_median_windowed(iterator, maxlen):
             yield (window[i - 1] + window[i]) / 2
 
 
-def running_median(iterable, *, maxlen=None):  # pragma: no cover
+def running_median(iterable, *, maxlen=None):
     """Cumulative median of values seen so far or values in a sliding window.
 
     Set *maxlen* to a positive integer to specify the maximum size
