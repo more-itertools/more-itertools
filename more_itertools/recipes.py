@@ -1367,23 +1367,23 @@ def _running_median_minheap_only(iterator):  # pragma: no cover
 
 def _running_median_windowed(iterator, maxlen):
     "Yield median of values in a sliding window."
-    history = deque()
-    window = []
+    window = deque()
+    ordered = []
 
     for x in iterator:
-        history.append(x)  # data in arrival order
-        insort(window, x)  # data in sorted order
+        window.append(x)
+        insort(ordered, x)
 
-        if len(window) > maxlen:
-            i = bisect_left(window, history.popleft())
-            del window[i]
+        if len(ordered) > maxlen:
+            i = bisect_left(ordered, window.popleft())
+            del ordered[i]
 
-        n = len(window)
+        n = len(ordered)
         if n % 2 == 1:
-            yield window[n // 2]
+            yield ordered[n // 2]
         else:
             i = n // 2
-            yield (window[i - 1] + window[i]) / 2
+            yield (ordered[i - 1] + ordered[i]) / 2
 
 
 def running_median(iterable, *, maxlen=None):
