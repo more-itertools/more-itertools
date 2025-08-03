@@ -4,7 +4,6 @@ from doctest import DocTestSuite
 from fractions import Fraction
 from functools import reduce
 from itertools import combinations, count, groupby, permutations, islice
-from itertools import pairwise
 from operator import mul
 from math import comb, prod, factorial
 from statistics import mean
@@ -1493,7 +1492,7 @@ class RunningMedianTests(TestCase):
 
         # Window size of 2 is a moving average of pairs
         data = random.choices(range(-500, 500), k=500)
-        expected = list(map(mean, pairwise(data)))
+        expected = list(map(mean, mi.pairwise(data)))
         actual = list(islice(running_median(data, maxlen=2), 1, None))
         self.assertEqual(actual, expected)
 
