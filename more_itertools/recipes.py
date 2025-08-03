@@ -10,6 +10,7 @@ Some backward-compatible usability improvements have been made.
 
 import random
 
+from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
 from collections.abc import Sized
@@ -32,7 +33,7 @@ from itertools import (
     zip_longest,
 )
 from math import prod, comb, isqrt, gcd
-from operator import mul, not_, itemgetter, getitem
+from operator import mul, not_, itemgetter, getitem, index
 from random import randrange, sample, choice
 from sys import hexversion
 
@@ -980,7 +981,7 @@ def sieve(n):
     yield from iter_index(data, 1, start)
 
 
-def _batched(iterable, n, *, strict=False):
+def _batched(iterable, n, *, strict=False):  # pragma: no cover
     """Batch data into tuples of length *n*. If the number of items in
     *iterable* is not divisible by *n*:
     * The last batch will be shorter if *strict* is ``False``.
@@ -1332,29 +1333,10 @@ def multinomial(*counts):
     return prod(map(comb, accumulate(counts), counts))
 
 
-def running_median(iterable):  # pragma: no cover
-    """Yields the cumulative median of values seen so far.
+def _running_median_minheap_and_maxheap(iterator):  # pragma: no cover
+    "Non-windowed running_median() for Python 3.14+"
 
-    For example:
-
-    >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0]))
-    [5.0, 7.0, 5.0, 7.0, 8.0, 8.5]
-
-    Supports numeric types such as int, float, Decimal, and Fraction,
-    but not complex numbers which are unorderable.
-
-    On versions of Python prior to 3.14, max-heaps are simulated with
-    negative values. The negation causes Decimal inputs to apply context
-    rounding, making the results slightly different than that obtained
-    by statistics.median().
-    """
-
-    # This recipe differs from the one in the heapq docs in that
-    # eliminates the len() tests in favor of two updates per loop,
-    # one for the even case and the other for the case where
-    # the lo max-heap has one more element than the hi min-heap.
-
-    read = iter(iterable).__next__
+    read = iterator.__next__
     lo = []  # max-heap
     hi = []  # min-heap (same size as or one smaller than lo)
 
@@ -1367,10 +1349,10 @@ def running_median(iterable):  # pragma: no cover
             yield (lo[0] + hi[0]) / 2
 
 
-def _running_median_minheap_only(iterable):  # pragma: no cover
-    # Backport of running_median() for Python 3.13 and prior.
+def _running_median_minheap_only(iterator):  # pragma: no cover
+    "Backport of non-windowed running_median() for Python 3.13 and prior."
 
-    read = iter(iterable).__next__
+    read = iterator.__next__
     lo = []  # max-heap (actually a minheap with negated values)
     hi = []  # min-heap (same size as or one smaller than lo)
 
@@ -1383,6 +1365,57 @@ def _running_median_minheap_only(iterable):  # pragma: no cover
             yield (hi[0] - lo[0]) / 2
 
 
-if not _max_heap_available:
-    _running_median_minheap_only.__doc__ = running_median.__doc__
-    running_median = _running_median_minheap_only
+def _running_median_windowed(iterator, maxlen):
+    "Yield median of values in a sliding window."
+
+    window = deque()
+    ordered = []
+
+    for x in iterator:
+        window.append(x)
+        insort(ordered, x)
+
+        if len(ordered) > maxlen:
+            i = bisect_left(ordered, window.popleft())
+            del ordered[i]
+
+        n = len(ordered)
+        m = n // 2
+        yield ordered[m] if n & 1 else (ordered[m - 1] + ordered[m]) / 2
+
+
+def running_median(iterable, *, maxlen=None):
+    """Cumulative median of values seen so far or values in a sliding window.
+
+    Set *maxlen* to a positive integer to specify the maximum size
+    of the sliding window.  The default of *None* is equivalent to
+    an unbounded window.
+
+    For example:
+
+        >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0]))
+        [5.0, 7.0, 5.0, 7.0, 8.0, 8.5]
+        >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0], maxlen=3))
+        [5.0, 7.0, 5.0, 9.0, 8.0, 9.0]
+
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
+
+    On version Python 3.13 and prior, max-heaps are simulated with
+    negative values. The negation causes Decimal inputs to apply context
+    rounding, making the results slightly different than that obtained
+    by statistics.median().
+    """
+
+    iterator = iter(iterable)
+
+    if maxlen is not None:
+        maxlen = index(maxlen)
+        if maxlen <= 0:
+            raise ValueError('Window size should be positive')
+        return _running_median_windowed(iterator, maxlen)
+
+    if not _max_heap_available:
+        return _running_median_minheap_only(iterator)
+
+    return _running_median_minheap_and_maxheap(iterator)
