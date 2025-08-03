@@ -1501,7 +1501,7 @@ class RunningMedianTests(TestCase):
         with self.assertRaises(TypeError):
             running_median(1234)  # Non-iterable input
         with self.assertRaises(TypeError):
-            running_median([], maxlen='abc')  # Wrong type for window size
+            running_median([], maxlen=3.0)  # Non-integer type for window size
         with self.assertRaises(ValueError):
             running_median([], maxlen=0)  # Invalid window size
         with self.assertRaises(TypeError):
