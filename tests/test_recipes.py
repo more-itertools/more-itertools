@@ -3,9 +3,11 @@ from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
 from functools import reduce
-from itertools import combinations, count, groupby, permutations
+from itertools import combinations, count, groupby, permutations, islice
+from itertools import pairwise
 from operator import mul
 from math import comb, prod, factorial
+from statistics import mean
 from sys import version_info
 from unittest import TestCase, skipIf
 from unittest.mock import patch
@@ -1488,6 +1490,12 @@ class RunningMedianTests(TestCase):
         # Window size of 1 should return the original dataset unchanged
         data = random.choices(range(-500, 500), k=500)
         self.assertEqual(list(running_median(data, maxlen=1)), data)
+
+        # Window size of 2 is a moving average of pairs
+        data = random.choices(range(-500, 500), k=500)
+        expected = list(map(mean, pairwise(data)))
+        actual = list(islice(running_median(data, maxlen=2), 1, None))
+        self.assertEqual(actual, expected)
 
         # A window larger than the dataset should give the same
         # result as an unbounded running median.
