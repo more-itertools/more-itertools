@@ -1367,6 +1367,7 @@ def _running_median_minheap_only(iterator):  # pragma: no cover
 
 def _running_median_windowed(iterator, maxlen):
     "Yield median of values in a sliding window."
+
     window = deque()
     ordered = []
 
