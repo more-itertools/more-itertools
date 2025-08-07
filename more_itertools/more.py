@@ -104,6 +104,7 @@ __all__ = [
     'interleave',
     'interleave_evenly',
     'interleave_longest',
+    'interleave_randomly',
     'intersperse',
     'is_sorted',
     'islice_extended',
@@ -1314,6 +1315,26 @@ def interleave_evenly(iterables, lengths=None):
                 yield next(iters_secondary[i])
                 to_yield -= 1
                 errors[i] += delta_primary
+
+
+def interleave_randomly(*iterables):
+    """Return a new iterable randomly selecting from each iterable,
+    until all iterables are exhausted.
+
+    The relative order of the elements in each iterable is preserved,
+    but the order with respect to other iterables is randomized.
+
+        >>> iterables = [1, 2, 3], 'abc', (True, False, None)
+        >>> list(interleave_randomly(*iterables))  # doctest: +SKIP
+        ['a', 'b', 1, 'c', True, False, None, 2, 3]
+    """
+    iterators = [iter(e) for e in iterables]
+    while iterators:
+        idx = randrange(len(iterators))
+        try:
+            yield next(iterators[idx])
+        except StopIteration:
+            iterators.pop(idx)
 
 
 def collapse(iterable, base_type=None, levels=None):
