@@ -1,9 +1,0 @@
-coverage
-flit
-mypy
-ruff
-setuptools
-sphinx
-furo>=2024.8
-twine
-wheel

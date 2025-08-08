@@ -18,18 +18,18 @@ jobs:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: Install dependencies
-      run: make requirements
+      run: pip install nox
     - name: Run tests
-      run: make coverage
+      run: nox -s coverage
     - name: Static checks
       if: "matrix.python-version == '3.9'"
-      run: make check
+      run: nox -s check
     - name: Build docs with sphinx
       if: "matrix.python-version == '3.9'"
-      run: make docs
+      run: nox -s docs
     - name: Build packages
       if: "matrix.python-version == '3.9'"
-      run: make package
+      run: nox -s package
     - name: Upload packages
       if: "matrix.python-version == '3.9'"
       uses: actions/upload-artifact@v4

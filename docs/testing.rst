@@ -9,11 +9,10 @@ To run install dependencies and run tests, use this command::
 Multiple Python Versions
 ========================
 
-To run the tests on all the versions of Python more-itertools supports, install
-tox::
+To run the tests on all the versions of Python more-itertools supports, install nox::
 
-    pip install tox
+    pip install nox
 
 Then, run the tests::
 
-    tox
+    nox -s test

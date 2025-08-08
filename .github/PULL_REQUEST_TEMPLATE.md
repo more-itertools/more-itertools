@@ -9,4 +9,4 @@ more-itertools/more-itertools#XXXX
 <!-- Describe what your PR adds, fixes, or changes here -->
 
 ### Checks and tests
-<!-- Please run `make all-checks` to help make sure your branch meets the standards enforced by GitHub Actions. -->
+<!-- Please install nox and run `nox` to ensure sure your branch meets the standards enforced by GitHub Actions. -->
