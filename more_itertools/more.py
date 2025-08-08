@@ -1334,7 +1334,9 @@ def interleave_randomly(*iterables):
         try:
             yield next(iterators[idx])
         except StopIteration:
-            iterators.pop(idx)
+            # equivalent to `list.pop` but slightly faster
+            iterators[idx] = iterators[-1]
+            del iterators[-1]
 
 
 def collapse(iterable, base_type=None, levels=None):
