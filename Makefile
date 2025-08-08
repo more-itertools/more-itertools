@@ -3,8 +3,8 @@ all-checks: requirements coverage check docs package
 
 .PHONY: requirements
 requirements:
-	python3 -m pip install -r requirements/development.txt
-	python3 -m pip install --editable .
+	python -m pip install -r requirements/development.txt
+	python -m pip install --editable .
 
 .PHONY: check
 check:
@@ -23,7 +23,7 @@ coverage:
 
 .PHONY: test
 test:
-	python3 -m unittest -v ${tests}
+	python -m unittest -v ${tests}
 
 .PHONY: docs
 docs:
