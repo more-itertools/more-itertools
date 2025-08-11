@@ -452,7 +452,7 @@ def unzip(iterable: Iterable[Sequence[_T]]) -> tuple[Iterator[_T], ...]: ...
 def divide(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
 @overload
 def always_iterable(
-    obj: None, base_type: _ClassInfo | None = ...
+    obj: None, base_type: _ClassInfo | None
 ) -> Iterator[Never]: ...
 @overload
 def always_iterable(obj: bytes) -> Iterator[bytes]: ...
@@ -460,25 +460,23 @@ def always_iterable(obj: bytes) -> Iterator[bytes]: ...
 def always_iterable(obj: str) -> Iterator[str]: ...
 @overload
 def always_iterable(
-    obj: Iterable[_T],
+    obj: Iterable[_T] | _SupportsSlicing[_T],
 ) -> Iterator[_T]: ...
-@overload
-def always_iterable(obj: _T) -> Iterator[_T]: ...
 @overload
 def always_iterable(
-    obj: Iterable[_T],
-    base_type: None,
+    obj: Iterable[_T] | _SupportsSlicing[_T],
+    base_type: None | tuple[()],
 ) -> Iterator[_T]: ...
+@overload
+def always_iterable(
+    obj: Iterable[_T] | _SupportsSlicing[_T],
+    base_type: _ClassInfo,
+) -> Iterator[_T | Iterable[_T] | _SupportsSlicing[_T]]: ...
 @overload
 def always_iterable(
     obj: _T,
-    base_type: None,
+    base_type: _ClassInfo | None,
 ) -> Iterator[_T]: ...
-@overload
-def always_iterable(
-    obj: _T | Iterable[_T],
-    base_type: _ClassInfo = ...,
-) -> Iterator[_T | Iterable[_T]]: ...
 def adjacent(
     predicate: Callable[[_T], bool],
     iterable: Iterable[_T],
