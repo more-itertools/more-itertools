@@ -162,6 +162,9 @@ _T_co = TypeVar('_T_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
 _Raisable = BaseException | type[BaseException]
 
+class GetItemIIterable(Protocol[_T]):
+    def __getitem__(self, item: int) -> _T: ...
+
 # The type of isinstance's second argument (from typeshed builtins)
 if sys.version_info >= (3, 10):
     _ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
@@ -460,13 +463,13 @@ def always_iterable(obj: bytes) -> Iterator[bytes]: ...
 def always_iterable(obj: str) -> Iterator[str]: ...
 @overload
 def always_iterable(
-    obj: Iterable[_T],
+    obj: Iterable[_T] | GetItemIIterable[_T],
 ) -> Iterator[_T]: ...
 @overload
 def always_iterable(obj: _T) -> Iterator[_T]: ...
 @overload
 def always_iterable(
-    obj: Iterable[_T],
+    obj: Iterable[_T] | GetItemIIterable[_T],
     base_type: None,
 ) -> Iterator[_T]: ...
 @overload
@@ -476,7 +479,7 @@ def always_iterable(
 ) -> Iterator[_T]: ...
 @overload
 def always_iterable(
-    obj: _T | Iterable[_T],
+    obj: _T | Iterable[_T] | GetItemIIterable[_T],
     base_type: _ClassInfo = ...,
 ) -> Iterator[_T | Iterable[_T]]: ...
 def adjacent(
