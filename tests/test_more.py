@@ -36,7 +36,6 @@ from time import sleep
 from typing import Iterable, Iterator, NamedTuple
 from unittest import skipIf, TestCase
 
-import gc
 import more_itertools as mi
 
 
