@@ -5250,16 +5250,15 @@ def extract(iterable, indices):
     """
 
     iterator = iter(iterable)
-    indices = tuple(indices)
+    index_and_position = sorted(zip(indices, count()))
 
-    n = len(indices)
+    n = len(index_and_position)
+    if n and index_and_position[0][0] < 0:
+        raise ValueError('Indices must be non-negative')
+
     buffer = {}
     iterator_position = -1
     next_to_emit = 0
-    index_and_position = sorted(zip(indices, count()))
-
-    if indices and index_and_position[0][0] < 0:
-        raise ValueError('Indices must be non-negative')
 
     for index, order in index_and_position:
         advance = index - iterator_position
