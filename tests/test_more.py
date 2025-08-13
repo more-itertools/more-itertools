@@ -6369,3 +6369,8 @@ class ExtractTests(TestCase):
 
         self.assertEqual(next(iterator, 'C'))
         self.assertEqual(input_stream.peek(), 'F')
+
+        # Infinite input
+        self.assertEqual(
+            list(extract(count(), [5, 7, 3, 9, 4])), [5, 7, 3, 9, 4]
+        )
