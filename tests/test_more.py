@@ -6362,7 +6362,7 @@ class ExtractTests(TestCase):
     def lazy_consumption(self):
         extract = mi.extract
 
-        input_stream = peekable(iter('ABCDEFGHIJKLM'))
+        input_stream = mi.peekable(iter('ABCDEFGHIJKLM'))
         iterator = extract(input_stream, [4, 2, 10])
 
         self.assertEqual(next(iterator, 'E'))  # C is still buffered
