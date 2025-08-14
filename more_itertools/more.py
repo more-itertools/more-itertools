@@ -5252,8 +5252,7 @@ def extract(iterable, indices):
     iterator = iter(iterable)
     index_and_position = sorted(zip(indices, count()))
 
-    n = len(index_and_position)
-    if n and index_and_position[0][0] < 0:
+    if index_and_position and index_and_position[0][0] < 0:
         raise ValueError('Indices must be non-negative')
 
     buffer = {}
