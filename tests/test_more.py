@@ -6322,10 +6322,12 @@ class ExtractTests(TestCase):
         self.assertEqual(list(extract(data, range(5))), data)
 
     def test_all_orderings(self):
+        # Thorough test for all cases of five indices to detect
+        # obscure corner case bugs.
         extract = mi.extract
 
         data = 'abcdefg'
-        for indices in product(range(6), repeat=5):  # 6, 5
+        for indices in product(range(6), repeat=5):
             with self.subTest(indices=indices):
                 actual = tuple(extract(data, indices))
                 expected = itemgetter(*indices)(data)
