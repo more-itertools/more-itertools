@@ -6278,7 +6278,7 @@ class ArgMinArgMaxTests(TestCase):
 class ExtractTests(TestCase):
     def test_basics(self):
         extract = mi.extract
-        data = list('abcdefghijklmnopqrstuvwxyz')
+        data = 'abcdefghijklmnopqrstuvwxyz'
 
         # Test iterator inputs, increasing and decreasing indices, and repeats.
         self.assertEqual(
@@ -6287,7 +6287,7 @@ class ExtractTests(TestCase):
         )
 
         # Empty indices
-        self.assertEqual(list(extract(iter([data]), iter([]))), [])
+        self.assertEqual(list(extract(iter(data), iter([]))), [])
 
         # Result is an iterator
         iterator = extract('abc', [0, 1, 2])
@@ -6358,16 +6358,16 @@ class ExtractTests(TestCase):
         self.assertEqual(value, 'E')  #  Returns E.
         self.assertEqual(dead, {'A', 'B', 'D', 'C'})  # D and C are now dead.
 
-    def lazy_consumption(self):
+    def test_lazy_consumption(self):
         extract = mi.extract
 
         input_stream = mi.peekable(iter('ABCDEFGHIJKLM'))
         iterator = extract(input_stream, [4, 2, 10])
 
-        self.assertEqual(next(iterator, 'E'))  # C is still buffered
+        self.assertEqual(next(iterator), 'E')  # C is still buffered
         self.assertEqual(input_stream.peek(), 'F')
 
-        self.assertEqual(next(iterator, 'C'))
+        self.assertEqual(next(iterator), 'C')
         self.assertEqual(input_stream.peek(), 'F')
 
         # Infinite input

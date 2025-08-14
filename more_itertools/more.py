@@ -5238,7 +5238,7 @@ def extract(iterable, indices):
 
     Example:
 
-        >>> data = list('abcdefghijklmnopqrstuvwxyz')
+        >>> data = 'abcdefghijklmnopqrstuvwxyz'
         >>> list(extract(data, [7, 4, 11, 11, 14]))
         ['h', 'e', 'l', 'l', 'o']
 
@@ -5274,5 +5274,3 @@ def extract(iterable, indices):
         while next_to_emit in buffer:
             yield buffer.pop(next_to_emit)
             next_to_emit += 1
-            if next_to_emit == n:
-                return
