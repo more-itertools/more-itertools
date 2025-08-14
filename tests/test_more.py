@@ -6316,7 +6316,7 @@ class ExtractTests(TestCase):
 
     def test_none_value_bug(self):
         # The buffer used to be a list with unused slots marked with None.
-        # The marked got conflated with None values in the data stream.
+        # The mark got conflated with None values in the data stream.
         extract = mi.extract
         data = ['a', 'b', 'None', 'c', 'd']
         self.assertEqual(list(extract(data, range(5))), data)
