@@ -70,6 +70,7 @@ Python iterables.
 |                        | `partial_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.partial_product>`_                                                                |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Summarizing            | `ilen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.ilen>`_,                                                                                     |
+|                        | `extract <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.extract>`_,                                                                               |
 |                        | `unique_to_each <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.unique_to_each>`_,                                                                 |
 |                        | `sample <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sample>`_,                                                                                 |
 |                        | `consecutive_groups <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.consecutive_groups>`_,                                                         |

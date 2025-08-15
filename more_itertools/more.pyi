@@ -61,6 +61,7 @@ __all__ = [
     'duplicates_justseen',
     'classify_unique',
     'exactly_n',
+    'extract',
     'filter_except',
     'filter_map',
     'first',
@@ -941,3 +942,6 @@ def argmin(
 def argmax(
     iterable: Iterable[_T], *, key: Callable[[_T], _U] | None = ...
 ) -> int: ...
+def extract(
+    iterable: Iterable[_T], indices: Iterable[int]
+) -> Iterator[_T]: ...

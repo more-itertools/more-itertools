@@ -6273,3 +6273,106 @@ class ArgMinArgMaxTests(TestCase):
             with self.subTest(i=i):
                 self.assertEqual(mi.argmin(iterable, key=key), expected_min)
                 self.assertEqual(mi.argmax(iterable, key=key), expected_max)
+
+
+class ExtractTests(TestCase):
+    def test_basics(self):
+        extract = mi.extract
+        data = 'abcdefghijklmnopqrstuvwxyz'
+
+        # Test iterator inputs, increasing and decreasing indices, and repeats.
+        self.assertEqual(
+            list(extract(iter(data), iter([7, 4, 11, 11, 14]))),
+            ['h', 'e', 'l', 'l', 'o'],
+        )
+
+        # Empty indices
+        self.assertEqual(list(extract(iter(data), iter([]))), [])
+
+        # Result is an iterator
+        iterator = extract('abc', [0, 1, 2])
+        self.assertTrue(hasattr(iterator, '__next__'))
+
+        # Error cases
+
+        with self.assertRaises(TypeError):
+            list(extract(None, []))  # Non-iterable data source
+        with self.assertRaises(TypeError):
+            list(extract(data, None))  # Non-iterable indices
+        with self.assertRaises(ValueError):
+            list(extract(data, [0.0, 1.0, 2.0]))  # Non-integer indices
+        with self.assertRaises(ValueError):
+            list(extract(data, [1, 2, -3]))  # Negative indices
+        with self.assertRaises(IndexError):
+            list(extract(data, [1, 2, len(data)]))  # Indices out of range
+
+    def test_negative_one_bug(self):
+        # When the lowest index was exactly -1, it matched the initial
+        # iterator_position of -1 giving a zero advance step.
+        extract = mi.extract
+
+        with self.assertRaises(ValueError):
+            list(extract('abcdefg', [1, 2, -1]))
+
+    def test_none_value_bug(self):
+        # The buffer used to be a list with unused slots marked with None.
+        # The mark got conflated with None values in the data stream.
+        extract = mi.extract
+        data = ['a', 'b', 'None', 'c', 'd']
+        self.assertEqual(list(extract(data, range(5))), data)
+
+    def test_all_orderings(self):
+        # Thorough test for all cases of five indices to detect
+        # obscure corner case bugs.
+        extract = mi.extract
+
+        data = 'abcdefg'
+        for indices in product(range(6), repeat=5):
+            with self.subTest(indices=indices):
+                actual = tuple(extract(data, indices))
+                expected = itemgetter(*indices)(data)
+                self.assertEqual(actual, expected)
+
+    def test_early_free(self):
+        # No references are held for skipped values or for previously
+        # emitted values regardless of how long they were in the buffer.
+
+        extract = mi.extract
+
+        class TrackDels(str):
+            def __del__(self):
+                dead.add(str(self))
+
+        dead = set()
+        iterator = extract(map(TrackDels, 'ABCDEF'), [3, 2, 4, 5])
+
+        value = next(iterator)
+        gc.collect()  # Force collection on PyPy.
+        self.assertEqual(value, 'D')  #  Returns D.  Buffered C is alive.
+        self.assertEqual(dead, {'A', 'B'})  # A and B are dead.
+
+        value = next(iterator)
+        gc.collect()  # Force collection on PyPy
+        self.assertEqual(value, 'C')  #  Returns C.
+
+        value = next(iterator)
+        gc.collect()  # Force collection on PyPy
+        self.assertEqual(value, 'E')  #  Returns E.
+        self.assertEqual(dead, {'A', 'B', 'D', 'C'})  # D and C are now dead.
+
+    def test_lazy_consumption(self):
+        extract = mi.extract
+
+        input_stream = mi.peekable(iter('ABCDEFGHIJKLM'))
+        iterator = extract(input_stream, [4, 2, 10])
+
+        self.assertEqual(next(iterator), 'E')  # C is still buffered
+        self.assertEqual(input_stream.peek(), 'F')
+
+        self.assertEqual(next(iterator), 'C')
+        self.assertEqual(input_stream.peek(), 'F')
+
+        # Infinite input
+        self.assertEqual(
+            list(extract(count(), [5, 7, 3, 9, 4])), [5, 7, 3, 9, 4]
+        )

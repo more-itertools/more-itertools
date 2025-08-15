@@ -92,6 +92,7 @@ __all__ = [
     'duplicates_justseen',
     'classify_unique',
     'exactly_n',
+    'extract',
     'filter_except',
     'filter_map',
     'first',
@@ -5230,3 +5231,45 @@ def argmax(iterable, *, key=None):
     if key is not None:
         iterable = map(key, iterable)
     return max(enumerate(iterable), key=itemgetter(1))[0]
+
+
+def extract(iterable, indices):
+    """Yield values at the specified indices.
+
+    Example:
+
+        >>> data = 'abcdefghijklmnopqrstuvwxyz'
+        >>> list(extract(data, [7, 4, 11, 11, 14]))
+        ['h', 'e', 'l', 'l', 'o']
+
+    The *iterable* is consumed lazily and can be infinite.
+    The *indices* are consumed immediately and must be finite.
+
+    Raises ``IndexError`` if an index lies beyond the iterable.
+    Raises ``ValueError`` for negative indices.
+    """
+
+    iterator = iter(iterable)
+    index_and_position = sorted(zip(indices, count()))
+
+    if index_and_position and index_and_position[0][0] < 0:
+        raise ValueError('Indices must be non-negative')
+
+    buffer = {}
+    iterator_position = -1
+    next_to_emit = 0
+
+    for index, order in index_and_position:
+        advance = index - iterator_position
+        if advance:
+            try:
+                value = next(islice(iterator, advance - 1, None))
+            except StopIteration:
+                raise IndexError(index)
+            iterator_position = index
+
+        buffer[order] = value
+
+        while next_to_emit in buffer:
+            yield buffer.pop(next_to_emit)
+            next_to_emit += 1
