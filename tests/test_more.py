@@ -31,10 +31,9 @@ from pickle import loads, dumps
 from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
-from sys import version_info
 from time import sleep
 from typing import Iterable, Iterator, NamedTuple
-from unittest import skipIf, TestCase
+from unittest import TestCase
 
 import more_itertools as mi
 
@@ -1989,58 +1988,6 @@ class StaggerTest(TestCase):
             self.assertEqual(list(all_groups), expected)
 
 
-class ZipEqualTest(TestCase):
-    @skipIf(version_info[:2] < (3, 10), 'zip_equal deprecated for 3.10+')
-    def test_deprecation(self):
-        with self.assertWarns(DeprecationWarning):
-            self.assertEqual(
-                list(mi.zip_equal([1, 2], [3, 4])), [(1, 3), (2, 4)]
-            )
-
-    def test_equal(self):
-        lists = [0, 1, 2], [2, 3, 4]
-
-        for iterables in [lists, map(iter, lists)]:
-            actual = list(mi.zip_equal(*iterables))
-            expected = [(0, 2), (1, 3), (2, 4)]
-            self.assertEqual(actual, expected)
-
-    def test_unequal_lists(self):
-        two_items = [0, 1]
-        three_items = [2, 3, 4]
-        four_items = [5, 6, 7, 8]
-
-        # the mismatch is at index 1
-        try:
-            list(mi.zip_equal(two_items, three_items, four_items))
-        except mi.UnequalIterablesError as e:
-            self.assertEqual(
-                e.args[0],
-                (
-                    'Iterables have different lengths: '
-                    'index 0 has length 2; index 1 has length 3'
-                ),
-            )
-
-        # the mismatch is at index 2
-        try:
-            list(mi.zip_equal(two_items, two_items, four_items, four_items))
-        except mi.UnequalIterablesError as e:
-            self.assertEqual(
-                e.args[0],
-                (
-                    'Iterables have different lengths: '
-                    'index 0 has length 2; index 2 has length 4'
-                ),
-            )
-
-        # One without length: delegate to _zip_equal_generator
-        try:
-            list(mi.zip_equal(two_items, iter(two_items), three_items))
-        except mi.UnequalIterablesError as e:
-            self.assertEqual(e.args[0], 'Iterables have different lengths')
-
-
 class ZipOffsetTest(TestCase):
     """Tests for ``zip_offset()``"""
 
@@ -2256,7 +2203,7 @@ class SortTogetherTest(TestCase):
     def test_strict(self):
         # Test for list of lists or tuples
         self.assertRaises(
-            mi.UnequalIterablesError,
+            ValueError,
             lambda: mi.sort_together(
                 [(4, 3, 2, 1), ('a', 'b', 'c')], strict=True
             ),
@@ -2264,13 +2211,13 @@ class SortTogetherTest(TestCase):
 
         # Test for list of iterables
         self.assertRaises(
-            mi.UnequalIterablesError,
+            ValueError,
             lambda: mi.sort_together([range(4), range(5)], strict=True),
         )
 
         # Test for iterable of iterables
         self.assertRaises(
-            mi.UnequalIterablesError,
+            ValueError,
             lambda: mi.sort_together(
                 (range(i) for i in range(4)), strict=True
             ),
