@@ -14,7 +14,7 @@ from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
 from collections.abc import Sized
-from functools import lru_cache, partial
+from functools import lru_cache
 from heapq import heappush, heappushpop
 from itertools import (
     accumulate,
@@ -91,15 +91,6 @@ __all__ = [
 ]
 
 _marker = object()
-
-
-# zip with strict is available for Python 3.10+
-try:
-    zip(strict=True)
-except TypeError:
-    _zip_strict = zip
-else:
-    _zip_strict = partial(zip, strict=True)
 
 
 # math.sumprod is available for Python 3.12+
@@ -364,41 +355,6 @@ else:
     pairwise.__doc__ = _pairwise.__doc__
 
 
-class UnequalIterablesError(ValueError):
-    def __init__(self, details=None):
-        msg = 'Iterables have different lengths'
-        if details is not None:
-            msg += (': index 0 has length {}; index {} has length {}').format(
-                *details
-            )
-
-        super().__init__(msg)
-
-
-def _zip_equal_generator(iterables):
-    for combo in zip_longest(*iterables, fillvalue=_marker):
-        for val in combo:
-            if val is _marker:
-                raise UnequalIterablesError()
-        yield combo
-
-
-def _zip_equal(*iterables):
-    # Check whether the iterables are all the same size.
-    try:
-        first_size = len(iterables[0])
-        for i, it in enumerate(iterables[1:], 1):
-            size = len(it)
-            if size != first_size:
-                raise UnequalIterablesError(details=(first_size, i, size))
-        # All sizes are equal, we can use the built-in zip.
-        return zip(*iterables)
-    # If any one of the iterables didn't have a length, start reading
-    # them until one runs out.
-    except TypeError:
-        return _zip_equal_generator(iterables)
-
-
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
     """Group elements from *iterable* into fixed-length groups of length *n*.
 
@@ -419,20 +375,20 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
     >>> list(grouper('ABCDEFG', 3, incomplete='ignore', fillvalue='x'))
     [('A', 'B', 'C'), ('D', 'E', 'F')]
 
-    When *incomplete* is `'strict'`, a subclass of `ValueError` will be raised.
+    When *incomplete* is `'strict'`, a `ValueError` will be raised.
 
     >>> iterator = grouper('ABCDEFG', 3, incomplete='strict')
     >>> list(iterator)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    UnequalIterablesError
+    ValueError
 
     """
     iterators = [iter(iterable)] * n
     if incomplete == 'fill':
         return zip_longest(*iterators, fillvalue=fillvalue)
     if incomplete == 'strict':
-        return _zip_equal(*iterators)
+        return zip(*iterators, strict=True)
     if incomplete == 'ignore':
         return zip(*iterators)
     else:
@@ -1021,7 +977,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return _zip_strict(*it)
+    return zip(*it, strict=True)
 
 
 def reshape(matrix, cols):
