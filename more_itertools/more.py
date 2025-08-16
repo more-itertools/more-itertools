@@ -1988,25 +1988,17 @@ def unzip(iterable):
     head = head[0]
     iterables = tee(iterable, len(head))
 
-    def itemgetter(i):
-        def getter(obj):
-            try:
-                return obj[i]
-            except IndexError:
-                # basically if we have an iterable like
-                # iter([(1, 2, 3), (4, 5), (6,)])
-                # the second unzipped iterable would fail at the third tuple
-                # since it would try to access tup[1]
-                # same with the third unzipped iterable and the second tuple
-                # to support these "improperly zipped" iterables,
-                # we create a custom itemgetter
-                # which just stops the unzipped iterables
-                # at first length mismatch
-                raise StopIteration
-
-        return getter
-
-    return tuple(map(itemgetter(i), it) for i, it in enumerate(iterables))
+    # If we have an iterable like iter([(1, 2, 3), (4, 5), (6,)]),
+    # the second unzipped iterable fails at the third tuple since
+    # it tries to access (6,)[1].
+    # Same with the third unzipped iterable and the second tuple.
+    # To support these "improperly zipped" iterables, we suppress
+    # the IndexError, which just stops the unzipped iterables at
+    # first length mismatch.
+    return tuple(
+        iter_suppress(map(itemgetter(i), it), IndexError)
+        for i, it in enumerate(iterables)
+    )
 
 
 def divide(n, iterable):
