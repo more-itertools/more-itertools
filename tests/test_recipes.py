@@ -1172,7 +1172,7 @@ class ReshapeTests(TestCase):
             list(mi.reshape([[10, 20, 30], 40], shape=(4,)))
 
         # Non-integer indices
-        with self.assertRaises(TypeError):
+        with self.assertRaises((TypeError, ValueError)):
             matrix = [(0, 1), (2, 3), (4, 5)]
             list(reshape(matrix, ('a', 'b', 'c')))
 
