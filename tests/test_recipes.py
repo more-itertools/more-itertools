@@ -1157,6 +1157,13 @@ class ReshapeTests(TestCase):
         # Incomplete structure: Input smaller than the requested shape
         self.assertEqual(list(reshape(matrix, [8])), [0, 1, 2, 3, 4, 5])
 
+        # Str and bytes treated as scalars
+        word_matrix = [[['ab', b'de', 'gh', b'jk']]]  # Shape: 1 x 1 x 4
+        self.assertEqual(
+            list(reshape(word_matrix, (2, 2))),
+            [('ab', b'de'), ('gh', b'jk')],
+        )
+
         # Empty input
         self.assertEqual(list(reshape([[]], shape=(1,))), [])
 
