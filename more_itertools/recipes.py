@@ -14,7 +14,7 @@ from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
 from collections.abc import Sized
-from functools import lru_cache, partial
+from functools import lru_cache, partial, reduce
 from heapq import heappush, heappushpop
 from itertools import (
     accumulate,
@@ -1024,15 +1024,68 @@ def transpose(it):
     return _zip_strict(*it)
 
 
-def reshape(matrix, cols):
-    """Reshape the 2-D input *matrix* to have a column count given by *cols*.
+def _is_scalar(x, stringy_types=(str, bytes)):
+    "Scalars are bytes, str, and non-iterables."
+    try:
+        iter(x)
+    except TypeError:
+        return True
+    return isinstance(x, stringy_types)
 
-    >>> matrix = [(0, 1), (2, 3), (4, 5)]
-    >>> cols = 3
-    >>> list(reshape(matrix, cols))
-    [(0, 1, 2), (3, 4, 5)]
+
+def _flatten_tensor(tensor):
+    "Depth-first iterator over all scalars in a tensor."
+    iterator = iter(tensor)
+    while True:
+        try:
+            value = next(iterator)
+        except StopIteration:
+            return iter(())
+        iterator = chain((value,), iterator)
+        if _is_scalar(value):
+            return iterator
+        iterator = chain.from_iterable(iterator)
+
+
+def reshape(matrix, shape):
+    """Change the shape a *matrix*.
+
+    If *shape* is an integer, the matrix must be two dimensional
+    and the shape is interpreted as the desired number of columns:
+
+        >>> matrix = [(0, 1), (2, 3), (4, 5)]
+        >>> cols = 3
+        >>> list(reshape(matrix, cols))
+        [(0, 1, 2), (3, 4, 5)]
+
+    If *shape* is a tuple, the input matrix can have any number
+    of dimensions. It will first be flattened and then rebuilt
+    to the desired shape which can also be multidimensional.
+
+        >>> matrix = [(0, 1), (2, 3), (4, 5)]    # Start with a 3 x 2 matrix
+
+        >>> list(reshape(matrix, (2, 3)))        # Make a 2 x 3 matrix
+        [(0, 1, 2), (3, 4, 5)]
+
+        >>> list(reshape(matrix, (6,)))          # Make a vector of length six
+        [0, 1, 2, 3, 4, 5]
+
+        >>> list(reshape(matrix, (2, 1, 3, 1)))  # Make 2 x 1 x 3 x 1 tensor
+        [(((0,), (1,), (2,)),), (((3,), (4,), (5,)),)]
+
+    Each dimension is assumed to be uniform, either all arrays or all
+    scalars. Flattening stops when the first element in a dimension is
+    a scalar (any non-iterable, text string, or byte string).
+
+    Inputs larger than the requested shape get truncated.
+    Inputs shorter than the requested shape generate an
+    incomplete structure.
+
     """
-    return batched(chain.from_iterable(matrix), cols)
+    if isinstance(shape, int):
+        return batched(chain.from_iterable(matrix), shape)
+    scalar_stream = _flatten_tensor(matrix)
+    return next(reduce(batched, reversed(shape), scalar_stream), ())
 
 
 def matmul(m1, m2):
