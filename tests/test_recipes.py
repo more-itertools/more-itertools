@@ -1151,8 +1151,8 @@ class ReshapeTests(TestCase):
                 new_matrix = reshape(matrix, new_shape)
                 self.assertEqual(shape(new_matrix), new_shape)
 
-        # Truncation:  Input larger than the requested shape
-        self.assertEqual(list(reshape(matrix, [3])), [0, 1, 2])
+        # Input larger than the requested shape
+        self.assertEqual(list(reshape(matrix, [3])), [0, 1, 2, 3, 4, 5])
 
         # Incomplete structure: Input smaller than the requested shape
         self.assertEqual(list(reshape(matrix, [8])), [0, 1, 2, 3, 4, 5])

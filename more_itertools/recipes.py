@@ -1077,15 +1077,14 @@ def reshape(matrix, shape):
     scalars. Flattening stops when the first element in a dimension is
     a scalar (any non-iterable, text string, or byte string).
 
-    Inputs larger than the requested shape get truncated.
-    Inputs shorter than the requested shape generate an
-    incomplete structure.
+    Inputs shorter than the requested shape generate an incomplete structure.
 
     """
     if isinstance(shape, int):
         return batched(chain.from_iterable(matrix), shape)
+    shape = tuple(shape)[1:]
     scalar_stream = _flatten_tensor(matrix)
-    return next(reduce(batched, reversed(shape), scalar_stream), iter(()))
+    return reduce(batched, reversed(shape), scalar_stream)
 
 
 def matmul(m1, m2):
