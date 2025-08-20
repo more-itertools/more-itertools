@@ -1025,7 +1025,7 @@ def transpose(it):
 
 
 def _is_scalar(value, stringlike=(str, bytes)):
-    "Scalars are bytes, str, and non-iterables."
+    "Scalars are bytes, strings, and non-iterables."
     try:
         iter(value)
     except TypeError:
@@ -1033,9 +1033,9 @@ def _is_scalar(value, stringlike=(str, bytes)):
     return isinstance(value, stringlike)
 
 
-def _flatten_tensor(iterable):
-    "Depth-first iterator over all scalars in a iterable."
-    iterator = iter(iterable)
+def _flatten_tensor(tensor):
+    "Depth-first iterator over scalars in a tensor."
+    iterator = iter(tensor)
     while True:
         try:
             value = next(iterator)
@@ -1048,7 +1048,7 @@ def _flatten_tensor(iterable):
 
 
 def reshape(matrix, shape):
-    """Change the shape a *matrix*.
+    """Change the shape of a *matrix*.
 
     If *shape* is an integer, the matrix must be two dimensional
     and the shape is interpreted as the desired number of columns:
@@ -1060,7 +1060,7 @@ def reshape(matrix, shape):
 
     If *shape* is a tuple (or other iterable), the input matrix can have
     any number of dimensions. It will first be flattened and then rebuilt
-    to the desired shape which can also be multidimensional.
+    to the desired shape which can also be multidimensional:
 
         >>> matrix = [(0, 1), (2, 3), (4, 5)]    # Start with a 3 x 2 matrix
 
@@ -1076,7 +1076,6 @@ def reshape(matrix, shape):
     Each dimension is assumed to be uniform, either all arrays or all scalars.
     Flattening stops when the first value in a dimension is a scalar.
     Scalars are bytes, strings, and non-iterables.
-
     The reshape iterator stops when the requested shape is complete
     or when the input exhausted, whichever comes first.
 
