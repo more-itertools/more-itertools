@@ -1024,23 +1024,23 @@ def transpose(it):
     return _zip_strict(*it)
 
 
-def _is_scalar(x, stringy_types=(str, bytes)):
+def _is_scalar(value, stringlike=(str, bytes)):
     "Scalars are bytes, str, and non-iterables."
     try:
-        iter(x)
+        iter(value)
     except TypeError:
         return True
-    return isinstance(x, stringy_types)
+    return isinstance(value, stringlike)
 
 
-def _flatten_tensor(tensor):
-    "Depth-first iterator over all scalars in a tensor."
-    iterator = iter(tensor)
+def _flatten_tensor(iterable):
+    "Depth-first iterator over all scalars in a iterable."
+    iterator = iter(iterable)
     while True:
         try:
             value = next(iterator)
         except StopIteration:
-            return iter(())
+            return iterator
         iterator = chain((value,), iterator)
         if _is_scalar(value):
             return iterator
@@ -1058,8 +1058,8 @@ def reshape(matrix, shape):
         >>> list(reshape(matrix, cols))
         [(0, 1, 2), (3, 4, 5)]
 
-    If *shape* is a tuple, the input matrix can have any number
-    of dimensions. It will first be flattened and then rebuilt
+    If *shape* is a tuple (or other iterable), the input matrix can have
+    any number of dimensions. It will first be flattened and then rebuilt
     to the desired shape which can also be multidimensional.
 
         >>> matrix = [(0, 1), (2, 3), (4, 5)]    # Start with a 3 x 2 matrix
@@ -1073,20 +1073,19 @@ def reshape(matrix, shape):
         >>> list(reshape(matrix, (2, 1, 3, 1)))  # Make 2 x 1 x 3 x 1 tensor
         [(((0,), (1,), (2,)),), (((3,), (4,), (5,)),)]
 
-    Each dimension is assumed to be uniform, either all arrays or all
-    scalars. Flattening stops when the first element in a dimension is
-    a scalar (any non-iterable, text string, or byte string).
+    Each dimension is assumed to be uniform, either all arrays or all scalars.
+    Flattening stops when the first value in a dimension is a scalar.
+    Scalars are bytes, strings, and non-iterables.
 
     Inputs larger than the requested shape get truncated.
-    Inputs shorter than the requested shape generate an
-    incomplete structure.
+    Inputs shorter than the requested shape generate an incomplete structure.
 
     """
     if isinstance(shape, int):
         return batched(chain.from_iterable(matrix), shape)
-    first_dim, *shape = shape
+    first_dim, *dims = shape
     scalar_stream = _flatten_tensor(matrix)
-    return islice(reduce(batched, reversed(shape), scalar_stream), first_dim)
+    return islice(reduce(batched, reversed(dims), scalar_stream), first_dim)
 
 
 def matmul(m1, m2):
