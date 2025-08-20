@@ -1077,8 +1077,8 @@ def reshape(matrix, shape):
     Flattening stops when the first value in a dimension is a scalar.
     Scalars are bytes, strings, and non-iterables.
 
-    Inputs larger than the requested shape get truncated.
-    Inputs shorter than the requested shape generate an incomplete structure.
+    The reshape iterator stops when the requested shape is complete
+    or when the input exhausted, whichever comes first.
 
     """
     if isinstance(shape, int):
