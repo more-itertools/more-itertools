@@ -1213,6 +1213,42 @@ class InterleaveEvenlyTests(TestCase):
             list(mi.interleave_evenly(iterables, lengths=lengths))
 
 
+class InterleaveRandomlyTests(TestCase):
+    def test_basic(self):
+        seed(0)  # For reproducibility
+        iterables = [1, 2, 3], 'abc', (True, False, None)
+        self.assertEqual(
+            list(mi.interleave_randomly(*iterables)),
+            ['a', 'b', 1, 'c', True, False, None, 2, 3],
+        )
+
+    def test_some_empty(self):
+        self.assertEqual(
+            list(mi.interleave_randomly([1, 2, 3], [], [])),
+            [1, 2, 3],
+        )
+        self.assertEqual(
+            list(mi.interleave_randomly([], [1, 2, 3], [])),
+            [1, 2, 3],
+        )
+        self.assertEqual(
+            list(mi.interleave_randomly([], [], [1, 2, 3])),
+            [1, 2, 3],
+        )
+
+    def test_all_empty(self):
+        iterables = [], [], []
+        self.assertEqual(list(mi.interleave_randomly(*iterables)), [])
+
+    def test_no_args(self):
+        self.assertEqual(list(mi.interleave_randomly()), [])
+
+    def test_bad_type(self):
+        # Should raise TypeError if not all arguments are iterable
+        with self.assertRaises(TypeError):
+            list(mi.interleave_randomly(1, [2, 3], 'abc'))
+
+
 class TestCollapse(TestCase):
     """Tests for ``collapse()``"""
 
