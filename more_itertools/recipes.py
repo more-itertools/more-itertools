@@ -105,7 +105,7 @@ else:
 # math.sumprod is available for Python 3.12+
 try:
     from math import sumprod as _sumprod
-except ImportError:
+except ImportError:  # pragma: no cover
     _sumprod = lambda x, y: dotproduct(x, y)
 
 
@@ -354,7 +354,7 @@ def _pairwise(iterable):
 
 try:
     from itertools import pairwise as itertools_pairwise
-except ImportError:
+except ImportError:  # pragma: no cover
     pairwise = _pairwise
 else:
 
