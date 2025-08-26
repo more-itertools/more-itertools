@@ -4172,6 +4172,12 @@ class SetPartitionsTests(TestCase):
             self._normalize_partitions(actual),
         )
 
+    def test_min_max(self):
+        it = 'abcdefg'
+        self.assertEqual(
+            list(mi.set_partitions(it, min_size=4, max_size=3)), []
+        )
+
 
 class TimeLimitedTests(TestCase):
     def test_basic(self):
