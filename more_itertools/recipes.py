@@ -96,26 +96,26 @@ _marker = object()
 # zip with strict is available for Python 3.10+
 try:
     zip(strict=True)
-except TypeError:
+except TypeError:  # pragma: no cover
     _zip_strict = zip
-else:
+else:  # pragma: no cover
     _zip_strict = partial(zip, strict=True)
 
 
 # math.sumprod is available for Python 3.12+
 try:
     from math import sumprod as _sumprod
-except ImportError:
+except ImportError:  # pragma: no cover
     _sumprod = lambda x, y: dotproduct(x, y)
 
 
 # heapq max-heap functions are available for Python 3.14+
 try:
     from heapq import heappush_max, heappushpop_max
-
-    _max_heap_available = True
-except ImportError:
+except ImportError:  # pragma: no cover
     _max_heap_available = False
+else:  # pragma: no cover
+    _max_heap_available = True
 
 
 def take(n, iterable):
@@ -354,9 +354,9 @@ def _pairwise(iterable):
 
 try:
     from itertools import pairwise as itertools_pairwise
-except ImportError:
+except ImportError:  # pragma: no cover
     pairwise = _pairwise
-else:
+else:  # pragma: no cover
 
     def pairwise(iterable):
         return itertools_pairwise(iterable)
@@ -1008,7 +1008,7 @@ if hexversion >= 0x30D00A2:  # pragma: no cover
         return itertools_batched(iterable, n, strict=strict)
 
     batched.__doc__ = _batched.__doc__
-else:
+else:  # pragma: no cover
     batched = _batched
 
 
@@ -1468,6 +1468,6 @@ def running_median(iterable, *, maxlen=None):
         return _running_median_windowed(iterator, maxlen)
 
     if not _max_heap_available:
-        return _running_median_minheap_only(iterator)
+        return _running_median_minheap_only(iterator)  # pragma: no cover
 
-    return _running_median_minheap_and_maxheap(iterator)
+    return _running_median_minheap_and_maxheap(iterator)  # pragma: no cover
