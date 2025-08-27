@@ -1,5 +1,4 @@
 import math
-import warnings
 
 from collections import Counter, defaultdict, deque, abc
 from collections.abc import Sequence
@@ -37,13 +36,11 @@ from operator import (
     sub,
     gt,
 )
-from sys import hexversion, maxsize
+from sys import maxsize
 from time import monotonic
 
 from .recipes import (
     _marker,
-    _zip_equal,
-    UnequalIterablesError,
     consume,
     first_true,
     flatten,
@@ -60,7 +57,6 @@ from .recipes import (
 __all__ = [
     'AbortThread',
     'SequenceView',
-    'UnequalIterablesError',
     'adjacent',
     'all_unique',
     'always_iterable',
@@ -172,7 +168,6 @@ __all__ = [
     'windowed_complete',
     'with_iter',
     'zip_broadcast',
-    'zip_equal',
     'zip_offset',
 ]
 
@@ -1840,37 +1835,6 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     )
 
 
-def zip_equal(*iterables):
-    """``zip`` the input *iterables* together but raise
-    ``UnequalIterablesError`` if they aren't all the same length.
-
-        >>> it_1 = range(3)
-        >>> it_2 = iter('abc')
-        >>> list(zip_equal(it_1, it_2))
-        [(0, 'a'), (1, 'b'), (2, 'c')]
-
-        >>> it_1 = range(3)
-        >>> it_2 = iter('abcd')
-        >>> list(zip_equal(it_1, it_2)) # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        more_itertools.more.UnequalIterablesError: Iterables have different
-        lengths
-
-    """
-    if hexversion >= 0x30A00A6:
-        warnings.warn(
-            (
-                'zip_equal will be removed in a future version of '
-                'more-itertools. Use the builtin zip function with '
-                'strict=True instead.'
-            ),
-            DeprecationWarning,
-        )
-
-    return _zip_equal(*iterables)
-
-
 def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     """``zip`` the input *iterables* together, but offset the `i`-th iterable
     by the `i`-th item in *offsets*.
@@ -1952,7 +1916,7 @@ def sort_together(
         [(3, 2, 1), ('a', 'b', 'c')]
 
     If the *strict* keyword argument is ``True``, then
-    ``UnequalIterablesError`` will be raised if any of the iterables have
+    ``ValueError`` will be raised if any of the iterables have
     different lengths.
 
     """
@@ -1977,10 +1941,10 @@ def sort_together(
                 *get_key_items(zipped_items)
             )
 
-    zipper = zip_equal if strict else zip
-    return list(
-        zipper(*sorted(zipper(*iterables), key=key_argument, reverse=reverse))
-    )
+    transposed = zip(*iterables, strict=strict)
+    reordered = sorted(transposed, key=key_argument, reverse=reverse)
+    untransposed = zip(*reordered, strict=strict)
+    return list(untransposed)
 
 
 def unzip(iterable):
@@ -4394,7 +4358,6 @@ def combination_index(element, iterable):
 
     n, _ = last(pool, default=(n, None))
 
-    # Python versions below 3.8 don't have math.comb
     index = 1
     for i, j in enumerate(reversed(indexes), start=1):
         j = n - j
@@ -4585,7 +4548,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     [('a', 0, 'x'), ('b', 0, 'y'), ('c', 0, 'z')]
 
     If the *strict* keyword argument is ``True``, then
-    ``UnequalIterablesError`` will be raised if any of the iterables have
+    ``ValueError`` will be raised if any of the iterables have
     different lengths.
     """
 
@@ -4616,8 +4579,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         yield tuple(objects)
         return
 
-    zipper = _zip_equal if strict else zip
-    for item in zipper(*iterables):
+    for item in zip(*iterables, strict=strict):
         for i, new_item[i] in zip(iterable_positions, item):
             pass
         yield tuple(new_item)
