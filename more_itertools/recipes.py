@@ -14,7 +14,7 @@ from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
 from collections.abc import Sized
-from functools import lru_cache, partial, reduce
+from functools import lru_cache, reduce
 from heapq import heappush, heappushpop
 from itertools import (
     accumulate,
