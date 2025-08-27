@@ -25,6 +25,7 @@ from itertools import (
     cycle,
     groupby,
     islice,
+    pairwise,
     product,
     repeat,
     starmap,
@@ -59,7 +60,6 @@ __all__ = [
     'nth_combination',
     'padnone',
     'pad_none',
-    'pairwise',
     'partition',
     'polynomial_eval',
     'polynomial_from_roots',
@@ -341,18 +341,6 @@ def _pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
-
-
-try:
-    from itertools import pairwise as itertools_pairwise
-except ImportError:  # pragma: no cover
-    pairwise = _pairwise
-else:  # pragma: no cover
-
-    def pairwise(iterable):
-        return itertools_pairwise(iterable)
-
-    pairwise.__doc__ = _pairwise.__doc__
 
 
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
