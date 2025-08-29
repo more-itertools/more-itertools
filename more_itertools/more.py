@@ -2433,11 +2433,11 @@ def count_cycle(iterable, n=None):
     [(0, 'A'), (0, 'B'), (1, 'A'), (1, 'B'), (2, 'A'), (2, 'B')]
 
     """
-    iterable = tuple(iterable)
-    if not iterable:
+    seq = tuple(iterable)
+    if not seq:
         return iter(())
     counter = count() if n is None else range(n)
-    return ((i, item) for i in counter for item in iterable)
+    return zip(repeat_each(counter, len(seq)), cycle(seq))
 
 
 def mark_ends(iterable):
