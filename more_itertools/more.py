@@ -2437,9 +2437,7 @@ def count_cycle(iterable, n=None):
     if not seq:
         return iter(())
     counter = count() if n is None else range(n)
-    return zip(
-        chain.from_iterable(map(repeat, counter, repeat(len(seq)))), cycle(seq)
-    )
+    return zip(repeat_each(counter, len(seq)), cycle(seq))
 
 
 def mark_ends(iterable):
