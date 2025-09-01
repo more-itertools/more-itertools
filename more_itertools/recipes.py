@@ -13,7 +13,6 @@ import random
 from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
-from collections.abc import Sized
 from functools import lru_cache, partial, reduce
 from heapq import heappush, heappushpop
 from itertools import (
@@ -160,14 +159,12 @@ def tail(n, iterable):
     ['E', 'F', 'G']
 
     """
-    # If the given iterable has a length, then we can use islice to get its
-    # final elements. Note that if the iterable is not actually Iterable,
-    # either islice or deque will throw a TypeError. This is why we don't
-    # check if it is Iterable.
-    if isinstance(iterable, Sized):
-        return islice(iterable, max(0, len(iterable) - n), None)
-    else:
+    try:
+        size = len(iterable)
+    except TypeError:
         return iter(deque(iterable, maxlen=n))
+    else:
+        return islice(iterable, max(0, size - n), None)
 
 
 def consume(iterator, n=None):
