@@ -1084,7 +1084,8 @@ def reshape(matrix, shape):
         return batched(chain.from_iterable(matrix), shape)
     first_dim, *dims = shape
     scalar_stream = _flatten_tensor(matrix)
-    return islice(reduce(batched, reversed(dims), scalar_stream), first_dim)
+    reshaped = reduce(batched, reversed(dims), scalar_stream)
+    return islice(reshaped, first_dim)
 
 
 def matmul(m1, m2):
