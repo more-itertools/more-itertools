@@ -886,8 +886,20 @@ def derangements(iterable, r=None):
         [(2, 0), (2, 3), (3, 0)]
 
     Elements are treated as unique based on their position, not on their value.
-    If the input elements are unique, there will be no repeated values within a
-    permutation.
+
+    Consider the Secret Santa example with two *different* people who have
+    the *same* name. Then there are two valid gift assignments even though
+    it might appear that a person is assigned to themselves:
+
+        >>> names = ['Alice', 'Bob', 'Bob']
+        >>> list(derangements(names))
+        [('Bob', 'Bob', 'Alice'), ('Bob', 'Alice', 'Bob')]
+
+    To avoid confusion, make the inputs distinct:
+
+        >>> deduped = [f'{name}{index}' for index, name in enumerate(names)]
+        >>> list(derangements(deduped))
+        [('Bob1', 'Bob2', 'Alice0'), ('Bob2', 'Alice0', 'Bob1')]
 
     The number of derangements of a set of size *n* is known as the
     "subfactorial of n".  For n > 0, the subfactorial is:
