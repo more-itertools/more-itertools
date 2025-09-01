@@ -5181,7 +5181,7 @@ def nth_prime(n, *, approximate=False):
     >>> nth_prime(100)
     547
 
-    If *approximate* is set to True, will return a prime in the close
+    If *approximate* is set to True, will return a prime close
     to the nth prime.  The estimation is much faster than computing
     an exact result.
 

@@ -60,6 +60,7 @@ Python iterables.
 |                        | `interleave <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.interleave>`_,                                                                         |
 |                        | `interleave_longest <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.interleave_longest>`_,                                                         |
 |                        | `interleave_evenly <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.interleave_evenly>`_,                                                           |
+|                        | `interleave_randomly <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.interleave_randomly>`_,                                                       |
 |                        | `zip_offset <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.zip_offset>`_,                                                                         |
 |                        | `zip_equal <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.zip_equal>`_,                                                                           |
 |                        | `zip_broadcast <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.zip_broadcast>`_,                                                                   |
@@ -70,7 +71,6 @@ Python iterables.
 |                        | `partial_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.partial_product>`_                                                                |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Summarizing            | `ilen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.ilen>`_,                                                                                     |
-|                        | `extract <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.extract>`_,                                                                               |
 |                        | `unique_to_each <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.unique_to_each>`_,                                                                 |
 |                        | `sample <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sample>`_,                                                                                 |
 |                        | `consecutive_groups <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.consecutive_groups>`_,                                                         |
@@ -81,6 +81,8 @@ Python iterables.
 |                        | `is_sorted <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.is_sorted>`_,                                                                           |
 |                        | `all_equal <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.all_equal>`_,                                                                           |
 |                        | `all_unique <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.all_unique>`_,                                                                         |
+|                        | `argmin <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.argmin>`_,                                                                                 |
+|                        | `argmax <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.argmax>`_,                                                                                 |
 |                        | `minmax <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.minmax>`_,                                                                                 |
 |                        | `first_true <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.first_true>`_,                                                                         |
 |                        | `quantify <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.quantify>`_,                                                                             |
@@ -100,6 +102,7 @@ Python iterables.
 |                        | `filter_map <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.filter_map>`_,                                                                         |
 |                        | `iter_suppress <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.iter_suppress>`_,                                                                   |
 |                        | `nth_or_last <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_or_last>`_,                                                                       |
+|                        | `extract <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.extract>`_,                                                                               |
 |                        | `unique_in_window <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.unique_in_window>`_,                                                             |
 |                        | `before_and_after <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.before_and_after>`_,                                                             |
 |                        | `nth <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth>`_,                                                                                       |
