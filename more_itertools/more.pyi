@@ -26,6 +26,11 @@ from typing import (
 )
 from typing_extensions import Protocol
 
+if sys.version_info >= (3, 11):
+    from typing import Never
+else:
+    from typing_extensions import Never
+
 __all__ = [
     'AbortThread',
     'SequenceView',
@@ -448,10 +453,33 @@ def sort_together(
 ) -> list[tuple[_T, ...]]: ...
 def unzip(iterable: Iterable[Sequence[_T]]) -> tuple[Iterator[_T], ...]: ...
 def divide(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
+@overload
 def always_iterable(
-    obj: object,
-    base_type: _ClassInfo | None = ...,
-) -> Iterator[Any]: ...
+    obj: None, base_type: _ClassInfo | None
+) -> Iterator[Never]: ...
+@overload
+def always_iterable(obj: bytes) -> Iterator[bytes]: ...
+@overload
+def always_iterable(obj: str) -> Iterator[str]: ...
+@overload
+def always_iterable(
+    obj: Iterable[_T] | _SupportsSlicing[_T],
+) -> Iterator[_T]: ...
+@overload
+def always_iterable(
+    obj: Iterable[_T] | _SupportsSlicing[_T],
+    base_type: None | tuple[()],
+) -> Iterator[_T]: ...
+@overload
+def always_iterable(
+    obj: Iterable[_T] | _SupportsSlicing[_T],
+    base_type: _ClassInfo,
+) -> Iterator[_T | Iterable[_T] | _SupportsSlicing[_T]]: ...
+@overload
+def always_iterable(
+    obj: _T,
+    base_type: _ClassInfo | None,
+) -> Iterator[_T]: ...
 def adjacent(
     predicate: Callable[[_T], bool],
     iterable: Iterable[_T],
