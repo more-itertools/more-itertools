@@ -634,8 +634,8 @@ def raise_(exception, *args):
 def strictly_n(iterable, n, too_short=None, too_long=None):
     """Validate that *iterable* has exactly *n* items and return them if
     it does. If it has fewer than *n* items, call function *too_short*
-    with those items. If it has more than *n* items, call function
-    *too_long* with the first ``n + 1`` items.
+    with the actual number of items. If it has more than *n* items, call function
+    *too_long* with the number ``n + 1``.
 
         >>> iterable = ['a', 'b', 'c', 'd']
         >>> n = 4
