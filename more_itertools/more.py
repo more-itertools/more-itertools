@@ -1331,15 +1331,16 @@ def interleave_evenly(iterables, lengths=None):
 
 
 def interleave_randomly(*iterables):
-    """Return a new iterable randomly selecting from each iterable,
-    until all iterables are exhausted.
-
-    The relative order of the elements in each iterable is preserved,
-    but the order with respect to other iterables is randomized.
+    """Repeatedly select one of the input *iterables* at random and yield the next
+    item from it.
 
         >>> iterables = [1, 2, 3], 'abc', (True, False, None)
         >>> list(interleave_randomly(*iterables))  # doctest: +SKIP
         ['a', 'b', 1, 'c', True, False, None, 2, 3]
+
+    The relative order of the items in each input iterable will preserved. Note the
+    sequences of items with this property are not equally likely to be generated.
+
     """
     iterators = [iter(e) for e in iterables]
     while iterators:
