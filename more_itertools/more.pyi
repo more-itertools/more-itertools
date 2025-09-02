@@ -108,6 +108,7 @@ __all__ = [
     'powerset_of_sets',
     'product_index',
     'raise_',
+    'random_derangement',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -947,3 +948,4 @@ def argmax(
 def extract(
     iterable: Iterable[_T], indices: Iterable[int]
 ) -> Iterator[_T]: ...
+def random_derangement(iterable: Iterable[_T]) -> tuple[_T, ...]: ...

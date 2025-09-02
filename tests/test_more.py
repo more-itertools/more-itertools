@@ -26,7 +26,7 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter
+from operator import add, mul, eq, itemgetter
 from pickle import loads, dumps
 from random import Random, random, randrange, seed
 from statistics import mean
@@ -624,6 +624,25 @@ class DerangementsTests(TestCase):
             with self.subTest(r=r):
                 actual = [''.join(x) for x in mi.derangements(s, r=r)]
                 self.assertEqual(actual, expected)
+
+
+class TestRandomDerangement(TestCase):
+    def test_basics(self):
+        word = tuple('love')
+        for _ in range(20):
+            d = mi.random_derangement(word)
+            self.assertEqual(len(d), len(word))  # Same size
+            self.assertEqual(set(d), set(word))  # Same values
+            self.assertFalse(any(map(eq, d, word)))  # No fixed points
+
+        c = Counter(mi.random_derangement(word) for _ in range(10_000))
+
+        # Repeated calls generate exactly the set of valid derangements.
+        self.assertEqual(set(c), set(mi.derangements(word)))
+
+        # Check approximate equidistribution (all counts within eight
+        # standard deviations of the expected mean).
+        self.assertTrue(940 <= min(c.values()) and max(c.values()) <= 1280)
 
 
 class IlenTests(TestCase):

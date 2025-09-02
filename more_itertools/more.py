@@ -29,6 +29,7 @@ from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
     attrgetter,
+    is_,
     is_not,
     itemgetter,
     lt,
@@ -139,6 +140,7 @@ __all__ = [
     'powerset_of_sets',
     'product_index',
     'raise_',
+    'random_derangement',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -916,6 +918,21 @@ def derangements(iterable, r=None):
         permutations(xs, r=r),
         map(all, map(map, repeat(is_not), repeat(ys), permutations(ys, r=r))),
     )
+
+
+def random_derangement(iterable):
+    """Return a random derangement of elements in the iterable.
+
+    Equivalent to but much faster than ``choice(list(derangements(iterable)))``.
+
+    """
+    seq = tuple(iterable)
+    perm = list(range(len(seq)))
+    start = tuple(perm)
+    while True:
+        shuffle(perm)
+        if not any(map(is_, start, perm)):
+            return itemgetter(*perm)(seq)
 
 
 def intersperse(e, iterable, n=1):
