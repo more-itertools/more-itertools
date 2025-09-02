@@ -686,6 +686,10 @@ class TestRandomDerangement(TestCase):
         # standard deviations of the expected mean).
         self.assertTrue(940 <= min(c.values()) and max(c.values()) <= 1280)
 
+        # Error case
+        with self.assertRaises(ValueError):
+            mi.random_derangement('x')  # Not enough values
+
 
 class NthCombinationTests(TestCase):
     def test_basic(self):

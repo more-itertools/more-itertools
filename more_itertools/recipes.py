@@ -1479,6 +1479,8 @@ def random_derangement(iterable):
 
     """
     seq = tuple(iterable)
+    if len(seq) < 2:
+        raise ValueError('derangments require at least two values')
     perm = list(range(len(seq)))
     start = tuple(perm)
     while True:
