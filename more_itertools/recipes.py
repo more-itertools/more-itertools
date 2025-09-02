@@ -32,8 +32,8 @@ from itertools import (
     zip_longest,
 )
 from math import prod, comb, isqrt, gcd
-from operator import mul, not_, itemgetter, getitem, index
-from random import randrange, sample, choice
+from operator import mul, is_, not_, itemgetter, getitem, index
+from random import randrange, sample, choice, shuffle
 from sys import hexversion
 
 __all__ = [
@@ -69,6 +69,7 @@ __all__ = [
     'reshape',
     'random_combination_with_replacement',
     'random_combination',
+    'random_derangement',
     'random_permutation',
     'random_product',
     'repeatfunc',
@@ -1469,3 +1470,18 @@ def running_median(iterable, *, maxlen=None):
         return _running_median_minheap_only(iterator)  # pragma: no cover
 
     return _running_median_minheap_and_maxheap(iterator)  # pragma: no cover
+
+
+def random_derangement(iterable):
+    """Return a random derangement of elements in the iterable.
+
+    Equivalent to but much faster than ``choice(list(derangements(iterable)))``.
+
+    """
+    seq = tuple(iterable)
+    perm = list(range(len(seq)))
+    start = tuple(perm)
+    while True:
+        shuffle(perm)
+        if not any(map(is_, start, perm)):
+            return itemgetter(*perm)(seq)

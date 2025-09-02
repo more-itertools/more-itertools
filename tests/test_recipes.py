@@ -4,7 +4,7 @@ from doctest import DocTestSuite
 from fractions import Fraction
 from functools import reduce
 from itertools import combinations, count, groupby, permutations, islice
-from operator import mul
+from operator import mul, eq
 from math import comb, prod, factorial
 from statistics import mean
 from sys import version_info
@@ -666,6 +666,25 @@ class RandomCombinationWithReplacementTests(TestCase):
             combination = mi.random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         self.assertEqual(all_items, set(items))
+
+
+class TestRandomDerangement(TestCase):
+    def test_basics(self):
+        word = tuple('love')
+        for _ in range(20):
+            d = mi.random_derangement(word)
+            self.assertEqual(len(d), len(word))  # Same size
+            self.assertEqual(set(d), set(word))  # Same values
+            self.assertFalse(any(map(eq, d, word)))  # No fixed points
+
+        c = Counter(mi.random_derangement(word) for _ in range(10_000))
+
+        # Repeated calls generate exactly the set of valid derangements.
+        self.assertEqual(set(c), set(mi.derangements(word)))
+
+        # Check approximate equidistribution (all counts within eight
+        # standard deviations of the expected mean).
+        self.assertTrue(940 <= min(c.values()) and max(c.values()) <= 1280)
 
 
 class NthCombinationTests(TestCase):
