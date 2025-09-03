@@ -66,6 +66,7 @@ __all__ = [
     'filter_map',
     'first',
     'gray_product',
+    'group_ordinal',
     'groupby_transform',
     'ichunked',
     'iequals',
@@ -947,3 +948,6 @@ def argmax(
 def extract(
     iterable: Iterable[_T], indices: Iterable[int]
 ) -> Iterator[_T]: ...
+def group_ordinal(
+    iterables: Iterable[Iterable[_T]]
+) -> Iterator[Tuple[_T]]: ...

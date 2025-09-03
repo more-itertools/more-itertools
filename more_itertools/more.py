@@ -97,6 +97,7 @@ __all__ = [
     'filter_map',
     'first',
     'gray_product',
+    'group_ordinal',
     'groupby_transform',
     'ichunked',
     'iequals',
@@ -5301,3 +5302,25 @@ def extract(iterable, indices):
         while next_to_emit in buffer:
             yield buffer.pop(next_to_emit)
             next_to_emit += 1
+
+
+def group_ordinal(*iterables):
+    """Group elements of iterables by their ordinal.
+
+        >>> iterables = (1, 2, 3), [4, 5, 6, 7], {8}
+        >>> list(group_ordinal(*iterables))
+        [(1, 4, 8), (2, 5), (3, 6), (7,)]
+
+    The elements are grouped in the same order as their iterables.
+    """
+    iterators = list(map(iter, reversed(iterables)))
+    result = []
+    while iterators:
+        result.clear()
+        for i in reversed(range(len(iterators))):
+            try:
+                result.append(next(iterators[i]))
+            except StopIteration:
+                del iterators[i]
+        if result:
+            yield tuple(result)
