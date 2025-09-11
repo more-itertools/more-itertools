@@ -13,7 +13,6 @@ import random
 from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
-from collections.abc import Sized
 from functools import lru_cache, reduce
 from heapq import heappush, heappushpop
 from itertools import (
@@ -151,14 +150,12 @@ def tail(n, iterable):
     ['E', 'F', 'G']
 
     """
-    # If the given iterable has a length, then we can use islice to get its
-    # final elements. Note that if the iterable is not actually Iterable,
-    # either islice or deque will throw a TypeError. This is why we don't
-    # check if it is Iterable.
-    if isinstance(iterable, Sized):
-        return islice(iterable, max(0, len(iterable) - n), None)
-    else:
+    try:
+        size = len(iterable)
+    except TypeError:
         return iter(deque(iterable, maxlen=n))
+    else:
+        return islice(iterable, max(0, size - n), None)
 
 
 def consume(iterator, n=None):
@@ -327,20 +324,6 @@ def repeatfunc(func, times=None, *args):
     if times is None:
         return starmap(func, repeat(args))
     return starmap(func, repeat(args, times))
-
-
-def _pairwise(iterable):
-    """Returns an iterator of paired items, overlapping, from the original
-
-    >>> take(4, pairwise(count()))
-    [(0, 1), (1, 2), (2, 3), (3, 4)]
-
-    On Python 3.10 and above, this is an alias for :func:`itertools.pairwise`.
-
-    """
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
 
 
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
@@ -1028,7 +1011,8 @@ def reshape(matrix, shape):
         return batched(chain.from_iterable(matrix), shape)
     first_dim, *dims = shape
     scalar_stream = _flatten_tensor(matrix)
-    return islice(reduce(batched, reversed(dims), scalar_stream), first_dim)
+    reshaped = reduce(batched, reversed(dims), scalar_stream)
+    return islice(reshaped, first_dim)
 
 
 def matmul(m1, m2):

@@ -629,8 +629,8 @@ def raise_(exception, *args):
 def strictly_n(iterable, n, too_short=None, too_long=None):
     """Validate that *iterable* has exactly *n* items and return them if
     it does. If it has fewer than *n* items, call function *too_short*
-    with those items. If it has more than *n* items, call function
-    *too_long* with the first ``n + 1`` items.
+    with the actual number of items. If it has more than *n* items, call function
+    *too_long* with the number ``n + 1``.
 
         >>> iterable = ['a', 'b', 'c', 'd']
         >>> n = 4
@@ -881,8 +881,20 @@ def derangements(iterable, r=None):
         [(2, 0), (2, 3), (3, 0)]
 
     Elements are treated as unique based on their position, not on their value.
-    If the input elements are unique, there will be no repeated values within a
-    permutation.
+
+    Consider the Secret Santa example with two *different* people who have
+    the *same* name. Then there are two valid gift assignments even though
+    it might appear that a person is assigned to themselves:
+
+        >>> names = ['Alice', 'Bob', 'Bob']
+        >>> list(derangements(names))
+        [('Bob', 'Bob', 'Alice'), ('Bob', 'Alice', 'Bob')]
+
+    To avoid confusion, make the inputs distinct:
+
+        >>> deduped = [f'{name}{index}' for index, name in enumerate(names)]
+        >>> list(derangements(deduped))
+        [('Bob1', 'Bob2', 'Alice0'), ('Bob2', 'Alice0', 'Bob1')]
 
     The number of derangements of a set of size *n* is known as the
     "subfactorial of n".  For n > 0, the subfactorial is:
@@ -1314,15 +1326,16 @@ def interleave_evenly(iterables, lengths=None):
 
 
 def interleave_randomly(*iterables):
-    """Return a new iterable randomly selecting from each iterable,
-    until all iterables are exhausted.
-
-    The relative order of the elements in each iterable is preserved,
-    but the order with respect to other iterables is randomized.
+    """Repeatedly select one of the input *iterables* at random and yield the next
+    item from it.
 
         >>> iterables = [1, 2, 3], 'abc', (True, False, None)
         >>> list(interleave_randomly(*iterables))  # doctest: +SKIP
         ['a', 'b', 1, 'c', True, False, None, 2, 3]
+
+    The relative order of the items in each input iterable will preserved. Note the
+    sequences of items with this property are not equally likely to be generated.
+
     """
     iterators = [iter(e) for e in iterables]
     while iterators:
@@ -5131,7 +5144,7 @@ def nth_prime(n, *, approximate=False):
     >>> nth_prime(100)
     547
 
-    If *approximate* is set to True, will return a prime in the close
+    If *approximate* is set to True, will return a prime close
     to the nth prime.  The estimation is much faster than computing
     an exact result.
 
