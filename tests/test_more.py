@@ -5,8 +5,8 @@ import gc
 import platform
 import weakref
 
-from collections import Counter, abc, deque
-from collections.abc import Set
+from collections import Counter, deque
+from collections.abc import Set, Sequence, Iterable, Iterator, Hashable
 from datetime import datetime, timedelta
 from decimal import Decimal
 from doctest import DocTestSuite
@@ -32,7 +32,7 @@ from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
 from time import sleep
-from typing import Iterable, Iterator, NamedTuple
+from typing import NamedTuple
 from unittest import TestCase
 
 import more_itertools as mi
@@ -3086,10 +3086,10 @@ class NumericRangeTests(TestCase):
 
     def test_parent_classes(self):
         r = mi.numeric_range(7.0)
-        self.assertTrue(isinstance(r, abc.Iterable))
-        self.assertFalse(isinstance(r, abc.Iterator))
-        self.assertTrue(isinstance(r, abc.Sequence))
-        self.assertTrue(isinstance(r, abc.Hashable))
+        self.assertTrue(isinstance(r, Iterable))
+        self.assertFalse(isinstance(r, Iterator))
+        self.assertTrue(isinstance(r, Sequence))
+        self.assertTrue(isinstance(r, Hashable))
 
     def test_bad_key(self):
         r = mi.numeric_range(7.0)

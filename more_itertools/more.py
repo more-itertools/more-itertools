@@ -1,6 +1,6 @@
 import math
 
-from collections import Counter, defaultdict, deque, abc
+from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
 from functools import cached_property, partial, reduce, wraps
@@ -2189,7 +2189,7 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
     return ret
 
 
-class numeric_range(abc.Sequence, abc.Hashable):
+class numeric_range(Sequence):
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
 
