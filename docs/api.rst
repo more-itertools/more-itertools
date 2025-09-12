@@ -72,7 +72,6 @@ These tools yield windows of items from an iterable.
 
 **Itertools recipes**
 
-.. autofunction:: pairwise
 .. autofunction:: triplewise
 .. autofunction:: sliding_window
 .. autofunction:: subslices
@@ -123,7 +122,6 @@ These tools combine multiple iterables.
 .. autofunction:: sort_together
 .. autofunction:: value_chain
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
-.. autofunction:: zip_equal
 .. autofunction:: zip_broadcast(*objects, scalar_types=(str, bytes), strict=False)
 
 ----

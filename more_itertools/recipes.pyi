@@ -34,7 +34,6 @@ __all__ = [
     'nth_combination',
     'padnone',
     'pad_none',
-    'pairwise',
     'partition',
     'polynomial_eval',
     'polynomial_from_roots',
@@ -96,7 +95,6 @@ def flatten(listOfLists: Iterable[Iterable[_T]]) -> Iterator[_T]: ...
 def repeatfunc(
     func: Callable[..., _U], times: int | None = ..., *args: Any
 ) -> Iterator[_U]: ...
-def pairwise(iterable: Iterable[_T]) -> Iterator[tuple[_T, _T]]: ...
 def grouper(
     iterable: Iterable[_T],
     n: int,
