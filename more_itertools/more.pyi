@@ -949,5 +949,5 @@ def extract(
     iterable: Iterable[_T], indices: Iterable[int]
 ) -> Iterator[_T]: ...
 def group_ordinal(
-    iterables: *Iterable[_T]
+    *iterables: Iterable[_T]
 ) -> Iterator[tuple[_T, ...]]: ...
