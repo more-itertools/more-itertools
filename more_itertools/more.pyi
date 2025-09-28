@@ -142,6 +142,7 @@ __all__ = [
     'with_iter',
     'zip_broadcast',
     'zip_equal',
+    'zip_mappings',
     'zip_offset',
 ]
 
@@ -947,3 +948,6 @@ def argmax(
 def extract(
     iterable: Iterable[_T], indices: Iterable[int]
 ) -> Iterator[_T]: ...
+def zip_mappings(
+    *mappings: Mapping[_T, _U], default: _V | None, sorted: bool = ...
+) -> Iterator[tuple[_T, _U | _V, ...]]: ...

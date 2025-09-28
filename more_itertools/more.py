@@ -173,6 +173,7 @@ __all__ = [
     'with_iter',
     'zip_broadcast',
     'zip_equal',
+    'zip_mappings',
     'zip_offset',
 ]
 
@@ -5301,3 +5302,43 @@ def extract(iterable, indices):
         while next_to_emit in buffer:
             yield buffer.pop(next_to_emit)
             next_to_emit += 1
+
+
+def zip_mappings(*mappings, default=None, sorted=False):
+    """Combine multiple *mappings* by their keys.
+
+    Example:
+
+        >>> dict1 = {'a': 1, 'b': 2}
+        >>> dict2 = {'b': 20, 'c': 30}
+        >>> list(zip_mappings(dict1, dict2))
+        [('a', 1, None), ('b', 2, 20), ('c', None, 30)]
+
+        >>> list(zip_mappings(dict1, dict2, default='missing'))
+        [('a', 1, 'missing'), ('b', 2, 20), ('c', 'missing', 30)]
+
+        >>> list(zip_mappings({'x': 1, 'y': 2}))
+        [('x', 1), ('y', 2)]
+
+    Raises ``TypeError`` if any of the provided arguments is not a mapping.
+    """
+    if not mappings:
+        return
+    
+    for i, mapping in enumerate(mappings):
+        if not isinstance(mapping, abc.Mapping):
+            raise TypeError(f'Argument {i} must be a mapping, got {mapping.__class__.__name__}')
+    
+    if len(mappings) == 1:
+        for key in sorted(mappings[0]):
+            yield (key, mappings[0][key])
+
+        return
+    
+    all_keys = set()
+
+    for mapping in mappings:
+        all_keys.update(mapping)
+    
+    for key in sorted(all_keys):
+        yield (key,) + tuple(mapping.get(key, default) for mapping in mappings)
