@@ -1,0 +1,7 @@
+version = 1
+requires-python = ">=3.9"
+
+[[package]]
+name = "more-itertools"
+version = "10.8.0"
+source = { editable = "." }

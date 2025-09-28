@@ -5304,7 +5304,7 @@ def extract(iterable, indices):
             next_to_emit += 1
 
 
-def zip_mappings(*mappings, default=None, sorted=False):
+def zip_mappings(*mappings, default=None):
     """Combine multiple *mappings* by their keys.
 
     Example:
