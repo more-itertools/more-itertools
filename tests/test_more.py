@@ -6548,9 +6548,9 @@ class ZipMappingsTests(TestCase):
 
     def test_mixed_key_types(self):
         dict1 = {1: 'one', 2: 'two'}
-        dict2 = {1: 'uno', 3: 'tres'}
+        dict2 = {1: 'um', 3: 'três'}
         result = list(mi.zip_mappings(dict1, dict2))
-        expected = [(1, 'one', 'uno'), (2, 'two', None), (3, None, 'tres')]
+        expected = [(1, 'one', 'um'), (2, 'two', None), (3, None, 'três')]
         self.assertEqual(result, expected)
 
     def test_nested_mappings(self):
