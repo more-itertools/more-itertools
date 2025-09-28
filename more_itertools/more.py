@@ -5324,21 +5324,23 @@ def zip_mappings(*mappings, default=None):
     """
     if not mappings:
         return
-    
+
     for i, mapping in enumerate(mappings):
         if not isinstance(mapping, abc.Mapping):
-            raise TypeError(f'Argument {i} must be a mapping, got {mapping.__class__.__name__}')
-    
+            raise TypeError(
+                f'Argument {i} must be a mapping, got {mapping.__class__.__name__}'
+            )
+
     if len(mappings) == 1:
         for key in sorted(mappings[0]):
             yield (key, mappings[0][key])
 
         return
-    
+
     all_keys = set()
 
     for mapping in mappings:
         all_keys.update(mapping)
-    
+
     for key in sorted(all_keys):
         yield (key,) + tuple(mapping.get(key, default) for mapping in mappings)

@@ -6424,79 +6424,67 @@ class ZipMappingsTests(TestCase):
     """Tests for ``zip_mappings()``"""
 
     def test_basic_functionality(self):
-        """Test basic functionality with two mappings"""
         dict1 = {'a': 1, 'b': 2}
         dict2 = {'b': 20, 'c': 30}
-        
+
         result = list(mi.zip_mappings(dict1, dict2))
         expected = [('a', 1, None), ('b', 2, 20), ('c', None, 30)]
         self.assertEqual(result, expected)
 
     def test_single_mapping(self):
-        """Test single mapping behavior"""
         mapping = {'x': 1, 'y': 2, 'z': 3}
         result = list(mi.zip_mappings(mapping))
         expected = [('x', 1), ('y', 2), ('z', 3)]
         self.assertEqual(result, expected)
 
     def test_empty_mappings(self):
-        """Test empty mappings and no arguments"""
-        # No arguments
         result = list(mi.zip_mappings())
         self.assertEqual(result, [])
-        
-        # Empty mappings
+
         result = list(mi.zip_mappings({}, {}))
         self.assertEqual(result, [])
-        
-        # One empty mapping
+
         result = list(mi.zip_mappings({'a': 1}, {}))
         expected = [('a', 1, None)]
         self.assertEqual(result, expected)
 
     def test_default_parameter(self):
-        """Test default parameter behavior"""
         dict1 = {'a': 1, 'b': 2}
         dict2 = {'b': 20, 'c': 30}
-        
-        # With custom default
+
         result = list(mi.zip_mappings(dict1, dict2, default='missing'))
         expected = [('a', 1, 'missing'), ('b', 2, 20), ('c', 'missing', 30)]
         self.assertEqual(result, expected)
-        
-        # With default=0
+
         result = list(mi.zip_mappings(dict1, dict2, default=0))
         expected = [('a', 1, 0), ('b', 2, 20), ('c', 0, 30)]
         self.assertEqual(result, expected)
 
     def test_multiple_mappings(self):
-        """Test with more than two mappings"""
         dict1 = {'a': 1, 'b': 2}
         dict2 = {'b': 20, 'c': 30}
         dict3 = {'a': 100, 'd': 400}
-        
+
         result = list(mi.zip_mappings(dict1, dict2, dict3))
         expected = [
             ('a', 1, None, 100),
             ('b', 2, 20, None),
             ('c', None, 30, None),
-            ('d', None, None, 400)
+            ('d', None, None, 400),
         ]
         self.assertEqual(result, expected)
 
     def test_different_mapping_types(self):
-        """Test with different mapping types"""
         from collections import OrderedDict
-        
-        # Test with OrderedDict
+
         od1 = OrderedDict([('a', 1), ('b', 2)])
         od2 = OrderedDict([('b', 20), ('c', 30)])
         result = list(mi.zip_mappings(od1, od2))
         expected = [('a', 1, None), ('b', 2, 20), ('c', None, 30)]
         self.assertEqual(result, expected)
-        
-        # Test with Counter
+
         from collections import Counter
+
         c1 = Counter({'a': 1, 'b': 2})
         c2 = Counter({'b': 20, 'c': 30})
         result = list(mi.zip_mappings(c1, c2))
@@ -6504,44 +6492,39 @@ class ZipMappingsTests(TestCase):
         self.assertEqual(result, expected)
 
     def test_type_errors(self):
-        """Test TypeError for non-mapping arguments"""
-        # Test with list (not a mapping)
         with self.assertRaises(TypeError) as cm:
             list(mi.zip_mappings({'a': 1}, [1, 2, 3]))
         self.assertIn('Argument 1 must be a mapping', str(cm.exception))
-        
-        # Test with string (not a mapping)
+
         with self.assertRaises(TypeError) as cm:
             list(mi.zip_mappings({'a': 1}, 'hello'))
         self.assertIn('Argument 1 must be a mapping', str(cm.exception))
-        
-        # Test with integer (not a mapping)
+
         with self.assertRaises(TypeError) as cm:
             list(mi.zip_mappings({'a': 1}, 42))
         self.assertIn('Argument 1 must be a mapping', str(cm.exception))
 
     def test_edge_cases(self):
-        """Test edge cases and special scenarios"""
         # Test with None values in mappings
         dict1 = {'a': None, 'b': 2}
         dict2 = {'b': 20, 'c': None}
         result = list(mi.zip_mappings(dict1, dict2))
         expected = [('a', None, None), ('b', 2, 20), ('c', None, None)]
         self.assertEqual(result, expected)
-        
+
         # Test with duplicate keys in same mapping (should not affect result)
-        dict1 = {'a': 1, 'a': 2}  # Later value overwrites
+        dict1 = {'a': 1, 'a': 2}  # Later value overwrites  # noqa: F601
         dict2 = {'b': 20}
         result = list(mi.zip_mappings(dict1, dict2))
         expected = [('a', 2, None), ('b', None, 20)]
         self.assertEqual(result, expected)
-        
+
         # Test with very large mappings
-        large_dict1 = {i: i*2 for i in range(1000)}
-        large_dict2 = {i: i*3 for i in range(500, 1500)}
+        large_dict1 = {i: i * 2 for i in range(1000)}
+        large_dict2 = {i: i * 3 for i in range(500, 1500)}
         result = list(mi.zip_mappings(large_dict1, large_dict2))
         self.assertEqual(len(result), 1500)  # Should have all unique keys
-        
+
         # Test key ordering (should be sorted)
         dict1 = {'z': 1, 'a': 2, 'm': 3}
         dict2 = {'b': 20, 'y': 30}
@@ -6550,23 +6533,20 @@ class ZipMappingsTests(TestCase):
         self.assertEqual(keys, sorted(keys))
 
     def test_iterator_behavior(self):
-        """Test that zip_mappings returns an iterator"""
         dict1 = {'a': 1, 'b': 2}
         dict2 = {'b': 20, 'c': 30}
-        
+
         iterator = mi.zip_mappings(dict1, dict2)
         self.assertTrue(hasattr(iterator, '__iter__'))
         self.assertTrue(hasattr(iterator, '__next__'))
-        
-        # Test that we can consume it partially
+
         first_item = next(iterator)
         self.assertEqual(first_item, ('a', 1, None))
-        
+
         remaining = list(iterator)
         self.assertEqual(remaining, [('b', 2, 20), ('c', None, 30)])
 
     def test_mixed_key_types(self):
-        """Test with different key types (same type within each mapping)"""
         dict1 = {1: 'one', 2: 'two'}
         dict2 = {1: 'uno', 3: 'tres'}
         result = list(mi.zip_mappings(dict1, dict2))
@@ -6574,13 +6554,12 @@ class ZipMappingsTests(TestCase):
         self.assertEqual(result, expected)
 
     def test_nested_mappings(self):
-        """Test with nested dictionary values"""
         dict1 = {'a': {'nested': 1}, 'b': 2}
         dict2 = {'b': 20, 'c': {'nested': 30}}
         result = list(mi.zip_mappings(dict1, dict2))
         expected = [
             ('a', {'nested': 1}, None),
             ('b', 2, 20),
-            ('c', None, {'nested': 30})
+            ('c', None, {'nested': 30}),
         ]
         self.assertEqual(result, expected)
