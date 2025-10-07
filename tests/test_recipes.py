@@ -14,7 +14,6 @@ from itertools import (
 from operator import mul
 from math import comb, prod, factorial
 from statistics import mean
-from sys import version_info
 from unittest import TestCase
 from unittest.mock import patch
 
