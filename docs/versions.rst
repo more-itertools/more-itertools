@@ -5,6 +5,36 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+10.8.0
+------
+
+* New functions:
+    * :func:`derangements` was added (thanks to debruijn)
+    * :func:`argmin` and :func:`argmax` were added (thanks to rhettinger)
+    * :func:`running_median` was added (thanks to rhettinger)
+    * :func:`extract` was added (thanks to rhettinger)
+    * :func:`interleave_randomly` was added (thanks to ktbarrett)
+
+* Changes to existing functions:
+    * The type hints and docstring for :func:`batched` were improved (thanks to qobilidop and inventshah)
+    * The memory usage of :func:`islice_extended` was reduced (thanks to ben42code)
+    * The performance of :func:`sample` and :func:`consecutive_groups`, :func:`dft`, :func:`idft`, :func:`map_if`, :func:`count_cycle`, and :func:`tail` were improved (thanks to rhettinger) 
+    * The performance of :func:`before_and_after`, :func:`mark_ends`, and :func:`interleave_longest` were improved (thanks to pochmann3) 
+    * :func:`nth_prime` now accepts an ``approximate`` keyword. When set to ``True``, a faster but less accurate method is used to return a result. (thanks to rhettinger)
+    * :func:`last` now works when its input has ``__reversed__`` set to ``None`` (thanks to inventshah)
+    * The :func:`unzip` function was simplified (thanks to pochmann3)
+    * The :func:`reshape` function now accepts ``shape`` values that represent multidimensional matrices (thanks to rhettinger)
+
+* Other changes:
+    * An issue with dark themes and documentation display was fixed (thanks to pochmann3, moreati, and pradyunsg)
+    * Variable names in several functions were improved (thanks to rhettinger)
+    * The docstrings for :func:`dft`, :func:`idft`, :func:`minmax`, :func:`sample`, and :func:`multinomial` were improved (thanks to rhettinger)
+    * Packaging and package index metadata were improved (thanks to cdce8p)
+    * Several aspects of the documentation were improved (thanks to rhettinger, saadmanrafat)
+    * The Makefile now refers to `python` instead of `python3` (thanks to ktbarrett)
+    * Test coverage was improved (thanks to rhettinger)
+    * Python 3.14 is now tested by GitHub Actions
+
 10.7.0
 ------
 

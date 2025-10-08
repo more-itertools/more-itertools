@@ -72,7 +72,6 @@ These tools yield windows of items from an iterable.
 
 **Itertools recipes**
 
-.. autofunction:: pairwise
 .. autofunction:: triplewise
 .. autofunction:: sliding_window
 .. autofunction:: subslices
@@ -118,11 +117,11 @@ These tools combine multiple iterables.
 .. autofunction:: interleave
 .. autofunction:: interleave_longest
 .. autofunction:: interleave_evenly
+.. autofunction:: interleave_randomly
 .. autofunction:: partial_product
 .. autofunction:: sort_together
 .. autofunction:: value_chain
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
-.. autofunction:: zip_equal
 .. autofunction:: zip_broadcast(*objects, scalar_types=(str, bytes), strict=False)
 
 ----
@@ -144,7 +143,6 @@ These tools return summarized or aggregated data from an iterable.
 **New itertools**
 
 .. autofunction:: ilen
-.. autofunction:: extract
 .. autofunction:: unique_to_each
 .. autofunction:: sample(iterable, k=1, weights=None)
 .. autofunction:: consecutive_groups(iterable, ordering=lambda x: x)
@@ -195,6 +193,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: filter_map
 .. autofunction:: iter_suppress
 .. autofunction:: nth_or_last(iterable, n[, default])
+.. autofunction:: extract
 .. autofunction:: unique_in_window
 .. autofunction:: duplicates_everseen
 .. autofunction:: duplicates_justseen
