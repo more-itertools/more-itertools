@@ -13,7 +13,7 @@ import random
 from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
-from functools import lru_cache, partial, reduce
+from functools import lru_cache, reduce
 from heapq import heappush, heappushpop
 from itertools import (
     accumulate,
@@ -24,6 +24,7 @@ from itertools import (
     cycle,
     groupby,
     islice,
+    pairwise,
     product,
     repeat,
     starmap,
@@ -58,7 +59,6 @@ __all__ = [
     'nth_combination',
     'padnone',
     'pad_none',
-    'pairwise',
     'partition',
     'polynomial_eval',
     'polynomial_from_roots',
@@ -90,15 +90,6 @@ __all__ = [
 ]
 
 _marker = object()
-
-
-# zip with strict is available for Python 3.10+
-try:
-    zip(strict=True)
-except TypeError:  # pragma: no cover
-    _zip_strict = zip
-else:  # pragma: no cover
-    _zip_strict = partial(zip, strict=True)
 
 
 # math.sumprod is available for Python 3.12+
@@ -335,67 +326,6 @@ def repeatfunc(func, times=None, *args):
     return starmap(func, repeat(args, times))
 
 
-def _pairwise(iterable):
-    """Returns an iterator of paired items, overlapping, from the original
-
-    >>> take(4, pairwise(count()))
-    [(0, 1), (1, 2), (2, 3), (3, 4)]
-
-    On Python 3.10 and above, this is an alias for :func:`itertools.pairwise`.
-
-    """
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
-
-try:
-    from itertools import pairwise as itertools_pairwise
-except ImportError:  # pragma: no cover
-    pairwise = _pairwise
-else:  # pragma: no cover
-
-    def pairwise(iterable):
-        return itertools_pairwise(iterable)
-
-    pairwise.__doc__ = _pairwise.__doc__
-
-
-class UnequalIterablesError(ValueError):
-    def __init__(self, details=None):
-        msg = 'Iterables have different lengths'
-        if details is not None:
-            msg += (': index 0 has length {}; index {} has length {}').format(
-                *details
-            )
-
-        super().__init__(msg)
-
-
-def _zip_equal_generator(iterables):
-    for combo in zip_longest(*iterables, fillvalue=_marker):
-        for val in combo:
-            if val is _marker:
-                raise UnequalIterablesError()
-        yield combo
-
-
-def _zip_equal(*iterables):
-    # Check whether the iterables are all the same size.
-    try:
-        first_size = len(iterables[0])
-        for i, it in enumerate(iterables[1:], 1):
-            size = len(it)
-            if size != first_size:
-                raise UnequalIterablesError(details=(first_size, i, size))
-        # All sizes are equal, we can use the built-in zip.
-        return zip(*iterables)
-    # If any one of the iterables didn't have a length, start reading
-    # them until one runs out.
-    except TypeError:
-        return _zip_equal_generator(iterables)
-
-
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
     """Group elements from *iterable* into fixed-length groups of length *n*.
 
@@ -416,20 +346,20 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
     >>> list(grouper('ABCDEFG', 3, incomplete='ignore', fillvalue='x'))
     [('A', 'B', 'C'), ('D', 'E', 'F')]
 
-    When *incomplete* is `'strict'`, a subclass of `ValueError` will be raised.
+    When *incomplete* is `'strict'`, a `ValueError` will be raised.
 
     >>> iterator = grouper('ABCDEFG', 3, incomplete='strict')
     >>> list(iterator)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    UnequalIterablesError
+    ValueError
 
     """
     iterators = [iter(iterable)] * n
     if incomplete == 'fill':
         return zip_longest(*iterators, fillvalue=fillvalue)
     if incomplete == 'strict':
-        return _zip_equal(*iterators)
+        return zip(*iterators, strict=True)
     if incomplete == 'ignore':
         return zip(*iterators)
     else:
@@ -1018,7 +948,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return _zip_strict(*it)
+    return zip(*it, strict=True)
 
 
 def _is_scalar(value, stringlike=(str, bytes)):
