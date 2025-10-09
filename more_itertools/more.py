@@ -4326,14 +4326,14 @@ def product_index(element, *args):
     ``ValueError`` will be raised if the given *element* isn't in the product
     of *args*.
     """
+    elements = tuple(element)
+    pools = tuple(map(tuple, args))
+    if len(element) != len(args):
+        raise ValueError('element is not a product of args')
+
     index = 0
-
-    for x, pool in zip_longest(element, args, fillvalue=_marker):
-        if x is _marker or pool is _marker:
-            raise ValueError('element is not a product of args')
-
-        pool = tuple(pool)
-        index = index * len(pool) + pool.index(x)
+    for elem, pool in zip(elements, pools):
+        index = index * len(pool) + pool.index(elem)
 
     return index
 
