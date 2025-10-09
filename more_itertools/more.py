@@ -3627,7 +3627,10 @@ def iequals(*iterables):
     elements of iterable are equal to each other.
 
     """
-    return all(map(all_equal, zip_longest(*iterables, fillvalue=object())))
+    try:
+        return all(map(all_equal, zip(*iterables, strict=True)))
+    except ValueError:
+        return False
 
 
 def distinct_combinations(iterable, r):

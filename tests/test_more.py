@@ -33,7 +33,7 @@ from statistics import mean
 from string import ascii_letters
 from time import sleep
 from typing import NamedTuple
-from unittest import TestCase
+from unittest import TestCase, mock
 
 import more_itertools as mi
 
@@ -5784,6 +5784,10 @@ class IequalsTests(TestCase):
 
     def test_not_identical_but_equal(self):
         self.assertTrue([1, True], [1.0, complex(1, 0)])
+
+    def test_fillvalue_not_fakeable(self):
+        # See https://github.com/more-itertools/more-itertools/issues/900
+        self.assertFalse(mi.iequals([], [mock.ANY]))
 
 
 class ConstrainedBatchesTests(TestCase):
