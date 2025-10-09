@@ -92,13 +92,6 @@ __all__ = [
 _marker = object()
 
 
-# math.sumprod is available for Python 3.12+
-try:
-    from math import sumprod as _sumprod
-except ImportError:  # pragma: no cover
-    _sumprod = lambda x, y: dotproduct(x, y)
-
-
 # heapq max-heap functions are available for Python 3.14+
 try:
     from heapq import heappush_max, heappushpop_max
@@ -285,6 +278,13 @@ def dotproduct(vec1, vec2):
     In Python 3.12 and later, use ``math.sumprod()`` instead.
     """
     return sum(map(mul, vec1, vec2))
+
+
+# math.sumprod is available for Python 3.12+
+try:
+    from math import sumprod as _sumprod
+except ImportError:  # pragma: no cover
+    _sumprod = dotproduct
 
 
 def flatten(listOfLists):
