@@ -672,8 +672,11 @@ class TestRandomDerangement(TestCase):
         # standard deviations of the expected mean).
         self.assertTrue(940 <= min(c.values()) and max(c.values()) <= 1280)
 
+        # Corner case for empty input
+        self.assertEqual(mi.random_derangement(''), ())
+
         # Error case
-        with self.assertRaises(ValueError):
+        with self.assertRaises(IndexError):
             mi.random_derangement('x')  # Not enough values
 
 
