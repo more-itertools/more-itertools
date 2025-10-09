@@ -157,6 +157,7 @@ Python iterables.
 |                        +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 |                        | `random_combination <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_combination>`_,                                                         |
 |                        | `random_combination_with_replacement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_combination_with_replacement>`_,                       |
+|                        | `random_derangement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_derangement>`_,                                                         |
 |                        | `random_permutation <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_permutation>`_,                                                         |
 |                        | `random_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_product>`_                                                                  |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
