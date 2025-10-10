@@ -46,7 +46,7 @@ name = "more_itertools"
 [tool.ruff]
 indent-width = 4
 line-length = 79
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.format]
 quote-style = "preserve"
