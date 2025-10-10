@@ -4947,6 +4947,12 @@ class ProductIndexTests(TestCase):
         with self.assertRaises(ValueError):
             mi.product_index('axf', 'ab', 'cde', 'fghi')
 
+    def test_iterator_input(self):
+        self.assertEqual(
+            mi.product_index(iter(['i', 'a']), iter('snicker'), iter('snack')),
+            12,
+        )
+
 
 class CombinationIndexTests(TestCase):
     def test_r_less_than_n(self):

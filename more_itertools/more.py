@@ -4331,13 +4331,12 @@ def product_index(element, *args):
     """
     elements = tuple(element)
     pools = tuple(map(tuple, args))
-    if len(element) != len(args):
+    if len(elements) != len(pools):
         raise ValueError('element is not a product of args')
 
     index = 0
     for elem, pool in zip(elements, pools):
         index = index * len(pool) + pool.index(elem)
-
     return index
 
 
