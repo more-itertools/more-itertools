@@ -357,14 +357,15 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
 
     """
     iterators = [iter(iterable)] * n
-    if incomplete == 'fill':
-        return zip_longest(*iterators, fillvalue=fillvalue)
-    if incomplete == 'strict':
-        return zip(*iterators, strict=True)
-    if incomplete == 'ignore':
-        return zip(*iterators)
-    else:
-        raise ValueError('Expected fill, strict, or ignore')
+    match incomplete:
+        case 'fill':
+            return zip_longest(*iterators, fillvalue=fillvalue)
+        case 'strict':
+            return zip(*iterators, strict=True)
+        case 'ignore':
+            return zip(*iterators)
+        case _:
+            raise ValueError('Expected fill, strict, or ignore')
 
 
 def roundrobin(*iterables):
