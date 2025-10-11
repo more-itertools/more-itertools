@@ -580,8 +580,8 @@ def random_product(*args, repeat=1):
     ``itertools.product(*args, repeat=repeat)``.
 
     """
-    pools = [tuple(pool) for pool in args] * repeat
-    return tuple(choice(pool) for pool in pools)
+    pools = list(map(tuple, args)) * repeat
+    return tuple(map(choice, pools))
 
 
 def random_permutation(iterable, r=None):
