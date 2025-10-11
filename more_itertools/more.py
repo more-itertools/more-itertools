@@ -4617,7 +4617,7 @@ def unique_in_window(iterable, n, key=None):
     Updates a sliding window no larger than n and yields a value
     if the item only occurs once in the updated window.
 
-    When `n == 1`, the *unique_in_window* is memoryless:
+    When `n == 1`, *unique_in_window* is memoryless:
 
         >>> list(unique_in_window('aab', n=1))
         ['a', 'a', 'b']
