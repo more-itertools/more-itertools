@@ -615,7 +615,7 @@ def random_combination(iterable, r):
     pool = tuple(iterable)
     n = len(pool)
     indices = sorted(sample(range(n), r))
-    return tuple(pool[i] for i in indices)
+    return tuple([pool[i] for i in indices])
 
 
 def random_combination_with_replacement(iterable, r):
@@ -632,7 +632,7 @@ def random_combination_with_replacement(iterable, r):
     pool = tuple(iterable)
     n = len(pool)
     indices = sorted(randrange(n) for i in range(r))
-    return tuple(pool[i] for i in indices)
+    return tuple([pool[i] for i in indices])
 
 
 def nth_combination(iterable, r, index):
