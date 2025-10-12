@@ -4602,7 +4602,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
 
 def unique_in_window(iterable, n, key=None):
     """Yield the items from *iterable* that haven't been seen recently.
-    *n* is the size of the lookback window.
+    *n* is the size of the sliding window.
 
         >>> iterable = [0, 1, 0, 2, 3, 0]
         >>> n = 3
@@ -4614,6 +4614,14 @@ def unique_in_window(iterable, n, key=None):
         >>> list(unique_in_window('abAcda', 3, key=lambda x: x.lower()))
         ['a', 'b', 'c', 'd', 'a']
 
+    Updates a sliding window no larger than n and yields a value
+    if the item only occurs once in the updated window.
+
+    When `n == 1`, *unique_in_window* is memoryless:
+
+        >>> list(unique_in_window('aab', n=1))
+        ['a', 'a', 'b']
+
     The items in *iterable* must be hashable.
 
     """
@@ -4621,7 +4629,7 @@ def unique_in_window(iterable, n, key=None):
         raise ValueError('n must be greater than 0')
 
     window = deque(maxlen=n)
-    counts = defaultdict(int)
+    counts = Counter()
     use_key = key is not None
 
     for item in iterable:
