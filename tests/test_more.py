@@ -6162,6 +6162,12 @@ class PowersetOfSetsTests(TestCase):
         self.assertEqual(len(list(mi.powerset_of_sets(iterable))), 128)
         self.assertLessEqual(hash_count, 14)
 
+    def test_baseset(self):
+        iterable = [0, 1, 2]
+        for kind in (set, frozenset):
+            ps = list(mi.powerset_of_sets(iterable, baseset=kind))
+            self.assertEqual(set(map(type, ps)), {kind})
+
 
 class JoinMappingTests(TestCase):
     def test_basic(self):
