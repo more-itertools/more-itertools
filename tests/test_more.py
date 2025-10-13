@@ -6168,6 +6168,10 @@ class PowersetOfSetsTests(TestCase):
             ps = list(mi.powerset_of_sets(iterable, baseset=kind))
             self.assertEqual(set(map(type, ps)), {kind})
 
+        # Verify that an actual set can be formed.
+        ps = set(mi.powerset_of_sets('abc', baseset=frozenset))
+        self.assertIn({'a', 'b'}, ps)
+
 
 class JoinMappingTests(TestCase):
     def test_basic(self):
