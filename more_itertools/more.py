@@ -5011,7 +5011,7 @@ def filter_map(func, iterable):
             yield y
 
 
-def powerset_of_sets(iterable):
+def powerset_of_sets(iterable, *, baseset=set):
     """Yields all possible subsets of the iterable.
 
         >>> list(powerset_of_sets([1, 2, 3]))  # doctest: +SKIP
@@ -5021,11 +5021,14 @@ def powerset_of_sets(iterable):
 
     :func:`powerset_of_sets` takes care to minimize the number
     of hash operations performed.
+
+    The *baseset* parameter determines what kind of sets are
+    constructed, either *set* or *frozenset*.
     """
     sets = tuple(dict.fromkeys(map(frozenset, zip(iterable))))
+    union = baseset().union
     return chain.from_iterable(
-        starmap(set().union, combinations(sets, r))
-        for r in range(len(sets) + 1)
+        starmap(union, combinations(sets, r)) for r in range(len(sets) + 1)
     )
 
 
