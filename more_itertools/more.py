@@ -2612,20 +2612,6 @@ class islice_extended:
         raise TypeError('islice_extended.__getitem__ argument must be a slice')
 
 
-class IteratorCounterWrapper:
-    def __init__(self, iterator):
-        self._iterator = iterator
-        self.count = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        next_element = next(self._iterator)
-        self.count += 1
-        return next_element
-
-
 def _islice_helper(it, s):
     start = s.start
     stop = s.stop
@@ -2638,9 +2624,9 @@ def _islice_helper(it, s):
 
         if start < 0:
             # Consume all but the last -start items
-            wrapper = IteratorCounterWrapper(it)
+            wrapper = countable(it)
             cache = deque(wrapper, maxlen=-start)
-            len_iter = wrapper.count
+            len_iter = wrapper.items_seen
 
             # Adjust start to be positive
             i = max(len_iter + start, 0)
@@ -2694,9 +2680,9 @@ def _islice_helper(it, s):
         if (stop is not None) and (stop < 0):
             # Consume all but the last items
             n = -stop - 1
-            wrapper = IteratorCounterWrapper(it)
+            wrapper = countable(it)
             cache = deque(wrapper, maxlen=n)
-            len_iter = wrapper.count
+            len_iter = wrapper.items_seen
 
             # If start and stop are both negative they are comparable and
             # we can just slice. Otherwise we can adjust start to be negative
