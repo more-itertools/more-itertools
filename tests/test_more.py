@@ -26,7 +26,7 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter
+from operator import add, mul, itemgetter, not_
 from pickle import loads, dumps
 from random import Random, random, randrange, seed
 from statistics import mean
@@ -3674,6 +3674,8 @@ class ExactlyNTests(TestCase):
         self.assertTrue(mi.exactly_n([1, 1, 1, 0], 3))
         self.assertTrue(mi.exactly_n([False, False], 0))
         self.assertTrue(mi.exactly_n(range(100), 10, lambda x: x < 10))
+        self.assertTrue(mi.exactly_n(repeat(True, 100), 100))
+        self.assertTrue(mi.exactly_n(repeat(False, 100), 100, predicate=not_))
 
     def test_false(self):
         """Iterable does not have ``n`` ``True`` elements"""
@@ -3681,6 +3683,10 @@ class ExactlyNTests(TestCase):
         self.assertFalse(mi.exactly_n([True, True, False], 1))
         self.assertFalse(mi.exactly_n([False], 1))
         self.assertFalse(mi.exactly_n([True], -1))
+        self.assertFalse(mi.exactly_n([True], -10))
+        self.assertFalse(mi.exactly_n([], -1))
+        self.assertFalse(mi.exactly_n([], -10))
+        self.assertFalse(mi.exactly_n([True], 0))
         self.assertFalse(mi.exactly_n(repeat(True), 100))
 
     def test_empty(self):
