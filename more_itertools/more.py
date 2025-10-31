@@ -2410,6 +2410,8 @@ def count_cycle(iterable, n=None):
     [(0, 'A'), (0, 'B'), (1, 'A'), (1, 'B'), (2, 'A'), (2, 'B')]
 
     """
+    if n is not None:
+        return product(range(n), iterable)
     seq = tuple(iterable)
     if not seq:
         return iter(())
