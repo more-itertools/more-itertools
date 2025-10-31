@@ -28,6 +28,7 @@ from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
     attrgetter,
+    getitem,
     is_not,
     itemgetter,
     lt,
@@ -1041,19 +1042,15 @@ def substrings(iterable):
         >>> list(substrings([0, 1, 2]))
         [(0,), (1,), (2,), (0, 1), (1, 2), (0, 1, 2)]
 
-    """
-    # The length-1 substrings
-    seq = []
-    for item in iterable:
-        seq.append(item)
-        yield (item,)
-    seq = tuple(seq)
-    item_count = len(seq)
+    Like subslices() but returns tuples instead of lists
+    and returns the shortest substrings first.
 
-    # And the rest
-    for n in range(2, item_count + 1):
-        for i in range(item_count - n + 1):
-            yield seq[i : i + n]
+    """
+    seq = tuple(iterable)
+    item_count = len(seq)
+    for n in range(1, item_count + 1):
+        slices = map(slice, range(item_count), range(n, item_count + 1))
+        yield from map(getitem, repeat(seq), slices)
 
 
 def substrings_indexes(seq, reverse=False):
