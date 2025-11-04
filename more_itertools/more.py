@@ -3077,7 +3077,20 @@ def exactly_n(iterable, n, predicate=bool):
     so avoid calling it on infinite iterables.
 
     """
-    return ilen(islice(filter(predicate, iterable), n + 1)) == n
+    iterator = filter(predicate, iterable)
+    if n <= 0:
+        if n < 0:
+            return False
+        for _ in iterator:
+            return False
+        return True
+
+    iterator = islice(iterator, n - 1, None)
+    for _ in iterator:
+        for _ in iterator:
+            return False
+        return True
+    return False
 
 
 def circular_shifts(iterable, steps=1):
