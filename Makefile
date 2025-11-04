@@ -27,9 +27,11 @@ test:
 
 .PHONY: docs
 docs:
+	python -m pip install -r docs/requirements.txt
 	sphinx-build -W -b html docs docs/_build/html
 
 .PHONY: package
 package: requirements
+	python -m pip install -r requirements/packaging.txt
 	flit build --setup-py
 	twine check dist/*
