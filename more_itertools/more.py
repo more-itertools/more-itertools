@@ -4303,8 +4303,9 @@ def value_chain(*args):
     Multiple levels of nesting are not flattened.
 
     """
+    scalar_types = (str, bytes)
     for value in args:
-        if isinstance(value, (str, bytes)):
+        if isinstance(value, scalar_types):
             yield value
             continue
         try:
