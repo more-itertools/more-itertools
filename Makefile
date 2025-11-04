@@ -18,7 +18,7 @@ format:
 
 .PHONY: coverage
 coverage:
-	python -m pip install -r docs/testing.txt
+	python -m pip install -r requirements/testing.txt
 	coverage run --include="more_itertools/*.py" -m unittest
 	coverage report --show-missing --fail-under=99
 
