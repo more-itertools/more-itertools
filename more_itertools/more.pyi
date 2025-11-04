@@ -909,7 +909,10 @@ def argmax(
     iterable: Iterable[_T], *, key: Callable[[_T], _U] | None = ...
 ) -> int: ...
 def extract(
-    iterable: Iterable[_T], indices: Iterable[int]
+    iterable: Iterable[_T],
+    indices: Iterable[int],
+    *,
+    monotonic: bool = ...,
 ) -> Iterator[_T]: ...
 
 class serialize(Generic[_T], Iterator[_T]):

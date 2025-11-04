@@ -5253,7 +5253,24 @@ def argmax(iterable, *, key=None):
     return max(enumerate(iterable), key=itemgetter(1))[0]
 
 
-def extract(iterable, indices):
+def _extract_monotonic(iterator, indices):
+    'Non-decreasing indices, lazily consumed'
+    num_read = 0
+    for index in indices:
+        advance = index - num_read
+        try:
+            value = next(islice(iterator, advance, None))
+        except ValueError:
+            if advance != -1 or index < 0:
+                raise ValueError(f'Invalid index: {index}') from None
+        except StopIteration:
+            raise IndexError(index) from None
+        else:
+            num_read += advance + 1
+        yield value
+
+
+def extract(iterable, indices, *, monotonic=False):
     """Yield values at the specified indices.
 
     Example:
@@ -5263,13 +5280,20 @@ def extract(iterable, indices):
         ['h', 'e', 'l', 'l', 'o']
 
     The *iterable* is consumed lazily and can be infinite.
-    The *indices* are consumed immediately and must be finite.
+
+    When *monotonic* is false, the *indices* are consumed immediately
+    and must be finite. When *monotonic* is true, *indices* are consumed
+    lazily and can be infinite but must be non-decreasing.
 
     Raises ``IndexError`` if an index lies beyond the iterable.
-    Raises ``ValueError`` for negative indices.
+    Raises ``ValueError`` for a negative index or for a decreasing
+    index when *monotonic* is true.
     """
 
     iterator = iter(iterable)
+    if monotonic:
+        yield from _extract_monotonic(iterator, indices)
+        return
     index_and_position = sorted(zip(indices, count()))
 
     if index_and_position and index_and_position[0][0] < 0:
