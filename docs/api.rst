@@ -265,10 +265,11 @@ consume iterables.
 
 .. autofunction:: always_iterable
 .. autofunction:: always_reversible
+.. autoclass:: callback_iter
 .. autofunction:: countable
 .. autofunction:: consumer
+.. autoclass:: serialize
 .. autofunction:: with_iter
-.. autoclass:: callback_iter
 
 ----
 

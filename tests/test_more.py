@@ -31,6 +31,7 @@ from pickle import loads, dumps
 from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
+from threading import Thread, Lock
 from time import sleep
 from typing import NamedTuple
 from unittest import TestCase, mock
@@ -6391,3 +6392,33 @@ class ExtractTests(TestCase):
         self.assertEqual(
             list(extract(count(), [5, 7, 3, 9, 4])), [5, 7, 3, 9, 4]
         )
+
+
+class TestSerialize(TestCase):
+    def test_concurrent_calls(self):
+        result = 0
+        result_lock = Lock()
+
+        def producer(limit):
+            'Non-concurrent producer. A generator version of range(limit).'
+            for x in range(limit):
+                yield x
+
+        def consumer(counter):
+            'Concurrent data consumer'
+            nonlocal result
+            total = 0
+            for x in counter:
+                total += x
+            with result_lock:
+                result += total
+
+        limit = 10**6
+        counter = mi.serialize(producer(limit))
+        workers = [Thread(target=consumer, args=[counter]) for _ in range(10)]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        self.assertEqual(result, limit * (limit - 1) // 2)

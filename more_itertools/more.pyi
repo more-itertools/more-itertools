@@ -16,6 +16,7 @@ from collections.abc import (
     Sized,
 )
 from contextlib import AbstractContextManager
+from threading import Lock
 from typing import (
     Any,
     Callable,
@@ -115,6 +116,7 @@ __all__ = [
     'run_length',
     'sample',
     'seekable',
+    'serialize',
     'set_partitions',
     'side_effect',
     'sliced',
@@ -907,3 +909,10 @@ def argmax(
 def extract(
     iterable: Iterable[_T], indices: Iterable[int]
 ) -> Iterator[_T]: ...
+
+class serialize(Generic[_T], Iterator[_T]):
+    iterator: Iterator[_T]
+    lock: Lock
+    def __init__(self, iterable: Iterable[_T]) -> None: ...
+    def __iter__(self) -> serialize[_T]: ...
+    def __next__(self) -> _T: ...
