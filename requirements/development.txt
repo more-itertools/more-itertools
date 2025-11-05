@@ -1,9 +1,3 @@
-coverage
-flit
-mypy
-ruff
-setuptools
-sphinx
-furo>=2024.8
-twine
-wheel
+--requirement testing.txt
+--requirement ../docs/requirements.txt
+--requirement packaging.txt

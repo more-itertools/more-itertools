@@ -18,6 +18,7 @@ format:
 
 .PHONY: coverage
 coverage:
+	python -m pip install -r requirements/testing.txt
 	coverage run --include="more_itertools/*.py" -m unittest
 	coverage report --show-missing --fail-under=99
 
@@ -27,9 +28,11 @@ test:
 
 .PHONY: docs
 docs:
+	python -m pip install -r docs/requirements.txt
 	sphinx-build -W -b html docs docs/_build/html
 
 .PHONY: package
-package: requirements
+package:
+	python -m pip install -r requirements/packaging.txt
 	flit build --setup-py
 	twine check dist/*
