@@ -6422,3 +6422,50 @@ class TestSerialize(TestCase):
             worker.join()
 
         self.assertEqual(result, limit * (limit - 1) // 2)
+
+
+class TestConcurrentTee(TestCase):
+    def test_concurrent_consumers(self):
+        result = 0
+        result_lock = Lock()
+
+        def producer(limit):
+            'Non-concurrent producer. A generator version of range(limit).'
+            for x in range(limit):
+                yield x
+
+        def consumer(iterator):
+            'Concurrent data consumer'
+            nonlocal result
+            reconstructed = [x for x in iterator]
+            if reconstructed == list(range(limit)):
+                with result_lock:
+                    result += 1
+
+        limit = 10**5
+        num_threads = 100
+        non_concurrent_source = producer(limit)
+        tees = mi.concurrent_tee(non_concurrent_source, n=num_threads)
+
+        # Verify that locks are shared
+        self.assertEqual(len({id(t_obj.lock) for t_obj in tees}), 1)
+
+        # Run the consumers
+        workers = [Thread(target=consumer, args=[t_obj]) for t_obj in tees]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        # Verify that every consumer received 100% of the  data (no dups or drops).
+        self.assertEqual(result, len(tees))
+
+        # Corner case
+        non_concurrent_source = producer(limit)
+        tees = mi.concurrent_tee(non_concurrent_source, n=0)  # Zero n
+        self.assertEqual(tees, ())
+
+        # Error cases
+        with self.assertRaises(ValueError):
+            non_concurrent_source = producer(limit)
+            mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n

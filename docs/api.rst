@@ -133,6 +133,16 @@ These tools combine multiple iterables.
 .. autofunction:: prepend
 
 
+Concurrency
+===========
+
+These tools support thread-safe concurrency.
+
+----
+
+.. autofunction:: concurrent_tee
+.. autoclass:: serialize
+
 Summarizing
 ===========
 
@@ -268,7 +278,6 @@ consume iterables.
 .. autoclass:: callback_iter
 .. autofunction:: countable
 .. autofunction:: consumer
-.. autoclass:: serialize
 .. autofunction:: with_iter
 
 ----
