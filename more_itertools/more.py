@@ -39,6 +39,7 @@ from operator import (
 )
 from sys import maxsize
 from time import monotonic
+from threading import Lock
 
 from .recipes import (
     _marker,
@@ -144,6 +145,7 @@ __all__ = [
     'run_length',
     'sample',
     'seekable',
+    'serialize',
     'set_partitions',
     'side_effect',
     'sliced',
@@ -5289,3 +5291,25 @@ def extract(iterable, indices):
         while next_to_emit in buffer:
             yield buffer.pop(next_to_emit)
             next_to_emit += 1
+
+
+class serialize:
+    """Wrap a non-concurrent iterator with a lock to enforce sequential access.
+
+    Applies a non-reentrant lock around calls to ``__next__``, allowing
+    iterator and generator instances to be shared by multiple consumer
+    threads.
+    """
+
+    __slots__ = ('iterator', 'lock')
+
+    def __init__(self, iterable):
+        self.iterator = iter(iterable)
+        self.lock = Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        with self.lock:
+            return next(self.iterator)
