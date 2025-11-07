@@ -73,6 +73,7 @@ __all__ = [
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
+    'concurrent_tee',
     'consecutive_groups',
     'constrained_batches',
     'consumer',
@@ -5313,3 +5314,52 @@ class serialize:
     def __next__(self):
         with self.lock:
             return next(self.iterator)
+
+
+def concurrent_tee(iterable, n=2):
+    """Variant of itertools.tee() but with guaranteed threading semantics.
+
+    Takes a non-threadsafe iterator as an input and creates concurrent
+    tee objects for other threads to have reliable independent copies of
+    the data stream.
+
+    The new iterators are only thread-safe if consumed within a single thread.
+    To share just one of the new iterators across multiple threads, wrap it
+    with :func:`serialize`.
+    """
+
+    if n < 0:
+        raise ValueError
+    if n == 0:
+        return ()
+    iterator = _concurrent_tee(iterable)
+    result = [iterator]
+    for _ in range(n - 1):
+        result.append(_concurrent_tee(iterator))
+    return tuple(result)
+
+
+class _concurrent_tee:
+    def __init__(self, iterable):
+        it = iter(iterable)
+        if isinstance(it, _concurrent_tee):
+            self.iterator = it.iterator
+            self.link = it.link
+            self.lock = it.lock
+        else:
+            self.iterator = it
+            self.link = [None, None]
+            self.lock = Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        link = self.link
+        if link[1] is None:
+            with self.lock:
+                if link[1] is None:
+                    link[0] = next(self.iterator)
+                    link[1] = [None, None]
+        value, self.link = link
+        return value
