@@ -3,12 +3,18 @@ from decimal import Decimal
 from doctest import DocTestSuite
 from fractions import Fraction
 from functools import reduce
-from itertools import combinations, count, groupby, permutations, islice
-from operator import mul
+from itertools import (
+    combinations,
+    count,
+    groupby,
+    permutations,
+    islice,
+    pairwise,
+)
+from operator import mul, eq
 from math import comb, prod, factorial
 from statistics import mean
-from sys import version_info
-from unittest import TestCase, skipIf
+from unittest import TestCase
 from unittest.mock import patch
 
 import more_itertools as mi
@@ -271,26 +277,6 @@ class RepeatfuncTests(TestCase):
         """repeat 0 should return an empty iterator"""
         r = mi.repeatfunc(range, 0, 3)
         self.assertRaises(StopIteration, lambda: next(r))
-
-
-class PairwiseTests(TestCase):
-    """Tests for ``pairwise()``"""
-
-    def test_base_case(self):
-        """ensure an iterable will return pairwise"""
-        p = mi.pairwise([1, 2, 3])
-        self.assertEqual([(1, 2), (2, 3)], list(p))
-
-    def test_short_case(self):
-        """ensure an empty iterator if there's not enough values to pair"""
-        p = mi.pairwise("a")
-        self.assertRaises(StopIteration, lambda: next(p))
-
-    def test_coverage(self):
-        from more_itertools import recipes
-
-        p = recipes._pairwise([1, 2, 3])
-        self.assertEqual([(1, 2), (2, 3)], list(p))
 
 
 class GrouperTests(TestCase):
@@ -666,6 +652,32 @@ class RandomCombinationWithReplacementTests(TestCase):
             combination = mi.random_combination_with_replacement(items, 5)
             all_items |= set(combination)
         self.assertEqual(all_items, set(items))
+
+
+class TestRandomDerangement(TestCase):
+    def test_basics(self):
+        word = tuple('love')
+        for _ in range(20):
+            d = mi.random_derangement(word)
+            self.assertEqual(len(d), len(word))  # Same size
+            self.assertEqual(set(d), set(word))  # Same values
+            self.assertFalse(any(map(eq, d, word)))  # No fixed points
+
+        c = Counter(mi.random_derangement(word) for _ in range(10_000))
+
+        # Repeated calls generate exactly the set of valid derangements.
+        self.assertEqual(set(c), set(mi.derangements(word)))
+
+        # Check approximate equidistribution (all counts within eight
+        # standard deviations of the expected mean).
+        self.assertTrue(940 <= min(c.values()) and max(c.values()) <= 1280)
+
+        # Corner case for empty input
+        self.assertEqual(mi.random_derangement(''), ())
+
+        # Error case
+        with self.assertRaises(IndexError):
+            mi.random_derangement('x')  # Not enough values
 
 
 class NthCombinationTests(TestCase):
@@ -1073,18 +1085,10 @@ class TransposeTests(TestCase):
         expected = [(10, 20, 30), (11, 21, 31), (12, 22, 32)]
         self.assertEqual(actual, expected)
 
-    @skipIf(version_info[:2] < (3, 10), 'strict=True missing on 3.9')
     def test_incompatible_error(self):
         it = [(10, 11, 12, 13), (20, 21, 22), (30, 31, 32)]
         with self.assertRaises(ValueError):
             list(mi.transpose(it))
-
-    @skipIf(version_info[:2] >= (3, 9), 'strict=True missing on 3.9')
-    def test_incompatible_allow(self):
-        it = [(10, 11, 12, 13), (20, 21, 22), (30, 31, 32)]
-        actual = list(mi.transpose(it))
-        expected = [(10, 20, 30), (11, 21, 31), (12, 22, 32)]
-        self.assertEqual(actual, expected)
 
 
 class ReshapeTests(TestCase):
@@ -1545,7 +1549,7 @@ class RunningMedianTests(TestCase):
 
         # Window size of 2 is a moving average of pairs
         data = random.choices(range(-500, 500), k=500)
-        expected = list(map(mean, mi.pairwise(data)))
+        expected = list(map(mean, pairwise(data)))
         actual = list(islice(running_median(data, maxlen=2), 1, None))
         self.assertEqual(actual, expected)
 

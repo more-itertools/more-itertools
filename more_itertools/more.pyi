@@ -16,6 +16,7 @@ from collections.abc import (
     Sized,
 )
 from contextlib import AbstractContextManager
+from threading import Lock
 from typing import (
     Any,
     Callable,
@@ -29,7 +30,6 @@ from typing_extensions import Protocol
 __all__ = [
     'AbortThread',
     'SequenceView',
-    'UnequalIterablesError',
     'adjacent',
     'all_unique',
     'always_iterable',
@@ -44,6 +44,7 @@ __all__ = [
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
+    'concurrent_tee',
     'consecutive_groups',
     'constrained_batches',
     'consumer',
@@ -117,6 +118,7 @@ __all__ = [
     'run_length',
     'sample',
     'seekable',
+    'serialize',
     'set_partitions',
     'side_effect',
     'sliced',
@@ -142,7 +144,6 @@ __all__ = [
     'windowed_complete',
     'with_iter',
     'zip_broadcast',
-    'zip_equal',
     'zip_offset',
 ]
 
@@ -344,46 +345,6 @@ def stagger(
     longest: bool = ...,
     fillvalue: _U = ...,
 ) -> Iterator[tuple[_T | _U, ...]]: ...
-
-class UnequalIterablesError(ValueError):
-    def __init__(self, details: tuple[int, int, int] | None = ...) -> None: ...
-
-# zip_equal
-@overload
-def zip_equal(__iter1: Iterable[_T1]) -> Iterator[tuple[_T1]]: ...
-@overload
-def zip_equal(
-    __iter1: Iterable[_T1], __iter2: Iterable[_T2]
-) -> Iterator[tuple[_T1, _T2]]: ...
-@overload
-def zip_equal(
-    __iter1: Iterable[_T1], __iter2: Iterable[_T2], __iter3: Iterable[_T3]
-) -> Iterator[tuple[_T1, _T2, _T3]]: ...
-@overload
-def zip_equal(
-    __iter1: Iterable[_T1],
-    __iter2: Iterable[_T2],
-    __iter3: Iterable[_T3],
-    __iter4: Iterable[_T4],
-) -> Iterator[tuple[_T1, _T2, _T3, _T4]]: ...
-@overload
-def zip_equal(
-    __iter1: Iterable[_T1],
-    __iter2: Iterable[_T2],
-    __iter3: Iterable[_T3],
-    __iter4: Iterable[_T4],
-    __iter5: Iterable[_T5],
-) -> Iterator[tuple[_T1, _T2, _T3, _T4, _T5]]: ...
-@overload
-def zip_equal(
-    __iter1: Iterable[Any],
-    __iter2: Iterable[Any],
-    __iter3: Iterable[Any],
-    __iter4: Iterable[Any],
-    __iter5: Iterable[Any],
-    __iter6: Iterable[Any],
-    *iterables: Iterable[Any],
-) -> Iterator[tuple[Any, ...]]: ...
 
 # zip_offset
 @overload
@@ -927,7 +888,9 @@ def filter_map(
     func: Callable[[_T], _V | None],
     iterable: Iterable[_T],
 ) -> Iterator[_V]: ...
-def powerset_of_sets(iterable: Iterable[_T]) -> Iterator[set[_T]]: ...
+def powerset_of_sets(
+    iterable: Iterable[_T], *, baseset: type = ...
+) -> Iterator[set[_T]] | Iterator[frozenset[_T]]: ...
 def join_mappings(
     **field_to_map: Mapping[_T, _V],
 ) -> dict[_T, dict[str, _V]]: ...
@@ -948,6 +911,17 @@ def argmax(
 def extract(
     iterable: Iterable[_T], indices: Iterable[int]
 ) -> Iterator[_T]: ...
+
+class serialize(Generic[_T], Iterator[_T]):
+    iterator: Iterator[_T]
+    lock: Lock
+    def __init__(self, iterable: Iterable[_T]) -> None: ...
+    def __iter__(self) -> serialize[_T]: ...
+    def __next__(self) -> _T: ...
+
+def concurrent_tee(
+    iterable: Iterable[_T], n: int = ...
+) -> tuple[Iterator[_T]]: ...
 def group_ordinal(
     *iterables: Iterable[_T]
 ) -> Iterator[tuple[_T, ...]]: ...

@@ -1,7 +1,6 @@
 import math
-import warnings
 
-from collections import Counter, defaultdict, deque, abc
+from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
 from functools import cached_property, partial, reduce, wraps
@@ -29,6 +28,7 @@ from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
     attrgetter,
+    getitem,
     is_not,
     itemgetter,
     lt,
@@ -37,13 +37,12 @@ from operator import (
     sub,
     gt,
 )
-from sys import hexversion, maxsize
+from sys import maxsize
 from time import monotonic
+from threading import Lock
 
 from .recipes import (
     _marker,
-    _zip_equal,
-    UnequalIterablesError,
     consume,
     first_true,
     flatten,
@@ -60,7 +59,6 @@ from .recipes import (
 __all__ = [
     'AbortThread',
     'SequenceView',
-    'UnequalIterablesError',
     'adjacent',
     'all_unique',
     'always_iterable',
@@ -75,6 +73,7 @@ __all__ = [
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
+    'concurrent_tee',
     'consecutive_groups',
     'constrained_batches',
     'consumer',
@@ -148,6 +147,7 @@ __all__ = [
     'run_length',
     'sample',
     'seekable',
+    'serialize',
     'set_partitions',
     'side_effect',
     'sliced',
@@ -173,7 +173,6 @@ __all__ = [
     'windowed_complete',
     'with_iter',
     'zip_broadcast',
-    'zip_equal',
     'zip_offset',
 ]
 
@@ -1047,19 +1046,15 @@ def substrings(iterable):
         >>> list(substrings([0, 1, 2]))
         [(0,), (1,), (2,), (0, 1), (1, 2), (0, 1, 2)]
 
-    """
-    # The length-1 substrings
-    seq = []
-    for item in iterable:
-        seq.append(item)
-        yield (item,)
-    seq = tuple(seq)
-    item_count = len(seq)
+    Like subslices() but returns tuples instead of lists
+    and returns the shortest substrings first.
 
-    # And the rest
-    for n in range(2, item_count + 1):
-        for i in range(item_count - n + 1):
-            yield seq[i : i + n]
+    """
+    seq = tuple(iterable)
+    item_count = len(seq)
+    for n in range(1, item_count + 1):
+        slices = map(slice, range(item_count), range(n, item_count + 1))
+        yield from map(getitem, repeat(seq), slices)
 
 
 def substrings_indexes(seq, reverse=False):
@@ -1854,37 +1849,6 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
     )
 
 
-def zip_equal(*iterables):
-    """``zip`` the input *iterables* together but raise
-    ``UnequalIterablesError`` if they aren't all the same length.
-
-        >>> it_1 = range(3)
-        >>> it_2 = iter('abc')
-        >>> list(zip_equal(it_1, it_2))
-        [(0, 'a'), (1, 'b'), (2, 'c')]
-
-        >>> it_1 = range(3)
-        >>> it_2 = iter('abcd')
-        >>> list(zip_equal(it_1, it_2)) # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        ...
-        more_itertools.more.UnequalIterablesError: Iterables have different
-        lengths
-
-    """
-    if hexversion >= 0x30A00A6:
-        warnings.warn(
-            (
-                'zip_equal will be removed in a future version of '
-                'more-itertools. Use the builtin zip function with '
-                'strict=True instead.'
-            ),
-            DeprecationWarning,
-        )
-
-    return _zip_equal(*iterables)
-
-
 def zip_offset(*iterables, offsets, longest=False, fillvalue=None):
     """``zip`` the input *iterables* together, but offset the `i`-th iterable
     by the `i`-th item in *offsets*.
@@ -1966,7 +1930,7 @@ def sort_together(
         [(3, 2, 1), ('a', 'b', 'c')]
 
     If the *strict* keyword argument is ``True``, then
-    ``UnequalIterablesError`` will be raised if any of the iterables have
+    ``ValueError`` will be raised if any of the iterables have
     different lengths.
 
     """
@@ -1991,10 +1955,10 @@ def sort_together(
                 *get_key_items(zipped_items)
             )
 
-    zipper = zip_equal if strict else zip
-    return list(
-        zipper(*sorted(zipper(*iterables), key=key_argument, reverse=reverse))
-    )
+    transposed = zip(*iterables, strict=strict)
+    reordered = sorted(transposed, key=key_argument, reverse=reverse)
+    untransposed = zip(*reordered, strict=strict)
+    return list(untransposed)
 
 
 def unzip(iterable):
@@ -2226,7 +2190,7 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
     return ret
 
 
-class numeric_range(abc.Sequence, abc.Hashable):
+class numeric_range(Sequence):
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
 
@@ -2447,6 +2411,8 @@ def count_cycle(iterable, n=None):
     [(0, 'A'), (0, 'B'), (1, 'A'), (1, 'B'), (2, 'A'), (2, 'B')]
 
     """
+    if n is not None:
+        return product(range(n), iterable)
     seq = tuple(iterable)
     if not seq:
         return iter(())
@@ -3117,7 +3083,20 @@ def exactly_n(iterable, n, predicate=bool):
     so avoid calling it on infinite iterables.
 
     """
-    return ilen(islice(filter(predicate, iterable), n + 1)) == n
+    iterator = filter(predicate, iterable)
+    if n <= 0:
+        if n < 0:
+            return False
+        for _ in iterator:
+            return False
+        return True
+
+    iterator = islice(iterator, n - 1, None)
+    for _ in iterator:
+        for _ in iterator:
+            return False
+        return True
+    return False
 
 
 def circular_shifts(iterable, steps=1):
@@ -3664,7 +3643,10 @@ def iequals(*iterables):
     elements of iterable are equal to each other.
 
     """
-    return all(map(all_equal, zip_longest(*iterables, fillvalue=object())))
+    try:
+        return all(map(all_equal, zip(*iterables, strict=True)))
+    except ValueError:
+        return False
 
 
 def distinct_combinations(iterable, r):
@@ -4340,8 +4322,9 @@ def value_chain(*args):
     Multiple levels of nesting are not flattened.
 
     """
+    scalar_types = (str, bytes)
     for value in args:
-        if isinstance(value, (str, bytes)):
+        if isinstance(value, scalar_types):
             yield value
             continue
         try:
@@ -4363,15 +4346,14 @@ def product_index(element, *args):
     ``ValueError`` will be raised if the given *element* isn't in the product
     of *args*.
     """
+    elements = tuple(element)
+    pools = tuple(map(tuple, args))
+    if len(elements) != len(pools):
+        raise ValueError('element is not a product of args')
+
     index = 0
-
-    for x, pool in zip_longest(element, args, fillvalue=_marker):
-        if x is _marker or pool is _marker:
-            raise ValueError('element is not a product of args')
-
-        pool = tuple(pool)
-        index = index * len(pool) + pool.index(x)
-
+    for elem, pool in zip(elements, pools):
+        index = index * len(pool) + pool.index(elem)
     return index
 
 
@@ -4408,7 +4390,6 @@ def combination_index(element, iterable):
 
     n, _ = last(pool, default=(n, None))
 
-    # Python versions below 3.8 don't have math.comb
     index = 1
     for i, j in enumerate(reversed(indexes), start=1):
         j = n - j
@@ -4599,7 +4580,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     [('a', 0, 'x'), ('b', 0, 'y'), ('c', 0, 'z')]
 
     If the *strict* keyword argument is ``True``, then
-    ``UnequalIterablesError`` will be raised if any of the iterables have
+    ``ValueError`` will be raised if any of the iterables have
     different lengths.
     """
 
@@ -4630,8 +4611,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
         yield tuple(objects)
         return
 
-    zipper = _zip_equal if strict else zip
-    for item in zipper(*iterables):
+    for item in zip(*iterables, strict=strict):
         for i, new_item[i] in zip(iterable_positions, item):
             pass
         yield tuple(new_item)
@@ -4639,7 +4619,7 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
 
 def unique_in_window(iterable, n, key=None):
     """Yield the items from *iterable* that haven't been seen recently.
-    *n* is the size of the lookback window.
+    *n* is the size of the sliding window.
 
         >>> iterable = [0, 1, 0, 2, 3, 0]
         >>> n = 3
@@ -4651,6 +4631,14 @@ def unique_in_window(iterable, n, key=None):
         >>> list(unique_in_window('abAcda', 3, key=lambda x: x.lower()))
         ['a', 'b', 'c', 'd', 'a']
 
+    Updates a sliding window no larger than n and yields a value
+    if the item only occurs once in the updated window.
+
+    When `n == 1`, *unique_in_window* is memoryless:
+
+        >>> list(unique_in_window('aab', n=1))
+        ['a', 'a', 'b']
+
     The items in *iterable* must be hashable.
 
     """
@@ -4658,7 +4646,7 @@ def unique_in_window(iterable, n, key=None):
         raise ValueError('n must be greater than 0')
 
     window = deque(maxlen=n)
-    counts = defaultdict(int)
+    counts = Counter()
     use_key = key is not None
 
     for item in iterable:
@@ -5040,7 +5028,7 @@ def filter_map(func, iterable):
             yield y
 
 
-def powerset_of_sets(iterable):
+def powerset_of_sets(iterable, *, baseset=set):
     """Yields all possible subsets of the iterable.
 
         >>> list(powerset_of_sets([1, 2, 3]))  # doctest: +SKIP
@@ -5050,11 +5038,14 @@ def powerset_of_sets(iterable):
 
     :func:`powerset_of_sets` takes care to minimize the number
     of hash operations performed.
+
+    The *baseset* parameter determines what kind of sets are
+    constructed, either *set* or *frozenset*.
     """
     sets = tuple(dict.fromkeys(map(frozenset, zip(iterable))))
+    union = baseset().union
     return chain.from_iterable(
-        starmap(set().union, combinations(sets, r))
-        for r in range(len(sets) + 1)
+        starmap(union, combinations(sets, r)) for r in range(len(sets) + 1)
     )
 
 
@@ -5302,6 +5293,77 @@ def extract(iterable, indices):
         while next_to_emit in buffer:
             yield buffer.pop(next_to_emit)
             next_to_emit += 1
+
+
+class serialize:
+    """Wrap a non-concurrent iterator with a lock to enforce sequential access.
+
+    Applies a non-reentrant lock around calls to ``__next__``, allowing
+    iterator and generator instances to be shared by multiple consumer
+    threads.
+    """
+
+    __slots__ = ('iterator', 'lock')
+
+    def __init__(self, iterable):
+        self.iterator = iter(iterable)
+        self.lock = Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        with self.lock:
+            return next(self.iterator)
+
+
+def concurrent_tee(iterable, n=2):
+    """Variant of itertools.tee() but with guaranteed threading semantics.
+
+    Takes a non-threadsafe iterator as an input and creates concurrent
+    tee objects for other threads to have reliable independent copies of
+    the data stream.
+
+    The new iterators are only thread-safe if consumed within a single thread.
+    To share just one of the new iterators across multiple threads, wrap it
+    with :func:`serialize`.
+    """
+
+    if n < 0:
+        raise ValueError
+    if n == 0:
+        return ()
+    iterator = _concurrent_tee(iterable)
+    result = [iterator]
+    for _ in range(n - 1):
+        result.append(_concurrent_tee(iterator))
+    return tuple(result)
+
+
+class _concurrent_tee:
+    def __init__(self, iterable):
+        it = iter(iterable)
+        if isinstance(it, _concurrent_tee):
+            self.iterator = it.iterator
+            self.link = it.link
+            self.lock = it.lock
+        else:
+            self.iterator = it
+            self.link = [None, None]
+            self.lock = Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        link = self.link
+        if link[1] is None:
+            with self.lock:
+                if link[1] is None:
+                    link[0] = next(self.iterator)
+                    link[1] = [None, None]
+        value, self.link = link
+        return value
 
 
 def group_ordinal(*iterables):

@@ -5,8 +5,8 @@ import gc
 import platform
 import weakref
 
-from collections import Counter, abc, deque
-from collections.abc import Set
+from collections import Counter, deque
+from collections.abc import Set, Sequence, Iterable, Iterator, Hashable
 from datetime import datetime, timedelta
 from decimal import Decimal
 from doctest import DocTestSuite
@@ -26,15 +26,15 @@ from itertools import (
     product,
     repeat,
 )
-from operator import add, mul, itemgetter
+from operator import add, mul, itemgetter, not_
 from pickle import loads, dumps
 from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
-from sys import version_info
+from threading import Thread, Lock
 from time import sleep
-from typing import Iterable, Iterator, NamedTuple
-from unittest import skipIf, TestCase
+from typing import NamedTuple
+from unittest import TestCase, mock
 
 import more_itertools as mi
 
@@ -2025,58 +2025,6 @@ class StaggerTest(TestCase):
             self.assertEqual(list(all_groups), expected)
 
 
-class ZipEqualTest(TestCase):
-    @skipIf(version_info[:2] < (3, 10), 'zip_equal deprecated for 3.10+')
-    def test_deprecation(self):
-        with self.assertWarns(DeprecationWarning):
-            self.assertEqual(
-                list(mi.zip_equal([1, 2], [3, 4])), [(1, 3), (2, 4)]
-            )
-
-    def test_equal(self):
-        lists = [0, 1, 2], [2, 3, 4]
-
-        for iterables in [lists, map(iter, lists)]:
-            actual = list(mi.zip_equal(*iterables))
-            expected = [(0, 2), (1, 3), (2, 4)]
-            self.assertEqual(actual, expected)
-
-    def test_unequal_lists(self):
-        two_items = [0, 1]
-        three_items = [2, 3, 4]
-        four_items = [5, 6, 7, 8]
-
-        # the mismatch is at index 1
-        try:
-            list(mi.zip_equal(two_items, three_items, four_items))
-        except mi.UnequalIterablesError as e:
-            self.assertEqual(
-                e.args[0],
-                (
-                    'Iterables have different lengths: '
-                    'index 0 has length 2; index 1 has length 3'
-                ),
-            )
-
-        # the mismatch is at index 2
-        try:
-            list(mi.zip_equal(two_items, two_items, four_items, four_items))
-        except mi.UnequalIterablesError as e:
-            self.assertEqual(
-                e.args[0],
-                (
-                    'Iterables have different lengths: '
-                    'index 0 has length 2; index 2 has length 4'
-                ),
-            )
-
-        # One without length: delegate to _zip_equal_generator
-        try:
-            list(mi.zip_equal(two_items, iter(two_items), three_items))
-        except mi.UnequalIterablesError as e:
-            self.assertEqual(e.args[0], 'Iterables have different lengths')
-
-
 class ZipOffsetTest(TestCase):
     """Tests for ``zip_offset()``"""
 
@@ -2292,7 +2240,7 @@ class SortTogetherTest(TestCase):
     def test_strict(self):
         # Test for list of lists or tuples
         self.assertRaises(
-            mi.UnequalIterablesError,
+            ValueError,
             lambda: mi.sort_together(
                 [(4, 3, 2, 1), ('a', 'b', 'c')], strict=True
             ),
@@ -2300,13 +2248,13 @@ class SortTogetherTest(TestCase):
 
         # Test for list of iterables
         self.assertRaises(
-            mi.UnequalIterablesError,
+            ValueError,
             lambda: mi.sort_together([range(4), range(5)], strict=True),
         )
 
         # Test for iterable of iterables
         self.assertRaises(
-            mi.UnequalIterablesError,
+            ValueError,
             lambda: mi.sort_together(
                 (range(i) for i in range(4)), strict=True
             ),
@@ -3139,10 +3087,10 @@ class NumericRangeTests(TestCase):
 
     def test_parent_classes(self):
         r = mi.numeric_range(7.0)
-        self.assertTrue(isinstance(r, abc.Iterable))
-        self.assertFalse(isinstance(r, abc.Iterator))
-        self.assertTrue(isinstance(r, abc.Sequence))
-        self.assertTrue(isinstance(r, abc.Hashable))
+        self.assertTrue(isinstance(r, Iterable))
+        self.assertFalse(isinstance(r, Iterator))
+        self.assertTrue(isinstance(r, Sequence))
+        self.assertTrue(isinstance(r, Hashable))
 
     def test_bad_key(self):
         r = mi.numeric_range(7.0)
@@ -3727,6 +3675,8 @@ class ExactlyNTests(TestCase):
         self.assertTrue(mi.exactly_n([1, 1, 1, 0], 3))
         self.assertTrue(mi.exactly_n([False, False], 0))
         self.assertTrue(mi.exactly_n(range(100), 10, lambda x: x < 10))
+        self.assertTrue(mi.exactly_n(repeat(True, 100), 100))
+        self.assertTrue(mi.exactly_n(repeat(False, 100), 100, predicate=not_))
 
     def test_false(self):
         """Iterable does not have ``n`` ``True`` elements"""
@@ -3734,6 +3684,10 @@ class ExactlyNTests(TestCase):
         self.assertFalse(mi.exactly_n([True, True, False], 1))
         self.assertFalse(mi.exactly_n([False], 1))
         self.assertFalse(mi.exactly_n([True], -1))
+        self.assertFalse(mi.exactly_n([True], -10))
+        self.assertFalse(mi.exactly_n([], -1))
+        self.assertFalse(mi.exactly_n([], -10))
+        self.assertFalse(mi.exactly_n([True], 0))
         self.assertFalse(mi.exactly_n(repeat(True), 100))
 
     def test_empty(self):
@@ -5000,6 +4954,12 @@ class ProductIndexTests(TestCase):
         with self.assertRaises(ValueError):
             mi.product_index('axf', 'ab', 'cde', 'fghi')
 
+    def test_iterator_input(self):
+        self.assertEqual(
+            mi.product_index(iter(['i', 'a']), iter('snicker'), iter('snack')),
+            12,
+        )
+
 
 class CombinationIndexTests(TestCase):
     def test_r_less_than_n(self):
@@ -5838,6 +5798,10 @@ class IequalsTests(TestCase):
     def test_not_identical_but_equal(self):
         self.assertTrue([1, True], [1.0, complex(1, 0)])
 
+    def test_fillvalue_not_fakeable(self):
+        # See https://github.com/more-itertools/more-itertools/issues/900
+        self.assertFalse(mi.iequals([], [mock.ANY]))
+
 
 class ConstrainedBatchesTests(TestCase):
     def test_basic(self):
@@ -6205,6 +6169,16 @@ class PowersetOfSetsTests(TestCase):
         self.assertEqual(len(list(mi.powerset_of_sets(iterable))), 128)
         self.assertLessEqual(hash_count, 14)
 
+    def test_baseset(self):
+        iterable = [0, 1, 2]
+        for kind in (set, frozenset):
+            ps = list(mi.powerset_of_sets(iterable, baseset=kind))
+            self.assertEqual(set(map(type, ps)), {kind})
+
+        # Verify that an actual set can be formed.
+        ps = set(mi.powerset_of_sets('abc', baseset=frozenset))
+        self.assertIn({'a', 'b'}, ps)
+
 
 class JoinMappingTests(TestCase):
     def test_basic(self):
@@ -6418,6 +6392,82 @@ class ExtractTests(TestCase):
         self.assertEqual(
             list(extract(count(), [5, 7, 3, 9, 4])), [5, 7, 3, 9, 4]
         )
+
+class TestSerialize(TestCase):
+    def test_concurrent_calls(self):
+        result = 0
+        result_lock = Lock()
+
+        def producer(limit):
+            'Non-concurrent producer. A generator version of range(limit).'
+            for x in range(limit):
+                yield x
+
+        def consumer(counter):
+            'Concurrent data consumer'
+            nonlocal result
+            total = 0
+            for x in counter:
+                total += x
+            with result_lock:
+                result += total
+
+        limit = 10**6
+        counter = mi.serialize(producer(limit))
+        workers = [Thread(target=consumer, args=[counter]) for _ in range(10)]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        self.assertEqual(result, limit * (limit - 1) // 2)
+
+
+class TestConcurrentTee(TestCase):
+    def test_concurrent_consumers(self):
+        result = 0
+        result_lock = Lock()
+
+        def producer(limit):
+            'Non-concurrent producer. A generator version of range(limit).'
+            for x in range(limit):
+                yield x
+
+        def consumer(iterator):
+            'Concurrent data consumer'
+            nonlocal result
+            reconstructed = [x for x in iterator]
+            if reconstructed == list(range(limit)):
+                with result_lock:
+                    result += 1
+
+        limit = 10**5
+        num_threads = 100
+        non_concurrent_source = producer(limit)
+        tees = mi.concurrent_tee(non_concurrent_source, n=num_threads)
+
+        # Verify that locks are shared
+        self.assertEqual(len({id(t_obj.lock) for t_obj in tees}), 1)
+
+        # Run the consumers
+        workers = [Thread(target=consumer, args=[t_obj]) for t_obj in tees]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        # Verify that every consumer received 100% of the  data (no dups or drops).
+        self.assertEqual(result, len(tees))
+
+        # Corner case
+        non_concurrent_source = producer(limit)
+        tees = mi.concurrent_tee(non_concurrent_source, n=0)  # Zero n
+        self.assertEqual(tees, ())
+
+        # Error cases
+        with self.assertRaises(ValueError):
+            non_concurrent_source = producer(limit)
+            mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n
 
 
 class GroupOrdinalTests(TestCase):

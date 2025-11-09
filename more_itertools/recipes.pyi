@@ -34,7 +34,6 @@ __all__ = [
     'nth_combination',
     'padnone',
     'pad_none',
-    'pairwise',
     'partition',
     'polynomial_eval',
     'polynomial_from_roots',
@@ -45,6 +44,7 @@ __all__ = [
     'reshape',
     'random_combination_with_replacement',
     'random_combination',
+    'random_derangement',
     'random_permutation',
     'random_product',
     'repeatfunc',
@@ -96,7 +96,6 @@ def flatten(listOfLists: Iterable[Iterable[_T]]) -> Iterator[_T]: ...
 def repeatfunc(
     func: Callable[..., _U], times: int | None = ..., *args: Any
 ) -> Iterator[_U]: ...
-def pairwise(iterable: Iterable[_T]) -> Iterator[tuple[_T, _T]]: ...
 def grouper(
     iterable: Iterable[_T],
     n: int,
@@ -203,3 +202,4 @@ def multinomial(*counts: int) -> int: ...
 def running_median(
     iterable: Iterable[_NumberT], *, maxlen: int | None = ...
 ) -> Iterator[_NumberT]: ...
+def random_derangement(iterable: Iterable[_T]) -> tuple[_T, ...]: ...

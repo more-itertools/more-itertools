@@ -13,7 +13,7 @@ import random
 from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
-from functools import lru_cache, partial, reduce
+from functools import lru_cache, reduce
 from heapq import heappush, heappushpop
 from itertools import (
     accumulate,
@@ -24,6 +24,7 @@ from itertools import (
     cycle,
     groupby,
     islice,
+    pairwise,
     product,
     repeat,
     starmap,
@@ -32,8 +33,8 @@ from itertools import (
     zip_longest,
 )
 from math import prod, comb, isqrt, gcd
-from operator import mul, not_, itemgetter, getitem, index
-from random import randrange, sample, choice
+from operator import mul, is_, not_, itemgetter, getitem, index
+from random import randrange, sample, choice, shuffle
 from sys import hexversion
 
 __all__ = [
@@ -58,7 +59,6 @@ __all__ = [
     'nth_combination',
     'padnone',
     'pad_none',
-    'pairwise',
     'partition',
     'polynomial_eval',
     'polynomial_from_roots',
@@ -69,6 +69,7 @@ __all__ = [
     'reshape',
     'random_combination_with_replacement',
     'random_combination',
+    'random_derangement',
     'random_permutation',
     'random_product',
     'repeatfunc',
@@ -90,22 +91,6 @@ __all__ = [
 ]
 
 _marker = object()
-
-
-# zip with strict is available for Python 3.10+
-try:
-    zip(strict=True)
-except TypeError:  # pragma: no cover
-    _zip_strict = zip
-else:  # pragma: no cover
-    _zip_strict = partial(zip, strict=True)
-
-
-# math.sumprod is available for Python 3.12+
-try:
-    from math import sumprod as _sumprod
-except ImportError:  # pragma: no cover
-    _sumprod = lambda x, y: dotproduct(x, y)
 
 
 # heapq max-heap functions are available for Python 3.14+
@@ -296,6 +281,13 @@ def dotproduct(vec1, vec2):
     return sum(map(mul, vec1, vec2))
 
 
+# math.sumprod is available for Python 3.12+
+try:
+    from math import sumprod as _sumprod
+except ImportError:  # pragma: no cover
+    _sumprod = dotproduct
+
+
 def flatten(listOfLists):
     """Return an iterator flattening one level of nesting in a list of lists.
 
@@ -335,67 +327,6 @@ def repeatfunc(func, times=None, *args):
     return starmap(func, repeat(args, times))
 
 
-def _pairwise(iterable):
-    """Returns an iterator of paired items, overlapping, from the original
-
-    >>> take(4, pairwise(count()))
-    [(0, 1), (1, 2), (2, 3), (3, 4)]
-
-    On Python 3.10 and above, this is an alias for :func:`itertools.pairwise`.
-
-    """
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
-
-try:
-    from itertools import pairwise as itertools_pairwise
-except ImportError:  # pragma: no cover
-    pairwise = _pairwise
-else:  # pragma: no cover
-
-    def pairwise(iterable):
-        return itertools_pairwise(iterable)
-
-    pairwise.__doc__ = _pairwise.__doc__
-
-
-class UnequalIterablesError(ValueError):
-    def __init__(self, details=None):
-        msg = 'Iterables have different lengths'
-        if details is not None:
-            msg += (': index 0 has length {}; index {} has length {}').format(
-                *details
-            )
-
-        super().__init__(msg)
-
-
-def _zip_equal_generator(iterables):
-    for combo in zip_longest(*iterables, fillvalue=_marker):
-        for val in combo:
-            if val is _marker:
-                raise UnequalIterablesError()
-        yield combo
-
-
-def _zip_equal(*iterables):
-    # Check whether the iterables are all the same size.
-    try:
-        first_size = len(iterables[0])
-        for i, it in enumerate(iterables[1:], 1):
-            size = len(it)
-            if size != first_size:
-                raise UnequalIterablesError(details=(first_size, i, size))
-        # All sizes are equal, we can use the built-in zip.
-        return zip(*iterables)
-    # If any one of the iterables didn't have a length, start reading
-    # them until one runs out.
-    except TypeError:
-        return _zip_equal_generator(iterables)
-
-
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
     """Group elements from *iterable* into fixed-length groups of length *n*.
 
@@ -416,24 +347,25 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
     >>> list(grouper('ABCDEFG', 3, incomplete='ignore', fillvalue='x'))
     [('A', 'B', 'C'), ('D', 'E', 'F')]
 
-    When *incomplete* is `'strict'`, a subclass of `ValueError` will be raised.
+    When *incomplete* is `'strict'`, a `ValueError` will be raised.
 
     >>> iterator = grouper('ABCDEFG', 3, incomplete='strict')
     >>> list(iterator)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
-    UnequalIterablesError
+    ValueError
 
     """
     iterators = [iter(iterable)] * n
-    if incomplete == 'fill':
-        return zip_longest(*iterators, fillvalue=fillvalue)
-    if incomplete == 'strict':
-        return _zip_equal(*iterators)
-    if incomplete == 'ignore':
-        return zip(*iterators)
-    else:
-        raise ValueError('Expected fill, strict, or ignore')
+    match incomplete:
+        case 'fill':
+            return zip_longest(*iterators, fillvalue=fillvalue)
+        case 'strict':
+            return zip(*iterators, strict=True)
+        case 'ignore':
+            return zip(*iterators)
+        case _:
+            raise ValueError('Expected fill, strict, or ignore')
 
 
 def roundrobin(*iterables):
@@ -648,8 +580,8 @@ def random_product(*args, repeat=1):
     ``itertools.product(*args, repeat=repeat)``.
 
     """
-    pools = [tuple(pool) for pool in args] * repeat
-    return tuple(choice(pool) for pool in pools)
+    pools = list(map(tuple, args)) * repeat
+    return tuple(map(choice, pools))
 
 
 def random_permutation(iterable, r=None):
@@ -683,7 +615,7 @@ def random_combination(iterable, r):
     pool = tuple(iterable)
     n = len(pool)
     indices = sorted(sample(range(n), r))
-    return tuple(pool[i] for i in indices)
+    return tuple([pool[i] for i in indices])
 
 
 def random_combination_with_replacement(iterable, r):
@@ -700,7 +632,7 @@ def random_combination_with_replacement(iterable, r):
     pool = tuple(iterable)
     n = len(pool)
     indices = sorted(randrange(n) for i in range(r))
-    return tuple(pool[i] for i in indices)
+    return tuple([pool[i] for i in indices])
 
 
 def nth_combination(iterable, r, index):
@@ -1018,7 +950,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return _zip_strict(*it)
+    return zip(*it, strict=True)
 
 
 def _is_scalar(value, stringlike=(str, bytes)):
@@ -1469,3 +1401,22 @@ def running_median(iterable, *, maxlen=None):
         return _running_median_minheap_only(iterator)  # pragma: no cover
 
     return _running_median_minheap_and_maxheap(iterator)  # pragma: no cover
+
+
+def random_derangement(iterable):
+    """Return a random derangement of elements in the iterable.
+
+    Equivalent to but much faster than ``choice(list(derangements(iterable)))``.
+
+    """
+    seq = tuple(iterable)
+    if len(seq) < 2:
+        if len(seq) == 0:
+            return ()
+        raise IndexError('No derangments to choose from')
+    perm = list(range(len(seq)))
+    start = tuple(perm)
+    while True:
+        shuffle(perm)
+        if not any(map(is_, start, perm)):
+            return itemgetter(*perm)(seq)

@@ -72,7 +72,6 @@ These tools yield windows of items from an iterable.
 
 **Itertools recipes**
 
-.. autofunction:: pairwise
 .. autofunction:: triplewise
 .. autofunction:: sliding_window
 .. autofunction:: subslices
@@ -124,7 +123,6 @@ These tools combine multiple iterables.
 .. autofunction:: sort_together
 .. autofunction:: value_chain
 .. autofunction:: zip_offset(*iterables, offsets, longest=False, fillvalue=None)
-.. autofunction:: zip_equal
 .. autofunction:: zip_broadcast(*objects, scalar_types=(str, bytes), strict=False)
 
 ----
@@ -135,6 +133,16 @@ These tools combine multiple iterables.
 .. autofunction:: roundrobin
 .. autofunction:: prepend
 
+
+Concurrency
+===========
+
+These tools support thread-safe concurrency.
+
+----
+
+.. autofunction:: concurrent_tee
+.. autoclass:: serialize
 
 Summarizing
 ===========
@@ -250,6 +258,7 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: random_permutation
 .. autofunction:: random_combination
 .. autofunction:: random_combination_with_replacement
+.. autofunction:: random_derangement
 .. autofunction:: nth_product
 .. autofunction:: nth_permutation
 .. autofunction:: nth_combination
@@ -267,10 +276,10 @@ consume iterables.
 
 .. autofunction:: always_iterable
 .. autofunction:: always_reversible
+.. autoclass:: callback_iter
 .. autofunction:: countable
 .. autofunction:: consumer
 .. autofunction:: with_iter
-.. autoclass:: callback_iter
 
 ----
 
