@@ -6393,7 +6393,6 @@ class ExtractTests(TestCase):
             list(extract(count(), [5, 7, 3, 9, 4])), [5, 7, 3, 9, 4]
         )
 
-
 class TestSerialize(TestCase):
     def test_concurrent_calls(self):
         result = 0
@@ -6469,3 +6468,22 @@ class TestConcurrentTee(TestCase):
         with self.assertRaises(ValueError):
             non_concurrent_source = producer(limit)
             mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n
+
+
+class GroupOrdinalTests(TestCase):
+    def test_basic(self):
+        iterables = (
+            (1, 2, 3),
+            [4, 5, 6, 7],
+            {8}
+        )
+        expected = [
+            (1, 4, 8),
+            (2, 5),
+            (3, 6),
+            (7,)
+        ]
+        self.assertEqual(list(mi.group_ordinal(*iterables)), expected)
+
+    def test_empty(self):
+        self.assertEqual(list(mi.group_ordinal()), [])

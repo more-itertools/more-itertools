@@ -67,6 +67,7 @@ __all__ = [
     'filter_map',
     'first',
     'gray_product',
+    'group_ordinal',
     'groupby_transform',
     'ichunked',
     'iequals',
@@ -921,3 +922,6 @@ class serialize(Generic[_T], Iterator[_T]):
 def concurrent_tee(
     iterable: Iterable[_T], n: int = ...
 ) -> tuple[Iterator[_T]]: ...
+def group_ordinal(
+    *iterables: Iterable[_T]
+) -> Iterator[tuple[_T, ...]]: ...

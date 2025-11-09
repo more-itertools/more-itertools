@@ -96,6 +96,7 @@ __all__ = [
     'filter_map',
     'first',
     'gray_product',
+    'group_ordinal',
     'groupby_transform',
     'ichunked',
     'iequals',
@@ -5363,3 +5364,25 @@ class _concurrent_tee:
                     link[1] = [None, None]
         value, self.link = link
         return value
+
+
+def group_ordinal(*iterables):
+    """Group elements of iterables by their ordinal.
+
+        >>> iterables = (1, 2, 3), [4, 5, 6, 7], {8}
+        >>> list(group_ordinal(*iterables))
+        [(1, 4, 8), (2, 5), (3, 6), (7,)]
+
+    The elements are grouped in the same order as their iterables.
+    """
+    iterators = list(map(iter, reversed(iterables)))
+    result = []
+    while iterators:
+        result.clear()
+        for i in reversed(range(len(iterators))):
+            try:
+                result.append(next(iterators[i]))
+            except StopIteration:
+                del iterators[i]
+        if result:
+            yield tuple(result)
