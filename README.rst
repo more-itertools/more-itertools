@@ -70,6 +70,7 @@ Python iterables.
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Concurrency            | `concurrent_tee <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.concurrent_tee>`_,                                                                 |
 |                        | `serialize <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.serialize>`_,                                                                           |
+|                        | `synchronized <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.synchronized>`_                                                                      |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Summarizing            | `ilen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.ilen>`_,                                                                                     |
 |                        | `unique_to_each <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.unique_to_each>`_,                                                                 |

@@ -133,6 +133,7 @@ __all__ = [
     'strictly_n',
     'substrings',
     'substrings_indexes',
+    'synchronized',
     'takewhile_inclusive',
     'time_limited',
     'unique_in_window',
@@ -921,3 +922,6 @@ class serialize(Generic[_T], Iterator[_T]):
 def concurrent_tee(
     iterable: Iterable[_T], n: int = ...
 ) -> tuple[Iterator[_T]]: ...
+def synchronized(
+    func: Callable[..., Iterator[_T]],
+) -> Callable[..., Iterator[_T]]: ...
