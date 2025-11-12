@@ -6424,6 +6424,43 @@ class TestSerialize(TestCase):
         self.assertEqual(result, limit * (limit - 1) // 2)
 
 
+class TestSynchronized(TestCase):
+    def test_concurrent_calls(self):
+        unique = 10  # Number of distinct counters
+        repetitions = 5  # Number of times each counter is used
+        limit = 100  # Calls per counter per repetition
+
+        @mi.synchronized
+        def atomic_counter():
+            # This is a generator so that non-concurrent calls are detectable.
+            # To make calls while running more likely, this code uses random
+            # time delays.
+            i = 0
+            while True:
+                yield i
+                next_i = i + 1
+                sleep(random() / 1000)
+                i = next_i
+
+        def consumer(counter):
+            for i in range(limit):
+                next(counter)
+
+        unique_counters = [atomic_counter() for _ in range(unique)]
+        counters = unique_counters * repetitions
+        workers = [
+            Thread(target=consumer, args=[counter]) for counter in counters
+        ]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+        self.assertEqual(
+            {next(counter) for counter in unique_counters},
+            {limit * repetitions},
+        )
+
+
 class TestConcurrentTee(TestCase):
     def test_concurrent_consumers(self):
         result = 0

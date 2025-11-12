@@ -162,6 +162,7 @@ __all__ = [
     'strictly_n',
     'substrings',
     'substrings_indexes',
+    'synchronized',
     'takewhile_inclusive',
     'time_limited',
     'unique_in_window',
@@ -5314,6 +5315,35 @@ class serialize:
     def __next__(self):
         with self.lock:
             return next(self.iterator)
+
+
+def synchronized(func):
+    """Wrap an iterator-returning callable to make its iterators thread-safe.
+
+    Existing itertools and more-itertools can be wrapped so that their
+    iterator instances are serialized.
+
+    For example, ``itertools.count`` does not make thread-safe instances,
+    but that is easily fixed with::
+
+        atomic_counter = synchronized(itertools.count)
+
+    Can also be used as a decorator for generator functions definitions
+    so that the generator instances are serialized::
+
+        @synchronized
+        def enumerate_and_timestamp(iterable):
+            for count, value in enumerate(iterable):
+                yield count, time_ns(), value
+
+    """
+
+    @wraps(func)
+    def inner(*args, **kwargs):
+        iterator = func(*args, **kwargs)
+        return serialize(iterator)
+
+    return inner
 
 
 def concurrent_tee(iterable, n=2):

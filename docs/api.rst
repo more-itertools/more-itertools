@@ -142,6 +142,8 @@ These tools support thread-safe concurrency.
 
 .. autofunction:: concurrent_tee
 .. autoclass:: serialize
+.. autofunction:: synchronized
+
 
 Summarizing
 ===========
