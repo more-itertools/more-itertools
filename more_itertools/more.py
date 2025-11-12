@@ -5270,30 +5270,8 @@ def _extract_monotonic(iterator, indices):
         yield value
 
 
-def extract(iterable, indices, *, monotonic=False):
-    """Yield values at the specified indices.
-
-    Example:
-
-        >>> data = 'abcdefghijklmnopqrstuvwxyz'
-        >>> list(extract(data, [7, 4, 11, 11, 14]))
-        ['h', 'e', 'l', 'l', 'o']
-
-    The *iterable* is consumed lazily and can be infinite.
-
-    When *monotonic* is false, the *indices* are consumed immediately
-    and must be finite. When *monotonic* is true, *indices* are consumed
-    lazily and can be infinite but must be non-decreasing.
-
-    Raises ``IndexError`` if an index lies beyond the iterable.
-    Raises ``ValueError`` for a negative index or for a decreasing
-    index when *monotonic* is true.
-    """
-
-    iterator = iter(iterable)
-    if monotonic:
-        yield from _extract_monotonic(iterator, indices)
-        return
+def _extract_buffered(iterator, indices):
+    'Arbitrary index order, greedily consumed'
     index_and_position = sorted(zip(indices, count()))
 
     if index_and_position and index_and_position[0][0] < 0:
@@ -5317,6 +5295,33 @@ def extract(iterable, indices, *, monotonic=False):
         while next_to_emit in buffer:
             yield buffer.pop(next_to_emit)
             next_to_emit += 1
+
+
+def extract(iterable, indices, *, monotonic=False):
+    """Yield values at the specified indices.
+
+    Example:
+
+        >>> data = 'abcdefghijklmnopqrstuvwxyz'
+        >>> list(extract(data, [7, 4, 11, 11, 14]))
+        ['h', 'e', 'l', 'l', 'o']
+
+    The *iterable* is consumed lazily and can be infinite.
+
+    When *monotonic* is false, the *indices* are consumed immediately
+    and must be finite. When *monotonic* is true, *indices* are consumed
+    lazily and can be infinite but must be non-decreasing.
+
+    Raises ``IndexError`` if an index lies beyond the iterable.
+    Raises ``ValueError`` for a negative index or for a decreasing
+    index when *monotonic* is true.
+    """
+
+    iterator = iter(iterable)
+    indices = iter(indices)
+    if monotonic:
+        return _extract_monotonic(iterator, indices)
+    return _extract_buffered(iterator, indices)
 
 
 class serialize:
