@@ -5270,13 +5270,8 @@ def _extract_monotonic(iterator, indices):
         yield value
 
 
-def _extract_buffered(iterator, indices):
+def _extract_buffered(iterator, index_and_position):
     'Arbitrary index order, greedily consumed'
-    index_and_position = sorted(zip(indices, count()))
-
-    if index_and_position and index_and_position[0][0] < 0:
-        raise ValueError('Indices must be non-negative')
-
     buffer = {}
     iterator_position = -1
     next_to_emit = 0
@@ -5287,7 +5282,7 @@ def _extract_buffered(iterator, indices):
             try:
                 value = next(islice(iterator, advance - 1, None))
             except StopIteration:
-                raise IndexError(index)
+                raise IndexError(index) from None
             iterator_position = index
 
         buffer[order] = value
@@ -5319,9 +5314,14 @@ def extract(iterable, indices, *, monotonic=False):
 
     iterator = iter(iterable)
     indices = iter(indices)
+
     if monotonic:
         return _extract_monotonic(iterator, indices)
-    return _extract_buffered(iterator, indices)
+
+    index_and_position = sorted(zip(indices, count()))
+    if index_and_position and index_and_position[0][0] < 0:
+        raise ValueError('Indices must be non-negative')
+    return _extract_buffered(iterator, index_and_position)
 
 
 class serialize:
