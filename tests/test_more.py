@@ -6376,6 +6376,34 @@ class ExtractTests(TestCase):
         self.assertEqual(value, 'E')  #  Returns E.
         self.assertEqual(dead, {'A', 'B', 'D', 'C'})  # D and C are now dead.
 
+    def test_monotonic(self):
+        collatz = mi.iterate(lambda x: 3 * x + 1 if x % 2 == 1 else x // 2, 42)
+        indices = count(0, 2)
+        self.assertEqual(
+            mi.take(3, mi.extract(collatz, indices, monotonic=True)),
+            [42, 64, 16],
+        )
+        self.assertEqual(next(collatz), 8)
+        self.assertEqual(next(indices), 6)
+
+        # Finite Inputs
+        self.assertEqual(
+            list(mi.extract('abcdefgh', [0, 2, 4], monotonic=True)),
+            ['a', 'c', 'e'],
+        )
+        with self.assertRaises(IndexError):
+            list(mi.extract('abcdefgh', [0, 2, 40], monotonic=True))
+
+        # Error cases
+        with self.assertRaises(ValueError):
+            list(
+                mi.extract('abcdefg', [2, 4, 3], monotonic=True)
+            )  # decreasing index
+        with self.assertRaises(ValueError):
+            list(
+                mi.extract('abcdefg', [-1, 0, 1], monotonic=True)
+            )  # negative index
+
     def test_lazy_consumption(self):
         extract = mi.extract
 
