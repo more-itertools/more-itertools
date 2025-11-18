@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 import types
+
 from collections.abc import (
     Container,
     Hashable,
@@ -25,7 +26,6 @@ from typing import (
     overload,
     type_check_only,
 )
-
 from typing_extensions import Protocol
 
 __all__ = [
