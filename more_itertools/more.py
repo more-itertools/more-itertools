@@ -5399,6 +5399,8 @@ def concurrent_tee(iterable, n=2):
 
 
 class _concurrent_tee:
+    __slots__ = ('iterator', 'link', 'lock')
+
     def __init__(self, iterable):
         it = iter(iterable)
         if isinstance(it, _concurrent_tee):
