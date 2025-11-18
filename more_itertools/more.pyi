@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 import types
-
 from collections.abc import (
     Container,
     Hashable,
@@ -21,10 +20,12 @@ from typing import (
     Any,
     Callable,
     Generic,
+    Literal,
     TypeVar,
     overload,
     type_check_only,
 )
+
 from typing_extensions import Protocol
 
 __all__ = [
@@ -336,13 +337,26 @@ def distribute(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
 def stagger(
     iterable: Iterable[_T],
     offsets: _SizedIterable[int] = ...,
-    longest: bool = ...,
+    longest: Literal[False] = ...,
+) -> Iterator[tuple[_T, ...]]: ...
+@overload
+def stagger(
+    iterable: Iterable[_T],
+    offsets: _SizedIterable[int] = ...,
+    longest: Literal[False] = ...,
+    fillvalue: object = ...,
+) -> Iterator[tuple[_T, ...]]: ...
+@overload
+def stagger(
+    iterable: Iterable[_T],
+    offsets: _SizedIterable[int] = ...,
+    longest: Literal[True] = ...,
 ) -> Iterator[tuple[_T | None, ...]]: ...
 @overload
 def stagger(
     iterable: Iterable[_T],
     offsets: _SizedIterable[int] = ...,
-    longest: bool = ...,
+    longest: Literal[True] = ...,
     fillvalue: _U = ...,
 ) -> Iterator[tuple[_T | _U, ...]]: ...
 
