@@ -4576,7 +4576,7 @@ class SampleTests(TestCase):
         self.assertTrue(difference_in_means < 4.4)
 
     def test_error_cases(self):
-        # weights and counts are mutally exclusive
+        # weights and counts are mutually exclusive
         with self.assertRaises(TypeError):
             mi.sample(
                 'abcde', 3, weights=[1, 2, 3, 4, 5], counts=[1, 2, 3, 4, 5]
