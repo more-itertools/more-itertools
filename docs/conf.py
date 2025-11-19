@@ -110,7 +110,7 @@ exclude_patterns = [build_dir]
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-# Pygments syntax highlighting theme when broswer or user has chosen dark mode.
+# Pygments syntax highlighting theme when browser or user has chosen dark mode.
 # Setting is specific to furo HTML theme.
 pygments_dark_style = "monokai"
 
