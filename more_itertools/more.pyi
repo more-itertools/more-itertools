@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 import types
 
 from collections.abc import (
@@ -162,11 +161,7 @@ _T_co = TypeVar('_T_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
 _Raisable = BaseException | type[BaseException]
 
-# The type of isinstance's second argument (from typeshed builtins)
-if sys.version_info >= (3, 10):
-    _ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
-else:
-    _ClassInfo = type | tuple[_ClassInfo, ...]
+_ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
 
 @type_check_only
 class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]): ...
@@ -424,6 +419,22 @@ def sort_together(
 ) -> list[tuple[_T, ...]]: ...
 def unzip(iterable: Iterable[Sequence[_T]]) -> tuple[Iterator[_T], ...]: ...
 def divide(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
+
+# Case where *obj* is None.  Always returns empty iterator
+@overload
+def always_iterable(obj: None, base_type: Any = ...) -> Iterator[Any]: ...
+
+# Cases where base_type is None.  Only wraps non-iterables.
+@overload
+def always_iterable(obj: bytes, base_type: None) -> Iterator[int]: ...
+@overload
+def always_iterable(obj: Iterable[_T], base_type: None) -> Iterator[_T]: ...
+@overload
+def always_iterable(obj: _T, base_type: None) -> Iterator[_T]: ...
+
+# Cases where *obj* and *base_type* are not None.
+# Don't make any inferences about the iterator type.
+@overload
 def always_iterable(
     obj: object,
     base_type: _ClassInfo | None = ...,
