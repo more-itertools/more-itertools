@@ -31,6 +31,7 @@ from pickle import loads, dumps
 from random import Random, random, randrange, seed
 from statistics import mean
 from string import ascii_letters
+from threading import Thread, Lock
 from time import sleep
 from typing import NamedTuple
 from unittest import TestCase, mock
@@ -4575,7 +4576,7 @@ class SampleTests(TestCase):
         self.assertTrue(difference_in_means < 4.4)
 
     def test_error_cases(self):
-        # weights and counts are mutally exclusive
+        # weights and counts are mutually exclusive
         with self.assertRaises(TypeError):
             mi.sample(
                 'abcde', 3, weights=[1, 2, 3, 4, 5], counts=[1, 2, 3, 4, 5]
@@ -6375,6 +6376,34 @@ class ExtractTests(TestCase):
         self.assertEqual(value, 'E')  #  Returns E.
         self.assertEqual(dead, {'A', 'B', 'D', 'C'})  # D and C are now dead.
 
+    def test_monotonic(self):
+        collatz = mi.iterate(lambda x: 3 * x + 1 if x % 2 == 1 else x // 2, 42)
+        indices = count(0, 2)
+        self.assertEqual(
+            mi.take(3, mi.extract(collatz, indices, monotonic=True)),
+            [42, 64, 16],
+        )
+        self.assertEqual(next(collatz), 8)
+        self.assertEqual(next(indices), 6)
+
+        # Finite Inputs
+        self.assertEqual(
+            list(mi.extract('abcdefgh', [0, 2, 4], monotonic=True)),
+            ['a', 'c', 'e'],
+        )
+        with self.assertRaises(IndexError):
+            list(mi.extract('abcdefgh', [0, 2, 40], monotonic=True))
+
+        # Error cases
+        with self.assertRaises(ValueError):
+            list(
+                mi.extract('abcdefg', [2, 4, 3], monotonic=True)
+            )  # decreasing index
+        with self.assertRaises(ValueError):
+            list(
+                mi.extract('abcdefg', [-1, 0, 1], monotonic=True)
+            )  # negative index
+
     def test_lazy_consumption(self):
         extract = mi.extract
 
@@ -6391,3 +6420,117 @@ class ExtractTests(TestCase):
         self.assertEqual(
             list(extract(count(), [5, 7, 3, 9, 4])), [5, 7, 3, 9, 4]
         )
+
+
+class TestSerialize(TestCase):
+    def test_concurrent_calls(self):
+        result = 0
+        result_lock = Lock()
+
+        def producer(limit):
+            'Non-concurrent producer. A generator version of range(limit).'
+            for x in range(limit):
+                yield x
+
+        def consumer(counter):
+            'Concurrent data consumer'
+            nonlocal result
+            total = 0
+            for x in counter:
+                total += x
+            with result_lock:
+                result += total
+
+        limit = 10**6
+        counter = mi.serialize(producer(limit))
+        workers = [Thread(target=consumer, args=[counter]) for _ in range(10)]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        self.assertEqual(result, limit * (limit - 1) // 2)
+
+
+class TestSynchronized(TestCase):
+    def test_concurrent_calls(self):
+        unique = 10  # Number of distinct counters
+        repetitions = 5  # Number of times each counter is used
+        limit = 100  # Calls per counter per repetition
+
+        @mi.synchronized
+        def atomic_counter():
+            # This is a generator so that non-concurrent calls are detectable.
+            # To make calls while running more likely, this code uses random
+            # time delays.
+            i = 0
+            while True:
+                yield i
+                next_i = i + 1
+                sleep(random() / 1000)
+                i = next_i
+
+        def consumer(counter):
+            for i in range(limit):
+                next(counter)
+
+        unique_counters = [atomic_counter() for _ in range(unique)]
+        counters = unique_counters * repetitions
+        workers = [
+            Thread(target=consumer, args=[counter]) for counter in counters
+        ]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+        self.assertEqual(
+            {next(counter) for counter in unique_counters},
+            {limit * repetitions},
+        )
+
+
+class TestConcurrentTee(TestCase):
+    def test_concurrent_consumers(self):
+        result = 0
+        result_lock = Lock()
+
+        def producer(limit):
+            'Non-concurrent producer. A generator version of range(limit).'
+            for x in range(limit):
+                yield x
+
+        def consumer(iterator):
+            'Concurrent data consumer'
+            nonlocal result
+            reconstructed = [x for x in iterator]
+            if reconstructed == list(range(limit)):
+                with result_lock:
+                    result += 1
+
+        limit = 10**5
+        num_threads = 100
+        non_concurrent_source = producer(limit)
+        tees = mi.concurrent_tee(non_concurrent_source, n=num_threads)
+
+        # Verify that locks are shared
+        self.assertEqual(len({id(t_obj.lock) for t_obj in tees}), 1)
+
+        # Run the consumers
+        workers = [Thread(target=consumer, args=[t_obj]) for t_obj in tees]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        # Verify that every consumer received 100% of the  data (no dups or drops).
+        self.assertEqual(result, len(tees))
+
+        # Corner case
+        non_concurrent_source = producer(limit)
+        tees = mi.concurrent_tee(non_concurrent_source, n=0)  # Zero n
+        self.assertEqual(tees, ())
+
+        # Error cases
+        with self.assertRaises(ValueError):
+            non_concurrent_source = producer(limit)
+            mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n

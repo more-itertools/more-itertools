@@ -39,6 +39,7 @@ from operator import (
 )
 from sys import maxsize
 from time import monotonic
+from threading import Lock
 
 from .recipes import (
     _marker,
@@ -72,6 +73,7 @@ __all__ = [
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
+    'concurrent_tee',
     'consecutive_groups',
     'constrained_batches',
     'consumer',
@@ -144,6 +146,7 @@ __all__ = [
     'run_length',
     'sample',
     'seekable',
+    'serialize',
     'set_partitions',
     'side_effect',
     'sliced',
@@ -159,6 +162,7 @@ __all__ = [
     'strictly_n',
     'substrings',
     'substrings_indexes',
+    'synchronized',
     'takewhile_inclusive',
     'time_limited',
     'unique_in_window',
@@ -5252,28 +5256,25 @@ def argmax(iterable, *, key=None):
     return max(enumerate(iterable), key=itemgetter(1))[0]
 
 
-def extract(iterable, indices):
-    """Yield values at the specified indices.
+def _extract_monotonic(iterator, indices):
+    'Non-decreasing indices, lazily consumed'
+    num_read = 0
+    for index in indices:
+        advance = index - num_read
+        try:
+            value = next(islice(iterator, advance, None))
+        except ValueError:
+            if advance != -1 or index < 0:
+                raise ValueError(f'Invalid index: {index}') from None
+        except StopIteration:
+            raise IndexError(index) from None
+        else:
+            num_read += advance + 1
+        yield value
 
-    Example:
 
-        >>> data = 'abcdefghijklmnopqrstuvwxyz'
-        >>> list(extract(data, [7, 4, 11, 11, 14]))
-        ['h', 'e', 'l', 'l', 'o']
-
-    The *iterable* is consumed lazily and can be infinite.
-    The *indices* are consumed immediately and must be finite.
-
-    Raises ``IndexError`` if an index lies beyond the iterable.
-    Raises ``ValueError`` for negative indices.
-    """
-
-    iterator = iter(iterable)
-    index_and_position = sorted(zip(indices, count()))
-
-    if index_and_position and index_and_position[0][0] < 0:
-        raise ValueError('Indices must be non-negative')
-
+def _extract_buffered(iterator, index_and_position):
+    'Arbitrary index order, greedily consumed'
     buffer = {}
     iterator_position = -1
     next_to_emit = 0
@@ -5284,7 +5285,7 @@ def extract(iterable, indices):
             try:
                 value = next(islice(iterator, advance - 1, None))
             except StopIteration:
-                raise IndexError(index)
+                raise IndexError(index) from None
             iterator_position = index
 
         buffer[order] = value
@@ -5292,3 +5293,137 @@ def extract(iterable, indices):
         while next_to_emit in buffer:
             yield buffer.pop(next_to_emit)
             next_to_emit += 1
+
+
+def extract(iterable, indices, *, monotonic=False):
+    """Yield values at the specified indices.
+
+    Example:
+
+        >>> data = 'abcdefghijklmnopqrstuvwxyz'
+        >>> list(extract(data, [7, 4, 11, 11, 14]))
+        ['h', 'e', 'l', 'l', 'o']
+
+    The *iterable* is consumed lazily and can be infinite.
+
+    When *monotonic* is false, the *indices* are consumed immediately
+    and must be finite. When *monotonic* is true, *indices* are consumed
+    lazily and can be infinite but must be non-decreasing.
+
+    Raises ``IndexError`` if an index lies beyond the iterable.
+    Raises ``ValueError`` for a negative index or for a decreasing
+    index when *monotonic* is true.
+    """
+
+    iterator = iter(iterable)
+    indices = iter(indices)
+
+    if monotonic:
+        return _extract_monotonic(iterator, indices)
+
+    index_and_position = sorted(zip(indices, count()))
+    if index_and_position and index_and_position[0][0] < 0:
+        raise ValueError('Indices must be non-negative')
+    return _extract_buffered(iterator, index_and_position)
+
+
+class serialize:
+    """Wrap a non-concurrent iterator with a lock to enforce sequential access.
+
+    Applies a non-reentrant lock around calls to ``__next__``, allowing
+    iterator and generator instances to be shared by multiple consumer
+    threads.
+    """
+
+    __slots__ = ('iterator', 'lock')
+
+    def __init__(self, iterable):
+        self.iterator = iter(iterable)
+        self.lock = Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        with self.lock:
+            return next(self.iterator)
+
+
+def synchronized(func):
+    """Wrap an iterator-returning callable to make its iterators thread-safe.
+
+    Existing itertools and more-itertools can be wrapped so that their
+    iterator instances are serialized.
+
+    For example, ``itertools.count`` does not make thread-safe instances,
+    but that is easily fixed with::
+
+        atomic_counter = synchronized(itertools.count)
+
+    Can also be used as a decorator for generator functions definitions
+    so that the generator instances are serialized::
+
+        @synchronized
+        def enumerate_and_timestamp(iterable):
+            for count, value in enumerate(iterable):
+                yield count, time_ns(), value
+
+    """
+
+    @wraps(func)
+    def inner(*args, **kwargs):
+        iterator = func(*args, **kwargs)
+        return serialize(iterator)
+
+    return inner
+
+
+def concurrent_tee(iterable, n=2):
+    """Variant of itertools.tee() but with guaranteed threading semantics.
+
+    Takes a non-threadsafe iterator as an input and creates concurrent
+    tee objects for other threads to have reliable independent copies of
+    the data stream.
+
+    The new iterators are only thread-safe if consumed within a single thread.
+    To share just one of the new iterators across multiple threads, wrap it
+    with :func:`serialize`.
+    """
+
+    if n < 0:
+        raise ValueError
+    if n == 0:
+        return ()
+    iterator = _concurrent_tee(iterable)
+    result = [iterator]
+    for _ in range(n - 1):
+        result.append(_concurrent_tee(iterator))
+    return tuple(result)
+
+
+class _concurrent_tee:
+    __slots__ = ('iterator', 'link', 'lock')
+
+    def __init__(self, iterable):
+        it = iter(iterable)
+        if isinstance(it, _concurrent_tee):
+            self.iterator = it.iterator
+            self.link = it.link
+            self.lock = it.lock
+        else:
+            self.iterator = it
+            self.link = [None, None]
+            self.lock = Lock()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        link = self.link
+        if link[1] is None:
+            with self.lock:
+                if link[1] is None:
+                    link[0] = next(self.iterator)
+                    link[1] = [None, None]
+        value, self.link = link
+        return value

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 import types
 
 from collections.abc import (
@@ -16,10 +15,12 @@ from collections.abc import (
     Sized,
 )
 from contextlib import AbstractContextManager
+from threading import Lock
 from typing import (
     Any,
     Callable,
     Generic,
+    Literal,
     TypeVar,
     overload,
     type_check_only,
@@ -43,6 +44,7 @@ __all__ = [
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
+    'concurrent_tee',
     'consecutive_groups',
     'constrained_batches',
     'consumer',
@@ -115,6 +117,7 @@ __all__ = [
     'run_length',
     'sample',
     'seekable',
+    'serialize',
     'set_partitions',
     'side_effect',
     'sliced',
@@ -130,6 +133,7 @@ __all__ = [
     'strictly_n',
     'substrings',
     'substrings_indexes',
+    'synchronized',
     'takewhile_inclusive',
     'time_limited',
     'unique_in_window',
@@ -157,11 +161,7 @@ _T_co = TypeVar('_T_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
 _Raisable = BaseException | type[BaseException]
 
-# The type of isinstance's second argument (from typeshed builtins)
-if sys.version_info >= (3, 10):
-    _ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
-else:
-    _ClassInfo = type | tuple[_ClassInfo, ...]
+_ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
 
 @type_check_only
 class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]): ...
@@ -332,13 +332,26 @@ def distribute(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
 def stagger(
     iterable: Iterable[_T],
     offsets: _SizedIterable[int] = ...,
-    longest: bool = ...,
+    longest: Literal[False] = ...,
+) -> Iterator[tuple[_T, ...]]: ...
+@overload
+def stagger(
+    iterable: Iterable[_T],
+    offsets: _SizedIterable[int] = ...,
+    longest: Literal[False] = ...,
+    fillvalue: object = ...,
+) -> Iterator[tuple[_T, ...]]: ...
+@overload
+def stagger(
+    iterable: Iterable[_T],
+    offsets: _SizedIterable[int] = ...,
+    longest: Literal[True] = ...,
 ) -> Iterator[tuple[_T | None, ...]]: ...
 @overload
 def stagger(
     iterable: Iterable[_T],
     offsets: _SizedIterable[int] = ...,
-    longest: bool = ...,
+    longest: Literal[True] = ...,
     fillvalue: _U = ...,
 ) -> Iterator[tuple[_T | _U, ...]]: ...
 
@@ -406,6 +419,30 @@ def sort_together(
 ) -> list[tuple[_T, ...]]: ...
 def unzip(iterable: Iterable[Sequence[_T]]) -> tuple[Iterator[_T], ...]: ...
 def divide(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
+@overload
+def always_iterable(
+    obj: None, base_type: Any = ...
+) -> Iterator[tuple[()]]: ...
+@overload
+def always_iterable(obj: bytes, base_type: None) -> Iterator[int]: ...
+@overload
+def always_iterable(obj: Iterable[_T], base_type: None) -> Iterator[_T]: ...
+@overload
+def always_iterable(obj: _T, base_type: None) -> Iterator[_T]: ...
+@overload
+def always_iterable(
+    obj: bytes, base_type: type[bytes] | tuple[type[str], type[bytes]] = ...
+) -> Iterator[bytes]: ...
+@overload
+def always_iterable(
+    obj: Iterable[_T],
+    base_type: type[bytes] | type[str] | tuple[type[str], type[bytes]] = ...,
+) -> Iterator[_T]: ...
+@overload
+def always_iterable(
+    obj: _T, base_type: tuple[type[str], type[bytes]] = ...
+) -> Iterator[_T]: ...
+@overload
 def always_iterable(
     obj: object,
     base_type: _ClassInfo | None = ...,
@@ -905,5 +942,22 @@ def argmax(
     iterable: Iterable[_T], *, key: Callable[[_T], _U] | None = ...
 ) -> int: ...
 def extract(
-    iterable: Iterable[_T], indices: Iterable[int]
+    iterable: Iterable[_T],
+    indices: Iterable[int],
+    *,
+    monotonic: bool = ...,
 ) -> Iterator[_T]: ...
+
+class serialize(Generic[_T], Iterator[_T]):
+    iterator: Iterator[_T]
+    lock: Lock
+    def __init__(self, iterable: Iterable[_T]) -> None: ...
+    def __iter__(self) -> serialize[_T]: ...
+    def __next__(self) -> _T: ...
+
+def concurrent_tee(
+    iterable: Iterable[_T], n: int = ...
+) -> tuple[Iterator[_T]]: ...
+def synchronized(
+    func: Callable[..., Iterator[_T]],
+) -> Callable[..., Iterator[_T]]: ...
