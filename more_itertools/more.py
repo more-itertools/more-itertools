@@ -4028,10 +4028,10 @@ class callback_iter:
         self._aborted = False
         self._future = None
         self._wait_seconds = wait_seconds
+
         # Lazily import concurrent.future
-        self._executor = __import__(
-            'concurrent.futures'
-        ).futures.ThreadPoolExecutor(max_workers=1)
+        self._module = __import__('concurrent.futures').futures
+        self._executor = self._module.ThreadPoolExecutor(max_workers=1)
         self._iterator = self._reader()
 
     def __enter__(self):
@@ -4055,10 +4055,13 @@ class callback_iter:
 
     @property
     def result(self):
-        if not self.done:
-            raise RuntimeError('Function has not yet completed')
+        if self._future:
+            try:
+                return self._future.result(timeout=0)
+            except self._module.TimeoutError:
+                pass
 
-        return self._future.result()
+        raise RuntimeError('Function has not yet completed')
 
     def _reader(self):
         q = Queue()
