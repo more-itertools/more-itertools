@@ -1,3 +1,4 @@
 --requirement testing.txt
+--requirement typechecks.txt
 --requirement ../docs/requirements.txt
 --requirement packaging.txt
