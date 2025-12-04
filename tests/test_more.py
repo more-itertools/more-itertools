@@ -4977,6 +4977,11 @@ class ProductIndexTests(TestCase):
                 [1, 2, 3, 4], range(10), range(10), range(10), range(10)
             ),
         )
+        target = ['B', 'D', 'E', 'A', 'C', 'G']
+        self.assertEqual(
+            mi.product_index(target, 'AB', 'CD', 'EFG', repeat=2),
+            mi.product_index(target, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
 
 
 class CombinationIndexTests(TestCase):
@@ -5976,6 +5981,23 @@ class GrayProductTests(TestCase):
             list(mi.gray_product('ABC', repeat=5)),
             list(mi.gray_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
         )
+        self.assertEqual(
+            list(mi.gray_product('ABC', 'DE', repeat=5)),
+            list(
+                mi.gray_product(
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                )
+            ),
+        )
 
 
 class PartialProductTests(TestCase):
@@ -6049,6 +6071,23 @@ class PartialProductTests(TestCase):
         self.assertEqual(
             list(mi.partial_product('ABC', repeat=5)),
             list(mi.partial_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
+        )
+        self.assertEqual(
+            list(mi.partial_product('ABC', 'DE', repeat=5)),
+            list(
+                mi.partial_product(
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                )
+            ),
         )
 
 
