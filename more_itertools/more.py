@@ -4198,8 +4198,8 @@ def nth_product(index, *iterables, repeat=1):
 
     ``IndexError`` will be raised if the given *index* is invalid.
     """
-    pools = list(map(tuple, reversed(iterables * repeat)))
-    ns = list(map(len, pools))
+    pools = tuple(map(tuple, reversed(iterables * repeat)))
+    ns = tuple(map(len, pools))
 
     c = reduce(mul, ns)
 
@@ -4912,7 +4912,7 @@ def gray_product(*iterables, repeat=1):
     `this section <https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz>`__
     of Donald Knuth's *The Art of Computer Programming*.
     """
-    all_iterables = tuple(tuple(x) for x in iterables * repeat)
+    all_iterables = tuple(map(tuple, iterables * repeat))
     iterable_count = len(all_iterables)
     for iterable in all_iterables:
         if len(iterable) < 2:
@@ -4954,7 +4954,7 @@ def partial_product(*iterables, repeat=1):
     equivalent to ``partial_product('AB', 'AB', 'AB')``.
     """
 
-    iterators = list(map(iter, iterables * repeat))
+    iterators = tuple(map(iter, iterables * repeat))
 
     try:
         prod = [next(it) for it in iterators]
