@@ -4855,6 +4855,16 @@ class NthProductTests(TestCase):
         with self.assertRaises(IndexError):
             mi.nth_product(24, 'ab', 'cde', 'fghi')
 
+    def test_repeat(self):
+        self.assertEqual(
+            mi.nth_product(1234, 'abcde', repeat=5),
+            mi.nth_product(1234, 'abcde', 'abcde', 'abcde', 'abcde', 'abcde'),
+        )
+        self.assertEqual(
+            mi.nth_product(123, 'AB', 'CD', 'EFG', repeat=2),
+            mi.nth_product(123, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
+
 
 class NthCombinationWithReplacementTests(TestCase):
     def test_basic(self):
@@ -4958,6 +4968,19 @@ class ProductIndexTests(TestCase):
         self.assertEqual(
             mi.product_index(iter(['i', 'a']), iter('snicker'), iter('snack')),
             12,
+        )
+
+    def test_repeat(self):
+        self.assertEqual(
+            mi.product_index([1, 2, 3, 4], range(10), repeat=4),
+            mi.product_index(
+                [1, 2, 3, 4], range(10), range(10), range(10), range(10)
+            ),
+        )
+        target = ['B', 'D', 'E', 'A', 'C', 'G']
+        self.assertEqual(
+            mi.product_index(target, 'AB', 'CD', 'EFG', repeat=2),
+            mi.product_index(target, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
         )
 
 
@@ -5953,6 +5976,29 @@ class GrayProductTests(TestCase):
             sorted(product(*iters)), sorted(mi.gray_product(*iters))
         )
 
+    def test_repeat(self):
+        self.assertEqual(
+            list(mi.gray_product('ABC', repeat=5)),
+            list(mi.gray_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
+        )
+        self.assertEqual(
+            list(mi.gray_product('ABC', 'DE', repeat=5)),
+            list(
+                mi.gray_product(
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                )
+            ),
+        )
+
 
 class PartialProductTests(TestCase):
     def test_no_iterables(self):
@@ -6020,6 +6066,29 @@ class PartialProductTests(TestCase):
         ]
 
         self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
+
+    def test_repeat(self):
+        self.assertEqual(
+            list(mi.partial_product('ABC', repeat=5)),
+            list(mi.partial_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
+        )
+        self.assertEqual(
+            list(mi.partial_product('ABC', 'DE', repeat=5)),
+            list(
+                mi.partial_product(
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                )
+            ),
+        )
 
 
 class IterateTests(TestCase):

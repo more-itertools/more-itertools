@@ -4180,20 +4180,26 @@ def all_unique(iterable, key=None):
     return True
 
 
-def nth_product(index, *args):
-    """Equivalent to ``list(product(*args))[index]``.
+def nth_product(index, *iterables, repeat=1):
+    """Equivalent to ``list(product(*iterables, repeat=repeat))[index]``.
 
-    The products of *args* can be ordered lexicographically.
+    The products of *iterables* can be ordered lexicographically.
     :func:`nth_product` computes the product at sort position *index* without
     computing the previous products.
 
         >>> nth_product(8, range(2), range(2), range(2), range(2))
         (1, 0, 0, 0)
 
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  The above example is equivalent to::
+
+        >>> nth_product(8, range(2), repeat=4)
+        (1, 0, 0, 0)
+
     ``IndexError`` will be raised if the given *index* is invalid.
     """
-    pools = list(map(tuple, reversed(args)))
-    ns = list(map(len, pools))
+    pools = tuple(map(tuple, reversed(iterables * repeat)))
+    ns = tuple(map(len, pools))
 
     c = reduce(mul, ns)
 
@@ -4336,21 +4342,27 @@ def value_chain(*args):
             yield value
 
 
-def product_index(element, *args):
-    """Equivalent to ``list(product(*args)).index(element)``
+def product_index(element, *iterables, repeat=1):
+    """Equivalent to ``list(product(*iterables, repeat=repeat)).index(tuple(element))``
 
-    The products of *args* can be ordered lexicographically.
+    The products of *iterables* can be ordered lexicographically.
     :func:`product_index` computes the first index of *element* without
     computing the previous products.
 
         >>> product_index([8, 2], range(10), range(5))
         42
 
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables::
+
+        >>> product_index([8, 0, 7], range(10), repeat=3)
+        807
+
     ``ValueError`` will be raised if the given *element* isn't in the product
     of *args*.
     """
     elements = tuple(element)
-    pools = tuple(map(tuple, args))
+    pools = tuple(map(tuple, iterables * repeat))
     if len(elements) != len(pools):
         raise ValueError('element is not a product of args')
 
@@ -4880,13 +4892,17 @@ def constrained_batches(
         yield tuple(batch)
 
 
-def gray_product(*iterables):
+def gray_product(*iterables, repeat=1):
     """Like :func:`itertools.product`, but return tuples in an order such
     that only one element in the generated tuple changes from one iteration
     to the next.
 
         >>> list(gray_product('AB','CD'))
         [('A', 'C'), ('B', 'C'), ('B', 'D'), ('A', 'D')]
+
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  For example, ``gray_product('AB', repeat=3)`` is
+    equivalent to ``gray_product('AB', 'AB', 'AB')``.
 
     This function consumes all of the input iterables before producing output.
     If any of the input iterables have fewer than two items, ``ValueError``
@@ -4896,7 +4912,7 @@ def gray_product(*iterables):
     `this section <https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz>`__
     of Donald Knuth's *The Art of Computer Programming*.
     """
-    all_iterables = tuple(tuple(x) for x in iterables)
+    all_iterables = tuple(map(tuple, iterables * repeat))
     iterable_count = len(all_iterables)
     for iterable in all_iterables:
         if len(iterable) < 2:
@@ -4922,7 +4938,7 @@ def gray_product(*iterables):
             f[j + 1] = j + 1
 
 
-def partial_product(*iterables):
+def partial_product(*iterables, repeat=1):
     """Yields tuples containing one item from each iterator, with subsequent
     tuples changing a single item at a time by advancing each iterator until it
     is exhausted. This sequence guarantees every value in each iterable is
@@ -4932,9 +4948,13 @@ def partial_product(*iterables):
 
         >>> list(partial_product('AB', 'C', 'DEF'))
         [('A', 'C', 'D'), ('B', 'C', 'D'), ('B', 'C', 'E'), ('B', 'C', 'F')]
+
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  For example, ``partial_product('AB', repeat=3)`` is
+    equivalent to ``partial_product('AB', 'AB', 'AB')``.
     """
 
-    iterators = list(map(iter, iterables))
+    iterators = tuple(map(iter, iterables * repeat))
 
     try:
         prod = [next(it) for it in iterators]
