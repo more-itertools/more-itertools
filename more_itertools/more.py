@@ -4342,21 +4342,27 @@ def value_chain(*args):
             yield value
 
 
-def product_index(element, *args):
+def product_index(element, *iterables, repeat=1):
     """Equivalent to ``list(product(*args)).index(element)``
 
-    The products of *args* can be ordered lexicographically.
+    The products of *iterables* can be ordered lexicographically.
     :func:`product_index` computes the first index of *element* without
     computing the previous products.
 
         >>> product_index([8, 2], range(10), range(5))
         42
 
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables::
+
+        >>> product_index([8, 0, 7], range(10), repeat=3)
+        807
+
     ``ValueError`` will be raised if the given *element* isn't in the product
     of *args*.
     """
     elements = tuple(element)
-    pools = tuple(map(tuple, args))
+    pools = tuple(map(tuple, iterables)) * repeat
     if len(elements) != len(pools):
         raise ValueError('element is not a product of args')
 

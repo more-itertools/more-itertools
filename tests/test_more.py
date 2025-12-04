@@ -4966,6 +4966,14 @@ class ProductIndexTests(TestCase):
             12,
         )
 
+    def test_repeat(self):
+        self.assertEqual(
+            mi.product_index([1, 2, 3, 4], range(10), repeat=4),
+            mi.product_index(
+                [1, 2, 3, 4], range(10), range(10), range(10), range(10)
+            ),
+        )
+
 
 class CombinationIndexTests(TestCase):
     def test_r_less_than_n(self):
