@@ -4855,6 +4855,12 @@ class NthProductTests(TestCase):
         with self.assertRaises(IndexError):
             mi.nth_product(24, 'ab', 'cde', 'fghi')
 
+    def test_repeat(self):
+        self.assertEqual(
+            mi.nth_product(1234, 'abcde', repeat=5),
+            mi.nth_product(1234, 'abcde', 'abcde', 'abcde', 'abcde', 'abcde'),
+        )
+
 
 class NthCombinationWithReplacementTests(TestCase):
     def test_basic(self):

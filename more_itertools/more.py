@@ -4180,19 +4180,25 @@ def all_unique(iterable, key=None):
     return True
 
 
-def nth_product(index, *args):
+def nth_product(index, *iterables, repeat=1):
     """Equivalent to ``list(product(*args))[index]``.
 
-    The products of *args* can be ordered lexicographically.
+    The products of *iterables* can be ordered lexicographically.
     :func:`nth_product` computes the product at sort position *index* without
     computing the previous products.
 
         >>> nth_product(8, range(2), range(2), range(2), range(2))
         (1, 0, 0, 0)
 
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  The above example is equivalent to::
+
+        >>> nth_product(8, range(2), repeat=4)
+        (1, 0, 0, 0)
+
     ``IndexError`` will be raised if the given *index* is invalid.
     """
-    pools = list(map(tuple, reversed(args)))
+    pools = list(map(tuple, reversed(iterables))) * repeat
     ns = list(map(len, pools))
 
     c = reduce(mul, ns)
