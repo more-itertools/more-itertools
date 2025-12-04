@@ -4181,7 +4181,7 @@ def all_unique(iterable, key=None):
 
 
 def nth_product(index, *iterables, repeat=1):
-    """Equivalent to ``list(product(*args))[index]``.
+    """Equivalent to ``list(product(*iterables, repeat=repeat))[index]``.
 
     The products of *iterables* can be ordered lexicographically.
     :func:`nth_product` computes the product at sort position *index* without
@@ -4343,7 +4343,7 @@ def value_chain(*args):
 
 
 def product_index(element, *iterables, repeat=1):
-    """Equivalent to ``list(product(*args)).index(element)``
+    """Equivalent to ``list(product(*iterables, repeat=repeat)).index(element)``
 
     The products of *iterables* can be ordered lexicographically.
     :func:`product_index` computes the first index of *element* without
