@@ -4938,7 +4938,7 @@ def gray_product(*iterables, repeat=1):
             f[j + 1] = j + 1
 
 
-def partial_product(*iterables):
+def partial_product(*iterables, repeat=1):
     """Yields tuples containing one item from each iterator, with subsequent
     tuples changing a single item at a time by advancing each iterator until it
     is exhausted. This sequence guarantees every value in each iterable is
@@ -4948,8 +4948,13 @@ def partial_product(*iterables):
 
         >>> list(partial_product('AB', 'C', 'DEF'))
         [('A', 'C', 'D'), ('B', 'C', 'D'), ('B', 'C', 'E'), ('B', 'C', 'F')]
+
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  For example, ``partial_product('AB', repeat=3)`` is
+    equivalent to ``partial_product('AB', 'AB', 'AB')``.
     """
 
+    iterables *= repeat
     iterators = list(map(iter, iterables))
 
     try:

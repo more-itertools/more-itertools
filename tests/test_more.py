@@ -6041,6 +6041,12 @@ class PartialProductTests(TestCase):
 
         self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
 
+    def test_repeat(self):
+        self.assertEqual(
+            list(mi.partial_product('ABC', repeat=5)),
+            list(mi.partial_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
+        )
+
 
 class IterateTests(TestCase):
     def test_basic(self) -> None:
