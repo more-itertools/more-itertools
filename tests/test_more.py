@@ -5967,6 +5967,12 @@ class GrayProductTests(TestCase):
             sorted(product(*iters)), sorted(mi.gray_product(*iters))
         )
 
+    def test_repeat(self):
+        self.assertEqual(
+            list(mi.gray_product('ABC', repeat=5)),
+            list(mi.gray_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
+        )
+
 
 class PartialProductTests(TestCase):
     def test_no_iterables(self):

@@ -4892,13 +4892,17 @@ def constrained_batches(
         yield tuple(batch)
 
 
-def gray_product(*iterables):
+def gray_product(*iterables, repeat=1):
     """Like :func:`itertools.product`, but return tuples in an order such
     that only one element in the generated tuple changes from one iteration
     to the next.
 
         >>> list(gray_product('AB','CD'))
         [('A', 'C'), ('B', 'C'), ('B', 'D'), ('A', 'D')]
+
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  For example, ``gray_product('AB', repeat=3)`` is
+    equivalent to ``gray_product('AB', 'AB', 'AB')``.
 
     This function consumes all of the input iterables before producing output.
     If any of the input iterables have fewer than two items, ``ValueError``
@@ -4908,7 +4912,7 @@ def gray_product(*iterables):
     `this section <https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz>`__
     of Donald Knuth's *The Art of Computer Programming*.
     """
-    all_iterables = tuple(tuple(x) for x in iterables)
+    all_iterables = tuple(tuple(x) for x in iterables) * repeat
     iterable_count = len(all_iterables)
     for iterable in all_iterables:
         if len(iterable) < 2:
