@@ -564,7 +564,7 @@ def first_true(iterable, default=None, pred=None):
     return next(filter(pred, iterable), default)
 
 
-def random_product(*args, repeat=1):
+def random_product(*iterables, repeat=1):
     """Draw an item at random from each of the input iterables.
 
         >>> random_product('abc', range(4), 'XYZ')  # doctest:+SKIP
@@ -580,7 +580,7 @@ def random_product(*args, repeat=1):
     ``itertools.product(*args, repeat=repeat)``.
 
     """
-    pools = list(map(tuple, args)) * repeat
+    pools = tuple(map(tuple, iterables * repeat))
     return tuple(map(choice, pools))
 
 
