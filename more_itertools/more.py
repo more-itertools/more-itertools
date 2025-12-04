@@ -4343,7 +4343,7 @@ def value_chain(*args):
 
 
 def product_index(element, *iterables, repeat=1):
-    """Equivalent to ``list(product(*iterables, repeat=repeat)).index(element)``
+    """Equivalent to ``list(product(*iterables, repeat=repeat)).index(tuple(element))``
 
     The products of *iterables* can be ordered lexicographically.
     :func:`product_index` computes the first index of *element* without
