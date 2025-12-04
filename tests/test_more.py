@@ -4860,6 +4860,10 @@ class NthProductTests(TestCase):
             mi.nth_product(1234, 'abcde', repeat=5),
             mi.nth_product(1234, 'abcde', 'abcde', 'abcde', 'abcde', 'abcde'),
         )
+        self.assertEqual(
+            mi.nth_product(123, 'AB', 'CD', 'EFG', repeat=2),
+            mi.nth_product(123, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
 
 
 class NthCombinationWithReplacementTests(TestCase):
