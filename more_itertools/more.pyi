@@ -67,6 +67,7 @@ __all__ = [
     'filter_map',
     'first',
     'gray_product',
+    'hypercube_product',
     'groupby_transform',
     'ichunked',
     'iequals',
@@ -907,6 +908,9 @@ def constrained_batches(
 ) -> Iterator[tuple[_T]]: ...
 def gray_product(
     *iterables: Iterable[_T], repeat: int = ...
+) -> Iterator[tuple[_T, ...]]: ...
+def hypercube_product(
+    *iterables: Iterable[_T],
 ) -> Iterator[tuple[_T, ...]]: ...
 def partial_product(
     *iterables: Iterable[_T], repeat: int = ...

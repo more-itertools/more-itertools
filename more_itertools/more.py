@@ -56,6 +56,15 @@ from .recipes import (
     batched,
 )
 
+try:
+    from math import lcm
+except (ImportError, ModuleNotFoundError):
+    from math import gcd as _gcd
+
+    def lcm(*numbers):
+        return reduce(lambda a, b: a * b // _gcd(a, b), numbers)
+
+
 __all__ = [
     'AbortThread',
     'SequenceView',
@@ -96,6 +105,7 @@ __all__ = [
     'filter_map',
     'first',
     'gray_product',
+    'hypercube_product',
     'groupby_transform',
     'ichunked',
     'iequals',
@@ -5447,3 +5457,96 @@ class _concurrent_tee:
                     link[1] = [None, None]
         value, self.link = link
         return value
+
+
+class _iterable_cycle:
+    __slots__ = ('_source', '_index', 'size', 'elements')
+
+    def __init__(self, iterable):
+        self._source = iter(iterable)
+        self.elements = []
+        self.size = None
+        self._index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._source is not None:
+            try:
+                item = next(self._source)
+                self.elements.append(item)
+                return item
+            except StopIteration:
+                self._source = None
+                self.size = len(self.elements)
+                if not self.size:
+                    raise
+
+        element = self.elements[self._index]
+        self._index = (self._index + 1) % self.size
+        return element
+
+    @property
+    def source_consumed(self):
+        return self._source is None
+
+
+def hypercube_product(*iterables):
+    """Hypercube Cartesian product of iterables. Similar to `itertools.product` but
+    yields elements in a diagonal / hypercube ordering.
+
+    Yields all elements of the Cartesian product of the iterables exactly once in a diagonal / hypercube
+    ordering. Guaranteed to yield all elements of each iterable at least N times after
+    sampling `N * max(len(list(iterable)) for iterable in iterables)` times. No caching of
+    previously yielded elements of the product space and no duplicates are yielded.
+
+    Note: This function *does* require the size of each iterable to be held in memory, as
+    is the case for `itertools.product` and `itertools.cycle` but can be used with true iterables
+    directly.
+    """
+    cycles = tuple(map(_iterable_cycle, iterables))
+
+    index = 0
+    # initially consume each iterable cyclically until all are exhausted.
+    while True:
+        product = tuple(next(cycle) for cycle in cycles)
+        # only know if source is consumed after the next() that raises StopIteration
+        if all(cycle.source_consumed for cycle in cycles):
+            break
+
+        yield product
+        index += 1
+
+    # determine the size of the product of the iterables.
+    sizes = tuple(cycle.size for cycle in cycles)
+    total_product_size = math.prod(sizes)
+    num_dims = len(cycles)
+
+    # determine the period of the product of the iterables, diagonal sequence will
+    # repeat every period, so need to offset a cycle.
+    period = lcm(*sizes)
+
+    size_order = sorted(range(num_dims), key=sizes.__getitem__)
+    divisors = [0] * num_dims
+    cumulative = 1
+
+    for orig_idx in size_order:
+        divisors[orig_idx] = cumulative
+        cumulative *= sizes[orig_idx]
+
+    def get_indices(n):
+        step = n % period
+        phase = n // period
+        indices = (
+            (step + (phase // divisor) % size) % size
+            for divisor, size in zip(divisors, sizes)
+        )
+        return indices
+
+    # restart at the index after the last one we yielded.
+    for index in range(index, total_product_size):
+        yield tuple(
+            cycles[dim].elements[idx]
+            for dim, idx in enumerate(get_indices(index))
+        )
