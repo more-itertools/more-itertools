@@ -22,7 +22,19 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import (
+    comb,
+    e,
+    exp,
+    factorial,
+    floor,
+    fsum,
+    lcm,
+    log,
+    log1p,
+    perm,
+    tau,
+)
 from math import ceil
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
@@ -81,6 +93,7 @@ __all__ = [
     'countable',
     'derangements',
     'dft',
+    'diagonal_product',
     'difference',
     'distinct_combinations',
     'distinct_permutations',
@@ -5447,3 +5460,143 @@ class _concurrent_tee:
                     link[1] = [None, None]
         value, self.link = link
         return value
+
+
+class _iterable_cycle:
+    __slots__ = ('_source', '_index', 'size', 'elements')
+
+    def __init__(self, iterable):
+        self._source = iter(iterable)
+        self.elements = []
+        self.size = None
+        self._index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._source is not None:
+            try:
+                item = next(self._source)
+                self.elements.append(item)
+                return item
+            except StopIteration:
+                self._source = None
+                self.size = len(self.elements)
+                if not self.size:
+                    raise
+
+        element = self.elements[self._index]
+        self._index = (self._index + 1) % self.size
+        return element
+
+    @property
+    def source_consumed(self):
+        return self._source is None
+
+
+def diagonal_product(*iterables):
+    """Generates the Cartesian product of iterables similar to `itertools.product` but
+    yields elements in a diagonal ordering uniquely. This is a maximally explorative way
+    of sampling all elements of the iterables in as few samples as possible.
+
+    Yields all elements of the Cartesian product of the iterables exactly once in a diagonal
+    ordering. Guaranteed to yield all elements of each iterable at least N times after
+    sampling `N * max(len(list(iterable)) for iterable in iterables)` times. No caching of
+    previously yielded elements of the product space and no duplicates are yielded.
+
+    Note: This function *does* require the size of each iterable to be held in memory, as
+    is the case for `itertools.product` and `itertools.cycle` but can be used with true iterables
+    directly.
+
+    For example, comparing to `itertools.product`:
+        >>> import itertools
+        >>> # total product size == 24, period at 12
+        >>> iterables = [list(range(3)), list(range(2)), list(range(4))]
+        >>> for i, (diagonal_sample, product_sample) in enumerate(zip(diagonal_product(*iterables), itertools.product(*iterables))):
+        ...     print(i, diagonal_sample, product_sample)
+        0 (0, 0, 0) (0, 0, 0)
+        1 (1, 1, 1) (0, 0, 1)
+        2 (2, 0, 2) (0, 0, 2)
+        3 (0, 1, 3) (0, 0, 3)
+        4 (1, 0, 0) (0, 1, 0)
+        5 (2, 1, 1) (0, 1, 1)
+        6 (0, 0, 2) (0, 1, 2)
+        7 (1, 1, 3) (0, 1, 3)
+        8 (2, 0, 0) (1, 0, 0)
+        9 (0, 1, 1) (1, 0, 1)
+        10 (1, 0, 2) (1, 0, 2)
+        11 (2, 1, 3) (1, 0, 3)
+        12 (0, 1, 0) (1, 1, 0)
+        13 (1, 0, 1) (1, 1, 1)
+        14 (2, 1, 2) (1, 1, 2)
+        15 (0, 0, 3) (1, 1, 3)
+        16 (1, 1, 0) (2, 0, 0)
+        17 (2, 0, 1) (2, 0, 1)
+        18 (0, 1, 2) (2, 0, 2)
+        19 (1, 0, 3) (2, 0, 3)
+        20 (2, 1, 0) (2, 1, 0)
+        21 (0, 0, 1) (2, 1, 1)
+        22 (1, 1, 2) (2, 1, 2)
+        23 (2, 0, 3) (2, 1, 3)
+
+    The diagonal sampling ensures that all elements of the iterables are seen in as few samples
+    as possible.
+
+        >>> iterables = [range(10), range(5), range(2)]
+        >>> counts = []
+        >>> samples = []
+        >>> for sample in diagonal_product(*iterables):
+        ...     samples.append(sample)
+        ...     if len(samples) == 10:
+        ...         break
+        >>> for dimension in zip(*samples):
+        ...     counts.append(Counter(dimension))
+        >>> counts
+        [Counter({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), Counter({0: 2, 1: 2, 2: 2, 3: 2, 4: 2}), Counter({0: 5, 1: 5})]
+    """
+    cycles = tuple(map(_iterable_cycle, iterables))
+
+    index = 0
+    # initially consume each iterable cyclically until all are exhausted.
+    while True:
+        product = tuple(next(cycle) for cycle in cycles)
+        # only know if source is consumed after the next() that raises StopIteration
+        if all(cycle.source_consumed for cycle in cycles):
+            break
+
+        yield product
+        index += 1
+
+    # determine the size of the product of the iterables.
+    sizes = tuple(cycle.size for cycle in cycles)
+    total_product_size = math.prod(sizes)
+    num_dims = len(cycles)
+
+    # determine the period of the product of the iterables, diagonal sequence will
+    # repeat every period, so need to offset a cycle.
+    period = lcm(*sizes)
+
+    size_order = sorted(range(num_dims), key=sizes.__getitem__)
+    divisors = [0] * num_dims
+    cumulative = 1
+
+    for orig_idx in size_order:
+        divisors[orig_idx] = cumulative
+        cumulative *= sizes[orig_idx]
+
+    def get_indices(n):
+        step = n % period
+        phase = n // period
+        indices = (
+            (step + (phase // divisor) % size) % size
+            for divisor, size in zip(divisors, sizes)
+        )
+        return indices
+
+    # restart at the index after the last one we yielded.
+    for index in range(index, total_product_size):
+        yield tuple(
+            cycles[dim].elements[idx]
+            for dim, idx in enumerate(get_indices(index))
+        )
