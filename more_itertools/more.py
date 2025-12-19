@@ -5425,13 +5425,12 @@ class _concurrent_tee:
     __slots__ = ('iterator', 'link', 'lock')
 
     def __init__(self, iterable):
-        it = iter(iterable)
-        if isinstance(it, _concurrent_tee):
-            self.iterator = it.iterator
-            self.link = it.link
-            self.lock = it.lock
+        if isinstance(iterable, _concurrent_tee):
+            self.iterator = iterable.iterator
+            self.link = iterable.link
+            self.lock = iterable.lock
         else:
-            self.iterator = it
+            self.iterator = iter(iterable)
             self.link = [None, None]
             self.lock = Lock()
 
