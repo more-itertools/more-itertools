@@ -23,7 +23,7 @@ from itertools import (
     product,
 )
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
-from math import ceil
+from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
@@ -48,6 +48,7 @@ from .recipes import (
     flatten,
     is_prime,
     nth,
+    nth_combination,
     powerset,
     sieve,
     take,
@@ -138,6 +139,11 @@ __all__ = [
     'powerset_of_sets',
     'product_index',
     'raise_',
+    'random_ordered_combinations',
+    'random_ordered_combs_with_replacement',
+    'random_ordered_permutations',
+    'random_ordered_product',
+    'random_ordered_range',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -5446,3 +5452,83 @@ class _concurrent_tee:
                     link[1] = [None, None]
         value, self.link = link
         return value
+
+
+def random_ordered_range(*args):
+    """Like range() but the output order is shuffled randomly.
+
+    Equivalent to:  ``iter(random.sample(range(*args), k=n))``
+    """
+
+    start, step = 0, 1
+    match args:
+        case [stop]:
+            pass
+        case [start, stop]:
+            pass
+        case [start, stop, step]:
+            pass
+        case _:
+            raise TypeError
+    n = len(range(start, stop, step))
+
+    # The algorithm is a fluxed, full period linear congruential generator.
+    # Size *m* is a power of two.  The mask speeds-up modulo calculations.
+    # The multiplier *a* and addend *c* are Hull-Dobell constants.  See:
+    # https://jackgiffin.com/main/pdfs/Random-Number-Generators-T-E-Hull-and-A-R-Dobell.pdf
+    # The value *x* is a random starting point.
+    # The *flux* bitfield breaks-up patterns in the LCG.
+
+    m = 1 << (n.bit_length())
+    mask = m - 1
+    a = randrange(5, m, 4) if m > 4 else 1
+    c = randrange(1, m, 2) if m > 1 else 1
+    x = randrange(m)
+    flux = randrange(m)
+
+    for _ in range(m):
+        index = x ^ flux
+        if index < n:
+            yield start + index * step
+        x = (a * x + c) & mask
+
+
+def random_ordered_product(*iterables, repeat=1):
+    'Return ``product(*iterables, repeat=1)`` tuples in randomly shuffled order.'
+    pools = tuple(map(tuple, iterables * repeat))
+    n = prod(map(len, pools))
+    for index in random_ordered_range(n):
+        yield nth_product(index, *pools)
+
+
+def random_ordered_permutations(iterable, r=None):
+    'Return ``permutations(iterable, r=None)`` tuples in randomly shuffled order.'
+    sequence = tuple(iterable)
+    if r is None:
+        r = len(sequence)
+    n = perm(len(sequence), r)
+    for index in random_ordered_range(n):
+        yield nth_permutation(sequence, r, index)
+
+
+def random_ordered_combinations(iterable, r):
+    '''Return ``combinations(iterable, r)`` tuples in randomly shuffled order.
+
+    Raises ``ValueError`` if *r* is negative or greater than the length
+    of *iterable*.
+    '''
+    sequence = tuple(iterable)
+    n = comb(len(sequence), r)
+    for index in random_ordered_range(n):
+        yield nth_combination(sequence, r, index)
+
+
+def random_ordered_combs_with_replacement(iterable, r):
+    'Return ``combinations_with_replacement(iterable, r)`` tuples in randomly shuffled order.'
+    sequence = tuple(iterable)
+    if not sequence:
+        yield ()
+        return
+    n = comb(len(sequence) + r - 1, r)
+    for index in random_ordered_range(n):
+        yield nth_combination_with_replacement(sequence, r, index)
