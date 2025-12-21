@@ -5454,7 +5454,7 @@ class _concurrent_tee:
         return value
 
 
-def _random_ordered_indices(n):
+def _full_period_lcg(n):
     "Returns values from range(n) in randomly shuffled order."
 
     # The algorithm is a fluxed, full period linear congruential generator.
@@ -5476,6 +5476,15 @@ def _random_ordered_indices(n):
         if index < n:
             yield index
         x = (a * x + c) & mask
+
+
+def _random_ordered_indices(n):
+    "Batch shuffle inputs to mitigate the small state space of the LCG."
+
+    # Batched variation of Knuth's Algorithm M in §3.2.2 of TAOCP.
+    for batch in map(list, batched(_full_period_lcg(n), 32)):
+        shuffle(batch)
+        yield from batch
 
 
 def random_ordered_range(*args):
