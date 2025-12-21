@@ -5464,7 +5464,7 @@ def _full_period_lcg(n):
     # The value *x* is a random starting point.
     # The *flux* bitfield breaks-up patterns in the LCG.
 
-    m = 1 << (n.bit_length())
+    m = 1 << n.bit_length()
     mask = m - 1
     a = randrange(5, m, 4) if m > 4 else 1
     c = randrange(1, m, 2) if m > 1 else 1
@@ -5480,6 +5480,13 @@ def _full_period_lcg(n):
 
 def _random_ordered_indices(n):
     "Batch shuffle inputs to mitigate the small state space of the LCG."
+
+    if n <= 256:
+        # Fast path for small n
+        batch = list(range(n))
+        shuffle(batch)
+        yield from batch
+        return
 
     # Batched variation of Knuth's Algorithm M in §3.2.2 of TAOCP.
     for batch in map(list, batched(_full_period_lcg(n), 32)):
