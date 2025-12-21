@@ -166,7 +166,7 @@ Python iterables.
 |                        | `random_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_product>`_                                                                  |
 |                        +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 |                        | `random_ordered_combinations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools. random_ordered_combinations>`_,                                      |
-|                        | `random_ordered_comb_with_replacement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_ordered_comb_with_replacement>`_,                     |
+|                        | `random_ordered_combs_with_replacement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_ordered_combs_with_replacement>`_,                   |
 |                        | `random_ordered_permutations <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools. random_ordered_permutations>`_,                                      |
 |                        | `random_ordered_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools. random_ordered_product>`_,                                                |
 |                        | `random_ordered_range <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools. random_ordered_range>`_                                                     |
