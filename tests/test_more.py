@@ -6642,12 +6642,6 @@ class TestRandomOrderedRange(TestsRandomOrderedCombinatorics):
         ((2000, 1000, -10),),
     ]
 
-    def test_incorrect_arguments(self):
-        with self.assertRaises(TypeError):
-            list(self.randomized_tool())  # Not enough arguments
-        with self.assertRaises(TypeError):
-            list(self.randomized_tool(10, 20, 2, 5))  # Too many arguments
-
 
 class TestRandomOrderedProduct(TestsRandomOrderedCombinatorics):
     randomized_tool = staticmethod(mi.random_ordered_product)

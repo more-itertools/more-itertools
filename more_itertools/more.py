@@ -5455,10 +5455,10 @@ class _concurrent_tee:
 
 
 def _shuffled_indices(n):
-    "Returns a values from range(n) in randomly shuffled order."
+    "Returns values from range(n) in randomly shuffled order."
 
     # The algorithm is a fluxed, full period linear congruential generator.
-    # Size *m* is a power of two.  The mask speeds-up modulo calculations.
+    # Size *m* is a power of two.  The *mask* speeds-up modulo calculations.
     # The multiplier *a* and addend *c* are Hull-Dobell constants.  See:
     # https://jackgiffin.com/main/pdfs/Random-Number-Generators-T-E-Hull-and-A-R-Dobell.pdf
     # The value *x* is a random starting point.
@@ -5484,19 +5484,10 @@ def random_ordered_range(*args):
     Equivalent to:  ``iter(random.sample(range(*args), k=n))``
     """
 
-    start, step = 0, 1
-    match args:
-        case [stop]:
-            pass
-        case [start, stop]:
-            pass
-        case [start, stop, step]:
-            pass
-        case _:
-            raise TypeError
-    n = len(range(start, stop, step))
+    range_object = range(*args)
+    n = len(range_object)
     for index in _shuffled_indices(n):
-        yield start + index * step
+        yield range_object[index]
 
 
 def random_ordered_product(*iterables, repeat=1):
