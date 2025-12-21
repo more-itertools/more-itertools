@@ -5454,7 +5454,7 @@ class _concurrent_tee:
         return value
 
 
-def _shuffled_indices(n):
+def _random_ordered_indices(n):
     "Returns values from range(n) in randomly shuffled order."
 
     # The algorithm is a fluxed, full period linear congruential generator.
@@ -5471,7 +5471,7 @@ def _shuffled_indices(n):
     x = randrange(m)
     flux = randrange(m)
 
-    for _ in range(m):
+    for _ in repeat(None, m):
         index = x ^ flux
         if index < n:
             yield index
@@ -5483,49 +5483,48 @@ def random_ordered_range(*args):
 
     Equivalent to:  ``iter(random.sample(range(*args), k=n))``
     """
-
     range_object = range(*args)
     n = len(range_object)
-    for index in _shuffled_indices(n):
+    for index in _random_ordered_indices(n):
         yield range_object[index]
 
 
 def random_ordered_product(*iterables, repeat=1):
-    'Return ``product(*iterables, repeat=1)`` tuples in randomly shuffled order.'
+    'Return *product* tuples in randomly shuffled order.'
     pools = tuple(map(tuple, iterables * repeat))
     n = prod(map(len, pools))
-    for index in _shuffled_indices(n):
+    for index in _random_ordered_indices(n):
         yield nth_product(index, *pools)
 
 
 def random_ordered_permutations(iterable, r=None):
-    'Return ``permutations(iterable, r=None)`` tuples in randomly shuffled order.'
+    'Return *permutations* tuples in randomly shuffled order.'
     sequence = tuple(iterable)
     if r is None:
         r = len(sequence)
     n = perm(len(sequence), r)
-    for index in _shuffled_indices(n):
+    for index in _random_ordered_indices(n):
         yield nth_permutation(sequence, r, index)
 
 
 def random_ordered_combinations(iterable, r):
-    '''Return ``combinations(iterable, r)`` tuples in randomly shuffled order.
+    '''Return *combinations* tuples in randomly shuffled order.
 
-    Raises ``ValueError`` if *r* is negative or greater than the length
-    of *iterable*.
+    Raises :exc:`ValueError` if *r* is negative or greater than
+    the length of *iterable*.
     '''
     sequence = tuple(iterable)
     n = comb(len(sequence), r)
-    for index in _shuffled_indices(n):
+    for index in _random_ordered_indices(n):
         yield nth_combination(sequence, r, index)
 
 
 def random_ordered_combs_with_replacement(iterable, r):
-    'Return ``combinations_with_replacement(iterable, r)`` tuples in randomly shuffled order.'
+    'Return *combinations_with_replacement* tuples in randomly shuffled order.'
     sequence = tuple(iterable)
     if not sequence:
         yield ()
         return
     n = comb(len(sequence) + r - 1, r)
-    for index in _shuffled_indices(n):
+    for index in _random_ordered_indices(n):
         yield nth_combination_with_replacement(sequence, r, index)
