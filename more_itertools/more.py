@@ -5481,15 +5481,9 @@ def _full_period_lcg(n):
 def _random_ordered_indices(n):
     "Batch shuffle inputs to mitigate the small state space of the LCG."
 
-    if n <= 256:
-        # Fast path for small n
-        batch = list(range(n))
-        shuffle(batch)
-        yield from batch
-        return
-
     # Batched variation of Knuth's Algorithm M in §3.2.2 of TAOCP.
-    for batch in map(list, batched(_full_period_lcg(n), 32)):
+    iterator = iter(range(n)) if n < 256 else _full_period_lcg(n)
+    for batch in map(list, batched(iterator, 256)):
         shuffle(batch)
         yield from batch
 
