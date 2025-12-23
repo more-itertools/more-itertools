@@ -5479,20 +5479,18 @@ def _full_period_lcg(n):
 
 
 def _random_ordered_indices(n):
-    "Batch shuffle inputs to mitigate the small state space of the LCG."
+    "Shuffle batches to mitigate the small state space of the LCG."
 
     # Batched variation of Knuth's Algorithm M in §3.2.2 of TAOCP.
-    iterator = iter(range(n)) if n < 256 else _full_period_lcg(n)
-    for batch in map(list, batched(iterator, 256)):
+    batch_size = 256
+    iterable = range(n) if n < batch_size else _full_period_lcg(n)
+    for batch in map(list, batched(iterable, batch_size)):
         shuffle(batch)
         yield from batch
 
 
 def random_ordered_range(*args):
-    """Like range() but the output order is shuffled randomly.
-
-    Equivalent to:  ``iter(random.sample(range(*args), k=n))``
-    """
+    "Return :func:`range` values in randomly shuffled order."
     range_object = range(*args)
     n = len(range_object)
     for index in _random_ordered_indices(n):
@@ -5500,7 +5498,7 @@ def random_ordered_range(*args):
 
 
 def random_ordered_product(*iterables, repeat=1):
-    'Return *product* tuples in randomly shuffled order.'
+    "Return :func:`product` tuples in randomly shuffled order."
     pools = tuple(map(tuple, iterables * repeat))
     n = prod(map(len, pools))
     for index in _random_ordered_indices(n):
@@ -5508,7 +5506,7 @@ def random_ordered_product(*iterables, repeat=1):
 
 
 def random_ordered_permutations(iterable, r=None):
-    'Return *permutations* tuples in randomly shuffled order.'
+    "Return :func:`permutations` tuples in randomly shuffled order."
     sequence = tuple(iterable)
     if r is None:
         r = len(sequence)
@@ -5518,11 +5516,11 @@ def random_ordered_permutations(iterable, r=None):
 
 
 def random_ordered_combinations(iterable, r):
-    '''Return *combinations* tuples in randomly shuffled order.
+    """Return :func:`combinations` tuples in randomly shuffled order.
 
     Raises :exc:`ValueError` if *r* is negative or greater than
     the length of *iterable*.
-    '''
+    """
     sequence = tuple(iterable)
     n = comb(len(sequence), r)
     for index in _random_ordered_indices(n):
@@ -5530,7 +5528,7 @@ def random_ordered_combinations(iterable, r):
 
 
 def random_ordered_combs_with_replacement(iterable, r):
-    'Return *combinations_with_replacement* tuples in randomly shuffled order.'
+    "Return :func:`combinations_with_replacement` tuples in randomly shuffled order."
     sequence = tuple(iterable)
     if not sequence:
         yield ()
