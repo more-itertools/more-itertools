@@ -5499,7 +5499,7 @@ def random_ordered_range(*args):
 
 def random_ordered_product(*iterables, repeat=1):
     "Return :func:`product` tuples in randomly shuffled order."
-    pools = tuple(map(tuple, iterables * repeat))
+    pools = tuple(map(tuple, iterables)) * repeat
     n = prod(map(len, pools))
     for index in _random_ordered_indices(n):
         yield nth_product(index, *pools)
