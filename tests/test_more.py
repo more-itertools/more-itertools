@@ -26,7 +26,7 @@ from itertools import (
     product,
     repeat,
 )
-from math import comb
+from math import factorial
 from operator import add, mul, itemgetter, not_
 from pickle import loads, dumps
 from random import Random, random, randrange, seed
@@ -6656,6 +6656,11 @@ class TestRandomOrderedRange(TestsRandomOrderedCombinatorics):
         ((1000, 2000, 10),),
         ((2000, 1000, -10),),
     ]
+
+    def test_lcg_mitigation(self):
+        # Without mitigation the LCG doesn't produce many distinct permutations
+        c = Counter(tuple(mi.random_ordered_range(6)) for _ in range(10**6))
+        self.assertEqual(len(c), factorial(6))
 
 
 class TestRandomOrderedProduct(TestsRandomOrderedCombinatorics):
