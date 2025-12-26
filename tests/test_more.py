@@ -26,6 +26,7 @@ from itertools import (
     product,
     repeat,
 )
+from math import comb
 from operator import add, mul, itemgetter, not_
 from pickle import loads, dumps
 from random import Random, random, randrange, seed
@@ -4882,13 +4883,27 @@ class NthCombinationWithReplacementTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_invalid_r(self):
-        for r in (-1, 3):
-            with self.assertRaises(ValueError):
-                mi.nth_combination_with_replacement([], r, 0)
+        with self.assertRaises(ValueError):
+            mi.nth_combination_with_replacement([], -1, 0)  # Negative r
 
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
             mi.nth_combination_with_replacement('abcdefg', 3, -85)
+
+    def test_various_n_and_r(self):
+        seq = 'abcdef'
+        for n in range(len(seq)):
+            iterable = seq[:n]
+            for r in range(8):
+                expected = list(combinations_with_replacement(iterable, r))
+                c = len(expected)
+                actual = [
+                    mi.nth_combination_with_replacement(iterable, r, index)
+                    for index in range(c)
+                ]
+                self.assertEqual(actual, expected)
+                with self.assertRaises(IndexError):
+                    mi.nth_combination_with_replacement(iterable, r, c)
 
 
 class ValueChainTests(TestCase):
@@ -6713,7 +6728,7 @@ class TestRandomOrderedCombinationsWithReplacement(
         (('ab', 1),),
         (('abc', 2),),
         (('abcd', 0),),
-        # (('abcd', 5),),
+        (('abcd', 5),),
         (('abcdefgh', 5),),
         (('abc', 3),),
         (('abcd', 4),),

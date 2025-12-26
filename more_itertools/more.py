@@ -4280,16 +4280,15 @@ def nth_combination_with_replacement(iterable, r, index):
         >>> nth_combination_with_replacement(range(5), 3, 5)
         (0, 1, 1)
 
-    ``ValueError`` will be raised If *r* is negative or greater than the length
-    of *iterable*.
+    ``ValueError`` will be raised If *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = tuple(iterable)
     n = len(pool)
-    if (r < 0) or (r > n):
+    if r < 0:
         raise ValueError
 
-    c = comb(n + r - 1, r)
+    c = comb(n + r - 1, r) if n else 0 if r else 1
 
     if index < 0:
         index += c
@@ -5516,11 +5515,7 @@ def random_ordered_permutations(iterable, r=None):
 
 
 def random_ordered_combinations(iterable, r):
-    """Return :func:`combinations` tuples in randomly shuffled order.
-
-    Raises :exc:`ValueError` if *r* is negative or greater than
-    the length of *iterable*.
-    """
+    "Return :func:`combinations` tuples in randomly shuffled order."
     sequence = tuple(iterable)
     n = comb(len(sequence), r)
     for index in _random_ordered_indices(n):
