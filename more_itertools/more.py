@@ -5507,8 +5507,6 @@ def random_ordered_product(*iterables, repeat=1):
 def random_ordered_permutations(iterable, r=None):
     "Return :func:`permutations` tuples in randomly shuffled order."
     sequence = tuple(iterable)
-    if r is None:
-        r = len(sequence)
     n = perm(len(sequence), r)
     for index in _random_ordered_indices(n):
         yield nth_permutation(sequence, r, index)
