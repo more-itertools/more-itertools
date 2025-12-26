@@ -5482,7 +5482,7 @@ def _random_ordered_indices(n):
 
     # Batched variation of Knuth's Algorithm M in §3.2.2 of TAOCP.
     batch_size = 256
-    iterable = range(n) if n < batch_size else _full_period_lcg(n)
+    iterable = range(n) if n <= batch_size else _full_period_lcg(n)
     for batch in map(list, batched(iterable, batch_size)):
         shuffle(batch)
         yield from batch
