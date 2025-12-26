@@ -6659,8 +6659,8 @@ class TestRandomOrderedRange(TestsRandomOrderedCombinatorics):
 
     def test_lcg_mitigation(self):
         # Without mitigation the LCG doesn't produce many distinct permutations
-        c = Counter(tuple(mi.random_ordered_range(6)) for _ in range(10**6))
-        self.assertEqual(len(c), factorial(6))
+        perms = set(tuple(mi.random_ordered_range(6)) for _ in range(10**5))
+        self.assertEqual(len(perms), factorial(6))
 
 
 class TestRandomOrderedProduct(TestsRandomOrderedCombinatorics):
