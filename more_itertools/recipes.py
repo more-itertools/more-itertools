@@ -580,7 +580,7 @@ def random_product(*iterables, repeat=1):
     ``itertools.product(*args, repeat=repeat)``.
 
     """
-    pools = tuple(map(tuple, iterables * repeat))
+    pools = tuple(map(tuple, iterables)) * repeat
     return tuple(map(choice, pools))
 
 
