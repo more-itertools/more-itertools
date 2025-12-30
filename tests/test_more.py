@@ -4864,6 +4864,10 @@ class NthProductTests(TestCase):
             mi.nth_product(123, 'AB', 'CD', 'EFG', repeat=2),
             mi.nth_product(123, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
         )
+        self.assertEqual(
+            mi.nth_product(123, iter('AB'), iter('CD'), iter('EFG'), repeat=2),
+            mi.nth_product(123, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
 
 
 class NthCombinationWithReplacementTests(TestCase):
@@ -4980,6 +4984,12 @@ class ProductIndexTests(TestCase):
         target = ['B', 'D', 'E', 'A', 'C', 'G']
         self.assertEqual(
             mi.product_index(target, 'AB', 'CD', 'EFG', repeat=2),
+            mi.product_index(target, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
+        self.assertEqual(
+            mi.product_index(
+                iter(target), iter('AB'), iter('CD'), iter('EFG'), repeat=2
+            ),
             mi.product_index(target, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
         )
 
