@@ -655,8 +655,7 @@ def nth_combination(iterable, r, index):
 
     if index < 0:
         index += c
-
-    if (index < 0) or (index >= c):
+    if not 0 <= index < c:
         raise IndexError
 
     result = []
