@@ -4198,7 +4198,7 @@ def nth_product(index, *iterables, repeat=1):
 
     ``IndexError`` will be raised if the given *index* is invalid.
     """
-    pools = tuple(map(tuple, reversed(iterables * repeat)))
+    pools = tuple(map(tuple, reversed(iterables))) * repeat
     ns = tuple(map(len, pools))
 
     c = reduce(mul, ns)
@@ -4362,7 +4362,7 @@ def product_index(element, *iterables, repeat=1):
     of *args*.
     """
     elements = tuple(element)
-    pools = tuple(map(tuple, iterables * repeat))
+    pools = tuple(map(tuple, iterables)) * repeat
     if len(elements) != len(pools):
         raise ValueError('element is not a product of args')
 

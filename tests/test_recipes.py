@@ -568,6 +568,14 @@ class RandomProductTests(TestCase):
         self.assertEqual(len(n), len(nums))
         self.assertEqual(len(m), len(lets))
 
+        r = list(mi.random_product(iter(nums), iter(lets), repeat=100))
+        self.assertEqual(2 * 100, len(r))
+        n, m = set(r[::2]), set(r[1::2])
+        self.assertEqual(n, set(nums))
+        self.assertEqual(m, set(lets))
+        self.assertEqual(len(n), len(nums))
+        self.assertEqual(len(m), len(lets))
+
 
 class RandomPermutationTests(TestCase):
     """Tests for ``random_permutation()``"""
