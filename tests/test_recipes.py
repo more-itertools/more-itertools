@@ -694,9 +694,10 @@ class NthCombinationTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_invalid_r(self):
-        for r in (-1, 3):
-            with self.assertRaises(ValueError):
-                mi.nth_combination([], r, 0)
+        with self.assertRaises(ValueError):
+            mi.nth_combination([], -1, 0)
+        with self.assertRaises(IndexError):
+            mi.nth_combination('abc', 5, 0)
 
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
