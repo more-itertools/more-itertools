@@ -4879,6 +4879,10 @@ class NthCombinationWithReplacementTests(TestCase):
         ):
             actual = mi.nth_combination_with_replacement(iterable, r, index)
             self.assertEqual(actual, expected)
+        self.assertEqual(
+            mi.nth_combination_with_replacement('abcde', 7, 320),
+            ('c', 'd', 'e', 'e', 'e', 'e', 'e'),
+        )
 
     def test_long(self):
         actual = mi.nth_combination_with_replacement(range(90), 4, 2000000)
@@ -4886,13 +4890,14 @@ class NthCombinationWithReplacementTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_invalid_r(self):
-        for r in (-1, 3):
-            with self.assertRaises(ValueError):
-                mi.nth_combination_with_replacement([], r, 0)
+        with self.assertRaises(ValueError):
+            mi.nth_combination_with_replacement([], -1, 0)
 
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
             mi.nth_combination_with_replacement('abcdefg', 3, -85)
+        with self.assertRaises(IndexError):
+            mi.nth_combination_with_replacement('abcde', 7, 400)
 
 
 class ValueChainTests(TestCase):
