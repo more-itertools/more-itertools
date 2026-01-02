@@ -3,7 +3,7 @@ import math
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
-from functools import cached_property, partial, reduce, wraps
+from functools import cached_property, partial, wraps
 from heapq import heapify, heapreplace
 from itertools import (
     chain,
@@ -22,7 +22,19 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import (
+    comb,
+    e,
+    exp,
+    factorial,
+    floor,
+    fsum,
+    log,
+    log1p,
+    perm,
+    prod,
+    tau,
+)
 from math import ceil
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
@@ -32,7 +44,6 @@ from operator import (
     is_not,
     itemgetter,
     lt,
-    mul,
     neg,
     sub,
     gt,
@@ -4201,11 +4212,10 @@ def nth_product(index, *iterables, repeat=1):
     pools = tuple(map(tuple, reversed(iterables))) * repeat
     ns = tuple(map(len, pools))
 
-    c = reduce(mul, ns)
+    c = prod(ns)
 
     if index < 0:
         index += c
-
     if not 0 <= index < c:
         raise IndexError
 
@@ -4979,6 +4989,7 @@ def outer_product(func, xs, ys, *args, **kwargs):
 
     Multiplication table:
 
+    >>> from operator import mul
     >>> list(outer_product(mul, range(1, 4), range(1, 6)))
     [(1, 2, 3, 4, 5), (2, 4, 6, 8, 10), (3, 6, 9, 12, 15)]
 
