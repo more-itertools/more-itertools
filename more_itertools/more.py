@@ -4228,24 +4228,17 @@ def nth_permutation(iterable, r, index):
         >>> nth_permutation('ghijk', 2, 5)
         ('h', 'i')
 
-    ``ValueError`` will be raised If *r* is negative or greater than the length
-    of *iterable*.
+    ``ValueError`` will be raised If *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = list(iterable)
     n = len(pool)
-
-    if r is None or r == n:
-        r, c = n, factorial(n)
-    elif not 0 <= r < n:
-        raise ValueError
-    else:
-        c = perm(n, r)
-    assert c > 0  # factorial(n)>0, and r<n so perm(n,r) is never zero
+    if r is None:
+        r = n
+    c = perm(n, r)
 
     if index < 0:
         index += c
-
     if not 0 <= index < c:
         raise IndexError
 
