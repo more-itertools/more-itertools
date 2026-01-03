@@ -22,20 +22,8 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import (
-    comb,
-    e,
-    exp,
-    factorial,
-    floor,
-    fsum,
-    log,
-    log1p,
-    perm,
-    prod,
-    tau,
-)
-from math import ceil
+from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
