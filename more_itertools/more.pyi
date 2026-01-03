@@ -109,6 +109,11 @@ __all__ = [
     'powerset_of_sets',
     'product_index',
     'raise_',
+    'random_ordered_combinations',
+    'random_ordered_combs_with_replacement',
+    'random_ordered_permutations',
+    'random_ordered_product',
+    'random_ordered_range',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -969,3 +974,18 @@ def concurrent_tee(
 def synchronized(
     func: Callable[..., Iterator[_T]],
 ) -> Callable[..., Iterator[_T]]: ...
+def random_ordered_combinations(
+    iterable: Iterable[_T], r: int
+) -> Iterator[tuple[_T, ...]]: ...
+def random_ordered_combs_with_replacement(
+    iterable: Iterable[_T], r: int
+) -> Iterator[tuple[_T, ...]]: ...
+def random_ordered_permutations(
+    iterable: Iterable[_T], r: int | None = ...
+) -> Iterator[tuple[_T, ...]]: ...
+def random_ordered_product(
+    *iterables: Iterable[_T], repeat: int = ...
+) -> Iterator[tuple[_T, ...]]: ...
+def random_ordered_range(
+    *args: int,
+) -> Iterator[int]: ...
