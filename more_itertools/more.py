@@ -3,7 +3,7 @@ import math
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
-from functools import cached_property, partial, reduce, wraps
+from functools import cached_property, partial, wraps
 from heapq import heapify, heapreplace
 from itertools import (
     chain,
@@ -23,7 +23,7 @@ from itertools import (
     product,
 )
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
-from math import ceil
+from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
@@ -32,7 +32,6 @@ from operator import (
     is_not,
     itemgetter,
     lt,
-    mul,
     neg,
     sub,
     gt,
@@ -4201,11 +4200,10 @@ def nth_product(index, *iterables, repeat=1):
     pools = tuple(map(tuple, reversed(iterables))) * repeat
     ns = tuple(map(len, pools))
 
-    c = reduce(mul, ns)
+    c = prod(ns)
 
     if index < 0:
         index += c
-
     if not 0 <= index < c:
         raise IndexError
 
@@ -4228,24 +4226,17 @@ def nth_permutation(iterable, r, index):
         >>> nth_permutation('ghijk', 2, 5)
         ('h', 'i')
 
-    ``ValueError`` will be raised If *r* is negative or greater than the length
-    of *iterable*.
+    ``ValueError`` will be raised If *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = list(iterable)
     n = len(pool)
-
-    if r is None or r == n:
-        r, c = n, factorial(n)
-    elif not 0 <= r < n:
-        raise ValueError
-    else:
-        c = perm(n, r)
-    assert c > 0  # factorial(n)>0, and r<n so perm(n,r) is never zero
+    if r is None:
+        r = n
+    c = perm(n, r)
 
     if index < 0:
         index += c
-
     if not 0 <= index < c:
         raise IndexError
 
@@ -4274,21 +4265,18 @@ def nth_combination_with_replacement(iterable, r, index):
         >>> nth_combination_with_replacement(range(5), 3, 5)
         (0, 1, 1)
 
-    ``ValueError`` will be raised If *r* is negative or greater than the length
-    of *iterable*.
+    ``ValueError`` will be raised If *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = tuple(iterable)
     n = len(pool)
-    if (r < 0) or (r > n):
+    if r < 0:
         raise ValueError
-
-    c = comb(n + r - 1, r)
+    c = comb(n + r - 1, r) if n else 0 if r else 1
 
     if index < 0:
         index += c
-
-    if (index < 0) or (index >= c):
+    if not 0 <= index < c:
         raise IndexError
 
     result = []
@@ -4989,6 +4977,7 @@ def outer_product(func, xs, ys, *args, **kwargs):
 
     Multiplication table:
 
+    >>> from operator import mul
     >>> list(outer_product(mul, range(1, 4), range(1, 6)))
     [(1, 2, 3, 4, 5), (2, 4, 6, 8, 10), (3, 6, 9, 12, 15)]
 
