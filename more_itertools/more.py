@@ -563,6 +563,8 @@ def with_iter(context_manager):
 
         upper_lines = (line.upper() for line in with_iter(open('foo')))
 
+    Note that you have to actually exhaust the iterator for opened files to be closed.
+
     Any context manager which returns an iterable is a candidate for
     ``with_iter``.
 
