@@ -3,6 +3,7 @@ from __future__ import annotations
 import cmath
 import gc
 import platform
+import math
 import weakref
 
 from collections import Counter, deque
@@ -6605,137 +6606,163 @@ class TestConcurrentTee(TestCase):
             mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n
 
 
-class DiagonalProductTests(TestCase):
-    def test_diagonal_sampling(self):
-        # total space size == 10 * 5 * 2 == 100, period == 10.
-        iterables = [range(10), range(5), range(2)]
-        expected = [
-            # period 0
-            (0, 0, 0),
-            (1, 1, 1),
-            (2, 2, 0),
-            (3, 3, 1),
-            (4, 4, 0),
-            (5, 0, 1),
-            (6, 1, 0),
-            (7, 2, 1),
-            (8, 3, 0),
-            (9, 4, 1),
-            # period 1
-            (0, 0, 1),
-            (1, 1, 0),
-            (2, 2, 1),
-            (3, 3, 0),
-            (4, 4, 1),
-            (5, 0, 0),
-            (6, 1, 1),
-            (7, 2, 0),
-            (8, 3, 1),
-            (9, 4, 0),
-            # period 2
-            (0, 1, 0),
-            (1, 2, 1),
-            (2, 3, 0),
-            (3, 4, 1),
-            (4, 0, 0),
-            (5, 1, 1),
-            (6, 2, 0),
-            (7, 3, 1),
-            (8, 4, 0),
-            (9, 0, 1),
-            # period 3
-            (0, 1, 1),
-            (1, 2, 0),
-            (2, 3, 1),
-            (3, 4, 0),
-            (4, 0, 1),
-            (5, 1, 0),
-            (6, 2, 1),
-            (7, 3, 0),
-            (8, 4, 1),
-            (9, 0, 0),
-            # period 4
-            (0, 2, 0),
-            (1, 3, 1),
-            (2, 4, 0),
-            (3, 0, 1),
-            (4, 1, 0),
-            (5, 2, 1),
-            (6, 3, 0),
-            (7, 4, 1),
-            (8, 0, 0),
-            (9, 1, 1),
-            # period 5
-            (0, 2, 1),
-            (1, 3, 0),
-            (2, 4, 1),
-            (3, 0, 0),
-            (4, 1, 1),
-            (5, 2, 0),
-            (6, 3, 1),
-            (7, 4, 0),
-            (8, 0, 1),
-            (9, 1, 0),
-            # period 6
-            (0, 3, 0),
-            (1, 4, 1),
-            (2, 0, 0),
-            (3, 1, 1),
-            (4, 2, 0),
-            (5, 3, 1),
-            (6, 4, 0),
-            (7, 0, 1),
-            (8, 1, 0),
-            (9, 2, 1),
-            # period 7
-            (0, 3, 1),
-            (1, 4, 0),
-            (2, 0, 1),
-            (3, 1, 0),
-            (4, 2, 1),
-            (5, 3, 0),
-            (6, 4, 1),
-            (7, 0, 0),
-            (8, 1, 1),
-            (9, 2, 0),
-            # period 8
-            (0, 4, 0),
-            (1, 0, 1),
-            (2, 1, 0),
-            (3, 2, 1),
-            (4, 3, 0),
-            (5, 4, 1),
-            (6, 0, 0),
-            (7, 1, 1),
-            (8, 2, 0),
-            (9, 3, 1),
-            # period 9
-            (0, 4, 1),
-            (1, 0, 0),
-            (2, 1, 1),
-            (3, 2, 0),
-            (4, 3, 1),
-            (5, 4, 0),
-            (6, 0, 1),
-            (7, 1, 0),
-            (8, 2, 1),
-            (9, 3, 0),
+class EquidistributedProductTests(TestCase):
+    def _verify_properties(self, iterables, method, expected_total):
+        iterables = list(iterables)
+        samples = list(
+            mi.equidistributed_product(
+                *iterables, iterable_stride_method=method
+            )
+        )
+
+        # 1. completeness / uniqueness checks
+        unique_samples = set(samples)
+        self.assertEqual(
+            len(samples),
+            expected_total,
+            f"Total samples mismatch for {method}",
+        )
+        self.assertEqual(
+            len(unique_samples),
+            expected_total,
+            f"Uniqueness failure for {method}",
+        )
+
+        # 2. equidistribution checks
+        sizes = [len(it) for it in iterables]
+        period = math.lcm(*sizes)
+
+        # for every lcm period, ensure that each element is present exactly N * LCM / size_i
+        # times for the ith iterable
+        for coset_index in range(1, expected_total // period):
+            sample_limit = coset_index * period
+
+            subset = samples[:sample_limit]
+
+            for dim, size in enumerate(sizes):
+                counts = Counter(s[dim] for s in subset)
+                # expected N * LCM / size times at the nth LCM period
+                expected_count = sample_limit // size
+                # all elements present
+                self.assertEqual(
+                    len(counts),
+                    size,
+                    f"Missing elements in dim {dim} at sample {sample_limit} ({method})",
+                )
+                # Check equidistribution
+                for element_count in counts.values():
+                    self.assertEqual(
+                        element_count,
+                        expected_count,
+                        f"Equidistribution failure dim {dim} at sample {sample_limit} ({method})",
+                    )
+
+    def test_lcm_equals_largest_size(self):
+        # lcm == 6
+        # number of cosets == 6
+        # coset counts per element in iterable at nth coset == [n, n * 2, n * 3]
+        iterables = [range(6), range(3), range(2)]
+        total = 36
+        for method in ["small_coprime", "incremental"]:
+            self._verify_properties(iterables, method, total)
+
+    def test_lcm_equals_joint_largest_size(self):
+        # lcm == 4
+        # number of cosets == 8
+        # coset counts per element in iterable at nth coset == [n, n, n * 2]
+        iterables = [range(4), range(4), range(2)]
+        total = 32
+        for method in ["small_coprime", "incremental"]:
+            self._verify_properties(iterables, method, total)
+
+    def test_lcm_greater_than_largest_size(self):
+        # lcm == 12
+        # number of cosets == 2
+        # coset counts per element in iterable at nth coset == [n, n * 4, n * 6]
+        iterables = [range(4), range(3), range(2)]
+        total = 24
+        for method in ["small_coprime", "incremental"]:
+            self._verify_properties(iterables, method, total)
+
+    def test_coprime_strides_decorrelation(self):
+        # small_coprime method decorrelates same-sized dims within lcm period
+        iterables = [range(4), range(4)]
+        samples = list(
+            mi.equidistributed_product(
+                *iterables, iterable_stride_method="small_coprime"
+            )
+        )[:4]
+
+        diffs = [s[0] != s[1] for s in samples]
+        self.assertTrue(
+            any(diffs), "Coprime should decorrelate same-sized dims"
+        )
+
+        samples = list(
+            mi.equidistributed_product(
+                *iterables, iterable_stride_method="incremental"
+            )
+        )[:4]
+        diffs = [s[0] == s[1] for s in samples]
+        self.assertTrue(
+            all(diffs), "Incremental should decorrelate same-sized dims"
+        )
+
+    def test_coprime_coset_stride_decorrelation(self):
+        # ensure that coset stride decorrelation ensures different cosets are visited first
+
+        sample_size = 24  # 3 x lcm period == 24, i.e. all samples in the first three cosets
+
+        iterables = [range(8), range(4), range(4)]
+        incremental_coset_samples = list(
+            mi.equidistributed_product(
+                *iterables,
+                iterable_stride_method="incremental",
+                coset_stride_method="incremental",
+            )
+        )[:sample_size]
+
+        stride_coset_samples = list(
+            mi.equidistributed_product(
+                *iterables,
+                iterable_stride_method="incremental",
+                coset_stride_method="small_coprime",
+            )
+        )[:sample_size]
+
+        self.assertTrue(
+            incremental_coset_samples[0] == stride_coset_samples[0],
+            "First coset should be equivalent.",
+        )
+        # reach 'later' cosets earlier with coset striding
+        self.assertTrue(
+            incremental_coset_samples[8:16] != stride_coset_samples[8:16],
+            "Second coset should be different.",
+        )
+        self.assertTrue(
+            incremental_coset_samples[16:] != stride_coset_samples[16:],
+            "Third coset should be different.",
+        )
+
+    def test_edge_cases_highly_correlated(self):
+        # divisibility chains and highly correlated sizes
+        test_cases = [
+            ([64, 4, 4], 1024),  # large dim divides small, same small sizes
+            (
+                [9, 6, 4],
+                216,
+            ),  # sub periodicities 9 (LCM(9, 6) == 18, 18 mod 4 == 2)
+            ([2, 4, 8], 64),  # pure power-of-2 chain
+            ([3, 9], 27),  # power of 3
+            ([2, 6, 12], 144),  # divisibility chain
+            # same size iterables
+            ([4, 4], 16),
+            ([3, 3, 3], 27),
+            ([2, 2, 2, 2], 16),
+            ([5, 5], 25),
+            ([7, 7], 49),
         ]
-        actual = list(mi.diagonal_product(*iterables))
-        # only unique elements are yielded
-        assert len(set(actual)) == len(actual)
-        self.assertEqual(actual, expected)
-
-    def test_diagonal_sampling_maximally_explorative(self):
-        iterables = [range(10), range(5), range(2)]
-
-        n_samples_per_element = 5
-
-        samples = mi.diagonal_product(*iterables)
-        first_50_samples = islice(samples, n_samples_per_element * 10)
-
-        for sampled_elements in zip(*first_50_samples):
-            counts = Counter(sampled_elements)
-            for number in counts.values():
-                # sampled each iterable element at least 5 times in 50 samples.
-                assert number >= n_samples_per_element
+        for iterables_sizes, total in test_cases:
+            iterables = [range(s) for s in iterables_sizes]
+            for method in ["small_coprime", "incremental"]:
+                self._verify_properties(iterables, method, total)

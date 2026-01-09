@@ -52,7 +52,6 @@ __all__ = [
     'countable',
     'derangements',
     'dft',
-    'diagonal_product',
     'difference',
     'distinct_combinations',
     'distinct_permutations',
@@ -62,6 +61,7 @@ __all__ = [
     'duplicates_everseen',
     'duplicates_justseen',
     'classify_unique',
+    'equidistributed_product',
     'exactly_n',
     'extract',
     'filter_except',
@@ -909,8 +909,10 @@ def constrained_batches(
 def gray_product(
     *iterables: Iterable[_T], repeat: int = ...
 ) -> Iterator[tuple[_T, ...]]: ...
-def diagonal_product(
+def equidistributed_product(
     *iterables: Iterable[_T],
+    coset_stride_method: Literal["incremental", "small_coprime"],
+    iterable_stride_method: Literal["incremental", "small_coprime"],
 ) -> Iterator[tuple[_T, ...]]: ...
 def partial_product(
     *iterables: Iterable[_T], repeat: int = ...

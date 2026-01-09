@@ -93,7 +93,6 @@ __all__ = [
     'countable',
     'derangements',
     'dft',
-    'diagonal_product',
     'difference',
     'distinct_combinations',
     'distinct_permutations',
@@ -103,6 +102,7 @@ __all__ = [
     'duplicates_everseen',
     'duplicates_justseen',
     'classify_unique',
+    'equidistributed_product',
     'exactly_n',
     'extract',
     'filter_except',
@@ -5495,108 +5495,222 @@ class _iterable_cycle:
         return self._source is None
 
 
-def diagonal_product(*iterables):
-    """Generates the Cartesian product of iterables similar to `itertools.product` but
-    yields elements in a diagonal ordering uniquely. This is a maximally explorative way
-    of sampling all elements of the iterables in as few samples as possible.
+def _compute_coset_bases(sizes, num_cosets):
+    """Compute coset bases for coset enumeration using GCD allocation.
 
-    Yields all elements of the Cartesian product of the iterables exactly once in a diagonal
-    ordering. Guaranteed to yield all elements of each iterable at least N times after
-    sampling `N * max(len(list(iterable)) for iterable in iterables)` times. No caching of
-    previously yielded elements of the product space and no duplicates are yielded.
+    Given dimension sizes and the number of cosets to enumerate,
+    returns a list of coset_bases where coset_bases[i] indicates how many
+    distinct offset values dimension i will cycle through across all cosets.
 
-    Note: This function *does* require the size of each iterable to be held in memory, as
-    is the case for `itertools.product` and `itertools.cycle` but can be used with true iterables
-    directly.
+    The GCD allocation algorithm ensures:
+    - prod(coset_bases) == num_cosets (exactly enough cosets)
+    - coset_bases[i] divides sizes[i] (valid offsets)
+    - All cosets are distinct (no collisions from diagonal periodicity)
+    """
+    num_dims = len(sizes)
+    size_order = sorted(range(num_dims), key=lambda i: sizes[i])
+    coset_bases = [0] * num_dims
+    remaining = num_cosets
+    # coset bases from smallest to largest dimension
+    for i in size_order[:-1]:
+        # utilise the gcd to avoid common factors between dimensions
+        divisor = math.gcd(remaining, sizes[i])
+        coset_bases[i] = divisor
+        remaining //= divisor
+    # largest dimension takes the remainder
+    coset_bases[size_order[-1]] = remaining
+    return coset_bases
 
-    For example, comparing to `itertools.product`:
-        >>> import itertools
-        >>> # total product size == 24, period at 12
-        >>> iterables = [list(range(3)), list(range(2)), list(range(4))]
-        >>> for i, (diagonal_sample, product_sample) in enumerate(zip(diagonal_product(*iterables), itertools.product(*iterables))):
-        ...     print(i, diagonal_sample, product_sample)
-        0 (0, 0, 0) (0, 0, 0)
-        1 (1, 1, 1) (0, 0, 1)
-        2 (2, 0, 2) (0, 0, 2)
-        3 (0, 1, 3) (0, 0, 3)
-        4 (1, 0, 0) (0, 1, 0)
-        5 (2, 1, 1) (0, 1, 1)
-        6 (0, 0, 2) (0, 1, 2)
-        7 (1, 1, 3) (0, 1, 3)
-        8 (2, 0, 0) (1, 0, 0)
-        9 (0, 1, 1) (1, 0, 1)
-        10 (1, 0, 2) (1, 0, 2)
-        11 (2, 1, 3) (1, 0, 3)
-        12 (0, 1, 0) (1, 1, 0)
-        13 (1, 0, 1) (1, 1, 1)
-        14 (2, 1, 2) (1, 1, 2)
-        15 (0, 0, 3) (1, 1, 3)
-        16 (1, 1, 0) (2, 0, 0)
-        17 (2, 0, 1) (2, 0, 1)
-        18 (0, 1, 2) (2, 0, 2)
-        19 (1, 0, 3) (2, 0, 3)
-        20 (2, 1, 0) (2, 1, 0)
-        21 (0, 0, 1) (2, 1, 1)
-        22 (1, 1, 2) (2, 1, 2)
-        23 (2, 0, 3) (2, 1, 3)
 
-    The diagonal sampling ensures that all elements of the iterables are seen in as few samples
-    as possible.
+def _find_smallest_coprime(n):
+    """Find the smallest coprime to n.
 
+    Returns the smallest integer that is coprime to n.
+    """
+    if n > 1:
+        candidate = 2
+        while math.gcd(candidate, n) != 1:
+            candidate += 1
+        return candidate
+    return 1
+
+
+def _find_smallest_unique_coprimes(*numbers):
+    """Find the smallest unique coprimes for a list of numbers.
+
+    Returns a list of coprimes where each coprime is coprime to the numbers
+    and all coprimes are unique.
+    """
+    coprimes = []
+    for number in numbers:
+        candidate = 2
+        # in all practical cases never takes long
+        while candidate in coprimes or math.gcd(candidate, number) != 1:
+            candidate += 1
+        coprimes.append(candidate)
+    return coprimes
+
+
+def diagonal_mixed_radix_decompose(
+    sizes, period, total_product_size, strides, coset_stride
+):
+    """Factory for index decomposition in equidistributed product sampling.
+
+    Returns a function that maps idx -> indices for each dimension.
+
+    Args:
+        sizes: Tuple of dimension sizes.
+        period: LCM of sizes (number of samples per coset).
+        total_product_size: Total number of products.
+        strides: List of strides per dimension. Must be coprime to each size in ``sizes``.
+        coset_stride: Stride in coset order. Must be coprime to the number of cosets.
+
+    Returns:
+        A function that maps iteration index to indices for each dimension.
+    """
+    num_dims = len(sizes)
+    num_cosets = total_product_size // period
+
+    # compute coset bases (how offsets are distributed across dimensions)
+    coset_bases = _compute_coset_bases(sizes, num_cosets)
+
+    def decompose(idx):
+        """Decompose iteration index into indices for each dimension."""
+        coset_idx = idx // period
+        step = idx % period
+
+        # shuffle coset order to decorrelate across cosets
+        shuffled_coset = (coset_idx * coset_stride) % num_cosets
+
+        # mixed-radix decomposition of shuffled_coset into per-dimension offsets
+        indices = []
+        temp = shuffled_coset
+        for j in range(num_dims):
+            length = sizes[j]
+            # within-coset: jump by stride
+            move = (step * strides[j]) % length
+            # cross-coset: add offset from coset decomposition
+            temp, offset = divmod(temp, coset_bases[j])
+            indices.append((move + offset) % length)
+        return indices
+
+    return decompose
+
+
+def equidistributed_product(
+    *iterables,
+    coset_stride_method="small_coprime",
+    iterable_stride_method="incremental",
+):
+    """Generates the Cartesian product of iterables with uniform marginal sampling
+    guarantees.
+
+    Yields all elements of the Cartesian product through mixed-radix index decomposition
+    with uniform marginal sampling. At every ``k * LCM`` products, each element of an
+    iterable of size S will have been yielded exactly ``k * LCM / S`` times.
+
+    Between LCM checkpoints, approximate marginal uniformity is maintained. For any
+    N products, each element's frequency count within each iterable deviates by at most
+    1 from the proportional expectation ``N / S`` for all iterables.
+
+    The product space is partitioned into ``prod(sizes) / LCM`` cosets of the diagonal subgroup.
+    A GCD-based allocation algorithm computes "coset bases" that ensure all cosets are
+    visited exactly once, avoiding collisions from shared factors between dimension sizes.
+
+    Each coset contains a set of products that are comprised by stepping in each iterable
+    by a striding method. The incremental method steps by 1 in each iterable, while the
+    small_coprime method uses small coprime strides to make jumps between iterable elements.
+
+    The coset stride is a coprime to the number of cosets to shuffle the coset order jump
+    to 'later' cosets earlier.
+
+    Args:
+        *iterables: The iterables to generate the Cartesian product of.
+        coset_stride_method:
+            The method to use for the coset stride. Must be one of "small_coprime" or "incremental".
+            "incremental" corresponds to a step-wise stride for each coset, whereas "small_coprime"
+            finds a small stride that is coprime to the number of cosets to jump to later cosets earlier.
+        iterable_stride_method:
+            The method to use to stride between elements of the iterables. Must be one of
+            "incremental" or "small_coprime". "incremental" corresponds to a step-wise
+            stride for each iterable (i.e. incrementing by `1` for each product), whereas
+            "small_coprime" finds unique strides for each iterable that are coprime to the
+            size of each iterable ensuring that each iterable is stepped by a unique amount.
+
+    Examples:
+        >>> from collections import Counter
         >>> iterables = [range(10), range(5), range(2)]
         >>> counts = []
-        >>> samples = []
-        >>> for sample in diagonal_product(*iterables):
-        ...     samples.append(sample)
-        ...     if len(samples) == 10:
+        >>> products = []
+        >>> for prod in equidistributed_product(*iterables):
+        ...     products.append(prod)
+        ...     if len(products) == 10:
         ...         break
-        >>> for dimension in zip(*samples):
+        >>> for dimension in zip(*products):
         ...     counts.append(Counter(dimension))
         >>> counts
         [Counter({0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}), Counter({0: 2, 1: 2, 2: 2, 3: 2, 4: 2}), Counter({0: 5, 1: 5})]
     """
+    if coset_stride_method not in ("incremental", "small_coprime"):
+        raise ValueError(
+            f"coset_stride_method must be 'incremental' or 'small_coprime', got {coset_stride_method!r}"
+        )
+    if iterable_stride_method not in ("incremental", "small_coprime"):
+        raise ValueError(
+            f"iterable_stride_method must be 'incremental' or 'small_coprime', got {iterable_stride_method!r}"
+        )
+
     cycles = tuple(map(_iterable_cycle, iterables))
-
-    index = 0
-    # initially consume each iterable cyclically until all are exhausted.
-    while True:
-        product = tuple(next(cycle) for cycle in cycles)
-        # only know if source is consumed after the next() that raises StopIteration
-        if all(cycle.source_consumed for cycle in cycles):
-            break
-
-        yield product
-        index += 1
-
-    # determine the size of the product of the iterables.
-    sizes = tuple(cycle.size for cycle in cycles)
-    total_product_size = math.prod(sizes)
     num_dims = len(cycles)
 
-    # determine the period of the product of the iterables, diagonal sequence will
-    # repeat every period, so need to offset a cycle.
+    # can yield during incremental consumption since first phase will always have zero offsets
+    yield_during_consumption = iterable_stride_method == "incremental"
+
+    idx = 0
+    while True:
+        sample = tuple(next(cycle) for cycle in cycles)
+        all_consumed = all(cycle.source_consumed for cycle in cycles)
+
+        # don't yield on the iteration where all cycles become consumed
+        if yield_during_consumption and not all_consumed:
+            yield sample
+            idx += 1
+
+        if all_consumed:
+            break
+
+    sizes = tuple(cycle.size for cycle in cycles)
+    total_product_size = math.prod(sizes)
     period = lcm(*sizes)
 
-    size_order = sorted(range(num_dims), key=sizes.__getitem__)
-    divisors = [0] * num_dims
-    cumulative = 1
+    if iterable_stride_method == "small_coprime":
+        # small_coprime == coprime strides for each dimension to make jumps between
+        # iterable elements
+        strides = _find_smallest_unique_coprimes(*sizes)
+        start_idx = 0
+    else:
+        # incremental == stepwise stride for each dimension
+        strides = [1] * num_dims
+        start_idx = idx
 
-    for orig_idx in size_order:
-        divisors[orig_idx] = cumulative
-        cumulative *= sizes[orig_idx]
+    # determine stride in coset order
+    if coset_stride_method == "small_coprime":
+        coset_stride = _find_smallest_coprime(total_product_size // period)
+    else:
+        coset_stride = 1
 
-    def get_indices(n):
-        step = n % period
-        phase = n // period
-        indices = (
-            (step + (phase // divisor) % size) % size
-            for divisor, size in zip(divisors, sizes)
-        )
-        return indices
+    # create decomposition function with iterable and coset strides
+    decompose = diagonal_mixed_radix_decompose(
+        sizes,
+        period,
+        total_product_size,
+        strides,
+        coset_stride,
+    )
 
-    # restart at the index after the last one we yielded.
-    for index in range(index, total_product_size):
+    for index in range(start_idx, total_product_size):
+        product_indices = decompose(index)
         yield tuple(
-            cycles[dim].elements[idx]
-            for dim, idx in enumerate(get_indices(index))
+            cycles[dim].elements[dim_index]
+            for dim, dim_index in enumerate(product_indices)
         )
