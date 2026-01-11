@@ -2829,7 +2829,7 @@ def difference(iterable, func=sub, *, initial=None):
         return iter([])
 
     if initial is not None:
-        first = []
+        return map(func, b, a)
 
     return chain(first, map(func, b, a))
 
