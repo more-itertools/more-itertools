@@ -2628,8 +2628,9 @@ def _islice_helper(it, s):
 
         if start < 0:
             # Consume all but the last -start items
-            cache = deque(enumerate(it, 1), maxlen=-start)
-            len_iter = cache[-1][0] if cache else 0
+            wrapper = countable(it)
+            cache = deque(wrapper, maxlen=-start)
+            len_iter = wrapper.items_seen
 
             # Adjust start to be positive
             i = max(len_iter + start, 0)
@@ -2652,7 +2653,7 @@ def _islice_helper(it, s):
                     # pop and yield the item.
                     # We don't want to use an intermediate variable
                     # it would extend the lifetime of the current item
-                    yield cache.popleft()[1]
+                    yield cache.popleft()
                 else:
                     # just pop and discard the item
                     cache.popleft()
@@ -2683,8 +2684,9 @@ def _islice_helper(it, s):
         if (stop is not None) and (stop < 0):
             # Consume all but the last items
             n = -stop - 1
-            cache = deque(enumerate(it, 1), maxlen=n)
-            len_iter = cache[-1][0] if cache else 0
+            wrapper = countable(it)
+            cache = deque(wrapper, maxlen=n)
+            len_iter = wrapper.items_seen
 
             # If start and stop are both negative they are comparable and
             # we can just slice. Otherwise we can adjust start to be negative
@@ -2694,8 +2696,7 @@ def _islice_helper(it, s):
             else:
                 i, j = min(start - len_iter, -1), None
 
-            for index, item in list(cache)[i:j:step]:
-                yield item
+            yield from list(cache)[i:j:step]
         else:
             # Advance to the stop position
             if stop is not None:
