@@ -148,6 +148,7 @@ __all__ = [
     'serialize',
     'set_partitions',
     'side_effect',
+    'sized_iterator',
     'sliced',
     'sort_together',
     'split_after',
@@ -570,6 +571,39 @@ def with_iter(context_manager):
     """
     with context_manager as iterable:
         yield from iterable
+
+
+class sized_iterator:
+    """Wrap *iterable* with an iterator that also implements ``__len__``.
+
+    This is useful when the length of an iterable is known in advance but
+    not supported by the iterable itself (e.g., a generator). This allows
+    usage with tools that rely on ``len()``, such as progress bars.
+
+        >>> def my_generator(n):
+        ...     for i in range(n):
+        ...         yield f"Item{i}"
+        >>> gen = my_generator(3)
+        >>> sized_gen = sized_iterator(gen, 3)
+        >>> len(sized_gen)
+        3
+        >>> list(sized_gen)
+        ['Item0', 'Item1', 'Item2']
+
+    """
+
+    def __init__(self, iterable, length):
+        self._iterator = iter(iterable)
+        self._length = length
+
+    def __next__(self):
+        return next(self._iterator)
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        return self._length
 
 
 def one(iterable, too_short=None, too_long=None):

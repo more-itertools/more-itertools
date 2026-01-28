@@ -706,6 +706,17 @@ class WithIterTests(TestCase):
         self.assertTrue(s.closed)
 
 
+class SizedIteratorTests(TestCase):
+    def test_sized_iterator(self):
+        gen = (x for x in range(3))
+        sized_gen = mi.sized_iterator(gen, 3)
+
+        # The sized_generator should have the correct length
+        self.assertEqual(len(sized_gen), 3)
+        # The sized_generator elements should be the same as the original
+        self.assertListEqual(list(sized_gen), list(range(3)))
+
+
 class OneTests(TestCase):
     def test_basic(self):
         it = iter(['item'])

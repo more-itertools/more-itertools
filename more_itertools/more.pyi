@@ -120,6 +120,7 @@ __all__ = [
     'serialize',
     'set_partitions',
     'side_effect',
+    'sized_iterator',
     'sliced',
     'sort_together',
     'split_after',
@@ -210,6 +211,13 @@ def iterate(func: Callable[[_T], _T], start: _T) -> Iterator[_T]: ...
 def with_iter(
     context_manager: AbstractContextManager[Iterable[_T]],
 ) -> Iterator[_T]: ...
+
+class sized_iterator(Generic[_T], Iterator[_T], Sized):
+    def __init__(self, iterable: Iterable[_T], length: int) -> None: ...
+    def __next__(self) -> _T: ...
+    def __iter__(self) -> sized_iterator[_T]: ...
+    def __len__(self) -> int: ...
+
 def one(
     iterable: Iterable[_T],
     too_short: _Raisable | None = ...,
