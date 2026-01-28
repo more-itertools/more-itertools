@@ -280,6 +280,7 @@ consume iterables.
 .. autoclass:: callback_iter
 .. autofunction:: countable
 .. autofunction:: consumer
+.. autoclass:: sized_iterator
 .. autofunction:: with_iter
 
 ----

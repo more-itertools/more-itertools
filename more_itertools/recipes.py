@@ -564,7 +564,7 @@ def first_true(iterable, default=None, pred=None):
     return next(filter(pred, iterable), default)
 
 
-def random_product(*args, repeat=1):
+def random_product(*iterables, repeat=1):
     """Draw an item at random from each of the input iterables.
 
         >>> random_product('abc', range(4), 'XYZ')  # doctest:+SKIP
@@ -580,7 +580,7 @@ def random_product(*args, repeat=1):
     ``itertools.product(*args, repeat=repeat)``.
 
     """
-    pools = list(map(tuple, args)) * repeat
+    pools = tuple(map(tuple, iterables)) * repeat
     return tuple(map(choice, pools))
 
 
@@ -646,24 +646,16 @@ def nth_combination(iterable, r, index):
         >>> nth_combination(range(5), 3, 5)
         (0, 3, 4)
 
-    ``ValueError`` will be raised If *r* is negative or greater than the length
-    of *iterable*.
+    ``ValueError`` will be raised If *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = tuple(iterable)
     n = len(pool)
-    if (r < 0) or (r > n):
-        raise ValueError
-
-    c = 1
-    k = min(r, n - r)
-    for i in range(1, k + 1):
-        c = c * (n - k + i) // i
+    c = comb(n, r)
 
     if index < 0:
         index += c
-
-    if (index < 0) or (index >= c):
+    if not 0 <= index < c:
         raise IndexError
 
     result = []

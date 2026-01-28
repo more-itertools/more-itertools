@@ -3,7 +3,7 @@ import math
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
-from functools import cached_property, partial, reduce, wraps
+from functools import cached_property, partial, wraps
 from heapq import heapify, heapreplace
 from itertools import (
     chain,
@@ -23,7 +23,7 @@ from itertools import (
     product,
 )
 from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
-from math import ceil
+from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
@@ -32,7 +32,6 @@ from operator import (
     is_not,
     itemgetter,
     lt,
-    mul,
     neg,
     sub,
     gt,
@@ -149,6 +148,7 @@ __all__ = [
     'serialize',
     'set_partitions',
     'side_effect',
+    'sized_iterator',
     'sliced',
     'sort_together',
     'split_after',
@@ -563,12 +563,47 @@ def with_iter(context_manager):
 
         upper_lines = (line.upper() for line in with_iter(open('foo')))
 
+    Note that you have to actually exhaust the iterator for opened files to be closed.
+
     Any context manager which returns an iterable is a candidate for
     ``with_iter``.
 
     """
     with context_manager as iterable:
         yield from iterable
+
+
+class sized_iterator:
+    """Wrap *iterable* with an iterator that also implements ``__len__``.
+
+    This is useful when the length of an iterable is known in advance but
+    not supported by the iterable itself (e.g., a generator). This allows
+    usage with tools that rely on ``len()``, such as progress bars.
+
+        >>> def my_generator(n):
+        ...     for i in range(n):
+        ...         yield f"Item{i}"
+        >>> gen = my_generator(3)
+        >>> sized_gen = sized_iterator(gen, 3)
+        >>> len(sized_gen)
+        3
+        >>> list(sized_gen)
+        ['Item0', 'Item1', 'Item2']
+
+    """
+
+    def __init__(self, iterable, length):
+        self._iterator = iter(iterable)
+        self._length = length
+
+    def __next__(self):
+        return next(self._iterator)
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        return self._length
 
 
 def one(iterable, too_short=None, too_long=None):
@@ -2828,7 +2863,7 @@ def difference(iterable, func=sub, *, initial=None):
         return iter([])
 
     if initial is not None:
-        first = []
+        return map(func, b, a)
 
     return chain(first, map(func, b, a))
 
@@ -3560,36 +3595,6 @@ def only(iterable, default=None, too_long=None):
     return default
 
 
-def _ichunk(iterator, n):
-    cache = deque()
-    chunk = islice(iterator, n)
-
-    def generator():
-        with suppress(StopIteration):
-            while True:
-                if cache:
-                    yield cache.popleft()
-                else:
-                    yield next(chunk)
-
-    def materialize_next(n=1):
-        # if n not specified materialize everything
-        if n is None:
-            cache.extend(chunk)
-            return len(cache)
-
-        to_cache = n - len(cache)
-
-        # materialize up to n
-        if to_cache > 0:
-            cache.extend(islice(chunk, to_cache))
-
-        # return number materialized up to n
-        return min(n, len(cache))
-
-    return (generator(), materialize_next)
-
-
 def ichunked(iterable, n):
     """Break *iterable* into sub-iterables with *n* elements each.
     :func:`ichunked` is like :func:`chunked`, but it yields iterables
@@ -3612,18 +3617,11 @@ def ichunked(iterable, n):
 
     """
     iterator = iter(iterable)
-    while True:
-        # Create new chunk
-        chunk, materialize_next = _ichunk(iterator, n)
-
-        # Check to see whether we're at the end of the source iterable
-        if not materialize_next():
-            return
-
-        yield chunk
-
-        # Fill previous chunk's cache
-        materialize_next(None)
+    for first in iterator:
+        rest = islice(iterator, n - 1)
+        cache, cacher = tee(rest)
+        yield chain([first], rest, cache)
+        consume(cacher)
 
 
 def iequals(*iterables):
@@ -4180,26 +4178,31 @@ def all_unique(iterable, key=None):
     return True
 
 
-def nth_product(index, *args):
-    """Equivalent to ``list(product(*args))[index]``.
+def nth_product(index, *iterables, repeat=1):
+    """Equivalent to ``list(product(*iterables, repeat=repeat))[index]``.
 
-    The products of *args* can be ordered lexicographically.
+    The products of *iterables* can be ordered lexicographically.
     :func:`nth_product` computes the product at sort position *index* without
     computing the previous products.
 
         >>> nth_product(8, range(2), range(2), range(2), range(2))
         (1, 0, 0, 0)
 
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  The above example is equivalent to::
+
+        >>> nth_product(8, range(2), repeat=4)
+        (1, 0, 0, 0)
+
     ``IndexError`` will be raised if the given *index* is invalid.
     """
-    pools = list(map(tuple, reversed(args)))
-    ns = list(map(len, pools))
+    pools = tuple(map(tuple, reversed(iterables))) * repeat
+    ns = tuple(map(len, pools))
 
-    c = reduce(mul, ns)
+    c = prod(ns)
 
     if index < 0:
         index += c
-
     if not 0 <= index < c:
         raise IndexError
 
@@ -4222,24 +4225,17 @@ def nth_permutation(iterable, r, index):
         >>> nth_permutation('ghijk', 2, 5)
         ('h', 'i')
 
-    ``ValueError`` will be raised If *r* is negative or greater than the length
-    of *iterable*.
+    ``ValueError`` will be raised If *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = list(iterable)
     n = len(pool)
-
-    if r is None or r == n:
-        r, c = n, factorial(n)
-    elif not 0 <= r < n:
-        raise ValueError
-    else:
-        c = perm(n, r)
-    assert c > 0  # factorial(n)>0, and r<n so perm(n,r) is never zero
+    if r is None:
+        r = n
+    c = perm(n, r)
 
     if index < 0:
         index += c
-
     if not 0 <= index < c:
         raise IndexError
 
@@ -4268,21 +4264,18 @@ def nth_combination_with_replacement(iterable, r, index):
         >>> nth_combination_with_replacement(range(5), 3, 5)
         (0, 1, 1)
 
-    ``ValueError`` will be raised If *r* is negative or greater than the length
-    of *iterable*.
+    ``ValueError`` will be raised If *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = tuple(iterable)
     n = len(pool)
-    if (r < 0) or (r > n):
+    if r < 0:
         raise ValueError
-
-    c = comb(n + r - 1, r)
+    c = comb(n + r - 1, r) if n else 0 if r else 1
 
     if index < 0:
         index += c
-
-    if (index < 0) or (index >= c):
+    if not 0 <= index < c:
         raise IndexError
 
     result = []
@@ -4336,21 +4329,27 @@ def value_chain(*args):
             yield value
 
 
-def product_index(element, *args):
-    """Equivalent to ``list(product(*args)).index(element)``
+def product_index(element, *iterables, repeat=1):
+    """Equivalent to ``list(product(*iterables, repeat=repeat)).index(tuple(element))``
 
-    The products of *args* can be ordered lexicographically.
+    The products of *iterables* can be ordered lexicographically.
     :func:`product_index` computes the first index of *element* without
     computing the previous products.
 
         >>> product_index([8, 2], range(10), range(5))
         42
 
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables::
+
+        >>> product_index([8, 0, 7], range(10), repeat=3)
+        807
+
     ``ValueError`` will be raised if the given *element* isn't in the product
     of *args*.
     """
     elements = tuple(element)
-    pools = tuple(map(tuple, args))
+    pools = tuple(map(tuple, iterables)) * repeat
     if len(elements) != len(pools):
         raise ValueError('element is not a product of args')
 
@@ -4880,13 +4879,17 @@ def constrained_batches(
         yield tuple(batch)
 
 
-def gray_product(*iterables):
+def gray_product(*iterables, repeat=1):
     """Like :func:`itertools.product`, but return tuples in an order such
     that only one element in the generated tuple changes from one iteration
     to the next.
 
         >>> list(gray_product('AB','CD'))
         [('A', 'C'), ('B', 'C'), ('B', 'D'), ('A', 'D')]
+
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  For example, ``gray_product('AB', repeat=3)`` is
+    equivalent to ``gray_product('AB', 'AB', 'AB')``.
 
     This function consumes all of the input iterables before producing output.
     If any of the input iterables have fewer than two items, ``ValueError``
@@ -4896,7 +4899,7 @@ def gray_product(*iterables):
     `this section <https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz>`__
     of Donald Knuth's *The Art of Computer Programming*.
     """
-    all_iterables = tuple(tuple(x) for x in iterables)
+    all_iterables = tuple(map(tuple, iterables * repeat))
     iterable_count = len(all_iterables)
     for iterable in all_iterables:
         if len(iterable) < 2:
@@ -4922,7 +4925,7 @@ def gray_product(*iterables):
             f[j + 1] = j + 1
 
 
-def partial_product(*iterables):
+def partial_product(*iterables, repeat=1):
     """Yields tuples containing one item from each iterator, with subsequent
     tuples changing a single item at a time by advancing each iterator until it
     is exhausted. This sequence guarantees every value in each iterable is
@@ -4932,9 +4935,13 @@ def partial_product(*iterables):
 
         >>> list(partial_product('AB', 'C', 'DEF'))
         [('A', 'C', 'D'), ('B', 'C', 'D'), ('B', 'C', 'E'), ('B', 'C', 'F')]
+
+    The *repeat* keyword argument specifies the number of repetitions
+    of the iterables.  For example, ``partial_product('AB', repeat=3)`` is
+    equivalent to ``partial_product('AB', 'AB', 'AB')``.
     """
 
-    iterators = list(map(iter, iterables))
+    iterators = tuple(map(iter, iterables * repeat))
 
     try:
         prod = [next(it) for it in iterators]
@@ -4969,6 +4976,7 @@ def outer_product(func, xs, ys, *args, **kwargs):
 
     Multiplication table:
 
+    >>> from operator import mul
     >>> list(outer_product(mul, range(1, 4), range(1, 6)))
     [(1, 2, 3, 4, 5), (2, 4, 6, 8, 10), (3, 6, 9, 12, 15)]
 
@@ -5405,13 +5413,12 @@ class _concurrent_tee:
     __slots__ = ('iterator', 'link', 'lock')
 
     def __init__(self, iterable):
-        it = iter(iterable)
-        if isinstance(it, _concurrent_tee):
-            self.iterator = it.iterator
-            self.link = it.link
-            self.lock = it.lock
+        if isinstance(iterable, _concurrent_tee):
+            self.iterator = iterable.iterator
+            self.link = iterable.link
+            self.lock = iterable.lock
         else:
-            self.iterator = it
+            self.iterator = iter(iterable)
             self.link = [None, None]
             self.lock = Lock()
 

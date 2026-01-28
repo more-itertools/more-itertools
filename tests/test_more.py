@@ -706,6 +706,17 @@ class WithIterTests(TestCase):
         self.assertTrue(s.closed)
 
 
+class SizedIteratorTests(TestCase):
+    def test_sized_iterator(self):
+        gen = (x for x in range(3))
+        sized_gen = mi.sized_iterator(gen, 3)
+
+        # The sized_generator should have the correct length
+        self.assertEqual(len(sized_gen), 3)
+        # The sized_generator elements should be the same as the original
+        self.assertListEqual(list(sized_gen), list(range(3)))
+
+
 class OneTests(TestCase):
     def test_basic(self):
         it = iter(['item'])
@@ -4855,6 +4866,20 @@ class NthProductTests(TestCase):
         with self.assertRaises(IndexError):
             mi.nth_product(24, 'ab', 'cde', 'fghi')
 
+    def test_repeat(self):
+        self.assertEqual(
+            mi.nth_product(1234, 'abcde', repeat=5),
+            mi.nth_product(1234, 'abcde', 'abcde', 'abcde', 'abcde', 'abcde'),
+        )
+        self.assertEqual(
+            mi.nth_product(123, 'AB', 'CD', 'EFG', repeat=2),
+            mi.nth_product(123, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
+        self.assertEqual(
+            mi.nth_product(123, iter('AB'), iter('CD'), iter('EFG'), repeat=2),
+            mi.nth_product(123, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
+
 
 class NthCombinationWithReplacementTests(TestCase):
     def test_basic(self):
@@ -4865,6 +4890,10 @@ class NthCombinationWithReplacementTests(TestCase):
         ):
             actual = mi.nth_combination_with_replacement(iterable, r, index)
             self.assertEqual(actual, expected)
+        self.assertEqual(
+            mi.nth_combination_with_replacement('abcde', 7, 320),
+            ('c', 'd', 'e', 'e', 'e', 'e', 'e'),
+        )
 
     def test_long(self):
         actual = mi.nth_combination_with_replacement(range(90), 4, 2000000)
@@ -4872,13 +4901,14 @@ class NthCombinationWithReplacementTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_invalid_r(self):
-        for r in (-1, 3):
-            with self.assertRaises(ValueError):
-                mi.nth_combination_with_replacement([], r, 0)
+        with self.assertRaises(ValueError):
+            mi.nth_combination_with_replacement([], -1, 0)
 
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
             mi.nth_combination_with_replacement('abcdefg', 3, -85)
+        with self.assertRaises(IndexError):
+            mi.nth_combination_with_replacement('abcde', 7, 400)
 
 
 class ValueChainTests(TestCase):
@@ -4958,6 +4988,25 @@ class ProductIndexTests(TestCase):
         self.assertEqual(
             mi.product_index(iter(['i', 'a']), iter('snicker'), iter('snack')),
             12,
+        )
+
+    def test_repeat(self):
+        self.assertEqual(
+            mi.product_index([1, 2, 3, 4], range(10), repeat=4),
+            mi.product_index(
+                [1, 2, 3, 4], range(10), range(10), range(10), range(10)
+            ),
+        )
+        target = ['B', 'D', 'E', 'A', 'C', 'G']
+        self.assertEqual(
+            mi.product_index(target, 'AB', 'CD', 'EFG', repeat=2),
+            mi.product_index(target, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
+        )
+        self.assertEqual(
+            mi.product_index(
+                iter(target), iter('AB'), iter('CD'), iter('EFG'), repeat=2
+            ),
+            mi.product_index(target, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
         )
 
 
@@ -5953,6 +6002,29 @@ class GrayProductTests(TestCase):
             sorted(product(*iters)), sorted(mi.gray_product(*iters))
         )
 
+    def test_repeat(self):
+        self.assertEqual(
+            list(mi.gray_product('ABC', repeat=5)),
+            list(mi.gray_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
+        )
+        self.assertEqual(
+            list(mi.gray_product('ABC', 'DE', repeat=5)),
+            list(
+                mi.gray_product(
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                )
+            ),
+        )
+
 
 class PartialProductTests(TestCase):
     def test_no_iterables(self):
@@ -6020,6 +6092,29 @@ class PartialProductTests(TestCase):
         ]
 
         self.assertEqual(list(mi.partial_product('AB', 'C', 'DEF')), expected)
+
+    def test_repeat(self):
+        self.assertEqual(
+            list(mi.partial_product('ABC', repeat=5)),
+            list(mi.partial_product('ABC', 'ABC', 'ABC', 'ABC', 'ABC')),
+        )
+        self.assertEqual(
+            list(mi.partial_product('ABC', 'DE', repeat=5)),
+            list(
+                mi.partial_product(
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                    'ABC',
+                    'DE',
+                )
+            ),
+        )
 
 
 class IterateTests(TestCase):

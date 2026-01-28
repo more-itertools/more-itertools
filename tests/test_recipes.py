@@ -568,6 +568,14 @@ class RandomProductTests(TestCase):
         self.assertEqual(len(n), len(nums))
         self.assertEqual(len(m), len(lets))
 
+        r = list(mi.random_product(iter(nums), iter(lets), repeat=100))
+        self.assertEqual(2 * 100, len(r))
+        n, m = set(r[::2]), set(r[1::2])
+        self.assertEqual(n, set(nums))
+        self.assertEqual(m, set(lets))
+        self.assertEqual(len(n), len(nums))
+        self.assertEqual(len(m), len(lets))
+
 
 class RandomPermutationTests(TestCase):
     """Tests for ``random_permutation()``"""
@@ -694,9 +702,10 @@ class NthCombinationTests(TestCase):
         self.assertEqual(actual, expected)
 
     def test_invalid_r(self):
-        for r in (-1, 3):
-            with self.assertRaises(ValueError):
-                mi.nth_combination([], r, 0)
+        with self.assertRaises(ValueError):
+            mi.nth_combination([], -1, 0)
+        with self.assertRaises(IndexError):
+            mi.nth_combination('abc', 5, 0)
 
     def test_invalid_index(self):
         with self.assertRaises(IndexError):
@@ -745,14 +754,12 @@ class NthPermutationTests(TestCase):
         for index in [-1 - n, n + 1]:
             with self.assertRaises(IndexError):
                 mi.nth_permutation(iterable, r, index)
+        with self.assertRaises(IndexError):
+            mi.nth_permutation('abc', 5, 0)
 
     def test_invalid_r(self):
-        iterable = 'abcde'
-        r = 4
-        n = factorial(len(iterable)) // factorial(len(iterable) - r)
-        for r in [-1, n + 1]:
-            with self.assertRaises(ValueError):
-                mi.nth_permutation(iterable, r, 0)
+        with self.assertRaises(ValueError):
+            mi.nth_permutation('abcde', -1, 0)
 
 
 class PrependTests(TestCase):
