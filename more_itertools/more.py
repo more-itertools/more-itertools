@@ -574,22 +574,20 @@ def with_iter(context_manager):
 
 
 class sized_iterator:
-    """Wrap *iterable* with an iterator that also implements ``__len__``.
+    """Wrapper for *iterable* that implements ``__len__``.
 
-    This is useful when the length of an iterable is known in advance but
-    not supported by the iterable itself (e.g., a generator). This allows
-    usage with tools that rely on ``len()``, such as progress bars.
+    >>> it = map(str, range(5))
+    >>> sized_it = sized_iterator(it, 5)
+    >>> len(sized_it)
+    5
+    >>> list(sized_it)
+    ['0', '1', '2', '3', '4']
 
-        >>> def my_generator(n):
-        ...     for i in range(n):
-        ...         yield f"Item{i}"
-        >>> gen = my_generator(3)
-        >>> sized_gen = sized_iterator(gen, 3)
-        >>> len(sized_gen)
-        3
-        >>> list(sized_gen)
-        ['Item0', 'Item1', 'Item2']
+    This is useful for tools that use :func:`len`, like
+    `tqdm <https://pypi.org/project/tqdm/>`__ .
 
+    The wrapper doesn't validate the provided *length*, so be sure to choose
+    a value that reflects reality.
     """
 
     def __init__(self, iterable, length):
