@@ -26,6 +26,7 @@ from itertools import (
     product,
     repeat,
 )
+from math import factorial
 from operator import add, mul, itemgetter, not_
 from pickle import loads, dumps
 from random import Random, random, randrange, seed
@@ -6629,3 +6630,124 @@ class TestConcurrentTee(TestCase):
         with self.assertRaises(ValueError):
             non_concurrent_source = producer(limit)
             mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n
+
+
+class TestsRandomOrderedCombinatorics(TestCase):
+    # Shared test code
+
+    test_inputs = []
+
+    def test_vs_ordered_baseline(self):
+        # Verify that the randomized values match the ordered values.
+        for inputs in self.test_inputs:
+            if len(inputs) == 2:
+                args, kwargs = inputs
+            else:
+                args = inputs[0]
+                kwargs = {}
+            with self.subTest(args=args, kwargs=kwargs):
+                randomized = sorted(self.randomized_tool(*args, **kwargs))
+                ordered = sorted(self.ordered_tool(*args, **kwargs))
+                self.assertEqual(randomized, ordered)
+
+
+class TestRandomOrderedRange(TestsRandomOrderedCombinatorics):
+    randomized_tool = staticmethod(mi.random_ordered_range)
+
+    ordered_tool = range
+
+    test_inputs = [
+        ((0,),),
+        ((1,),),
+        ((2,),),
+        ((3,),),
+        ((4,),),
+        ((10,),),
+        ((50,),),
+        ((100, 200),),
+        ((1000, 2000, 10),),
+        ((2000, 1000, -10),),
+    ]
+
+    def test_lcg_mitigation(self):
+        # Without mitigation the LCG doesn't produce many distinct permutations
+        perms = set(tuple(mi.random_ordered_range(6)) for _ in range(10**5))
+        self.assertEqual(len(perms), factorial(6))
+
+
+class TestRandomOrderedProduct(TestsRandomOrderedCombinatorics):
+    randomized_tool = staticmethod(mi.random_ordered_product)
+
+    ordered_tool = product
+
+    test_inputs = [
+        (('',),),
+        (('a',),),
+        (('ab',),),
+        (('abc',),),
+        (('', 'def'),),
+        (('a', 'def'),),
+        (('ab', 'def'),),
+        (('abc', 'def'),),
+        (('ab', 'def', 'ghi'),),
+        (('ab', 'def'), {'repeat': 3}),
+    ]
+
+
+class TestRandomOrderedPermutations(TestsRandomOrderedCombinatorics):
+    randomized_tool = staticmethod(mi.random_ordered_permutations)
+
+    ordered_tool = permutations
+
+    test_inputs = [
+        (('',),),
+        (('a',),),
+        (('ab',),),
+        (('abc',),),
+        (('abcd',),),
+        (('abcdefgh',),),
+        (('abc', 3),),
+        (('abcd', 3),),
+        (('abcdefgh', 3),),
+        (('abcdefgh',), {'r': 4}),
+        (('abcdefgh',), {'r': None}),
+    ]
+
+
+class TestRandomOrderedCombinations(TestsRandomOrderedCombinatorics):
+    randomized_tool = staticmethod(mi.random_ordered_combinations)
+
+    ordered_tool = combinations
+
+    test_inputs = [
+        (('', 3),),
+        (('a', 1),),
+        (('ab', 1),),
+        (('abc', 2),),
+        (('abcd', 0),),
+        (('abcdefgh', 5),),
+        (('abc', 3),),
+        (('abcd', 5),),
+        (('abcdefgh', 3),),
+    ]
+
+
+class TestRandomOrderedCombinationsWithReplacement(
+    TestsRandomOrderedCombinatorics
+):
+    randomized_tool = staticmethod(mi.random_ordered_combs_with_replacement)
+
+    ordered_tool = combinations_with_replacement
+
+    test_inputs = [
+        (('', 0),),
+        (('a', 1),),
+        (('ab', 1),),
+        (('abc', 2),),
+        (('abcd', 0),),
+        (('abcd', 5),),
+        (('abcdefgh', 5),),
+        (('abc', 3),),
+        (('abcd', 4),),
+        (('abcdefgh', 3),),
+    ]
