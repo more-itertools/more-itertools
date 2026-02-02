@@ -6025,6 +6025,12 @@ class GrayProductTests(TestCase):
             ),
         )
 
+    def test_repeat_with_iterators(self):
+        self.assertEqual(
+            list(mi.gray_product(iter('abc'), iter('def'), repeat=2)),
+            list(mi.gray_product('abc', 'def', repeat=2)),
+        )
+
 
 class PartialProductTests(TestCase):
     def test_no_iterables(self):
@@ -6114,6 +6120,12 @@ class PartialProductTests(TestCase):
                     'DE',
                 )
             ),
+        )
+
+    def test_repeat_with_iterators(self):
+        self.assertEqual(
+            list(mi.partial_product(iter('abc'), iter('def'), repeat=2)),
+            list(mi.partial_product('abc', 'def', repeat=2)),
         )
 
 

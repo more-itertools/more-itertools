@@ -4897,7 +4897,7 @@ def gray_product(*iterables, repeat=1):
     `this section <https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz>`__
     of Donald Knuth's *The Art of Computer Programming*.
     """
-    all_iterables = tuple(map(tuple, iterables * repeat))
+    all_iterables = tuple(map(tuple, iterables)) * repeat
     iterable_count = len(all_iterables)
     for iterable in all_iterables:
         if len(iterable) < 2:
@@ -4939,7 +4939,8 @@ def partial_product(*iterables, repeat=1):
     equivalent to ``partial_product('AB', 'AB', 'AB')``.
     """
 
-    iterators = tuple(map(iter, iterables * repeat))
+    all_iterables = tuple(map(tuple, iterables)) * repeat
+    iterators = tuple(map(iter, all_iterables))
 
     try:
         prod = [next(it) for it in iterators]
