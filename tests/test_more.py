@@ -3211,7 +3211,7 @@ class LocateTests(TestCase):
 
     def test_window_size_large(self):
         iterable = [1, 2, 3, 4]
-        pred = lambda a, b, c, d, e: True
+        pred = lambda *args: True
         actual = list(mi.locate(iterable, pred, window_size=5))
         expected = [0]
         self.assertEqual(actual, expected)
@@ -3909,7 +3909,7 @@ class RlocateTests(TestCase):
 
     def test_window_size_large(self):
         iterable = [1, 2, 3, 4]
-        pred = lambda a, b, c, d, e: True
+        pred = lambda *args: True
         for it in (iterable, iter(iterable)):
             actual = list(mi.rlocate(iterable, pred, window_size=5))
             expected = [0]
@@ -3968,7 +3968,7 @@ class ReplaceTests(TestCase):
 
     def test_window_size_large(self):
         iterable = range(4)
-        pred = lambda a, b, c, d, e: True
+        pred = lambda *args: True
         substitutes = [5, 6, 7]
         actual = list(mi.replace(iterable, pred, substitutes, window_size=5))
         expected = [5, 6, 7]

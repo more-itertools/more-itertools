@@ -2499,7 +2499,9 @@ def locate(iterable, pred=bool, window_size=None):
         [1, 3]
 
     If *window_size* is given, then the *pred* function will be called with
-    that many items. This enables searching for sub-sequences:
+    that many items. This enables searching for sub-sequences.
+    *pred* may receive fewer than *window_size* arguments at the end of
+    the iterable and should be able to handle this.
 
         >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
         >>> pred = lambda *args: args == (1, 2, 3)
@@ -2528,7 +2530,10 @@ def locate(iterable, pred=bool, window_size=None):
         raise ValueError('window size must be at least 1')
 
     it = windowed(iterable, window_size, fillvalue=_marker)
-    return compress(count(), starmap(pred, it))
+    return compress(
+        count(),
+        (pred(*(x for x in w if x is not _marker)) for w in it),
+    )
 
 
 def longest_common_prefix(iterables):
@@ -3372,6 +3377,9 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
         >>> list(replace(iterable, pred, substitutes, window_size=window_size))
         [3, 4, 5, 3, 4, 5]
 
+    *pred* may receive fewer than *window_size* arguments at the end of
+    the iterable and should be able to handle this.
+
     """
     if window_size < 1:
         raise ValueError('window_size must be at least 1')
@@ -3386,13 +3394,17 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
     n = 0
     for w in windows:
+        # Strip any _marker padding so pred never sees internal sentinels.
+        # Near the end of the iterable, pred will receive fewer arguments.
+        args = tuple(x for x in w if x is not _marker)
+
         # If the current window matches our predicate (and we haven't hit
         # our maximum number of replacements), splice in the substitutes
         # and then consume the following windows that overlap with this one.
         # For example, if the iterable is (0, 1, 2, 3, 4...)
         # and the window size is 2, we have (0, 1), (1, 2), (2, 3)...
         # If the predicate matches on (0, 1), we need to zap (0, 1) and (1, 2)
-        if pred(*w):
+        if args and pred(*args):
             if (count is None) or (n < count):
                 n += 1
                 yield from substitutes
@@ -3401,8 +3413,8 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
 
         # If there was no match (or we've reached the replacement limit),
         # yield the first item from the window.
-        if w and (w[0] is not _marker):
-            yield w[0]
+        if args:
+            yield args[0]
 
 
 def partitions(iterable):
