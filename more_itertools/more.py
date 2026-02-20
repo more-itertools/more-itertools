@@ -2337,23 +2337,12 @@ class numeric_range(Sequence):
         if isinstance(key, int):
             return self._get_by_index(key)
         elif isinstance(key, slice):
-            step = self._step if key.step is None else key.step * self._step
-
-            if key.start is None or key.start <= -self._len:
-                start = self._start
-            elif key.start >= self._len:
-                start = self._stop
-            else:  # -self._len < key.start < self._len
-                start = self._get_by_index(key.start)
-
-            if key.stop is None or key.stop >= self._len:
-                stop = self._stop
-            elif key.stop <= -self._len:
-                stop = self._start
-            else:  # -self._len < key.stop < self._len
-                stop = self._get_by_index(key.stop)
-
-            return numeric_range(start, stop, step)
+            start_idx, stop_idx, step_idx = key.indices(self._len)
+            return numeric_range(
+                self._start + start_idx * self._step,
+                self._start + stop_idx * self._step,
+                self._step * step_idx,
+            )
         else:
             raise TypeError(
                 'numeric range indices must be '
