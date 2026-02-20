@@ -2856,6 +2856,11 @@ class NumericRangeTests(TestCase):
             ((1.0, 9.0, 1.5), slice(None, -10, 3), (1.0, 1.0, 4.5)),
             ((1.0, 9.0, 1.5), slice(None, 10, 3), (1.0, 9.0, 4.5)),
             (
+                (10.0, 0.0, -2.0),
+                slice(None, None, -1),
+                (2.0, 12.0, 2.0),
+            ),
+            (
                 (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
                 slice(1, -1, None),
                 (Decimal("2.5"), Decimal("8.5"), Decimal("1.5")),
