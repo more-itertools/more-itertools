@@ -164,6 +164,7 @@ __all__ = [
     'substrings_indexes',
     'synchronized',
     'takewhile_inclusive',
+    'tee_filtered',
     'time_limited',
     'unique_in_window',
     'unique_to_each',
@@ -5433,3 +5434,23 @@ class _concurrent_tee:
                     link[1] = [None, None]
         value, self.link = link
         return value
+
+
+def tee_filtered(iterable, *filters):
+    it = iter(iterable)
+    queues_and_filters = [(deque(), filter) for filter in filters]
+
+    def generator(q):
+        while True:
+            while len(q) == 0:
+                try:
+                    next_value = next(it)
+                except StopIteration:
+                    return
+
+                for queue, filter in queues_and_filters:
+                    if filter(next_value):
+                        queue.append(next_value)
+            yield q.popleft()
+
+    return tuple(generator(queue) for queue, _ in queues_and_filters)

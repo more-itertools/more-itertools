@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import cmath
 import gc
+import itertools
 import platform
+import sys
 import weakref
 
 from collections import Counter, deque
@@ -33,7 +35,7 @@ from statistics import mean
 from string import ascii_letters
 from threading import Thread, Lock
 from time import sleep
-from typing import NamedTuple
+from typing import Callable, NamedTuple
 from unittest import TestCase, mock
 
 import more_itertools as mi
@@ -6641,3 +6643,81 @@ class TestConcurrentTee(TestCase):
         with self.assertRaises(ValueError):
             non_concurrent_source = producer(limit)
             mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n
+
+
+class TestTeeFiltered(TestCase):
+    def test_basic_function(self):
+        def excepted_behavior(
+            iterable: Iterable[int], *filters: Callable[[int], bool]
+        ):
+            iterables = itertools.tee(iterable, len(filters))
+            return (
+                (x for x in iterable if filter(x))
+                for iterable, filter in zip(iterables, filters)
+            )
+
+        expected = excepted_behavior(
+            [1, 2, 3, 4, 5], lambda x: x > 2, lambda x: x < 3
+        )
+        actual = mi.tee_filtered(
+            [1, 2, 3, 4, 5], lambda x: x > 2, lambda x: x < 3
+        )
+        for e, a in zip(expected, actual, strict=True):
+            self.assertSequenceEqual(list(e), list(a))
+
+        expected = excepted_behavior(
+            [12, 213, 2, 31, 1],
+            lambda x: x > 2,
+            lambda x: x < 3,
+            lambda x: True,
+        )
+        actual = mi.tee_filtered(
+            [12, 213, 2, 31, 1],
+            lambda x: x > 2,
+            lambda x: x < 3,
+            lambda x: True,
+        )
+        for e, a in zip(expected, actual, strict=True):
+            self.assertSequenceEqual(list(e), list(a))
+
+        actual = mi.tee_filtered([], lambda x: True)
+        self.assertEqual(1, len(actual))
+        self.assertSequenceEqual([], list(actual[0]))
+
+        actual = mi.tee_filtered([])
+        self.assertEqual(0, len(actual))
+
+    def test_skipped(self):
+        inputs = [object(), object(), object()]
+        self.assertEqual(2, sys.getrefcount(inputs[0]))
+        self.assertEqual(2, sys.getrefcount(inputs[1]))
+        self.assertEqual(2, sys.getrefcount(inputs[2]))
+
+        i1, i2 = mi.tee_filtered(inputs, lambda x: True, lambda x: False)
+
+        it = iter(i1)
+        self.assertEqual(2, sys.getrefcount(inputs[0]))
+        self.assertEqual(2, sys.getrefcount(inputs[1]))
+        self.assertEqual(2, sys.getrefcount(inputs[2]))
+
+        next(it)
+        self.assertEqual(3, sys.getrefcount(inputs[0]))
+        self.assertEqual(2, sys.getrefcount(inputs[1]))
+        self.assertEqual(2, sys.getrefcount(inputs[2]))
+
+        next(it)
+        self.assertEqual(2, sys.getrefcount(inputs[0]))
+        self.assertEqual(3, sys.getrefcount(inputs[1]))
+        self.assertEqual(2, sys.getrefcount(inputs[2]))
+
+        next(it)
+        self.assertEqual(2, sys.getrefcount(inputs[0]))
+        self.assertEqual(2, sys.getrefcount(inputs[1]))
+        self.assertEqual(3, sys.getrefcount(inputs[2]))
+
+        with self.assertRaises(StopIteration):
+            next(it)
+
+        self.assertEqual(2, sys.getrefcount(inputs[0]))
+        self.assertEqual(2, sys.getrefcount(inputs[1]))
+        self.assertEqual(2, sys.getrefcount(inputs[2]))
