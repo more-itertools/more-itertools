@@ -33,7 +33,7 @@ from itertools import (
     zip_longest,
 )
 from math import prod, comb, isqrt, gcd
-from operator import mul, getitem, index, is_, itemgetter, not_, truediv
+from operator import mul, getitem, index, is_, itemgetter, truediv
 from random import randrange, sample, choice, shuffle
 from sys import hexversion
 
@@ -409,10 +409,22 @@ def partition(pred, iterable):
     """
     if pred is None:
         pred = bool
+    iterator = iter(iterable)
 
-    t1, t2, p = tee(iterable, 3)
-    p1, p2 = tee(map(pred, p))
-    return (compress(t1, map(not_, p1)), compress(t2, p2))
+    false_queue = deque()
+    true_queue = deque()
+
+    def gen(queue):
+        while True:
+            while queue:
+                yield queue.popleft()
+            for value in iterator:
+                (true_queue if pred(value) else false_queue).append(value)
+                break
+            else:
+                return
+
+    return gen(false_queue), gen(true_queue)
 
 
 def powerset(iterable):
