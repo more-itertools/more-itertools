@@ -1158,6 +1158,13 @@ class bucket:
         >>> list(s[2])
         []
 
+    .. seealso:: :func:`map_reduce`, :func:`groupby_transform`
+
+    If storage is not a concern, :func:`map_reduce` returns a Python
+    dictionary, which is generally easier to work with. If the elements
+    with the same key are already adjacent, :func:`groupby_transform`
+    or :func:`itertools.groupby` can be used without any caching overhead.
+
     """
 
     def __init__(self, iterable, key, validator=None):
@@ -2211,7 +2218,12 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
 
     Note that the order of items in the iterable is significant.
     Only adjacent items are grouped together, so if you don't want any
-    duplicate groups, you should sort the iterable by the key function.
+    duplicate groups, you should sort the iterable by the key function
+    or consider :func:`bucket` or :func:`map_reduce`. :func:`map_reduce`
+    consumes the iterable immediately and returns a dictionary, while
+    :func:`bucket` does not.
+
+    .. seealso:: :func:`bucket`, :func:`map_reduce`
 
     """
     ret = groupby(iterable, keyfunc)
@@ -3266,6 +3278,13 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
     The returned object is a :obj:`collections.defaultdict` with the
     ``default_factory`` set to ``None``, such that it behaves like a normal
     dictionary.
+
+    .. seealso:: :func:`bucket`, :func:`groupby_transform`
+
+    If storage is a concern, :func:`bucket` can be used without consuming the
+    entire iterable right away. If the elements with the same key are already
+    adjacent, :func:`groupby_transform` or :func:`itertools.groupby` can be
+    used without any caching overhead.
 
     """
 
