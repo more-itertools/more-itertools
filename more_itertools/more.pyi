@@ -136,6 +136,7 @@ __all__ = [
     'substrings_indexes',
     'synchronized',
     'takewhile_inclusive',
+    'tee_filtered',
     'time_limited',
     'unique_in_window',
     'unique_to_each',
@@ -977,3 +978,6 @@ def concurrent_tee(
 def synchronized(
     func: Callable[..., Iterator[_T]],
 ) -> Callable[..., Iterator[_T]]: ...
+def tee_filtered(
+    iterable: Iterable[_T], *filters: Callable[[_T], bool]
+) -> tuple[Iterator[_T], ...]: ...
