@@ -5540,9 +5540,8 @@ class Stats:
     mean: float
 
 
-# fmt: off
 def running_statistics(iterable, *, maxlen=None):
-    """ Statistics for values seen so far or values in a sliding window.
+    """Statistics for values seen so far or values in a sliding window.
 
     Set *maxlen* to a positive integer to specify the maximum size
     of the sliding window.  The default of *None* is equivalent to
@@ -5555,6 +5554,7 @@ def running_statistics(iterable, *, maxlen=None):
     but not complex numbers which are unorderable.
     """
 
+    # fmt: off
     t0, t1, t2, t3 = tee(iterable, 4)
     running_count = count(1) if maxlen is None else chain(range(1, maxlen), repeat(maxlen))
     return map(
@@ -5565,4 +5565,4 @@ def running_statistics(iterable, *, maxlen=None):
         running_max(t2, maxlen=maxlen),
         running_mean(t3, maxlen=maxlen),
     )
-# fmt: on
+    # fmt: on
