@@ -5549,7 +5549,7 @@ def running_statistics(iterable, *, maxlen=None):
     of the sliding window.  The default of *None* is equivalent to
     an unbounded window.
 
-    Yields instances of ``Stat`` with fields for the dataset *size*,
+    Yields instances of a ``Stats`` dataclass with fields for the dataset *size*,
     *mininum* value, *median* value, *maximum* value, and the arithmetic *mean*.
 
     Supports numeric types such as int, float, Decimal, and Fraction,
