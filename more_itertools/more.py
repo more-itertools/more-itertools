@@ -5558,10 +5558,9 @@ def running_statistics(iterable, *, maxlen=None):
 
     # fmt: off
     t0, t1, t2, t3 = tee(iterable, 4)
-    running_count = count(1) if maxlen is None else chain(range(1, maxlen), repeat(maxlen))
     return map(
         Stats,
-        running_count,
+        count(1) if maxlen is None else chain(range(1, maxlen), repeat(maxlen)),
         running_min(t0, maxlen=maxlen),
         running_median(t1, maxlen=maxlen),
         running_max(t2, maxlen=maxlen),
