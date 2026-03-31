@@ -2508,9 +2508,9 @@ def locate(iterable, pred=bool, window_size=None):
         [1, 3]
 
     If *window_size* is given, then the *pred* function will be called with
-    that many items. This enables searching for sub-sequences.
-    *pred* may receive fewer than *window_size* arguments at the end of
-    the iterable and should be able to handle this.
+    the values in each window. This enables searching for sub-sequences.
+    Note that *pred* may receive fewer than *window_size* arguments at the end of
+    the iterable.
 
         >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
         >>> pred = lambda *args: args == (1, 2, 3)

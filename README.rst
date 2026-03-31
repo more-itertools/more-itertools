@@ -175,6 +175,7 @@ Python iterables.
 |                        | `countable <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.countable>`_,                                                                           |
 |                        | `consumer <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.consumer>`_,                                                                             |
 |                        | `iter_except <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.iter_except>`_,                                                                       |
+|                        | `sized_iterator <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sized_iterator>`_                                                                  |
 |                        | `with_iter <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.with_iter>`_                                                                            |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Others                 | `locate <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.locate>`_,                                                                                 |
