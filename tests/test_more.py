@@ -28,8 +28,8 @@ from itertools import (
 )
 from operator import add, mul, itemgetter, not_
 from pickle import loads, dumps
-from random import Random, random, randrange, seed
-from statistics import mean
+from random import Random, choices, random, randrange, seed
+from statistics import mean, median
 from string import ascii_letters
 from threading import Thread, Lock
 from time import sleep
@@ -6646,3 +6646,208 @@ class TestConcurrentTee(TestCase):
         with self.assertRaises(ValueError):
             non_concurrent_source = producer(limit)
             mi.concurrent_tee(non_concurrent_source, n=-1)  # Negative n
+
+
+def grow_to_window(data, maxlen):
+    "Return growing window views upto maxlen."
+    for j in range(1, len(data) + 1):
+        i = max(j - maxlen, 0)
+        yield data[i:j]
+
+
+class TestRunningMin(TestCase):
+    def test_basic(self):
+        for i, (iterable, expected) in enumerate(
+            [
+                ([], []),
+                ([1], [1]),
+                ([1, 2], [1, 1]),
+                (
+                    [Fraction(1, 1), Fraction(2, 1)],
+                    [Fraction(1, 1), Fraction(1, 1)],
+                ),
+                (
+                    [Decimal('1.0'), Decimal('2.0')],
+                    [Decimal('1.0'), Decimal('1.0')],
+                ),
+                ([8.5, 9.5, 7.5, 6.5], [8.5, 8.5, 7.5, 6.5]),
+            ]
+        ):
+            with self.subTest(i=i, iterable=iterable, expected=expected):
+                actual = list(mi.running_min(iterable))
+                self.assertEqual(actual, expected)
+
+    def test_maxlen(self):
+        data = choices(range(20), k=1000)
+
+        # Window size must be positive
+        with self.assertRaises(ValueError):
+            list(mi.running_min(iter(data), maxlen=0))
+
+        # Window size of 1 should return the original dataset unchanged
+        self.assertEqual(list(mi.running_min(iter(data), maxlen=1)), data)
+
+        # Window size normal cases
+        for maxlen in range(2, 6):
+            with self.subTest(maxlen=maxlen):
+                actual = list(mi.running_min(iter(data), maxlen=maxlen))
+                expected = list(map(min, grow_to_window(data, maxlen)))
+                self.assertEqual(actual, expected)
+
+        # Window size larger than the data same as the unbounded case
+        self.assertEqual(
+            list(mi.running_min(iter(data), maxlen=len(data) * 2)),
+            list(mi.running_min(iter(data))),
+        )
+
+
+class TestRunningMax(TestCase):
+    def test_basic(self):
+        for i, (iterable, expected) in enumerate(
+            [
+                ([], []),
+                ([1], [1]),
+                ([1, 2], [1, 2]),
+                (
+                    [Fraction(1, 1), Fraction(2, 1)],
+                    [Fraction(1, 1), Fraction(2, 1)],
+                ),
+                (
+                    [Decimal('1.0'), Decimal('2.0')],
+                    [Decimal('1.0'), Decimal('2.0')],
+                ),
+                ([8.5, 9.5, 7.5, 6.5], [8.5, 9.5, 9.5, 9.5]),
+            ]
+        ):
+            with self.subTest(i=i, iterable=iterable, expected=expected):
+                actual = list(mi.running_max(iterable))
+                self.assertEqual(actual, expected)
+
+    def test_maxlen(self):
+        data = choices(range(20), k=1000)
+
+        # Window size must be positive
+        with self.assertRaises(ValueError):
+            list(mi.running_max(iter(data), maxlen=0))
+
+        # Window size of 1 should return the original dataset unchanged
+        self.assertEqual(list(mi.running_max(iter(data), maxlen=1)), data)
+
+        # Window size normal cases
+        for maxlen in range(2, 6):
+            with self.subTest(maxlen=maxlen):
+                actual = list(mi.running_max(iter(data), maxlen=maxlen))
+                expected = list(map(max, grow_to_window(data, maxlen)))
+                self.assertEqual(actual, expected)
+
+        # Window size larger than the data same as the unbounded case
+        self.assertEqual(
+            list(mi.running_max(iter(data), maxlen=len(data) * 2)),
+            list(mi.running_max(iter(data))),
+        )
+
+
+class TestRunningStats(TestCase):
+    # Assumes that the component functions are already tested,
+    # so we only need to test whether they are properly integrated
+    # (i.e correctly pass *maxlen* to each and correctly send
+    # each statistic to the correct slot in Stats).
+
+    def test_single_example(self):
+        data = [4, 3, 7, 0, 8, 1, 6, 2, 9, 5]
+
+        it = mi.running_statistics(iter(data))
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=1, minimum=4, median=4, maximum=4, mean=4.0),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=2, minimum=3, median=3.5, maximum=4, mean=7 / 2),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=3, minimum=3, median=4, maximum=7, mean=14 / 3),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=4, minimum=0, median=3.5, maximum=7, mean=14 / 4),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=5, minimum=0, median=4, maximum=8, mean=22 / 5),
+        )
+        w = [4, 3, 7, 0, 8, 1]  # Unbounded window
+        self.assertEqual(
+            next(it),
+            mi.Stats(
+                size=len(w),
+                minimum=min(w),
+                median=median(w),
+                maximum=max(w),
+                mean=mean(w),
+            ),
+        )
+
+        it = mi.running_statistics(iter(data), maxlen=3)
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=1, minimum=4, median=4, maximum=4, mean=4.0),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=2, minimum=3, median=3.5, maximum=4, mean=7 / 2),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=3, minimum=3, median=4, maximum=7, mean=14 / 3),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=3, minimum=0, median=3, maximum=7, mean=10 / 3),
+        )
+        self.assertEqual(
+            next(it),
+            mi.Stats(size=3, minimum=0, median=7, maximum=8, mean=15 / 3),
+        )
+        w = [0, 8, 1]  # Window with maxlen=3
+        self.assertEqual(
+            next(it),
+            mi.Stats(
+                size=len(w),
+                minimum=min(w),
+                median=median(w),
+                maximum=max(w),
+                mean=mean(w),
+            ),
+        )
+
+    def test_early_error_detection(self):
+        with self.assertRaises(TypeError):
+            mi.running_statistics(None)  # Non-iterable input
+
+        with self.assertRaises(ValueError):
+            mi.running_statistics([10, 5, 20], maxlen=0)  # Non-positive maxlen
+
+    def test_stat_properties(self):
+        st = mi.Stats(size=5, minimum=0, median=4, maximum=8, mean=22 / 5)
+
+        # Hashable
+        hash(st)
+
+        # Slots
+        with self.assertRaises(TypeError):
+            vars(st)
+
+        # Immutable
+        with self.assertRaises(AttributeError):
+            st.size = 10
+
+        # Not sizeable, indexable, or iterable
+        # (so we can add new fields in the future)
+        with self.assertRaises(TypeError):
+            len(st)
+        with self.assertRaises(TypeError):
+            st[0]
+        with self.assertRaises(TypeError):
+            iter(st)
