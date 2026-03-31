@@ -5454,7 +5454,7 @@ class _concurrent_tee:
 def _windowed_running_min(iterator, maxlen):
     sis = deque()  # Strictly increasing subsequence
     for index, value in enumerate(iterator):
-        if sis and sis[0][0] == index - maxlen:  # Entry leaves the window
+        if sis and sis[0][0] == index - maxlen:
             sis.popleft()
         while sis and not sis[-1][1] < value:  # Remove non-increasing values
             sis.pop()
@@ -5495,7 +5495,7 @@ def running_min(iterable, *, maxlen=None):
 def _windowed_running_max(iterator, maxlen):
     sds = deque()  # Strictly decreasing subsequence
     for index, value in enumerate(iterator):
-        if sds and sds[0][0] == index - maxlen:  # Entry leaves the window
+        if sds and sds[0][0] == index - maxlen:
             sds.popleft()
         while sds and not sds[-1][1] > value:  # Remove non-decreasing values
             sds.pop()

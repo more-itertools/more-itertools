@@ -986,7 +986,7 @@ def synchronized(
     func: Callable[..., Iterator[_T]],
 ) -> Callable[..., Iterator[_T]]: ...
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class Stats:
     size: int
     minimum: float
