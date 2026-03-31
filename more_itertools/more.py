@@ -5453,13 +5453,13 @@ class _concurrent_tee:
 
 def _windowed_running_min(iterator, maxlen):
     sis = deque()  # Strictly increasing subsequence
-    for i, val in enumerate(iterator):
-        if sis and sis[0][1] <= i - maxlen:
+    for index, value in enumerate(iterator):
+        if sis and sis[0][0] == index - maxlen:  # Entry leaves the window
             sis.popleft()
-        while sis and not sis[-1][0] < val:
+        while sis and not sis[-1][1] < value:  # Remove non-increasing values
             sis.pop()
-        sis.append((val, i))  # Most recent value at position -1
-        yield sis[0][0]  # Window minimum at position 0
+        sis.append((index, value))  # Most recent value at position -1
+        yield sis[0][1]  # Window minimum at position 0
 
 
 def running_min(iterable, *, maxlen=None):
@@ -5494,13 +5494,13 @@ def running_min(iterable, *, maxlen=None):
 
 def _windowed_running_max(iterator, maxlen):
     sds = deque()  # Strictly decreasing subsequence
-    for i, val in enumerate(iterator):
-        if sds and sds[0][1] <= i - maxlen:
+    for index, value in enumerate(iterator):
+        if sds and sds[0][0] == index - maxlen:  # Entry leaves the window
             sds.popleft()
-        while sds and not sds[-1][0] > val:
+        while sds and not sds[-1][1] > value:  # Remove non-decreasing values
             sds.pop()
-        sds.append((val, i))  # Most recent value at position -1
-        yield sds[0][0]  # Window maximum at position 0
+        sds.append((index, value))  # Most recent value at position -1
+        yield sds[0][1]  # Window maximum at position 0
 
 
 def running_max(iterable, *, maxlen=None):
