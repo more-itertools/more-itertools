@@ -6878,3 +6878,13 @@ class TestRunningStats(TestCase):
             st[0]
         with self.assertRaises(TypeError):
             iter(st)
+
+    def test_datatypes(self):
+        data = [4, 3, 7, 0, 8, 1, 6, 2, 9, 5]
+        for kind in (int, float, Fraction, Decimal):
+            list(mi.running_statistics(map(kind, data)))
+            list(mi.running_statistics(map(kind, data), maxlen=3))
+        with self.assertRaises(TypeError):
+            list(mi.running_statistics(map(complex, data)))
+        with self.assertRaises(TypeError):
+            list(mi.running_statistics(map(complex, data), maxlen=3))

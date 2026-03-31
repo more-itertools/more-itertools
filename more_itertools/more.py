@@ -5477,7 +5477,8 @@ def running_min(iterable, *, maxlen=None):
         >>> list(running_min([4, 3, 7, 0, 8, 1, 6, 2, 9, 5], maxlen=3))
         [4, 3, 3, 0, 0, 0, 1, 1, 2, 2]
 
-    Supports numeric types such as int, float, complex, Decimal, and Fraction.
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
     """
 
     iterator = iter(iterable)
@@ -5517,7 +5518,8 @@ def running_max(iterable, *, maxlen=None):
         >>> list(running_max([4, 3, 7, 0, 8, 1, 6, 2, 9, 5], maxlen=3))
         [4, 4, 7, 7, 8, 8, 8, 6, 9, 9]
 
-    Supports numeric types such as int, float, complex, Decimal, and Fraction.
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
     """
 
     iterator = iter(iterable)
