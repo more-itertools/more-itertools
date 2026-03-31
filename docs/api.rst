@@ -309,7 +309,6 @@ These tools work with most numeric data types.
 .. autofunction:: polynomial_from_roots
 .. autofunction:: polynomial_derivative
 .. autofunction:: polynomial_eval
-.. autofunction:: running_median
 .. autofunction:: sum_of_squares
 
 
@@ -333,6 +332,27 @@ The tools focus on math with integers.
 .. autofunction:: multinomial
 .. autofunction:: sieve
 .. autofunction:: totient
+
+
+Statistics
+==========
+
+**New itertools**
+
+The tools focus on simple statistics.
+
+----
+
+.. autofunction:: running_min
+.. autofunction:: running_max
+.. autofunction:: running_statistics
+
+----
+
+**Itertools recipes**
+
+.. autofunction:: running_mean
+.. autofunction:: running_median
 
 
 Others

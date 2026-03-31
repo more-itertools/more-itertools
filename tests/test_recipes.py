@@ -1507,6 +1507,13 @@ class MultinomialTests(TestCase):
             multinomial([5, 7])  # No sequence inputs
 
 
+def grow_to_window(data, maxlen):
+    "Return growing window views upto maxlen."
+    for j in range(1, len(data) + 1):
+        i = max(j - maxlen, 0)
+        yield data[i:j]
+
+
 class RunningMeanTests(TestCase):
     def test_basic(self):
         for i, (iterable, expected) in enumerate(
@@ -1523,11 +1530,35 @@ class RunningMeanTests(TestCase):
                     [Decimal('1.0'), Decimal('1.5')],
                 ),
                 ([8.5, 9.5, 7.5, 6.5], [8.5, 9.0, 8.5, 8.0]),
+                ([3 + 4j, 5 - 1j, 4 + 3j], [(3 + 4j), (4 + 1.5j), (4 + 2j)]),
             ]
         ):
             with self.subTest(i=i):
                 actual = list(mi.running_mean(iterable))
                 self.assertEqual(actual, expected)
+
+    def test_maxlen(self):
+        data = random.choices(range(20), k=1000)
+
+        # Window size must be positive
+        with self.assertRaises(ValueError):
+            list(mi.running_mean(iter(data), maxlen=0))
+
+        # Window size of 1 should return the original dataset unchanged
+        self.assertEqual(list(mi.running_mean(iter(data), maxlen=1)), data)
+
+        # Window size normal cases
+        for maxlen in range(2, 6):
+            with self.subTest(maxlen=maxlen):
+                actual = list(mi.running_mean(iter(data), maxlen=maxlen))
+                expected = list(map(mean, grow_to_window(data, maxlen)))
+                self.assertEqual(actual, expected)
+
+        # Window size larger than the data same as the unbounded case
+        self.assertEqual(
+            list(mi.running_mean(iter(data), maxlen=len(data) * 2)),
+            list(mi.running_mean(iter(data))),
+        )
 
 
 class RunningMedianTests(TestCase):
