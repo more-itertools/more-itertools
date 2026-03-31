@@ -1408,19 +1408,48 @@ def running_median(iterable, *, maxlen=None):
     return _running_median_minheap_and_maxheap(iterator)  # pragma: no cover
 
 
-def running_mean(iterable):
-    """Yield the average of all values seen so far.
+def _windowed_running_mean(iterator, n):
+    window = deque()
+    running_sum = 0
+    for value in iterator:
+        window.append(value)
+        running_sum += value
+        if len(window) > n:
+            running_sum -= window.popleft()
+        yield running_sum / len(window)
 
-    >>> iterable = [100, 200, 600]
-    >>> all_means = running_mean(iterable)
-    >>> next(all_means)
-    100.0
-    >>> next(all_means)
-    150.0
-    >>> next(all_means)
-    300.0
+
+def running_mean(iterable, *, maxlen=None):
+    """Cumulative mean of values seen so far or values in a sliding window.
+
+    Set *maxlen* to a positive integer to specify the maximum size
+    of the sliding window.  The default of *None* is equivalent to
+    an unbounded window.
+
+    For example:
+
+        >>> list(running_mean([40, 30, 50, 46, 39, 44]))
+        [40.0, 35.0, 40.0, 41.5, 41.0, 41.5]
+
+        >>> list(running_mean([40, 30, 50, 46, 39, 44], maxlen=3))
+        [40.0, 35.0, 40.0, 42.0, 45.0, 43.0]
+
+    Supports numeric types such as int, float, complex, Decimal, and Fraction.
+
+    No extra effort is made to reduce round-off errors for float inputs.
+    So the results may be slightly different from `statistics.mean`.
+
     """
-    return map(truediv, accumulate(iterable), count(1))
+
+    iterator = iter(iterable)
+
+    if maxlen is None:
+        return map(truediv, accumulate(iterator), count(1))
+
+    if maxlen <= 0:
+        raise ValueError('Window size should be positive')
+
+    return _windowed_running_mean(iterator, maxlen)
 
 
 def random_derangement(iterable):
