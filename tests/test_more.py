@@ -6854,6 +6854,10 @@ class TestRunningStats(TestCase):
     def test_stat_properties(self):
         st = mi.Stats(size=5, minimum=0, median=4, maximum=8, mean=22 / 5)
 
+        # Comparable
+        self.assertEqual(st,
+               mi.Stats(size=5, minimum=0, median=4, maximum=8, mean=22 / 5))
+
         # Hashable
         hash(st)
 
