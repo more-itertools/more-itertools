@@ -6788,6 +6788,17 @@ class TestRunningStats(TestCase):
                 mean=mean(w),
             ),
         )
+        w = [4, 3, 7, 0, 8, 1, 6]  # Unbounded window
+        self.assertEqual(
+            next(it),
+            mi.Stats(
+                size=len(w),
+                minimum=min(w),
+                median=median(w),
+                maximum=max(w),
+                mean=mean(w),
+            ),
+        )
 
         it = mi.running_statistics(iter(data), maxlen=3)
         self.assertEqual(
@@ -6811,6 +6822,17 @@ class TestRunningStats(TestCase):
             mi.Stats(size=3, minimum=0, median=7, maximum=8, mean=15 / 3),
         )
         w = [0, 8, 1]  # Window with maxlen=3
+        self.assertEqual(
+            next(it),
+            mi.Stats(
+                size=len(w),
+                minimum=min(w),
+                median=median(w),
+                maximum=max(w),
+                mean=mean(w),
+            ),
+        )
+        w = [8, 1, 6]  # Window with maxlen=3
         self.assertEqual(
             next(it),
             mi.Stats(
