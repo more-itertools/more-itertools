@@ -1530,6 +1530,7 @@ class RunningMeanTests(TestCase):
                     [Decimal('1.0'), Decimal('1.5')],
                 ),
                 ([8.5, 9.5, 7.5, 6.5], [8.5, 9.0, 8.5, 8.0]),
+                ([3 + 4j, 5 - 1j, 4 + 3j], [(3 + 4j), (4 + 1.5j), (4 + 2j)]),
             ]
         ):
             with self.subTest(i=i):
