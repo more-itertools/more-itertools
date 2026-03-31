@@ -985,6 +985,7 @@ def concurrent_tee(
 def synchronized(
     func: Callable[..., Iterator[_T]],
 ) -> Callable[..., Iterator[_T]]: ...
+
 @dataclass(frozen=True, slots=True)
 class Stats:
     size: int

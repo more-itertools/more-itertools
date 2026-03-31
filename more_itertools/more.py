@@ -5542,14 +5542,27 @@ class Stats:
 
 # fmt: off
 def running_statistics(iterable, *, maxlen=None):
+    """ Statistics for values seen so far or values in a sliding window.
+
+    Set *maxlen* to a positive integer to specify the maximum size
+    of the sliding window.  The default of *None* is equivalent to
+    an unbounded window.
+
+    Yields instances of ``Stat`` with fields for the dataset *size*,
+    *mininum* value, *median* value, *maximum* value, and the arithmetic *mean*.
+
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
+    """
+
     t0, t1, t2, t3 = tee(iterable, 4)
     running_count = count(1) if maxlen is None else chain(range(1, maxlen), repeat(maxlen))
     return map(
         Stats,
         running_count,
-        running_min(t2, maxlen=maxlen),
+        running_min(t0, maxlen=maxlen),
         running_median(t1, maxlen=maxlen),
-        running_max(t3, maxlen=maxlen),
-        running_mean(t0, maxlen=maxlen),
+        running_max(t2, maxlen=maxlen),
+        running_mean(t3, maxlen=maxlen),
     )
 # fmt: on
