@@ -1045,11 +1045,8 @@ def windowed(seq, n, fillvalue=None, step=1):
         >>> list(windowed(chain(padding, iterable), 3))
         [(None, None, 1), (None, 1, 2), (1, 2, 3), (2, 3, 4)]
     """
-    if n < 0:
-        raise ValueError('n must be >= 0')
-    if n == 0:
-        yield ()
-        return
+    if n <= 0:
+        raise ValueError('n must be > 0')
     if step < 1:
         raise ValueError('step must be >= 1')
 
