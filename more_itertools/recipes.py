@@ -462,10 +462,10 @@ def unique_everseen(iterable, key=None):
     Some unhashable objects can be converted to hashable objects
     using the *key* parameter:
 
-        For ``list`` objects, try ``key=tuple``.
-        For ``set`` objects, try ``key=frozenset``.
-        For ``dict`` objects, try ``key=lambda x: frozenset(x.items())``
-        or in Python 3.15 and later, set ``key=frozendict``.
+    * For ``list`` objects, try ``key=tuple``.
+    * For ``set`` objects, try ``key=frozenset``.
+    * For ``dict`` objects, try ``key=lambda x: frozenset(x.items())``
+      or in Python 3.15 and later, set ``key=frozendict``.
 
     Alternatively, consider the ``unique()`` itertool recipe.  It sorts
     the data and then uses equality to eliminate duplicates.  Hashability
