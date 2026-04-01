@@ -289,7 +289,7 @@ except ImportError:  # pragma: no cover
     _sumprod = dotproduct
 
 
-def flatten(listOfLists):
+def flatten(list_of_lists):
     """Return an iterator flattening one level of nesting in a list of lists.
 
         >>> list(flatten([[0, 1], [2, 3]]))
@@ -298,7 +298,7 @@ def flatten(listOfLists):
     See also :func:`collapse`, which can flatten multiple levels of nesting.
 
     """
-    return chain.from_iterable(listOfLists)
+    return chain.from_iterable(list_of_lists)
 
 
 def repeatfunc(function, times=None, *args):
