@@ -410,15 +410,36 @@ class UniqueEverseenTests(TestCase):
         u = mi.unique_everseen('aAbACCc', key=str.lower)
         self.assertEqual(list('abC'), list(u))
 
-    def test_unhashable(self):
-        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
-        u = mi.unique_everseen(iterable)
-        self.assertEqual(list(u), ['a', [1, 2, 3]])
+    def test_unhashable_lists(self):
+        data = [[10, 20], [30, 40], [10, 20]]
 
-    def test_unhashable_key(self):
-        iterable = ['a', [1, 2, 3], [1, 2, 3], 'a']
-        u = mi.unique_everseen(iterable, key=lambda x: x)
-        self.assertEqual(list(u), ['a', [1, 2, 3]])
+        with self.assertRaises(TypeError):
+            list(mi.unique_everseen(data))
+
+        self.assertEqual(
+            list(mi.unique_everseen(data, key=tuple)), [[10, 20], [30, 40]]
+        )
+
+    def test_unhashable_sets(self):
+        data = [{10, 20}, {30, 40}, {20, 10}]
+
+        with self.assertRaises(TypeError):
+            list(mi.unique_everseen(data))
+
+        self.assertEqual(
+            list(mi.unique_everseen(data, key=frozenset)), [{10, 20}, {30, 40}]
+        )
+
+    def test_unhashable_dicts(self):
+        data = [{'a': 10}, {'b': 20}, {'a': 10}]
+
+        with self.assertRaises(TypeError):
+            list(mi.unique_everseen(data))
+
+        self.assertEqual(
+            list(mi.unique_everseen(data, key=frozenset)),
+            [{'a': 10}, {'b': 20}],
+        )
 
 
 class UniqueJustseenTests(TestCase):

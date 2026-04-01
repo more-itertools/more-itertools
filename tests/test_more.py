@@ -540,7 +540,7 @@ class DistinctPermutationsTests(TestCase):
     def test_unhashable(self):
         iterable = ([1], [1], 2)
         actual = list(mi.distinct_permutations(iterable))
-        expected = list(mi.unique_everseen(permutations(iterable)))
+        expected = list(mi.unique_everseen(permutations(iterable), key=str))
         self.assertCountEqual(actual, expected)
 
 
