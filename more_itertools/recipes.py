@@ -290,7 +290,7 @@ except ImportError:  # pragma: no cover
     _sumprod = dotproduct
 
 
-def flatten(listOfLists):
+def flatten(list_of_lists):
     """Return an iterator flattening one level of nesting in a list of lists.
 
         >>> list(flatten([[0, 1], [2, 3]]))
@@ -299,11 +299,11 @@ def flatten(listOfLists):
     See also :func:`collapse`, which can flatten multiple levels of nesting.
 
     """
-    return chain.from_iterable(listOfLists)
+    return chain.from_iterable(list_of_lists)
 
 
-def repeatfunc(func, times=None, *args):
-    """Call *func* with *args* repeatedly, returning an iterable over the
+def repeatfunc(function, times=None, *args):
+    """Call *function* with *args* repeatedly, returning an iterable over the
     results.
 
     If *times* is specified, the iterable will terminate after that many
@@ -325,8 +325,8 @@ def repeatfunc(func, times=None, *args):
 
     """
     if times is None:
-        return starmap(func, repeat(args))
-    return starmap(func, repeat(args, times))
+        return starmap(function, repeat(args))
+    return starmap(function, repeat(args, times))
 
 
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
@@ -520,11 +520,11 @@ def unique(iterable, key=None, reverse=False):
     return unique_justseen(sequenced, key=key)
 
 
-def iter_except(func, exception, first=None):
+def iter_except(function, exception, first=None):
     """Yields results from a function repeatedly until an exception is raised.
 
     Converts a call-until-exception interface to an iterator interface.
-    Like ``iter(func, sentinel)``, but uses an exception instead of a sentinel
+    Like ``iter(function, sentinel)``, but uses an exception instead of a sentinel
     to end the loop.
 
         >>> l = [0, 1, 2]
@@ -546,7 +546,7 @@ def iter_except(func, exception, first=None):
         if first is not None:
             yield first()
         while True:
-            yield func()
+            yield function()
 
 
 def first_true(iterable, default=None, pred=None):
@@ -674,19 +674,19 @@ def nth_combination(iterable, r, index):
     return tuple(result)
 
 
-def prepend(value, iterator):
-    """Yield *value*, followed by the elements in *iterator*.
+def prepend(value, iterable):
+    """Yield *value*, followed by the elements in *iterable*.
 
         >>> value = '0'
-        >>> iterator = ['1', '2', '3']
-        >>> list(prepend(value, iterator))
+        >>> iterable = ['1', '2', '3']
+        >>> list(prepend(value, iterable))
         ['0', '1', '2', '3']
 
     To prepend multiple values, see :func:`itertools.chain`
     or :func:`value_chain`.
 
     """
-    return chain([value], iterator)
+    return chain([value], iterable)
 
 
 def convolve(signal, kernel):
@@ -938,7 +938,7 @@ else:  # pragma: no cover
     batched = _batched
 
 
-def transpose(it):
+def transpose(matrix):
     """Swap the rows and columns of the input matrix.
 
     >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
@@ -947,7 +947,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return zip(*it, strict=True)
+    return zip(*matrix, strict=True)
 
 
 def _is_scalar(value, stringlike=(str, bytes)):
@@ -1104,7 +1104,7 @@ def polynomial_eval(coefficients, x):
     return _sumprod(coefficients, powers)
 
 
-def sum_of_squares(it):
+def sum_of_squares(iterable):
     """Return the sum of the squares of the input values.
 
     >>> sum_of_squares([10, 20, 30])
@@ -1112,7 +1112,7 @@ def sum_of_squares(it):
 
     Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
-    return _sumprod(*tee(it))
+    return _sumprod(*tee(iterable))
 
 
 def polynomial_derivative(coefficients):
