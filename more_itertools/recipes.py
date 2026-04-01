@@ -232,14 +232,14 @@ def all_equal(iterable, key=None):
     return True
 
 
-def quantify(iterable, predicate=bool):
+def quantify(iterable, pred=bool):
     """Return the how many times the predicate is true.
 
     >>> quantify([True, False, True])
     2
 
     """
-    return sum(map(predicate, iterable))
+    return sum(map(pred, iterable))
 
 
 def pad_none(iterable):
