@@ -682,19 +682,19 @@ def nth_combination(iterable, r, index):
     return tuple(result)
 
 
-def prepend(value, iterator):
-    """Yield *value*, followed by the elements in *iterator*.
+def prepend(value, iterable):
+    """Yield *value*, followed by the elements in *iterable*.
 
         >>> value = '0'
-        >>> iterator = ['1', '2', '3']
-        >>> list(prepend(value, iterator))
+        >>> iterable = ['1', '2', '3']
+        >>> list(prepend(value, iterable))
         ['0', '1', '2', '3']
 
     To prepend multiple values, see :func:`itertools.chain`
     or :func:`value_chain`.
 
     """
-    return chain([value], iterator)
+    return chain([value], iterable)
 
 
 def convolve(signal, kernel):
