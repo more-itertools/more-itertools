@@ -557,7 +557,7 @@ def iter_except(func, exception, first=None):
             yield func()
 
 
-def first_true(iterable, default=None, pred=None):
+def first_true(iterable, default=None, predicate=None):
     """
     Returns the first true value in the iterable.
 
@@ -568,13 +568,13 @@ def first_true(iterable, default=None, pred=None):
 
         >>> first_true(range(10))
         1
-        >>> first_true(range(10), pred=lambda x: x > 5)
+        >>> first_true(range(10), predicate=lambda x: x > 5)
         6
-        >>> first_true(range(10), default='missing', pred=lambda x: x > 9)
+        >>> first_true(range(10), default='missing', predicate=lambda x: x > 9)
         'missing'
 
     """
-    return next(filter(pred, iterable), default)
+    return next(filter(predicate, iterable), default)
 
 
 def random_product(*iterables, repeat=1):

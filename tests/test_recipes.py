@@ -522,7 +522,7 @@ class FirstTrueTests(TestCase):
     def test_pred(self):
         """Test with a custom predicate"""
         self.assertEqual(
-            mi.first_true([2, 4, 6], pred=lambda x: x % 3 == 0), 6
+            mi.first_true([2, 4, 6], predicate=lambda x: x % 3 == 0), 6
         )
 
 

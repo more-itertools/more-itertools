@@ -5227,7 +5227,7 @@ def nth_prime(n, *, approximate=False):
 
     # Search from the midpoint and return the first odd prime
     odd = floor((lb + ub) / 2) | 1
-    return first_true(count(odd, step=2), pred=is_prime)
+    return first_true(count(odd, step=2), predicate=is_prime)
 
 
 def argmin(iterable, *, key=None):
