@@ -829,7 +829,6 @@ class WindowedTests(TestCase):
             (3, [(1, 2, 3), (2, 3, 4), (3, 4, 5)]),
             (2, [(1, 2), (2, 3), (3, 4), (4, 5)]),
             (1, [(1,), (2,), (3,), (4,), (5,)]),
-            (0, [()]),
         ):
             with self.subTest(n=n):
                 actual = list(mi.windowed(iterable, n))
@@ -865,9 +864,11 @@ class WindowedTests(TestCase):
         expected = [(1, 2, 3), (4, 5, '!')]
         self.assertEqual(actual, expected)
 
-    def test_negative(self):
+    def test_invalid_n(self):
         with self.assertRaises(ValueError):
-            list(mi.windowed([1, 2, 3, 4, 5], -1))
+            list(mi.windowed([1, 2, 3, 4, 5], 0))  # n is zero
+        with self.assertRaises(ValueError):
+            list(mi.windowed([1, 2, 3, 4, 5], -1))  # n is negative
 
     def test_empty_seq(self):
         actual = list(mi.windowed([], 3))
