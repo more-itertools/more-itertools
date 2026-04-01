@@ -946,7 +946,7 @@ else:  # pragma: no cover
     batched = _batched
 
 
-def transpose(it):
+def transpose(matrix):
     """Swap the rows and columns of the input matrix.
 
     >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
@@ -955,7 +955,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return zip(*it, strict=True)
+    return zip(*matrix, strict=True)
 
 
 def _is_scalar(value, stringlike=(str, bytes)):

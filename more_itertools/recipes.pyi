@@ -179,7 +179,7 @@ def _batched(
 batched = _batched
 
 def transpose(
-    it: Iterable[Iterable[_T]],
+    matrix: Iterable[Iterable[_T]],
 ) -> Iterator[tuple[_T, ...]]: ...
 @overload
 def reshape(
