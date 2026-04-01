@@ -12,7 +12,13 @@ Version History
     * Python 3.9 support was dropped, since it went EOL on 2025-10-31
     * :func:`iequals` no longer returns ``True`` when called with ``([], [ANY])`` (thanks to rhettinger and pochmann3)
     * The ``pred`` argument for :func:`locate` and :func:`replace` must now be able to
-      handle a variable number of arguments.See their docstrings for details. (thanks to veeceey, james-wasson, and pochmann3)
+      handle a variable number of arguments. See their docstrings for details. (thanks to veeceey, james-wasson, and pochmann3)
+    * :func:`unique_everseen` now raises ``TypeError`` when input elements are not hashable.
+      The silent fallback mechanism for unhashable inputs has been removed. (thanks to rhettinger and karlicoss)
+    * :func:`windowed` now raises ``ValueError`` when given a window size of ``0`` (thanks to rhettinger and brevzin)
+    * Parameter names for :func:`flatten`, :func:`iter_except`, :func:`repeatfunc`, :func:`prepend`, :func:`transpose`,
+      and :func:`sum_of_squares` have been changed. Code that uses these functions will need to be updated if it
+      uses keywords for positional arguments. (thanks to rhettinger)
 
 * New functions
     * :func:`concurrent_tee`: similar to :func:`tee`, but with guaranteed threading
