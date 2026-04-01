@@ -1112,7 +1112,7 @@ def polynomial_eval(coefficients, x):
     return _sumprod(coefficients, powers)
 
 
-def sum_of_squares(it):
+def sum_of_squares(iterable):
     """Return the sum of the squares of the input values.
 
     >>> sum_of_squares([10, 20, 30])
@@ -1120,7 +1120,7 @@ def sum_of_squares(it):
 
     Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
-    return _sumprod(*tee(it))
+    return _sumprod(*tee(iterable))
 
 
 def polynomial_derivative(coefficients):
