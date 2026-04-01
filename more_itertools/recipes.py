@@ -528,11 +528,11 @@ def unique(iterable, key=None, reverse=False):
     return unique_justseen(sequenced, key=key)
 
 
-def iter_except(func, exception, first=None):
+def iter_except(function, exception, first=None):
     """Yields results from a function repeatedly until an exception is raised.
 
     Converts a call-until-exception interface to an iterator interface.
-    Like ``iter(func, sentinel)``, but uses an exception instead of a sentinel
+    Like ``iter(function, sentinel)``, but uses an exception instead of a sentinel
     to end the loop.
 
         >>> l = [0, 1, 2]
@@ -554,7 +554,7 @@ def iter_except(func, exception, first=None):
         if first is not None:
             yield first()
         while True:
-            yield func()
+            yield function()
 
 
 def first_true(iterable, default=None, predicate=None):

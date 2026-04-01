@@ -121,13 +121,13 @@ def unique(
 ) -> Iterator[_T]: ...
 @overload
 def iter_except(
-    func: Callable[[], _T],
+    function: Callable[[], _T],
     exception: type[BaseException] | tuple[type[BaseException], ...],
     first: None = ...,
 ) -> Iterator[_T]: ...
 @overload
 def iter_except(
-    func: Callable[[], _T],
+    function: Callable[[], _T],
     exception: type[BaseException] | tuple[type[BaseException], ...],
     first: Callable[[], _U],
 ) -> Iterator[_T | _U]: ...
