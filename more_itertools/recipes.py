@@ -301,8 +301,8 @@ def flatten(listOfLists):
     return chain.from_iterable(listOfLists)
 
 
-def repeatfunc(func, times=None, *args):
-    """Call *func* with *args* repeatedly, returning an iterable over the
+def repeatfunc(function, times=None, *args):
+    """Call *function* with *args* repeatedly, returning an iterable over the
     results.
 
     If *times* is specified, the iterable will terminate after that many
@@ -324,8 +324,8 @@ def repeatfunc(func, times=None, *args):
 
     """
     if times is None:
-        return starmap(func, repeat(args))
-    return starmap(func, repeat(args, times))
+        return starmap(function, repeat(args))
+    return starmap(function, repeat(args, times))
 
 
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
