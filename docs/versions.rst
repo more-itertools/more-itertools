@@ -10,6 +10,7 @@ Version History
 
 * Potentially breaking changes
     * Python 3.9 support was dropped, since it went EOL on 2025-10-31
+    * :func:`callback_iter` is deprecated. It will be removed in a future major release.
     * :func:`iequals` no longer returns ``True`` when called with ``([], [ANY])`` (thanks to rhettinger and pochmann3)
     * The ``pred`` argument for :func:`locate` and :func:`replace` must now be able to
       handle a variable number of arguments. See their docstrings for details. (thanks to veeceey, james-wasson, and pochmann3)
