@@ -435,29 +435,42 @@ def sort_together(
 ) -> list[tuple[_T, ...]]: ...
 def unzip(iterable: Iterable[Sequence[_T]]) -> tuple[Iterator[_T], ...]: ...
 def divide(n: int, iterable: Iterable[_T]) -> list[Iterator[_T]]: ...
+
+# Literal None Handler (Fixes #1032 / #1107)
 @overload
-def always_iterable(  # Literal None Handler (Fixes #1032 / #1107)
+def always_iterable(
     obj: None, base_type: type[Any] | tuple[type[Any], ...] | None = ...
 ) -> Iterator[Any]: ...
+
+# When base_type is None, all iterable (including bytes and str) are iterable.
 @overload
-def always_iterable(  # Base type is None, so all bytes and str are iterable.
+def always_iterable(
     obj: Iterable[_T] | None, base_type: None
 ) -> Iterator[_T]: ...
+
+# When base_type is None and iterables haven't matched, it must be a scalar.
 @overload
 def always_iterable(obj: _T | None, base_type: None) -> Iterator[_T]: ...
+
+# By default str and bytes are scalars.
+# To prevent overlap, exclude the "| None" case.
 @overload
-def always_iterable(  # Default non-iterable str/bytes, excluding the "| None" case.
+def always_iterable(
     obj: str, base_type: type[Any] | tuple[type[Any], ...] = ...
 ) -> Iterator[str]: ...
 @overload
 def always_iterable(
     obj: bytes, base_type: type[Any] | tuple[type[Any], ...] = ...
 ) -> Iterator[bytes]: ...  # type: ignore
-@overload  # Generic fallbacks (Fixes #1143)
+
+# Generic fallbacks for iterables (Fixes #1143)
+@overload
 def always_iterable(
     obj: Iterable[_T] | None,
     base_type: type[Any] | tuple[type[Any], ...] = ...,
 ) -> Iterator[_T]: ...
+
+# Generic fallback for scalars
 @overload
 def always_iterable(
     obj: _T | None, base_type: type[Any] | tuple[type[Any], ...] = ...
