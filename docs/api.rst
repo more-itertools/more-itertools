@@ -72,6 +72,7 @@ These tools yield windows of items from an iterable.
 
 **Itertools recipes**
 
+.. autofunction:: pairwise
 .. autofunction:: triplewise
 .. autofunction:: sliding_window
 .. autofunction:: subslices

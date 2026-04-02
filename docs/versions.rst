@@ -5,6 +5,14 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+11.0.1
+------
+
+* Updates
+    * This release restores :func:`pairwise`, which was mistakenly removed in 11.0.0
+      instead of being deprecated. It is now marked as deprecated and will be removed
+      in a future major release. Use :func:`itertools.pairwise` as a replacement.
+
 11.0.0
 ------
 
@@ -40,7 +48,7 @@ Version History
     * The type hints for :func:`always_iterable` were improved (thanks to rhettinger and maltevesper)
     * A potential bug in :func:`callback_iter` was fixed
     * A bug in :func:`exactly_n`'s handling of negative arguments was fixed (thanks to rhettinger)
-    * :func:`extract`` now accepts a `monotonic` argument for improved performance (thanks to rhettinger)
+    * :func:`extract` now accepts a `monotonic` argument for improved performance (thanks to rhettinger)
     * A bug in :func:`numeric_range`'s handling of negative steps was fixed (thanks to bysiber)
     * :func:`grouper` implementation was updated to match the ``itertools`` docs (thanks to rhettinger)
     * :func:`nth_product`, :func:`product_index`, :func:`gray_product`,

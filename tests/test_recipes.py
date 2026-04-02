@@ -9,7 +9,6 @@ from itertools import (
     groupby,
     permutations,
     islice,
-    pairwise,
 )
 from operator import mul, eq
 from math import comb, prod, factorial
@@ -1631,7 +1630,7 @@ class RunningMedianTests(TestCase):
 
         # Window size of 2 is a moving average of pairs
         data = random.choices(range(-500, 500), k=500)
-        expected = list(map(mean, pairwise(data)))
+        expected = list(map(mean, mi.pairwise(data)))
         actual = list(islice(running_median(data, maxlen=2), 1, None))
         self.assertEqual(actual, expected)
 
