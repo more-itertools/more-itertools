@@ -25,7 +25,7 @@ from itertools import (
     filterfalse,
     groupby,
     islice,
-    pairwise,
+    pairwise as itertools_pairwise,
     product,
     repeat,
     starmap,
@@ -60,6 +60,7 @@ __all__ = [
     'nth_combination',
     'padnone',
     'pad_none',
+    'pairwise',
     'partition',
     'polynomial_eval',
     'polynomial_from_roots',
@@ -327,6 +328,13 @@ def repeatfunc(function, times=None, *args):
     if times is None:
         return starmap(function, repeat(args))
     return starmap(function, repeat(args, times))
+
+
+def pairwise(iterable):
+    return itertools_pairwise(iterable)
+
+
+pairwise.__doc__ = itertools_pairwise.__doc__
 
 
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
