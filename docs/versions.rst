@@ -5,6 +5,61 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+11.0.0
+------
+
+* Potentially breaking changes
+    * Python 3.9 support was dropped, since it went EOL on 2025-10-31
+    * :func:`callback_iter` is deprecated. It will be removed in a future major release.
+    * :func:`iequals` no longer returns ``True`` when called with ``([], [ANY])`` (thanks to rhettinger and pochmann3)
+    * The ``pred`` argument for :func:`locate` and :func:`replace` must now be able to
+      handle a variable number of arguments. See their docstrings for details. (thanks to veeceey, james-wasson, and pochmann3)
+    * :func:`unique_everseen` now raises ``TypeError`` when input elements are not hashable.
+      The silent fallback mechanism for unhashable inputs has been removed. (thanks to rhettinger and karlicoss)
+    * :func:`windowed` now raises ``ValueError`` when given a window size of ``0`` (thanks to rhettinger and brevzin)
+    * Parameter names for :func:`flatten`, :func:`iter_except`, :func:`repeatfunc`, :func:`prepend`, :func:`transpose`,
+      and :func:`sum_of_squares` have been changed. Code that uses these functions will need to be updated if it
+      uses keywords for positional arguments. (thanks to rhettinger)
+
+* New functions
+    * :func:`concurrent_tee`: similar to :func:`tee`, but with guaranteed threading
+      semantics (thanks to rhettinger)
+    * :func:`random_derangement`: returns a random derangement of elements from an
+      iterable (thanks to rhettinger)
+    * :func:`running_mean`: yields the mean of values in an iterable, or in a sliding
+      window (thanks to rhettinger)
+    * :func:`running_statistics`: provides statistics for the values in an iterable, or
+      in a sliding window (thanks to rhettinger)
+    * :func:`serialize`: wraps a non-concurrent iterator with a lock to enforce
+      sequential access (thanks to rhettinger)
+    * :func:`synchronized`: wraps an iterator-returning callable to make its iterators
+      thread-safe (thanks to rhettinger)
+    * :func:`sized_iterator`: wraps an iterable with a known length and implements ``__len__`` (thanks to assaf127)
+
+* Changes to existing functions
+    * The type hints for :func:`always_iterable` were improved (thanks to rhettinger and maltevesper)
+    * A potential bug in :func:`callback_iter` was fixed
+    * A bug in :func:`exactly_n`'s handling of negative arguments was fixed (thanks to rhettinger)
+    * :func:`extract`` now accepts a `monotonic` argument for improved performance (thanks to rhettinger)
+    * A bug in :func:`numeric_range`'s handling of negative steps was fixed (thanks to bysiber)
+    * :func:`grouper` implementation was updated to match the ``itertools`` docs (thanks to rhettinger)
+    * :func:`nth_product`, :func:`product_index`, :func:`gray_product`,
+      :func:`partial_product`, :func:`nth_product`, :func:`product_index`, and
+      :func:`random_product` now accept a ``repeat`` keyword argument (thanks to rhettinger)
+    * :func:`powerset_of_sets` can now construct ``frozenset`` instances (thanks to rhettinger)
+    * The type hints for :func:`stagger` were improved (thanks to nathanjmcdougall)
+    * Memory efficiency was improved for :func:`partition` was improved (thanks to rhettinger and yueyinqiu)
+    * Performance for the functions :func:`count_cycle`, :func:`difference`,
+      :func:`random_product`,  was improved :func:`nth_combination`, :func:`nth_combination_with_replacement`,
+      :func:`nth_permuwas improvedtation`, :func:`nth_product`, :func:`product_index`,
+      :func:`random_permutation`, :func:`substrings`, and :func:`value_chain` was
+      improved (thanks to rhettinger)
+    * Performance for :func:`ichunked` was improved (thanks to pochmann3 and rhettinger)
+
+* Other changes
+    * The docstrings for several functions were improved (thanks to nathanjmcdougall, olliemath, r266-tech, and rhettinger)
+
+
 10.8.0
 ------
 

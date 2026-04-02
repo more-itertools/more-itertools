@@ -1045,11 +1045,8 @@ def windowed(seq, n, fillvalue=None, step=1):
         >>> list(windowed(chain(padding, iterable), 3))
         [(None, None, 1), (None, 1, 2), (1, 2, 3), (2, 3, 4)]
     """
-    if n < 0:
-        raise ValueError('n must be >= 0')
-    if n == 0:
-        yield ()
-        return
+    if n <= 0:
+        raise ValueError('n must be > 0')
     if step < 1:
         raise ValueError('step must be >= 1')
 
@@ -2508,9 +2505,9 @@ def locate(iterable, pred=bool, window_size=None):
         [1, 3]
 
     If *window_size* is given, then the *pred* function will be called with
-    that many items. This enables searching for sub-sequences.
-    *pred* may receive fewer than *window_size* arguments at the end of
-    the iterable and should be able to handle this.
+    the values in each window. This enables searching for sub-sequences.
+    Note that *pred* may receive fewer than *window_size* arguments at the end of
+    the iterable.
 
         >>> iterable = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
         >>> pred = lambda *args: args == (1, 2, 3)
@@ -4001,6 +3998,11 @@ class AbortThread(BaseException):
 
 class callback_iter:
     """Convert a function that uses callbacks to an iterator.
+
+    .. warning::
+
+       This function is deprecated as of version 11.0.0. It will be removed in a future
+       major release.
 
     Let *func* be a function that takes a `callback` keyword argument.
     For example:

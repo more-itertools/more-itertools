@@ -22,6 +22,7 @@ from itertools import (
     compress,
     count,
     cycle,
+    filterfalse,
     groupby,
     islice,
     pairwise,
@@ -289,7 +290,7 @@ except ImportError:  # pragma: no cover
     _sumprod = dotproduct
 
 
-def flatten(listOfLists):
+def flatten(list_of_lists):
     """Return an iterator flattening one level of nesting in a list of lists.
 
         >>> list(flatten([[0, 1], [2, 3]]))
@@ -298,11 +299,11 @@ def flatten(listOfLists):
     See also :func:`collapse`, which can flatten multiple levels of nesting.
 
     """
-    return chain.from_iterable(listOfLists)
+    return chain.from_iterable(list_of_lists)
 
 
-def repeatfunc(func, times=None, *args):
-    """Call *func* with *args* repeatedly, returning an iterable over the
+def repeatfunc(function, times=None, *args):
+    """Call *function* with *args* repeatedly, returning an iterable over the
     results.
 
     If *times* is specified, the iterable will terminate after that many
@@ -324,8 +325,8 @@ def repeatfunc(func, times=None, *args):
 
     """
     if times is None:
-        return starmap(func, repeat(args))
-    return starmap(func, repeat(args, times))
+        return starmap(function, repeat(args))
+    return starmap(function, repeat(args, times))
 
 
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
@@ -449,47 +450,38 @@ def powerset(iterable):
 
 
 def unique_everseen(iterable, key=None):
-    """
-    Yield unique elements, preserving order.
+    """Yield unique elements, preserving order. Remember all elements ever seen.
 
         >>> list(unique_everseen('AAAABBBCCDAABBB'))
         ['A', 'B', 'C', 'D']
-        >>> list(unique_everseen('ABBCcAD', str.lower))
+        >>> list(unique_everseen('ABBCcAD', str.casefold))
         ['A', 'B', 'C', 'D']
 
-    Sequences with a mix of hashable and unhashable items can be used.
-    The function will be slower (i.e., `O(n^2)`) for unhashable items.
+    Raises ``TypeError`` for unhashable items.
 
-    Remember that ``list`` objects are unhashable - you can use the *key*
-    parameter to transform the list to a tuple (which is hashable) to
-    avoid a slowdown.
+    Some unhashable objects can be converted to hashable objects
+    using the *key* parameter:
 
-        >>> iterable = ([1, 2], [2, 3], [1, 2])
-        >>> list(unique_everseen(iterable))  # Slow
-        [[1, 2], [2, 3]]
-        >>> list(unique_everseen(iterable, key=tuple))  # Faster
-        [[1, 2], [2, 3]]
+    * For ``list`` objects, try ``key=tuple``.
+    * For ``set`` objects, try ``key=frozenset``.
+    * For ``dict`` objects, try ``key=lambda x: frozenset(x.items())``
+      or in Python 3.15 and later, set ``key=frozendict``.
 
-    Similarly, you may want to convert unhashable ``set`` objects with
-    ``key=frozenset``. For ``dict`` objects,
-    ``key=lambda x: frozenset(x.items())`` can be used.
+    Alternatively, consider the ``unique()`` itertool recipe.  It sorts
+    the data and then uses equality to eliminate duplicates.  Hashability
+    is not required.
 
     """
-    seenset = set()
-    seenset_add = seenset.add
-    seenlist = []
-    seenlist_add = seenlist.append
-    use_key = key is not None
-
-    for element in iterable:
-        k = key(element) if use_key else element
-        try:
-            if k not in seenset:
-                seenset_add(k)
-                yield element
-        except TypeError:
-            if k not in seenlist:
-                seenlist_add(k)
+    seen = set()
+    if key is None:
+        for element in filterfalse(seen.__contains__, iterable):
+            seen.add(element)
+            yield element
+    else:
+        for element in iterable:
+            k = key(element)
+            if k not in seen:
+                seen.add(k)
                 yield element
 
 
@@ -528,11 +520,11 @@ def unique(iterable, key=None, reverse=False):
     return unique_justseen(sequenced, key=key)
 
 
-def iter_except(func, exception, first=None):
+def iter_except(function, exception, first=None):
     """Yields results from a function repeatedly until an exception is raised.
 
     Converts a call-until-exception interface to an iterator interface.
-    Like ``iter(func, sentinel)``, but uses an exception instead of a sentinel
+    Like ``iter(function, sentinel)``, but uses an exception instead of a sentinel
     to end the loop.
 
         >>> l = [0, 1, 2]
@@ -554,7 +546,7 @@ def iter_except(func, exception, first=None):
         if first is not None:
             yield first()
         while True:
-            yield func()
+            yield function()
 
 
 def first_true(iterable, default=None, pred=None):
@@ -682,19 +674,19 @@ def nth_combination(iterable, r, index):
     return tuple(result)
 
 
-def prepend(value, iterator):
-    """Yield *value*, followed by the elements in *iterator*.
+def prepend(value, iterable):
+    """Yield *value*, followed by the elements in *iterable*.
 
         >>> value = '0'
-        >>> iterator = ['1', '2', '3']
-        >>> list(prepend(value, iterator))
+        >>> iterable = ['1', '2', '3']
+        >>> list(prepend(value, iterable))
         ['0', '1', '2', '3']
 
     To prepend multiple values, see :func:`itertools.chain`
     or :func:`value_chain`.
 
     """
-    return chain([value], iterator)
+    return chain([value], iterable)
 
 
 def convolve(signal, kernel):
@@ -946,7 +938,7 @@ else:  # pragma: no cover
     batched = _batched
 
 
-def transpose(it):
+def transpose(matrix):
     """Swap the rows and columns of the input matrix.
 
     >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
@@ -955,7 +947,7 @@ def transpose(it):
     The caller should ensure that the dimensions of the input are compatible.
     If the input is empty, no output will be produced.
     """
-    return zip(*it, strict=True)
+    return zip(*matrix, strict=True)
 
 
 def _is_scalar(value, stringlike=(str, bytes)):
@@ -1112,7 +1104,7 @@ def polynomial_eval(coefficients, x):
     return _sumprod(coefficients, powers)
 
 
-def sum_of_squares(it):
+def sum_of_squares(iterable):
     """Return the sum of the squares of the input values.
 
     >>> sum_of_squares([10, 20, 30])
@@ -1120,7 +1112,7 @@ def sum_of_squares(it):
 
     Supports all numeric types: int, float, complex, Decimal, Fraction.
     """
-    return _sumprod(*tee(it))
+    return _sumprod(*tee(iterable))
 
 
 def polynomial_derivative(coefficients):
