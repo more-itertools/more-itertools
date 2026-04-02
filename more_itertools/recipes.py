@@ -331,10 +331,15 @@ def repeatfunc(function, times=None, *args):
 
 
 def pairwise(iterable):
+    """
+    Wrapper for :func:`itertools.pairwise`.
+
+    .. warning::
+
+       This function is deprecated as of version 11.0.0. It will be removed in a future
+       major release.
+    """
     return itertools_pairwise(iterable)
-
-
-pairwise.__doc__ = itertools_pairwise.__doc__
 
 
 def grouper(iterable, n, incomplete='fill', fillvalue=None):
