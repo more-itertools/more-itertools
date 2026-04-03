@@ -444,9 +444,7 @@ def always_iterable(
 
 # When base_type is None, all iterable (including bytes and str) are iterable.
 @overload
-def always_iterable(
-    obj: Iterable[_T] | None, base_type: None
-) -> Iterator[_T]: ...
+def always_iterable(obj: Iterable[_T], base_type: None) -> Iterator[_T]: ...
 
 # When base_type is None and iterables haven't matched, it must be a scalar.
 @overload
