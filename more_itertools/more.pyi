@@ -463,14 +463,14 @@ def always_iterable(
 # Generic fallbacks for iterables (Fixes #1143)
 @overload
 def always_iterable(
-    obj: Iterable[_T] | None,
+    obj: Iterable[_T],
     base_type: type[Any] | tuple[type[Any], ...] = ...,
 ) -> Iterator[_T]: ...
 
 # Generic fallback for scalars
 @overload
 def always_iterable(
-    obj: _T | None, base_type: type[Any] | tuple[type[Any], ...] = ...
+    obj: _T, base_type: type[Any] | tuple[type[Any], ...] = ...
 ) -> Iterator[_T]: ...
 def adjacent(
     predicate: Callable[[_T], bool],
