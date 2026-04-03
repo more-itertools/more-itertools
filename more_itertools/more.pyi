@@ -471,7 +471,7 @@ def always_iterable(
 @overload
 def always_iterable(
     obj: _T | None, base_type: type[Any] | tuple[type[Any], ...] = ...
-) -> Iterator[_T]: ...  # type: ignore
+) -> Iterator[_T]: ...
 def adjacent(
     predicate: Callable[[_T], bool],
     iterable: Iterable[_T],
