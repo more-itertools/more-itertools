@@ -451,12 +451,17 @@ def always_iterable(
 ) -> Iterator[bytes]: ...
 @overload
 def always_iterable(
-    obj: Iterable[_T],
+    obj: str,
+    base_type: type[str] | tuple[type[str], type[bytes]] = ...,
+) -> Iterator[str]: ...
+@overload
+def always_iterable(
+    obj: Iterable[_T] | None,
     base_type: type[bytes] | type[str] | tuple[type[str], type[bytes]] = ...,
 ) -> Iterator[_T]: ...
 @overload
 def always_iterable(
-    obj: _T, base_type: tuple[type[str], type[bytes]] = ...
+    obj: _T | None, base_type: tuple[type[str], type[bytes]] = ...
 ) -> Iterator[_T]: ...
 @overload
 def always_iterable(
