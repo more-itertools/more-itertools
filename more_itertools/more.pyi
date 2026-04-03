@@ -450,8 +450,7 @@ def always_iterable(obj: Iterable[_T], base_type: None) -> Iterator[_T]: ...
 @overload
 def always_iterable(obj: _T, base_type: None) -> Iterator[_T]: ...
 
-# By default str and bytes are scalars.
-# To prevent overlap, exclude the "| None" case.
+# By default, str and bytes are scalars.
 @overload
 def always_iterable(
     obj: str, base_type: type[Any] | tuple[type[Any], ...] = ...
@@ -459,7 +458,7 @@ def always_iterable(
 @overload
 def always_iterable(
     obj: bytes, base_type: type[Any] | tuple[type[Any], ...] = ...
-) -> Iterator[bytes]: ...  # type: ignore
+) -> Iterator[bytes]: ...
 
 # Generic fallbacks for iterables (Fixes #1143)
 @overload
