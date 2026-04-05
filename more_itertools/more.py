@@ -5549,6 +5549,19 @@ def running_max(iterable, *, maxlen=None):
 
 @dataclass(frozen=True, slots=True)
 class Stats:
+    """Dataclass holding summary statistics for a window of numeric values.
+
+    Returned by :func:`running_statistics`.
+
+    Fields:
+
+    - *size*: number of values in the current window
+    - *minimum*: smallest value in the current window
+    - *median*: median value in the current window
+    - *maximum*: largest value in the current window
+    - *mean*: arithmetic mean of the current window
+    """
+
     size: int
     minimum: float
     median: float
@@ -5563,8 +5576,20 @@ def running_statistics(iterable, *, maxlen=None):
     of the sliding window.  The default of *None* is equivalent to
     an unbounded window.
 
-    Yields instances of a ``Stats`` dataclass with fields for the dataset *size*,
-    *mininum* value, *median* value, *maximum* value, and the arithmetic *mean*.
+    Yields instances of the ``Stats`` dataclass with fields for the dataset
+    *size*, *minimum* value, *median* value, *maximum* value, and the
+    arithmetic *mean*.
+
+    For example:
+
+        >>> from more_itertools import running_statistics
+        >>> stats = list(running_statistics([4, 3, 7, 0, 8]))
+        >>> [s.minimum for s in stats]
+        [4, 3, 3, 0, 0]
+        >>> [s.maximum for s in stats]
+        [4, 4, 7, 7, 8]
+        >>> [s.mean for s in stats]
+        [4.0, 3.5, 4.666666666666667, 3.5, 4.4]
 
     Supports numeric types such as int, float, Decimal, and Fraction,
     but not complex numbers which are unorderable.
