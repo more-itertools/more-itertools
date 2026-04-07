@@ -5564,7 +5564,7 @@ def running_statistics(iterable, *, maxlen=None):
     an unbounded window.
 
     Yields instances of a ``Stats`` dataclass with fields for the dataset *size*,
-    *mininum* value, *median* value, *maximum* value, and the arithmetic *mean*.
+    *minimum* value, *median* value, *maximum* value, and the arithmetic *mean*.
 
     Supports numeric types such as int, float, Decimal, and Fraction,
     but not complex numbers which are unorderable.
