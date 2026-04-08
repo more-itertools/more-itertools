@@ -16,7 +16,6 @@ from collections.abc import (
     Sized,
 )
 from contextlib import AbstractContextManager
-from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
 from threading import Lock
@@ -34,7 +33,6 @@ from typing_extensions import Protocol
 __all__ = [
     'AbortThread',
     'SequenceView',
-    'Stats',
     'adjacent',
     'all_unique',
     'always_iterable',
@@ -120,9 +118,6 @@ __all__ = [
     'rlocate',
     'rstrip',
     'run_length',
-    'running_min',
-    'running_max',
-    'running_statistics',
     'sample',
     'seekable',
     'serialize',
@@ -966,21 +961,3 @@ def concurrent_tee(
 def synchronized(
     func: Callable[..., Iterator[_T]],
 ) -> Callable[..., Iterator[_T]]: ...
-
-@dataclass(frozen=True, slots=True)
-class Stats:
-    size: int
-    minimum: float
-    median: float
-    maximum: float
-    mean: float
-
-def running_min(
-    iterable: Iterable[_NumberT], *, maxlen: int | None = ...
-) -> Iterator[_NumberT]: ...
-def running_max(
-    iterable: Iterable[_NumberT], *, maxlen: int | None = ...
-) -> Iterator[_NumberT]: ...
-def running_statistics(
-    iterable: Iterable[_NumberT], *, maxlen: int | None = ...
-) -> Iterator[Stats]: ...

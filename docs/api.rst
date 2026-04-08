@@ -338,22 +338,15 @@ The tools focus on math with integers.
 Statistics
 ==========
 
-**New itertools**
+**Itertools recipes**
 
 The tools focus on simple statistics.
 
-----
-
 .. autofunction:: running_min
 .. autofunction:: running_max
-.. autofunction:: running_statistics
-
-----
-
-**Itertools recipes**
-
 .. autofunction:: running_mean
 .. autofunction:: running_median
+.. autofunction:: running_statistics
 
 
 Others
