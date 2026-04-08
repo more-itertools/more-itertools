@@ -13,6 +13,7 @@ import random
 from bisect import bisect_left, insort
 from collections import deque
 from contextlib import suppress
+from dataclasses import dataclass
 from functools import lru_cache, reduce
 from heapq import heappush, heappushpop
 from itertools import (
@@ -34,11 +35,12 @@ from itertools import (
     zip_longest,
 )
 from math import prod, comb, isqrt, gcd
-from operator import mul, getitem, index, is_, itemgetter, truediv
+from operator import mul, getitem, index as _index, is_, itemgetter, truediv
 from random import randrange, sample, choice, shuffle
 from sys import hexversion
 
 __all__ = [
+    'Stats',
     'all_equal',
     'batched',
     'before_and_after',
@@ -76,8 +78,11 @@ __all__ = [
     'random_product',
     'repeatfunc',
     'roundrobin',
+    'running_max',
     'running_mean',
     'running_median',
+    'running_min',
+    'running_statistics',
     'sieve',
     'sliding_window',
     'subslices',
@@ -1402,7 +1407,7 @@ def running_median(iterable, *, maxlen=None):
     iterator = iter(iterable)
 
     if maxlen is not None:
-        maxlen = index(maxlen)
+        maxlen = _index(maxlen)
         if maxlen <= 0:
             raise ValueError('Window size should be positive')
         return _running_median_windowed(iterator, maxlen)
@@ -1455,6 +1460,124 @@ def running_mean(iterable, *, maxlen=None):
         raise ValueError('Window size should be positive')
 
     return _windowed_running_mean(iterator, maxlen)
+
+
+def _windowed_running_min(iterator, maxlen):
+    sis = deque()  # Strictly increasing subsequence
+    for index, value in enumerate(iterator):
+        if sis and sis[0][0] == index - maxlen:
+            sis.popleft()
+        while sis and not sis[-1][1] < value:  # Remove non-increasing values
+            sis.pop()
+        sis.append((index, value))  # Most recent value at position -1
+        yield sis[0][1]  # Window minimum at position 0
+
+
+def running_min(iterable, *, maxlen=None):
+    """Smallest of values seen so far or values in a sliding window.
+
+    Set *maxlen* to a positive integer to specify the maximum size
+    of the sliding window.  The default of *None* is equivalent to
+    an unbounded window.
+
+    For example:
+
+        >>> list(running_min([4, 3, 7, 0, 8, 1, 6, 2, 9, 5]))
+        [4, 3, 3, 0, 0, 0, 0, 0, 0, 0]
+
+        >>> list(running_min([4, 3, 7, 0, 8, 1, 6, 2, 9, 5], maxlen=3))
+        [4, 3, 3, 0, 0, 0, 1, 1, 2, 2]
+
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
+    """
+
+    iterator = iter(iterable)
+
+    if maxlen is None:
+        return accumulate(iterator, func=min)
+
+    if maxlen <= 0:
+        raise ValueError('Window size should be positive')
+
+    return _windowed_running_min(iterator, maxlen)
+
+
+def _windowed_running_max(iterator, maxlen):
+    sds = deque()  # Strictly decreasing subsequence
+    for index, value in enumerate(iterator):
+        if sds and sds[0][0] == index - maxlen:
+            sds.popleft()
+        while sds and not sds[-1][1] > value:  # Remove non-decreasing values
+            sds.pop()
+        sds.append((index, value))  # Most recent value at position -1
+        yield sds[0][1]  # Window maximum at position 0
+
+
+def running_max(iterable, *, maxlen=None):
+    """Largest of values seen so far or values in a sliding window.
+
+    Set *maxlen* to a positive integer to specify the maximum size
+    of the sliding window.  The default of *None* is equivalent to
+    an unbounded window.
+
+    For example:
+
+        >>> list(running_max([4, 3, 7, 0, 8, 1, 6, 2, 9, 5]))
+        [4, 4, 7, 7, 8, 8, 8, 8, 9, 9]
+
+        >>> list(running_max([4, 3, 7, 0, 8, 1, 6, 2, 9, 5], maxlen=3))
+        [4, 4, 7, 7, 8, 8, 8, 6, 9, 9]
+
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
+    """
+
+    iterator = iter(iterable)
+
+    if maxlen is None:
+        return accumulate(iterator, func=max)
+
+    if maxlen <= 0:
+        raise ValueError('Window size should be positive')
+
+    return _windowed_running_max(iterator, maxlen)
+
+
+@dataclass(frozen=True, slots=True)
+class Stats:
+    size: int
+    minimum: float
+    median: float
+    maximum: float
+    mean: float
+
+
+def running_statistics(iterable, *, maxlen=None):
+    """Statistics for values seen so far or values in a sliding window.
+
+    Set *maxlen* to a positive integer to specify the maximum size
+    of the sliding window.  The default of *None* is equivalent to
+    an unbounded window.
+
+    Yields instances of a ``Stats`` dataclass with fields for the dataset *size*,
+    *minimum* value, *median* value, *maximum* value, and the arithmetic *mean*.
+
+    Supports numeric types such as int, float, Decimal, and Fraction,
+    but not complex numbers which are unorderable.
+    """
+
+    # fmt: off
+    t0, t1, t2, t3 = tee(iterable, 4)
+    return map(
+        Stats,
+        count(1) if maxlen is None else chain(range(1, maxlen), repeat(maxlen)),
+        running_min(t0, maxlen=maxlen),
+        running_median(t1, maxlen=maxlen),
+        running_max(t2, maxlen=maxlen),
+        running_mean(t3, maxlen=maxlen),
+    )
+    # fmt: on
 
 
 def random_derangement(iterable):

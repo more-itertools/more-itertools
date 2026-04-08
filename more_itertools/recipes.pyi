@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Iterator, Sequence
+from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
 from typing import (
@@ -13,6 +14,7 @@ from typing import (
 )
 
 __all__ = [
+    'Stats',
     'all_equal',
     'batched',
     'before_and_after',
@@ -50,8 +52,11 @@ __all__ = [
     'random_product',
     'repeatfunc',
     'roundrobin',
+    'running_max',
     'running_mean',
     'running_median',
+    'running_min',
+    'running_statistics',
     'sieve',
     'sliding_window',
     'subslices',
@@ -202,10 +207,28 @@ def _strong_probable_prime(n: int, base: int) -> bool: ...
 def is_prime(n: int) -> bool: ...
 def loops(n: int) -> Iterator[None]: ...
 def multinomial(*counts: int) -> int: ...
+def random_derangement(iterable: Iterable[_T]) -> tuple[_T, ...]: ...
 def running_mean(
     iterable: Iterable[_NumberT], *, maxlen: int | None = ...
 ) -> Iterator[_NumberT]: ...
 def running_median(
     iterable: Iterable[_NumberT], *, maxlen: int | None = ...
 ) -> Iterator[_NumberT]: ...
-def random_derangement(iterable: Iterable[_T]) -> tuple[_T, ...]: ...
+def running_min(
+    iterable: Iterable[_NumberT], *, maxlen: int | None = ...
+) -> Iterator[_NumberT]: ...
+def running_max(
+    iterable: Iterable[_NumberT], *, maxlen: int | None = ...
+) -> Iterator[_NumberT]: ...
+
+@dataclass(frozen=True, slots=True)
+class Stats:
+    size: int
+    minimum: float
+    median: float
+    maximum: float
+    mean: float
+
+def running_statistics(
+    iterable: Iterable[_NumberT], *, maxlen: int | None = ...
+) -> Iterator[Stats]: ...
