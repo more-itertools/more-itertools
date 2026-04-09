@@ -14,7 +14,9 @@ Version History
     * :func:`zip_equal` was removed in 11.0.0. It had been deprecated and raising ``DeprecationWarning``
       since 2021, but it's removal should have been documented in 11.0.0's release notes.
       We regret the error.
-    * The docstring for :func:`running_statistics` was improved (thanks to mastash3ff)
+    * :func:`running_statistics` has been moved from ``more_itertools.more`` to
+      ``more_itertools.recipes``. Its docstring was also improved (thanks to mastash3ff
+      and rhettinger)
 
 11.0.1
 ------
