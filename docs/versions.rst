@@ -5,6 +5,19 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+11.0.2
+------
+
+* Updates
+    * The changes to the type hints for :func:`always_iterable` in 11.0.0 have been
+      reverted due to reported problems (thanks to ngoldbaum and rhettinger)
+    * :func:`zip_equal` was removed in 11.0.0. It had been deprecated and raising ``DeprecationWarning``
+      since 2021, but it's removal should have been documented in 11.0.0's release notes.
+      We regret the error.
+    * :func:`running_statistics` has been moved from ``more_itertools.more`` to
+      ``more_itertools.recipes``. Its docstring was also improved (thanks to mastash3ff
+      and rhettinger)
+
 11.0.1
 ------
 
@@ -18,6 +31,8 @@ Version History
 
 * Potentially breaking changes
     * Python 3.9 support was dropped, since it went EOL on 2025-10-31
+    * :func:`zip_equal` was removed. Applications should use the standard library
+      function :func:`zip` with ``strict=True`` as a replacement.
     * :func:`callback_iter` is deprecated. It will be removed in a future major release.
     * :func:`iequals` no longer returns ``True`` when called with ``([], [ANY])`` (thanks to rhettinger and pochmann3)
     * The ``pred`` argument for :func:`locate` and :func:`replace` must now be able to
