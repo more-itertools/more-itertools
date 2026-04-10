@@ -3137,6 +3137,9 @@ class NumericRangeTests(TestCase):
             self.assertTrue(dumps(r))  # assert not empty
             self.assertEqual(r, loads(dumps(r)))
 
+    def test_empty_reversed(self):
+        self.assertEqual(list(reversed(mi.numeric_range(0))), [])
+
 
 class CountCycleTests(TestCase):
     def test_basic(self):
