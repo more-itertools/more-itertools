@@ -1,4 +1,5 @@
 import math
+import types
 
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
@@ -433,6 +434,8 @@ class peekable:
 
         """
         self._cache.extendleft(reversed(items))
+
+    __class_getitem__ = classmethod(types.GenericAlias)
 
     def __next__(self):
         if self._cache:
