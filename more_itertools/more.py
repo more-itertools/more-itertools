@@ -2402,10 +2402,14 @@ class numeric_range(Sequence):
         )
 
     def __reversed__(self):
+        # Empty iterator
+        try:
+            start = self._get_by_index(-1)
+        except IndexError:
+            return iter([])
+
         return iter(
-            numeric_range(
-                self._get_by_index(-1), self._start - self._step, -self._step
-            )
+            numeric_range(start, self._start - self._step, -self._step)
         )
 
     def count(self, value):
