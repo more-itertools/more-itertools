@@ -3,6 +3,7 @@ from __future__ import annotations
 import cmath
 import gc
 import platform
+import types
 import weakref
 
 from collections import Counter, deque
@@ -471,6 +472,14 @@ class PeekableTests(PeekableMixinTests, TestCase):
         actual = list(it)
         expected = [12, 11, 10, 0, 1, 2]
         self.assertEqual(actual, expected)
+
+    def test_class_getitem(self):
+        """peekable[T] should return a GenericAlias, matching the behaviour of
+        list[T], allowing use in generic type annotations at runtime."""
+        alias = mi.peekable[str]
+        self.assertIsInstance(alias, types.GenericAlias)
+        self.assertIs(alias.__origin__, mi.peekable)
+        self.assertEqual(alias.__args__, (str,))
 
 
 class ConsumerTests(TestCase):
