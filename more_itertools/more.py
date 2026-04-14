@@ -5538,5 +5538,9 @@ def random_ordered_combs_with_replacement(iterable, r):
     "Return :func:`combinations_with_replacement` tuples in randomly shuffled order."
     sequence = tuple(iterable)
     n = comb(len(sequence) + r - 1, r) if sequence else 0 if r else 1
+    if not sequence:
+        yield ()
+        return
+    n = comb(len(sequence) + r - 1, r)
     for index in _random_ordered_indices(n):
         yield nth_combination_with_replacement(sequence, r, index)

@@ -6893,7 +6893,8 @@ class TestRunningStats(TestCase):
             list(mi.running_statistics(map(complex, data)))
         with self.assertRaises(TypeError):
             list(mi.running_statistics(map(complex, data), maxlen=3))
-=======
+
+
 class TestsRandomOrderedCombinatorics(TestCase):
     # Shared test code
 
