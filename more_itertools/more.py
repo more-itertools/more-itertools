@@ -2670,9 +2670,10 @@ def _islice_helper(it, s):
 
         if start < 0:
             # Consume all but the last -start items
-            wrapper = countable(it)
+            counter = count()
+            wrapper = map(lambda p, q: p, it, counter)
             cache = deque(wrapper, maxlen=-start)
-            len_iter = wrapper.items_seen
+            len_iter = next(counter)
 
             # Adjust start to be positive
             i = max(len_iter + start, 0)
