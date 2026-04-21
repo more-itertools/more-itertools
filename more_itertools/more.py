@@ -2670,9 +2670,11 @@ def _islice_helper(it, s):
 
         if start < 0:
             # Consume all but the last -start items
+
             counter = count()
-            wrapper = map(lambda p, q: p, it, counter)
+            wrapper = map(itemgetter(0), zip(it, counter))
             cache = deque(wrapper, maxlen=-start)
+            del wrapper  # Clear reference held by zip()
             len_iter = next(counter)
 
             # Adjust start to be positive
@@ -2728,8 +2730,9 @@ def _islice_helper(it, s):
             # Consume all but the last items
             n = -stop - 1
             counter = count()
-            wrapper = map(lambda p, q: p, it, counter)
+            wrapper = map(itemgetter(0), zip(it, counter))
             cache = deque(wrapper, maxlen=n)
+            del wrapper  # Clear reference held by zip()
             len_iter = next(counter)
 
             # If start and stop are both negative they are comparable and
