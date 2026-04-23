@@ -2670,9 +2670,10 @@ def _islice_helper(it, s):
 
         if start < 0:
             # Consume all but the last -start items
-            wrapper = countable(it)
+            counter = count(1)
+            wrapper = compress(it, counter)
             cache = deque(wrapper, maxlen=-start)
-            len_iter = wrapper.items_seen
+            len_iter = next(counter) - 1
 
             # Adjust start to be positive
             i = max(len_iter + start, 0)
@@ -2726,9 +2727,10 @@ def _islice_helper(it, s):
         if (stop is not None) and (stop < 0):
             # Consume all but the last items
             n = -stop - 1
-            wrapper = countable(it)
+            counter = count(1)
+            wrapper = compress(it, counter)
             cache = deque(wrapper, maxlen=n)
-            len_iter = wrapper.items_seen
+            len_iter = next(counter) - 1
 
             # If start and stop are both negative they are comparable and
             # we can just slice. Otherwise we can adjust start to be negative
