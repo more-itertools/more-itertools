@@ -6576,6 +6576,81 @@ class TestSerialize(TestCase):
 
         self.assertEqual(result, limit * (limit - 1) // 2)
 
+    def test_serialize_generator_methods(self):
+        # A generator that yields and receives
+        def echo():
+            try:
+                while True:
+                    val = yield "ready"
+                    yield f"received {val}"
+            except ValueError:
+                yield "caught"
+
+        it = mi.serialize(echo())
+
+        # Test __next__
+        self.assertEqual(next(it), "ready")
+
+        # Test send()
+        self.assertEqual(it.send("hello"), "received hello")
+        self.assertEqual(next(it), "ready")
+
+        # Test throw()
+        self.assertEqual(it.throw(ValueError), "caught")
+
+        # Test close()
+        it.close()
+        with self.assertRaises(StopIteration):
+            next(it)
+
+    def test_serialize_methods_attribute_error(self):
+        # A standard iterator that does not have send/throw/close
+        # should raise AttributeError when called.
+        standard_it = mi.serialize([1, 2, 3])
+
+        with self.assertRaises(AttributeError):
+            standard_it.send("foo")
+
+        with self.assertRaises(AttributeError):
+            standard_it.throw(ValueError)
+
+        with self.assertRaises(AttributeError):
+            standard_it.close()
+
+    def test_serialize_generator_methods_locking(self):
+        # Verifies that generator methods also acquire the lock.
+        # We can test this by checking if the lock is held during the call.
+
+        class LockCheckingGenerator:
+            def __init__(self, lock):
+                self.lock = lock
+
+            def __iter__(self):
+                return self
+
+            def send(self, value):
+                if not self.lock.locked():
+                    raise RuntimeError("Lock not held during send()")
+                return value
+
+            def throw(self, *args):
+                if not self.lock.locked():
+                    raise RuntimeError("Lock not held during throw()")
+
+            def close(self):
+                if not self.lock.locked():
+                    raise RuntimeError("Lock not held during close()")
+
+        # Manually create the serialize object to inspect the lock
+        it = mi.serialize([])
+        mock_gen = LockCheckingGenerator(it._lock)
+        it._iterator = mock_gen
+
+        # These should not raise RuntimeError
+        it.send(1)
+        it.throw(ValueError)
+        it.close()
+
 
 class TestSynchronized(TestCase):
     def test_concurrent_calls(self):
