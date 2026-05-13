@@ -3625,6 +3625,23 @@ class SeekableTest(PeekableMixinTests, TestCase):
         s.relative_seek(10)  # Lower bound
         self.assertEqual(list(s.elements()), [str(x) for x in range(5)])
 
+    def test_getitem(self):
+        s = mi.seekable(str(n) for n in range(10))
+        with self.assertRaises(IndexError):
+            s[0]
+        mi.take(3, s)
+        self.assertEqual(s[-1], '2')
+        self.assertEqual(s[0], '0')
+        self.assertEqual(s[2], '2')
+        with self.assertRaises(IndexError):
+            s[3]
+
+    def test_getitem_maxlen(self):
+        s = mi.seekable((str(n) for n in range(10)), maxlen=2)
+        mi.take(5, s)
+        self.assertEqual(s[-1], '4')
+        self.assertEqual(s[0], '3')
+
 
 class SequenceViewTests(TestCase):
     def test_init(self):

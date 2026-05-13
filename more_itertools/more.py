@@ -3007,6 +3007,17 @@ class seekable:
         >>> elements
         SequenceView(['0', '1', '2', '3'])
 
+    Indexing the :class:`seekable` directly returns items from the cache,
+    which is useful for inspecting the most recently produced item:
+
+        >>> it = seekable((str(n) for n in range(10)))
+        >>> next(it), next(it), next(it)
+        ('0', '1', '2')
+        >>> it[-1]
+        '2'
+        >>> it[0]
+        '0'
+
     By default, the cache grows as the source iterable progresses, so beware of
     wrapping very large or infinite iterables. Supply *maxlen* to limit the
     size of the cache (this of course limits how far back you can seek).
@@ -3083,6 +3094,9 @@ class seekable:
             self._index = len(self._cache)
 
         self.seek(max(self._index + count, 0))
+
+    def __getitem__(self, index):
+        return self._cache[index]
 
 
 class run_length:
