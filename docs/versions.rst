@@ -5,6 +5,16 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+11.1.0
+------
+
+* Changes to existing functions:
+    * :func:`numeric_range` was updated to fix its handling of empty ranges (thanks to rhettinger)
+    * :func:`peekable` was updated to fix typing issues (thanks to DORI2001, powellnorma, Pandede, m9810223, and rhettinger)
+    * :func:`islice_extended` was optimized for memory usage and speed (thanks to ben42code, rhettinger, and pochmann)
+    * :func:`serialize` now supports the generator methods ``throw``, ``send``, and ``close`` (thanks to rhettinger)
+    * :func:`seekable` now supports implements ``__getitem__`` for cached elements (thanks to SAY-5, jenstroeger, and JamesParrott)
+
 11.0.2
 ------
 
