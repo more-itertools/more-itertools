@@ -4850,11 +4850,15 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
     if key is None:
         for x, y in zip_longest(it, it, fillvalue=lo):
             if y < x:
-                x, y = y, x
-            if x < lo:
-                lo = x
-            if hi < y:
-                hi = y
+                if y < lo:
+                    lo = y
+                if hi < x:
+                    hi = x
+            else:
+                if x < lo:
+                    lo = x
+                if hi < y:
+                    hi = y
 
     else:
         lo_key = hi_key = key(lo)
@@ -4863,11 +4867,15 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
             x_key, y_key = key(x), key(y)
 
             if y_key < x_key:
-                x, y, x_key, y_key = y, x, y_key, x_key
-            if x_key < lo_key:
-                lo, lo_key = x, x_key
-            if hi_key < y_key:
-                hi, hi_key = y, y_key
+                if y_key < lo_key:
+                    lo, lo_key = y, y_key
+                if hi_key < x_key:
+                    hi, hi_key = x, x_key
+            else:
+                if x_key < lo_key:
+                    lo, lo_key = x, x_key
+                if hi_key < y_key:
+                    hi, hi_key = y, y_key
 
     return lo, hi
 
