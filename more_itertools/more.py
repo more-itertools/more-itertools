@@ -3007,8 +3007,7 @@ class seekable:
         >>> elements
         SequenceView(['0', '1', '2', '3'])
 
-    Indexing the :class:`seekable` directly returns items from the cache,
-    which is useful for inspecting the most recently produced item:
+    Indexing the :class:`seekable` directly returns items from the cache:
 
         >>> it = seekable((str(n) for n in range(10)))
         >>> next(it), next(it), next(it)
