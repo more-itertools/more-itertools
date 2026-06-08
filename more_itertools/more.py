@@ -283,13 +283,10 @@ def last(iterable, default=_marker):
     raise ``ValueError``.
     """
     try:
-        if isinstance(iterable, Sequence):
-            return iterable[-1]
-        # Work around https://bugs.python.org/issue38525
         if getattr(iterable, '__reversed__', None):
             return next(reversed(iterable))
         return deque(iterable, maxlen=1)[-1]
-    except (IndexError, TypeError, StopIteration):
+    except (IndexError, StopIteration):
         if default is _marker:
             raise ValueError(
                 'last() was called on an empty iterable, '
