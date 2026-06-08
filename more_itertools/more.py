@@ -2559,8 +2559,8 @@ def lstrip(iterable, pred):
         >>> list(lstrip(iterable, pred))
         [1, 2, None, 3, False, None]
 
-    This function is analogous to to :func:`str.lstrip`, and is essentially
-    an wrapper for :func:`itertools.dropwhile`.
+    This function is analogous to :func:`str.lstrip`, and is essentially
+    a wrapper for :func:`itertools.dropwhile`.
 
     """
     return dropwhile(pred, iterable)
@@ -2813,8 +2813,8 @@ def consecutive_groups(iterable, ordering=None):
         ['i']
         ['l', 'm', 'n', 'o', 'p']
 
-    Each group of consecutive items is an iterator that shares it source with
-    *iterable*. When an an output group is advanced, the previous group is
+    Each group of consecutive items is an iterator that shares its source with
+    *iterable*. When an output group is advanced, the previous group is
     no longer available unless its elements are copied (e.g., into a ``list``).
 
         >>> iterable = [1, 2, 11, 12, 21, 22]
