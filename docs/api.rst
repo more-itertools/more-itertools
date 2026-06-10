@@ -25,7 +25,7 @@ These tools yield groups of items from a source iterable.
 .. autofunction:: split_after
 .. autofunction:: split_into
 .. autofunction:: split_when
-.. autofunction:: bucket
+.. autoclass:: bucket
 .. autofunction:: unzip
 
 ----
@@ -279,7 +279,7 @@ consume iterables.
 .. autofunction:: always_iterable
 .. autofunction:: always_reversible
 .. autoclass:: callback_iter
-.. autofunction:: countable
+.. autoclass:: countable
 .. autofunction:: consumer
 .. autoclass:: sized_iterator
 .. autofunction:: with_iter
@@ -358,15 +358,15 @@ Others
 .. autofunction:: locate(iterable, pred=bool, window_size=None)
 .. autofunction:: rlocate(iterable, pred=bool, window_size=None)
 .. autofunction:: replace
-.. function:: numeric_range(stop)
-.. autofunction:: numeric_range(start, stop[, step])
+.. class:: numeric_range(stop)
+.. autoclass:: numeric_range(start, stop[, step])
   :noindex:
 .. autofunction:: side_effect
 .. autofunction:: iterate
 .. autofunction:: difference(iterable, func=operator.sub, *, initial=None)
 .. autofunction:: make_decorator
 .. autoclass:: SequenceView
-.. autofunction:: time_limited
+.. autoclass:: time_limited
 .. autofunction:: map_if(iterable, pred, func, func_else=lambda x: x)
 .. autofunction:: doublestarmap
 
