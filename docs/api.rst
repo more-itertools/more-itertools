@@ -323,6 +323,7 @@ The tools focus on math with integers.
 ----
 
 .. autofunction:: nth_prime
+.. autofunction:: subfactorial
 
 ----
 

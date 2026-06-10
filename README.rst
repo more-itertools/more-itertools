@@ -136,6 +136,7 @@ Python iterables.
 |                        | `multinomial <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.multinomial>`_,                                                                       |
 |                        | `nth_prime <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.nth_prime>`_,                                                                           |
 |                        | `sieve <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sieve>`_,                                                                                   |
+|                        | `subfactorial <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.subfactorial>`_,                                                                     |
 |                        | `totient <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.totient>`_                                                                                |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Statistics             | `running_min <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.running_min>`_,                                                                       |

@@ -161,6 +161,7 @@ __all__ = [
     'stagger',
     'strip',
     'strictly_n',
+    'subfactorial',
     'substrings',
     'substrings_indexes',
     'synchronized',
@@ -936,7 +937,8 @@ def derangements(iterable, r=None):
 
     The number of derangements of a set of size *n* is known as the
     "subfactorial of n".  For n > 0, the subfactorial is:
-    ``round(math.factorial(n) / math.e)``.
+    ``round(math.factorial(n) / math.e)``.   The more-itertools function
+    :func:`subfactorial` computes this directly.
 
     References:
 
@@ -5507,3 +5509,29 @@ class _concurrent_tee:
                     link[1] = [None, None]
         value, self.link = link
         return value
+
+
+def subfactorial(n):
+    """Number of permutations of *n* elements with no fixed points.
+
+    The :func:`subfactorial` function computes the length of
+    :func:`derangements`.  For example, there are 1,854 ways to
+    rearrange the letters in word "epsilon" without leaving any
+    letter in its original position:
+
+        >>> from more_itertools import derangements, ilen
+        >>> ilen(derangements('epsilon'))
+        1854
+        >>> subfactorial(len('epsilon'))
+        1854
+
+    Reference:  https://oeis.org/A000166
+
+    """
+    if n < 0:
+        raise ValueError
+    sf = adj = 1
+    for i in range(n + 1):
+        sf = sf * i + adj
+        adj = -adj
+    return sf
