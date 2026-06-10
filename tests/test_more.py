@@ -6993,3 +6993,33 @@ class TestRunningStats(TestCase):
             list(mi.running_statistics(map(complex, data)))
         with self.assertRaises(TypeError):
             list(mi.running_statistics(map(complex, data), maxlen=3))
+
+
+class TestSubfactorial(TestCase):
+    def test_oeis_baseline(self):
+        # https://oeis.org/A000166
+        reference_cases = """
+        1, 0, 1, 2, 9, 44, 265, 1854, 14833, 133496, 1334961, 14684570,
+        176214841, 2290792932, 32071101049, 481066515734, 7697064251745,
+        130850092279664, 2355301661033953, 44750731559645106,
+        895014631192902121, 18795307255050944540, 413496759611120779881,
+        9510425471055777937262
+        """.replace(',', ' ').split()
+        for n, target_str in enumerate(reference_cases):
+            with self.subTest(n=n):
+                self.assertEqual(mi.subfactorial(n), int(target_str))
+
+    def test_vs_derangements(self):
+        for n in range(10):
+            with self.subTest(n=n):
+                self.assertEqual(
+                    mi.subfactorial(n), mi.ilen(mi.derangements('.' * n))
+                )
+
+    def test_error_cases(self):
+        with self.assertRaises(TypeError):
+            mi.subfactorial(5.0)  # float input
+        with self.assertRaises(TypeError):
+            mi.subfactorial('5')  # string input
+        with self.assertRaises(ValueError):
+            mi.subfactorial(-1)  # negative input

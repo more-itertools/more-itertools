@@ -135,6 +135,7 @@ __all__ = [
     'stagger',
     'strip',
     'strictly_n',
+    'subfactorial',
     'substrings',
     'substrings_indexes',
     'synchronized',
@@ -950,6 +951,7 @@ def extract(
     *,
     monotonic: bool = ...,
 ) -> Iterator[_T]: ...
+def subfactorial(n: int) -> int: ...
 
 class serialize(Generic[_T], Iterator[_T]):
     iterator: Iterator[_T]
