@@ -6307,11 +6307,14 @@ class PowersetOfSetsTests(TestCase):
                 hash_count += 1
                 return super().__hash__()
 
-        # Seven input values should have 7 hash calls.
         # Four distinct input values should have 2 ** 4 subsets
         iterable = map(Str, 'ABBBCDD')
         self.assertEqual(mi.ilen(mi.powerset_of_sets(iterable)), 16)
-        self.assertEqual(hash_count, 7)
+
+        # Seven input values should have 7 hash calls.
+        # However, PyPy's version of dict.fromkeys calls hash a
+        # second time for set inputs. This doubles the 7 to 14.
+        self.assertIn(hash_count, {7, 14})
 
     def test_baseset(self):
         iterable = [0, 1, 2]
