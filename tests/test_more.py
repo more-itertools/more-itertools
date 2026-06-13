@@ -6308,7 +6308,7 @@ class PowersetOfSetsTests(TestCase):
                 return super().__hash__()
 
         # Seven input values should have 7 hash calls.
-        # Four distinct input values should have 2 ** 4 powersets.
+        # Four distinct input values should have 2 ** 4 subsets
         iterable = map(Str, 'ABBBCDD')
         self.assertEqual(mi.ilen(mi.powerset_of_sets(iterable)), 16)
         self.assertEqual(hash_count, 7)
