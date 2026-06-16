@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 import types
 
 from collections.abc import (
@@ -169,10 +168,7 @@ _Raisable = BaseException | type[BaseException]
 _NumberT = TypeVar("_NumberT", float, Decimal, Fraction)
 
 # The type of isinstance's second argument (from typeshed builtins)
-if sys.version_info >= (3, 10):
-    _ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
-else:
-    _ClassInfo = type | tuple[_ClassInfo, ...]
+_ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
 
 @type_check_only
 class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]): ...
