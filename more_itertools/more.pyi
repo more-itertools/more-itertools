@@ -16,8 +16,6 @@ from collections.abc import (
     Sized,
 )
 from contextlib import AbstractContextManager
-from decimal import Decimal
-from fractions import Fraction
 from threading import Lock
 from typing import (
     Any,
@@ -156,9 +154,6 @@ __all__ = [
 _T = TypeVar('_T')
 _T1 = TypeVar('_T1')
 _T2 = TypeVar('_T2')
-_T3 = TypeVar('_T3')
-_T4 = TypeVar('_T4')
-_T5 = TypeVar('_T5')
 _U = TypeVar('_U')
 _V = TypeVar('_V')
 _W = TypeVar('_W')
@@ -166,7 +161,6 @@ _T_co = TypeVar('_T_co', covariant=True)
 _U_co = TypeVar('_U_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
 _Raisable = BaseException | type[BaseException]
-_NumberT = TypeVar("_NumberT", float, Decimal, Fraction)
 
 # The type of isinstance's second argument (from typeshed builtins)
 if sys.version_info >= (3, 10):
