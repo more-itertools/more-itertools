@@ -28,7 +28,7 @@ from typing import (
     overload,
     type_check_only,
 )
-from typing_extensions import Protocol
+from typing_extensions import Protocol, Self
 
 __all__ = [
     'AbortThread',
@@ -659,12 +659,14 @@ def set_partitions(
     max_size: int | None = ...,
 ) -> Iterator[list[list[_T]]]: ...
 
-class time_limited(Generic[_T], Iterator[_T]):
+class time_limited(Generic[_T_co], Iterator[_T_co]):
+    limit_seconds: float
+    timed_out: bool
     def __init__(
-        self, limit_seconds: float, iterable: Iterable[_T]
+        self, limit_seconds: float, iterable: Iterable[_T_co]
     ) -> None: ...
-    def __iter__(self) -> islice_extended[_T]: ...
-    def __next__(self) -> _T: ...
+    def __iter__(self) -> Self: ...
+    def __next__(self) -> _T_co: ...
 
 @overload
 def only(
