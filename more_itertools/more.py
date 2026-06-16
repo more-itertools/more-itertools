@@ -1,6 +1,7 @@
 import math
 import types
 
+from _thread import allocate_lock
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
@@ -39,7 +40,6 @@ from operator import (
 )
 from sys import maxsize
 from time import monotonic
-from threading import Lock
 
 from .recipes import (
     _marker,
@@ -5397,7 +5397,7 @@ class serialize:
 
     def __init__(self, iterable):
         self._iterator = iter(iterable)
-        self._lock = Lock()
+        self._lock = allocate_lock()
 
     def __iter__(self):
         return self
@@ -5494,7 +5494,7 @@ class _concurrent_tee:
         else:
             self.iterator = iter(iterable)
             self.link = [None, None]
-            self.lock = Lock()
+            self.lock = allocate_lock()
 
     def __iter__(self):
         return self
