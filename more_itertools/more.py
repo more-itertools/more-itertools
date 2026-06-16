@@ -1,3 +1,5 @@
+__lazy_modules__ = frozenset({'queue'})
+
 import math
 import types
 
