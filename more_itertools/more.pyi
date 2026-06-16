@@ -1,7 +1,5 @@
 """Stubs for more_itertools.more"""
 
-from __future__ import annotations
-
 import types
 
 from collections.abc import (

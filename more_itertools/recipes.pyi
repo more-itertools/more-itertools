@@ -1,7 +1,5 @@
 """Stubs for more_itertools.recipes"""
 
-from __future__ import annotations
-
 from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
