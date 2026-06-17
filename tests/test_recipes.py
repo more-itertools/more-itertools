@@ -1026,6 +1026,25 @@ class IterIndexTests(TestCase):
         expected = [0, 1, 4]
         self.assertEqual(actual, expected)
 
+    def test_negative_start_and_stop(self):
+        # Negative *start* / *stop* should behave like the built-in
+        # ``str.index`` / ``list.index`` and produce identical results for the
+        # fast (sequence) and slow (general-iterable) code paths.
+        iterable = 'AABCADEAF'  # 'A' occurs at indexes 0, 1, 4, 7
+        cases = [
+            (dict(start=-3), [7]),
+            (dict(start=-9), [0, 1, 4, 7]),
+            (dict(stop=-2), [0, 1, 4]),
+            (dict(start=-5, stop=-1), [4, 7]),
+        ]
+        for kwargs, expected in cases:
+            for wrapper in (list, iter):
+                with self.subTest(kwargs=kwargs, wrapper=wrapper):
+                    actual = list(
+                        mi.iter_index(wrapper(iterable), 'A', **kwargs)
+                    )
+                    self.assertEqual(actual, expected)
+
 
 class SieveTests(TestCase):
     def test_basic(self):
