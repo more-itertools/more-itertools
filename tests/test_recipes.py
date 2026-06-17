@@ -1040,7 +1040,9 @@ class IterIndexTests(TestCase):
         for kwargs, expected in cases:
             for wrapper in (list, iter):
                 with self.subTest(kwargs=kwargs, wrapper=wrapper):
-                    actual = list(mi.iter_index(wrapper(iterable), 'A', **kwargs))
+                    actual = list(
+                        mi.iter_index(wrapper(iterable), 'A', **kwargs)
+                    )
                     self.assertEqual(actual, expected)
 
 
