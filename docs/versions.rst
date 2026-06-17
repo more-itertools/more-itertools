@@ -5,12 +5,6 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
-Unreleased
-----------
-
-* Changes to existing functions:
-    * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
-
 11.1.0
 ------
 
