@@ -889,6 +889,13 @@ def iter_index(iterable, value, start=0, stop=None):
 
     """
     seq_index = getattr(iterable, 'index', None)
+    if seq_index is None and (start < 0 or (stop is not None and stop < 0)):
+        # islice() rejects negative indices, but the fast path (below) accepts
+        # them with the usual from-the-end semantics. Materialize so that both
+        # paths agree for negative *start* / *stop*.
+        iterable = tuple(iterable)
+        seq_index = iterable.index
+
     if seq_index is None:
         # Slow path for general iterables
         iterator = islice(iterable, start, stop)
