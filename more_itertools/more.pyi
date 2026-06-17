@@ -447,23 +447,38 @@ def groupby_transform(
 def groupby_transform(
     iterable: Iterable[_T],
     keyfunc: Callable[[_T], _U],
-    valuefunc: None,
-    reducefunc: None,
+    valuefunc: None = None,
+    reducefunc: None = None,
 ) -> Iterator[tuple[_U, Iterator[_T]]]: ...
+@overload
+def groupby_transform(
+    iterable: Iterable[_T],
+    *,
+    valuefunc: Callable[[_T], _V],
+    reducefunc: None = None,
+) -> Iterator[tuple[_T, Iterator[_V]]]: ...
 @overload
 def groupby_transform(
     iterable: Iterable[_T],
     keyfunc: None,
     valuefunc: Callable[[_T], _V],
-    reducefunc: None,
+    reducefunc: None = None,
 ) -> Iterator[tuple[_T, Iterator[_V]]]: ...
 @overload
 def groupby_transform(
     iterable: Iterable[_T],
     keyfunc: Callable[[_T], _U],
     valuefunc: Callable[[_T], _V],
-    reducefunc: None,
+    reducefunc: None = None,
 ) -> Iterator[tuple[_U, Iterator[_V]]]: ...
+@overload
+def groupby_transform(
+    iterable: Iterable[_T],
+    keyfunc: None = None,
+    valuefunc: None = None,
+    *,
+    reducefunc: Callable[[Iterator[_T]], _W],
+) -> Iterator[tuple[_T, _W]]: ...
 @overload
 def groupby_transform(
     iterable: Iterable[_T],
@@ -478,6 +493,27 @@ def groupby_transform(
     valuefunc: None,
     reducefunc: Callable[[Iterator[_T]], _W],
 ) -> Iterator[tuple[_U, _W]]: ...
+@overload
+def groupby_transform(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    *,
+    reducefunc: Callable[[Iterator[_T]], _W],
+) -> Iterator[tuple[_U, _W]]: ...
+@overload
+def groupby_transform(
+    iterable: Iterable[_T],
+    keyfunc: Callable[[_T], _U],
+    valuefunc: None,
+    reducefunc: Callable[[Iterator[_T]], _W],
+) -> Iterator[tuple[_U, _W]]: ...
+@overload
+def groupby_transform(
+    iterable: Iterable[_T],
+    *,
+    valuefunc: Callable[[_T], _V],
+    reducefunc: Callable[[Iterator[_V]], _W],
+) -> Iterator[tuple[_T, _W]]: ...
 @overload
 def groupby_transform(
     iterable: Iterable[_T],
