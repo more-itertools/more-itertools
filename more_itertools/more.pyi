@@ -19,11 +19,17 @@ from typing import (
     Callable,
     Generic,
     Literal,
+    TypeAlias,
     TypeVar,
     overload,
     type_check_only,
 )
 from typing_extensions import Protocol, Self
+from _typeshed import (
+    SupportsDunderLT,
+    SupportsGetItem,
+    Viewable as _SizedIterable,
+)
 
 __all__ = [
     'AbortThread',
@@ -162,15 +168,10 @@ _Raisable = BaseException | type[BaseException]
 # The type of isinstance's second argument (from typeshed builtins)
 _ClassInfo = type | types.UnionType | tuple[_ClassInfo, ...]
 
-@type_check_only
-class _SizedIterable(Protocol[_T_co], Sized, Iterable[_T_co]): ...
+_SupportsLessThan: TypeAlias = SupportsDunderLT[Any]
 
 @type_check_only
 class _SizedReversible(Protocol[_T_co], Sized, Reversible[_T_co]): ...
-
-@type_check_only
-class _SupportsSlicing(Protocol[_T_co]):
-    def __getitem__(self, __k: slice) -> _T_co: ...
 
 def chunked(
     iterable: Iterable[_T], n: int | None, strict: bool = ...
@@ -295,7 +296,7 @@ def side_effect(
     after: Callable[[], object] | None = ...,
 ) -> Iterator[_T]: ...
 def sliced(
-    seq: _SupportsSlicing[_T], n: int, strict: bool = ...
+    seq: SupportsGetItem[slice, _T], n: int, strict: bool = ...
 ) -> Iterator[_T]: ...
 def split_at(
     iterable: Iterable[_T],
@@ -885,9 +886,6 @@ def duplicates_justseen(
 def classify_unique(
     iterable: Iterable[_T], key: Callable[[_T], _U] | None = ...
 ) -> Iterator[tuple[_T, bool, bool]]: ...
-
-class _SupportsLessThan(Protocol):
-    def __lt__(self, __other: Any) -> bool: ...
 
 _SupportsLessThanT = TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)
 
