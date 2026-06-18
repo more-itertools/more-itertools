@@ -891,35 +891,35 @@ _SupportsLessThanT = TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)
 
 @overload
 def minmax(
-    iterable_or_value: Iterable[_SupportsLessThanT], *, key: None = None
+    __iterable: Iterable[_SupportsLessThanT], *, key: None = None
 ) -> tuple[_SupportsLessThanT, _SupportsLessThanT]: ...
 @overload
 def minmax(
-    iterable_or_value: Iterable[_T], *, key: Callable[[_T], _SupportsLessThan]
+    __iterable: Iterable[_T], *, key: Callable[[_T], _SupportsLessThan]
 ) -> tuple[_T, _T]: ...
 @overload
 def minmax(
-    iterable_or_value: Iterable[_SupportsLessThanT],
+    __iterable: Iterable[_SupportsLessThanT],
     *,
     key: None = None,
     default: _U,
 ) -> _U | tuple[_SupportsLessThanT, _SupportsLessThanT]: ...
 @overload
 def minmax(
-    iterable_or_value: Iterable[_T],
+    __iterable: Iterable[_T],
     *,
     key: Callable[[_T], _SupportsLessThan],
     default: _U,
 ) -> _U | tuple[_T, _T]: ...
 @overload
 def minmax(
-    iterable_or_value: _SupportsLessThanT,
+    __value: _SupportsLessThanT,
     __other: _SupportsLessThanT,
     *others: _SupportsLessThanT,
 ) -> tuple[_SupportsLessThanT, _SupportsLessThanT]: ...
 @overload
 def minmax(
-    iterable_or_value: _T,
+    __value: _T,
     __other: _T,
     *others: _T,
     key: Callable[[_T], _SupportsLessThan],
