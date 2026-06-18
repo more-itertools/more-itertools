@@ -4831,7 +4831,9 @@ def minmax(*iterable, key=None, default=_marker):
     Raymond Hettinger.
     """
     if not iterable:
-        raise TypeError('`minmax()` expected one or more positional arguments.')
+        raise TypeError(
+            '`minmax()` expected one or more positional arguments.'
+        )
     if len(iterable) == 1:
         iterable = iterable[0]
 
