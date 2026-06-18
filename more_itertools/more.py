@@ -4795,7 +4795,7 @@ def classify_unique(iterable, key=None):
         yield element, is_unique_justseen, is_unique_everseen
 
 
-def minmax(iterable_or_value, *others, key=None, default=_marker):
+def minmax(*iterable, key=None, default=_marker):
     """Returns both the smallest and largest items from an iterable
     or from two or more arguments.
 
@@ -4830,7 +4830,8 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
     `recipe <https://code.activestate.com/recipes/577916-fast-minmax-function>`__ by
     Raymond Hettinger.
     """
-    iterable = (iterable_or_value, *others) if others else iterable_or_value
+    if not iterable: raise TypeError('`minmax()` expected one or more positional arguments.')
+    if len(iterable) == 1: iterable = iterable[0]
 
     it = iter(iterable)
 
