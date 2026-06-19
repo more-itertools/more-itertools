@@ -10,6 +10,7 @@ Unreleased
 
 * Changes to existing functions:
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
+    * :func:`replace` was fixed to return no items for empty iterables with a window size greater than one (thanks to gaoflow)
 
 11.1.0
 ------

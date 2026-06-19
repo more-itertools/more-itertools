@@ -4009,6 +4009,14 @@ class ReplaceTests(TestCase):
         expected = [5, 6, 7]
         self.assertEqual(actual, expected)
 
+    def test_window_size_empty(self):
+        iterable = []
+        pred = lambda *args: True
+        substitutes = [5, 6, 7]
+        actual = list(mi.replace(iterable, pred, substitutes, window_size=3))
+        expected = []
+        self.assertEqual(actual, expected)
+
     def test_window_size_zero(self):
         iterable = range(10)
         pred = lambda *args: True
