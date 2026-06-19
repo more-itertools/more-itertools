@@ -2534,11 +2534,19 @@ def locate(iterable, pred=bool, window_size=None):
     if window_size < 1:
         raise ValueError('window size must be at least 1')
 
-    it = windowed(iterable, window_size, fillvalue=_marker)
-    return compress(
-        count(),
-        (pred(*(x for x in w if x is not _marker)) for w in it),
-    )
+    def _windows():
+        last_window = None
+        for window in windowed(iterable, window_size, fillvalue=_marker):
+            last_window = window
+            yield tuple(x for x in window if x is not _marker)
+
+        if last_window is not None and all(
+            x is not _marker for x in last_window
+        ):
+            for i in range(1, window_size):
+                yield last_window[i:]
+
+    return compress(count(), (pred(*window) for window in _windows()))
 
 
 def longest_common_prefix(iterables):

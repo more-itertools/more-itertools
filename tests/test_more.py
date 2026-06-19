@@ -3227,6 +3227,13 @@ class LocateTests(TestCase):
         expected = [0, 3]
         self.assertEqual(actual, expected)
 
+    def test_window_size_tail(self):
+        iterable = [0, 1, 2, 3]
+        pred = lambda *args: args in [(2, 3), (3,)]
+        actual = list(mi.locate(iterable, pred, window_size=3))
+        expected = [2, 3]
+        self.assertEqual(actual, expected)
+
     def test_window_size_large(self):
         iterable = [1, 2, 3, 4]
         pred = lambda *args: True
@@ -3940,6 +3947,14 @@ class RlocateTests(TestCase):
         for it in (iterable, iter(iterable)):
             actual = list(mi.rlocate(it, pred, window_size=2))
             expected = [3, 0]
+            self.assertEqual(actual, expected)
+
+    def test_window_size_tail(self):
+        iterable = [0, 1, 2, 3]
+        pred = lambda *args: args in [(2, 3), (3,)]
+        for it in (iterable, iter(iterable)):
+            actual = list(mi.rlocate(it, pred, window_size=3))
+            expected = [3, 2]
             self.assertEqual(actual, expected)
 
     def test_window_size_large(self):
