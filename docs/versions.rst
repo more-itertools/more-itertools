@@ -10,6 +10,7 @@ Unreleased
 
 * Changes to existing functions:
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
+    * The type hints for :func:`difference` were improved for calls with *initial* set.
 
 11.1.0
 ------
