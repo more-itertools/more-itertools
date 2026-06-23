@@ -79,6 +79,10 @@ Python iterables.
 |                        | `run_length <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.run_length>`_,                                                                         |
 |                        | `map_reduce <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.map_reduce>`_,                                                                         |
 |                        | `join_mappings <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.join_mappings>`_,                                                                   |
+|                        | `map_keys <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.map_keys>`_,                                                                             |
+|                        | `map_values <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.map_values>`_,                                                                         |
+|                        | `filter_keys <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.filter_keys>`_,                                                                       |
+|                        | `filter_values <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.filter_values>`_,                                                                   |
 |                        | `exactly_n <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.exactly_n>`_,                                                                           |
 |                        | `is_sorted <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.is_sorted>`_,                                                                           |
 |                        | `all_equal <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.all_equal>`_,                                                                           |

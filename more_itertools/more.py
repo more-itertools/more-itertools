@@ -95,7 +95,9 @@ __all__ = [
     'exactly_n',
     'extract',
     'filter_except',
+    'filter_keys',
     'filter_map',
+    'filter_values',
     'first',
     'gray_product',
     'groupby_transform',
@@ -120,7 +122,9 @@ __all__ = [
     'make_decorator',
     'map_except',
     'map_if',
+    'map_keys',
     'map_reduce',
+    'map_values',
     'mark_ends',
     'minmax',
     'nth_or_last',
@@ -5128,6 +5132,134 @@ def join_mappings(**field_to_map):
             ret[key][field_name] = value
 
     return dict(ret)
+
+
+def map_values(func, mapping):
+    """Return a new dict with *func* applied to each value of *mapping*.
+
+        >>> map_values(str.upper, {'a': 'one', 'b': 'two'})
+        {'a': 'ONE', 'b': 'TWO'}
+
+    The keys are left unchanged:
+
+        >>> map_values(len, {'a': [1, 2], 'b': [3, 4, 5]})
+        {'a': 2, 'b': 3}
+
+    This is a convenient, readable alternative to a dict comprehension
+    such as ``{k: func(v) for k, v in mapping.items()}``. It composes
+    nicely with the other mapping tools, for example to normalize values
+    before filtering them:
+
+        >>> prices = {'apple': '1.50', 'pear': '2.00'}
+        >>> map_values(float, prices)
+        {'apple': 1.5, 'pear': 2.0}
+
+    The original *mapping* is never modified; a new ``dict`` is returned.
+
+    See :func:`map_keys` to transform keys instead, and
+    :func:`filter_values` to drop items by value.
+    """
+    return {key: func(value) for key, value in mapping.items()}
+
+
+def map_keys(func, mapping):
+    """Return a new dict with *func* applied to each key of *mapping*.
+
+        >>> map_keys(str.upper, {'a': 1, 'b': 2})
+        {'A': 1, 'B': 2}
+
+    The values are left unchanged:
+
+        >>> map_keys(lambda k: k * 2, {1: 'a', 2: 'b'})
+        {2: 'a', 4: 'b'}
+
+    A common use is normalizing keys, such as case-folding the headers
+    of an incoming request:
+
+        >>> map_keys(str.lower, {'Content-Type': 'text/plain'})
+        {'content-type': 'text/plain'}
+
+    If *func* maps two distinct keys to the same new key, a
+    ``ValueError`` is raised to avoid silently discarding a value:
+
+        >>> map_keys(abs, {-1: 'a', 1: 'b'})
+        Traceback (most recent call last):
+            ...
+        ValueError: duplicate key 1 produced by 1
+
+    The original *mapping* is never modified; a new ``dict`` is returned.
+
+    See :func:`map_values` to transform values instead, and
+    :func:`filter_keys` to drop items by key.
+    """
+    ret = {}
+    for key, value in mapping.items():
+        new_key = func(key)
+        if new_key in ret:
+            raise ValueError(f'duplicate key {new_key!r} produced by {key!r}')
+        ret[new_key] = value
+    return ret
+
+
+def filter_values(pred, mapping):
+    """Return a new dict with only the items of *mapping* whose value
+    satisfies the *pred* function.
+
+        >>> filter_values(lambda v: v > 1, {'a': 1, 'b': 2, 'c': 3})
+        {'b': 2, 'c': 3}
+
+    *pred* defaults to the truth test, so by default items with falsy
+    values are removed:
+
+        >>> filter_values(None, {'a': 0, 'b': 1, 'c': '', 'd': 'x'})
+        {'b': 1, 'd': 'x'}
+
+    Passing ``None`` is a handy way to drop keys with missing data
+    before further processing:
+
+        >>> filter_values(None, {'name': 'Bob', 'email': None})
+        {'name': 'Bob'}
+
+    The original *mapping* is never modified; a new ``dict`` is returned.
+
+    See :func:`filter_keys` to filter by key instead, and
+    :func:`map_values` to transform values.
+    """
+    if pred is None:
+        pred = bool
+    return {key: value for key, value in mapping.items() if pred(value)}
+
+
+def filter_keys(pred, mapping):
+    """Return a new dict with only the items of *mapping* whose key
+    satisfies the *pred* function.
+
+        >>> d = {'a1': 1, 'b': 2, 'a2': 3}
+        >>> filter_keys(lambda k: k.startswith('a'), d)
+        {'a1': 1, 'a2': 3}
+
+    *pred* defaults to the truth test, so by default items with falsy
+    keys are removed:
+
+        >>> filter_keys(None, {0: 'a', 1: 'b', '': 'c', 'x': 'd'})
+        {1: 'b', 'x': 'd'}
+
+    A common use is selecting a subset of keys, for example to keep only
+    the fields of a record that should be made public:
+
+        >>> record = {'id': 7, 'name': 'Bob', 'password': 'secret'}
+        >>> public = {'id', 'name'}
+        >>> filter_keys(public.__contains__, record)
+        {'id': 7, 'name': 'Bob'}
+
+    The original *mapping* is never modified; a new ``dict`` is returned.
+
+    See :func:`filter_values` to filter by value instead, and
+    :func:`map_keys` to transform keys.
+    """
+    if pred is None:
+        pred = bool
+    return {key: value for key, value in mapping.items() if pred(key)}
 
 
 def _complex_sumprod(v1, v2):
