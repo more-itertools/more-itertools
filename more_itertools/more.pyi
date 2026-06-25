@@ -604,7 +604,7 @@ def difference(
 ) -> Iterator[_T | _U]: ...
 @overload
 def difference(
-    iterable: Iterable[_T], func: Callable[[_T, _T], _U] = ..., *, initial: _U
+    iterable: Iterable[_T], func: Callable[[_T, _T], _U] = ..., *, initial: _T
 ) -> Iterator[_U]: ...
 
 class SequenceView(Generic[_T_co], Sequence[_T_co]):
