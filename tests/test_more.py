@@ -1173,6 +1173,10 @@ class InterleaveEvenlyTests(TestCase):
         actual = list(mi.interleave_evenly([a, b]))
         self.assertEqual(actual, expected)
 
+    def test_no_iterables(self):
+        self.assertEqual(list(mi.interleave_evenly([])), [])
+        self.assertEqual(list(mi.interleave_evenly([], lengths=[])), [])
+
     def test_three_iters(self):
         a = ["a1", "a2", "a3", "a4", "a5"]
         b = ["b1", "b2", "b3"]

@@ -1338,6 +1338,9 @@ def interleave_evenly(iterables, lengths=None):
 
     dims = len(lengths)
 
+    if not dims:
+        return
+
     # sort iterables by length, descending
     lengths_permute = sorted(
         range(dims), key=lambda i: lengths[i], reverse=True
