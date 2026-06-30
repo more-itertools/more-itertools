@@ -26,7 +26,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import comb, e, exp, floor, fsum, log, log1p, perm, tau
 from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
@@ -4284,37 +4284,43 @@ def nth_permutation(iterable, r, index):
         index += c
     if not 0 <= index < c:
         raise IndexError
+    if n == 0:
+        return ()
 
-    split=[index]
-    for depth in range(1, l := r.bit_length()+1):
-        prev, split = split, [0]*((r-1 >> l+~depth) + 1)
-        for i,s in enumerate(prev):
-            d, split[2*i] = divmod(s,perm(n-r + (2*i+1 << l+~depth),1 << l+~depth))
-            if d: split[2*i + 1] = d
-    
-    if n<10**5: #determined experimentally
+    split = [index]
+    for depth in range(1, l := r.bit_length() + 1):
+        prev, split = split, [0] * ((r - 1 >> l + ~depth) + 1)
+        for i, s in enumerate(prev):
+            d, split[2 * i] = divmod(
+                s, perm(n - r + (2 * i + 1 << l + ~depth), 1 << l + ~depth)
+            )
+            if d:
+                split[2 * i + 1] = d
+
+    if n < 10**5:  # determined experimentally
         return tuple(map(pool.pop, split[::-1]))
     else:
-        tree=[i+1&~i for i in range(n)]
-        for i in range(r-1, -1, -1):
-            t=0
-            u=1 << (n-1).bit_length()-1
+        tree = [i + 1 & ~i for i in range(n)]
+        for i in range(r - 1, -1, -1):
+            t = 0
+            u = 1 << (n - 1).bit_length() - 1
             while u:
-                if t|u <= n and split[i] >= (c:=tree[(t|u)-1]):
-                    split[i]-=c
+                if t | u <= n and split[i] >= (c := tree[(t | u) - 1]):
+                    split[i] -= c
                     t |= u
                 u >>= 1
             out = tree[t]
-            u=t
-            while u != t&t+1:
-                out -= tree[u-1]
-                u &= u-1
-            u=t
-            while u<n:
+            u = t
+            while u != t & t + 1:
+                out -= tree[u - 1]
+                u &= u - 1
+            u = t
+            while u < n:
                 tree[u] -= out
-                u |= u+1
+                u |= u + 1
             split[i] = t
         return tuple(map(pool.__getitem__, split[::-1]))
+
 
 def nth_combination_with_replacement(iterable, r, index):
     """Equivalent to
