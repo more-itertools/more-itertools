@@ -4261,7 +4261,7 @@ def nth_product(index, *iterables, repeat=1):
 
 
 def nth_permutation(iterable, r, index):
-    """Equivalent to ``list(permutations(iterable, r))[index]```
+    """Equivalent to ``list(permutations(iterable, r))[index]``
 
     The subsequences of *iterable* that are of length *r* where order is
     important can be ordered lexicographically. :func:`nth_permutation`
@@ -4285,17 +4285,36 @@ def nth_permutation(iterable, r, index):
     if not 0 <= index < c:
         raise IndexError
 
-    result = [0] * r
-    q = index * factorial(n) // c if r < n else index
-    for d in range(1, n + 1):
-        q, i = divmod(q, d)
-        if 0 <= n - d < r:
-            result[n - d] = i
-        if q == 0:
-            break
-
-    return tuple(map(pool.pop, result))
-
+    split=[index]
+    for depth in range(1, l := r.bit_length()+1):
+        prev, split = split, [0]*((r-1 >> l+~depth) + 1)
+        for i,s in enumerate(prev):
+            d, split[2*i] = divmod(s,perm(n-r + (2*i+1 << l+~depth),1 << l+~depth))
+            if d: split[2*i + 1] = d
+    
+    if n<10**5: #determined experimentally
+        return tuple(map(pool.pop, split[::-1]))
+    else:
+        tree=[i+1&~i for i in range(n)]
+        for i in range(r-1, -1, -1):
+            t=0
+            u=1 << (n-1).bit_length()-1
+            while u:
+                if t|u <= n and split[i] >= (c:=tree[(t|u)-1]):
+                    split[i]-=c
+                    t |= u
+                u >>= 1
+            out = tree[t]
+            u=t
+            while u != t&t+1:
+                out -= tree[u-1]
+                u &= u-1
+            u=t
+            while u<n:
+                tree[u] -= out
+                u |= u+1
+            split[i] = t
+        return tuple(map(pool.__getitem__, split[::-1]))
 
 def nth_combination_with_replacement(iterable, r, index):
     """Equivalent to
