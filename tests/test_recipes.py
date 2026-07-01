@@ -86,7 +86,9 @@ class TailTests(TestCase):
 
     def test_iterator_negative(self):
         """Negative tail sizes should raise for non-sized iterables."""
-        self.assertRaises(ValueError, lambda: list(mi.tail(-1, iter('ABCDEFG'))))
+        self.assertRaises(
+            ValueError, lambda: list(mi.tail(-1, iter('ABCDEFG')))
+        )
 
     def test_sized_greater(self):
         """Length of sized iterable is greater than requested tail"""
