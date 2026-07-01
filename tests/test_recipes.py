@@ -84,6 +84,10 @@ class TailTests(TestCase):
         """Length of iterator is less than requested tail"""
         self.assertEqual(list(mi.tail(8, iter('ABCDEFG'))), list('ABCDEFG'))
 
+    def test_iterator_negative(self):
+        """Negative tail sizes should raise for non-sized iterables."""
+        self.assertRaises(ValueError, lambda: list(mi.tail(-1, iter('ABCDEFG'))))
+
     def test_sized_greater(self):
         """Length of sized iterable is greater than requested tail"""
         self.assertEqual(list(mi.tail(3, 'ABCDEFG')), list('EFG'))
@@ -95,6 +99,10 @@ class TailTests(TestCase):
     def test_sized_less(self):
         """Length of sized iterable is less than requested tail"""
         self.assertEqual(list(mi.tail(8, 'ABCDEFG')), list('ABCDEFG'))
+
+    def test_sized_negative(self):
+        """Negative tail sizes should raise for sized iterables."""
+        self.assertRaises(ValueError, lambda: list(mi.tail(-1, 'ABCDEFG')))
 
 
 class ConsumeTests(TestCase):
