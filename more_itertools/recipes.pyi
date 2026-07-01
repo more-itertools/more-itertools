@@ -41,6 +41,7 @@ __all__ = [
     'polynomial_derivative',
     'powerset',
     'prepend',
+    'primes',
     'quantify',
     'reshape',
     'random_combination_with_replacement',
@@ -177,6 +178,7 @@ def iter_index(
     stop: int | None = ...,
 ) -> Iterator[int]: ...
 def sieve(n: int) -> Iterator[int]: ...
+def primes() -> Iterator[int]: ...
 def _batched(
     iterable: Iterable[_T], n: int, *, strict: bool = False
 ) -> Iterator[tuple[_T, ...]]: ...
@@ -218,7 +220,6 @@ def running_min(
 def running_max(
     iterable: Iterable[_NumberT], *, maxlen: int | None = ...
 ) -> Iterator[_NumberT]: ...
-
 @dataclass(frozen=True, slots=True)
 class Stats:
     size: int

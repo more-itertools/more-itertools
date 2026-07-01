@@ -69,6 +69,7 @@ __all__ = [
     'polynomial_derivative',
     'powerset',
     'prepend',
+    'primes',
     'quantify',
     'reshape',
     'random_combination_with_replacement',
@@ -933,6 +934,63 @@ def sieve(n):
         data[p * p : n : p + p] = bytes(len(range(p * p, n, p + p)))
         start = p * p
     yield from iter_index(data, 1, start)
+
+
+def primes():
+    """Yield the prime numbers, lazily and without an upper bound.
+
+    >>> from itertools import islice
+    >>> list(islice(primes(), 10))
+    [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+
+    Unlike :func:`sieve`, which requires a known limit and builds a table of
+    size proportional to that limit, this generator runs forever using a
+    *segmented* Sieve of Eratosthenes.  Primes are produced one block at a
+    time, so memory use stays proportional to the square root of the largest
+    prime yielded rather than the prime itself.  Pair it with the usual
+    iterator tools to take what you need::
+
+        >>> from itertools import takewhile
+        >>> list(takewhile(lambda p: p < 30, primes()))
+        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+
+    """
+    # 2 is the only even prime; emit it directly and sieve odds afterward.
+    yield 2
+
+    block_size = 1 << 15  # number of odd candidates per block
+    # Odd primes known so far, used to mark composites in each block.  Sieving
+    # the block [low, high) only needs the primes up to isqrt(high - 1).
+    base_primes = []
+    base_checked = 1  # base_primes holds every odd prime <= base_checked
+
+    low = 3
+    while True:
+        high = (
+            low + 2 * block_size
+        )  # block covers the odd numbers in [low, high)
+
+        # Extend base_primes until they cover the square root of this block.
+        limit = isqrt(high - 1)
+        if limit > base_checked:
+            base_primes = list(sieve(limit + 1))[1:]  # drop 2; keep odd primes
+            base_checked = limit
+
+        # data[i] tracks the odd number low + 2 * i; start it all-prime.
+        data = bytearray([1]) * block_size
+        for p in base_primes:
+            # First odd multiple of p that is both >= low and >= p * p.
+            start = max(p * p, low + (-low % p))
+            if start % 2 == 0:
+                start += p  # composites to mark must stay odd
+            data[(start - low) // 2 :: p] = bytes(
+                len(range(start, high, 2 * p))
+            )
+
+        for i in iter_index(data, 1):
+            yield low + 2 * i
+
+        low = high
 
 
 def _batched(iterable, n, *, strict=False):  # pragma: no cover
