@@ -598,14 +598,29 @@ def consecutive_groups(
 @overload
 def difference(
     iterable: Iterable[_T],
-    func: Callable[[_T, _T], _U] = ...,
+    func: Callable[[_T, _T], _U],
     *,
     initial: None = ...,
 ) -> Iterator[_T | _U]: ...
 @overload
 def difference(
-    iterable: Iterable[_T], func: Callable[[_T, _T], _U] = ..., *, initial: _U
+    iterable: Iterable[_T],
+    *,
+    initial: None = ...,
+) -> Iterator[Any]: ...
+@overload
+def difference(
+    iterable: Iterable[_T],
+    func: Callable[[_T, _T], _U],
+    *,
+    initial: Any,
 ) -> Iterator[_U]: ...
+@overload
+def difference(
+    iterable: Iterable[_T],
+    *,
+    initial: Any,
+) -> Iterator[Any]: ...
 
 class SequenceView(Generic[_T_co], Sequence[_T_co]):
     def __init__(self, target: Sequence[_T_co]) -> None: ...
