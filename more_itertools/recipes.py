@@ -152,6 +152,9 @@ def tail(n, iterable):
     ['E', 'F', 'G']
 
     """
+    if n < 0:
+        raise ValueError('n must be at least 0')
+
     try:
         size = len(iterable)
     except TypeError:
