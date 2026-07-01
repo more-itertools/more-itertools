@@ -4254,8 +4254,8 @@ def nth_product(index, *iterables, repeat=1):
 
     result = []
     for pool, n in zip(pools, ns):
-        result.append(pool[index % n])
-        index //= n
+        index, rem = divmod(index, n)
+        result.append(pool[rem])
 
     return tuple(reversed(result))
 
