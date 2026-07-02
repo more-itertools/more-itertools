@@ -4017,10 +4017,8 @@ class AbortThread(BaseException):
 class callback_iter:
     """Convert a function that uses callbacks to an iterator.
 
-    .. warning::
-
-       This function is deprecated as of version 11.0.0. It will be removed in a future
-       major release.
+    .. deprecated:: 11.0.0
+       Will be removed in a future major release.
 
     Let *func* be a function that takes a `callback` keyword argument.
     For example:
