@@ -342,10 +342,9 @@ def pairwise(iterable):
     """
     Wrapper for :func:`itertools.pairwise`.
 
-    .. warning::
-
-       This function is deprecated as of version 11.0.0. It will be removed in a future
-       major release.
+    .. deprecated:: 11.0.0
+       This function is deprecated. It will be removed in a future major release.
+       Use :func:`itertools.pairwise` directly.
     """
     return itertools_pairwise(iterable)
 
