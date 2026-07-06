@@ -72,6 +72,7 @@ __all__ = [
     'chunked',
     'chunked_even',
     'circular_shifts',
+    'classify_unique',
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
@@ -89,9 +90,9 @@ __all__ = [
     'distribute',
     'divide',
     'doublestarmap',
+    'duplicates',
     'duplicates_everseen',
     'duplicates_justseen',
-    'classify_unique',
     'exactly_n',
     'extract',
     'filter_except',
@@ -538,17 +539,19 @@ def ilen(iterable):
     # is both 10x faster and 10x more beautiful.
     return sum(compress(repeat(1), zip(iterable)))
 
+
 def duplicates(iterable, key=None):
     """Yield duplicated items in *iterable*, in the order each appears as
     a duplicate of a previous item.
 
         >>> print("".join(duplicates("mississippi")))
         sip
-        >>> list(duplicates([5, 11, 24, 35, 23, 42, 11, 56, 19, 18, 27, 27], lambda x: x // 10))
+        >>> list(duplicates([5, 11, 24, 35, 23, 42, 11, 56, 19, 18, 27, 27],
+        ...                 lambda x: x // 10))
         [23, 11]
 
-    Every item in the returned iterator will be distinct, or map to a different key if
-    *key* was passed.
+    Every item in the returned iterator will be distinct, or map to a
+    different key under *key* if passed.
     """
 
     duplicated = {}
@@ -569,6 +572,7 @@ def duplicates(iterable, key=None):
             elif not s:
                 duplicated[k] = True
                 yield i
+
 
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
