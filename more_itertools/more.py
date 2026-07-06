@@ -4018,7 +4018,7 @@ class callback_iter:
     """Convert a function that uses callbacks to an iterator.
 
     .. deprecated:: 11.0.0
-       This function is deprecated. It will be removed in a future major release.
+       This class is deprecated. It will be removed in a future major release.
 
     Let *func* be a function that takes a `callback` keyword argument.
     For example:
