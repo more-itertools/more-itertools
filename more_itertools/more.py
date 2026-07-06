@@ -538,6 +538,37 @@ def ilen(iterable):
     # is both 10x faster and 10x more beautiful.
     return sum(compress(repeat(1), zip(iterable)))
 
+def duplicates(iterable, key=None):
+    """Yield duplicated items in *iterable*, in the order each appears as
+    a duplicate of a previous item.
+
+        >>> print("".join(duplicates("mississippi")))
+        sip
+        >>> list(duplicates([5, 11, 24, 35, 23, 42, 11, 56, 19, 18, 27, 27], lambda x: x // 10))
+        [23, 11]
+
+    Every item in the returned iterator will be distinct, or map to a different key if
+    *key* was passed.
+    """
+
+    duplicated = {}
+    if key is None:
+        for i in iterable:
+            s = duplicated.get(i)
+            if s is None:
+                duplicated[i] = False
+            elif not s:
+                duplicated[i] = True
+                yield i
+    else:
+        for i in iterable:
+            k = key(i)
+            s = duplicated.get(k)
+            if s is None:
+                duplicated[k] = False
+            elif not s:
+                duplicated[k] = True
+                yield i
 
 def iterate(func, start):
     """Return ``start``, ``func(start)``, ``func(func(start))``, ...
