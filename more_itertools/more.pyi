@@ -45,6 +45,7 @@ __all__ = [
     'chunked',
     'chunked_even',
     'circular_shifts',
+    'classify_unique',
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
@@ -62,9 +63,9 @@ __all__ = [
     'distribute',
     'divide',
     'doublestarmap',
+    'duplicates',
     'duplicates_everseen',
     'duplicates_justseen',
-    'classify_unique',
     'exactly_n',
     'extract',
     'filter_except',
@@ -160,6 +161,7 @@ _T2 = TypeVar('_T2')
 _U = TypeVar('_U')
 _V = TypeVar('_V')
 _W = TypeVar('_W')
+_H = TypeVar('_H', bound=Hashable)
 _T_co = TypeVar('_T_co', covariant=True)
 _U_co = TypeVar('_U_co', covariant=True)
 _GenFn = TypeVar('_GenFn', bound=Callable[..., Iterator[Any]])
@@ -208,6 +210,12 @@ class peekable(Generic[_T], Iterator[_T]):
 
 def consumer(func: _GenFn) -> _GenFn: ...
 def ilen(iterable: Iterable[_T]) -> int: ...
+
+@overload
+def duplicates(iterable: Iterable[_H], key: None = None) -> Iterator[_H]: ...
+@overload
+def duplicates(iterable: Iterable[_T], key: Callable[[_T], _H]) -> Iterator[_T]: ...
+
 def iterate(func: Callable[[_T], _T], start: _T) -> Iterator[_T]: ...
 def with_iter(
     context_manager: AbstractContextManager[Iterable[_T]],
