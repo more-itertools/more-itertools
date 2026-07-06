@@ -1489,9 +1489,9 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
         >>> from more_itertools import consume
         >>> f = StringIO()
         >>> func = lambda x: print(x, file=f)
-        >>> before = lambda: print(u'HEADER', file=f)
+        >>> before = lambda: print('HEADER', file=f)
         >>> after = f.close
-        >>> it = [u'a', u'b', u'c']
+        >>> it = ['a', 'b', 'c']
         >>> consume(side_effect(func, it, before=before, after=after))
         >>> f.closed
         True
