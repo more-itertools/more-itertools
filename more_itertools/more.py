@@ -89,6 +89,7 @@ __all__ = [
     'distribute',
     'divide',
     'doublestarmap',
+    'duplicates',
     'duplicates_everseen',
     'duplicates_justseen',
     'classify_unique',
@@ -4664,7 +4665,33 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
             pass
         yield tuple(new_item)
 
+def duplicates(iterable, key=None):
+    """Yield each duplicate element of *iterable* exactly once. If *key* is
+    not ``None``, it will be used to determine uniqueness.
 
+    The function is inspired by the `duplicates` iterator adaptor from Rust's
+    `itertools` crate.
+
+    >>> list(duplicates([1, 2, 3, 2, 1]))
+    [1, 2]
+    >>> list(duplicates([5, 11, 24, 35, 23, 42, 11, 56, 19, 18, 27, 27],
+    ...                 key=lambda x: x // 10))
+    [23, 11]
+
+    """
+    seen = set()
+    seen_twice = set()
+    for item in iterable:
+        k = key(item) if key else item
+        if k in seen:
+            if k not in seen_twice:
+                seen_twice.add(k)
+                yield item
+        else:
+            seen.add(k)
+
+
+@composable
 def unique_in_window(iterable, n, key=None):
     """Yield the items from *iterable* that haven't been seen recently.
     *n* is the size of the sliding window.
