@@ -1534,6 +1534,9 @@ def sliced(seq, n, strict=False):
     For non-sliceable iterables, see :func:`chunked`.
 
     """
+    if n < 0:
+        raise ValueError('n must be at least 0')
+
     iterator = takewhile(len, (seq[i : i + n] for i in count(0, n)))
     if strict:
 

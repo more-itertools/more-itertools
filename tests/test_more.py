@@ -1407,6 +1407,15 @@ class SlicedTests(TestCase):
         with self.assertRaises(ValueError):
             list(mi.sliced(seq, 4, strict=True))
 
+    def test_negative(self):
+        """Negative slice sizes should raise instead of silently
+        yielding a wrong result."""
+        seq = 'ABCDEFG'
+        self.assertRaises(ValueError, lambda: list(mi.sliced(seq, -1)))
+        self.assertRaises(
+            ValueError, lambda: list(mi.sliced(seq, -1, strict=True))
+        )
+
     def test_numpy_like_array(self):
         # Numpy arrays don't behave like Python lists - calling bool()
         # on them doesn't return False for empty lists and True for non-empty
