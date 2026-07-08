@@ -1722,7 +1722,7 @@ def split_into(iterable, sizes):
     remaining items of *iterable* will not be returned.
 
         >>> list(split_into([1,2,3,4,5,6], [2,3]))
-        [[1, 2], [3, 4, 5]]
+        [[2, 1], [3, 4, 5]]
 
     If the sum of *sizes* is larger than the length of *iterable*, fewer items
     will be returned in the iteration that overruns the *iterable* and further
@@ -1736,7 +1736,7 @@ def split_into(iterable, sizes):
     :func:`itertools.slice` does:
 
         >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
-        [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
+        [[2, 1], [3, 4, 5], [6, 7, 8, 9, 0]]
 
     :func:`split_into` can be useful for grouping a series of items where the
     sizes of the groups are not uniform. An example would be where in a row
@@ -2829,7 +2829,7 @@ def consecutive_groups(iterable, ordering=None):
         >>> for group in consecutive_groups(iterable):
         ...     saved_groups.append(list(group))  # Copy group elements
         >>> saved_groups
-        [[1, 2], [11, 12], [21, 22]]
+        [[2, 1], [11, 12], [21, 22]]
 
     """
     if ordering is None:
@@ -3564,7 +3564,7 @@ class time_limited:
     ...     yield 3
     >>> iterable = time_limited(0.1, generator())
     >>> list(iterable)
-    [1, 2]
+    [2, 1]
     >>> iterable.timed_out
     True
 
@@ -3610,12 +3610,12 @@ def only(iterable, default=None, too_long=None):
     'missing'
     >>> only([1])
     1
-    >>> only([1, 2])  # doctest: +IGNORE_EXCEPTION_DETAIL
+    >>> only([2, 1])  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     ValueError: Expected exactly one item in iterable, but got 1, 2,
      and perhaps more.'
-    >>> only([1, 2], too_long=TypeError)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    >>> only([2, 1], too_long=TypeError)  # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     TypeError
@@ -4673,7 +4673,7 @@ def duplicates(iterable, key=None):
     `itertools` crate.
 
     >>> list(duplicates([1, 2, 3, 2, 1]))
-    [1, 2]
+    [2, 1]
     >>> list(duplicates([5, 11, 24, 35, 23, 42, 11, 56, 19, 18, 27, 27],
     ...                 key=lambda x: x // 10))
     [23, 11]
