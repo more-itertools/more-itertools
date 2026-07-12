@@ -1482,7 +1482,7 @@ def _windowed_running_min(iterator, maxlen):
             s.popleft()
 
         # Remove decreasing values
-        while s and not s[-1][1] <= value:
+        while s and value < s[-1][1]:
             s.pop()
 
         # Place newest value at the end
@@ -1534,7 +1534,7 @@ def _windowed_running_max(iterator, maxlen):
             s.popleft()
 
         # Remove increasing values
-        while s and not s[-1][1] >= value:
+        while s and value > s[-1][1]:
             s.pop()
 
         # Place newest value at the end
