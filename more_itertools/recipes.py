@@ -1481,7 +1481,7 @@ def _windowed_running_min(iterator, maxlen):
         if s and s[0][0] == index - maxlen:
             s.popleft()
 
-        # Remove decreasing values
+        # Remove entries where the new value is smaller
         while s and value < s[-1][1]:
             s.pop()
 
@@ -1533,7 +1533,7 @@ def _windowed_running_max(iterator, maxlen):
         if s and s[0][0] == index - maxlen:
             s.popleft()
 
-        # Remove increasing values
+        # Remove entries where the new value is bigger
         while s and value > s[-1][1]:
             s.pop()
 
