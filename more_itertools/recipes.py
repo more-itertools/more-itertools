@@ -377,6 +377,8 @@ def grouper(iterable, n, incomplete='fill', fillvalue=None):
     ValueError
 
     """
+    if n < 1:
+        raise ValueError('n must be at least one')
     iterators = [iter(iterable)] * n
     match incomplete:
         case 'fill':

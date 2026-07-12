@@ -361,6 +361,14 @@ class GrouperTests(TestCase):
         with self.assertRaises(ValueError):
             list(mi.grouper('ABCD', 3, incomplete='bogus'))
 
+    def test_invalid_n(self):
+        # A group length below one is nonsensical and previously
+        # returned an empty iterator instead of signalling the error.
+        for n in [0, -1, -3]:
+            with self.subTest(n=n):
+                with self.assertRaises(ValueError):
+                    list(mi.grouper('ABCDEF', n))
+
 
 class RoundrobinTests(TestCase):
     """Tests for ``roundrobin()``"""

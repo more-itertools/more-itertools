@@ -10,6 +10,7 @@ Unreleased
 
 * Changes to existing functions:
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
+    * :func:`grouper` now raises ``ValueError`` for a group length below one, matching :func:`batched`, instead of silently returning an empty iterator (thanks to vidigoat)
 
 11.1.0
 ------
