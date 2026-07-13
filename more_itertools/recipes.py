@@ -1477,18 +1477,11 @@ def _windowed_running_min(iterator, maxlen):
     s = deque()
 
     for index, value in enumerate(iterator):
-        # Has the current minimum aged out?
         if s and s[0][0] == index - maxlen:
             s.popleft()
-
-        # Remove entries where the new value is smaller
         while s and value < s[-1][1]:
             s.pop()
-
-        # Place newest value at the end
         s.append((index, value))
-
-        # Current minimum is at position zero
         yield s[0][1]
 
 
@@ -1529,18 +1522,11 @@ def _windowed_running_max(iterator, maxlen):
     s = deque()
 
     for index, value in enumerate(iterator):
-        # Has the current maximum aged out?
         if s and s[0][0] == index - maxlen:
             s.popleft()
-
-        # Remove entries where the new value is bigger
         while s and value > s[-1][1]:
             s.pop()
-
-        # Place newest value at the end
         s.append((index, value))
-
-        # Current maximum is at position zero
         yield s[0][1]
 
 
