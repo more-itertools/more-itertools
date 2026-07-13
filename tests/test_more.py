@@ -6823,6 +6823,14 @@ class TestRunningMin(TestCase):
             list(mi.running_min(iter(data))),
         )
 
+    def test_stability(self):
+        # min(x, y) returns x when x == y
+        data = [0, 0.0, Fraction(0)]
+        self.assertEqual(
+            list(map(type, mi.running_min(data, maxlen=2))),
+            [type(min(data[0:1])), type(min(data[0:2])), type(min(data[1:3]))],
+        )
+
 
 class TestRunningMax(TestCase):
     def test_basic(self):
@@ -6867,6 +6875,14 @@ class TestRunningMax(TestCase):
         self.assertEqual(
             list(mi.running_max(iter(data), maxlen=len(data) * 2)),
             list(mi.running_max(iter(data))),
+        )
+
+    def test_stability(self):
+        # max(x, y) returns x when x == y
+        data = [0, 0.0, Fraction(0)]
+        self.assertEqual(
+            list(map(type, mi.running_max(data, maxlen=2))),
+            [type(max(data[0:1])), type(max(data[0:2])), type(max(data[1:3]))],
         )
 
 
