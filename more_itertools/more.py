@@ -1,9 +1,8 @@
-__lazy_modules__ = frozenset({'queue'})
+__lazy_modules__ = frozenset({'queue', 'threading'})
 
 import math
 import types
 
-from _thread import allocate_lock
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
@@ -42,6 +41,7 @@ from operator import (
 )
 from sys import maxsize
 from time import monotonic
+from threading import Lock
 
 from .recipes import (
     _marker,
@@ -101,8 +101,8 @@ __all__ = [
     'gray_product',
     'groupby_transform',
     'ichunked',
-    'iequals',
     'idft',
+    'iequals',
     'ilen',
     'interleave',
     'interleave_evenly',
@@ -111,8 +111,8 @@ __all__ = [
     'intersperse',
     'is_sorted',
     'islice_extended',
-    'iterate',
     'iter_suppress',
+    'iterate',
     'join_mappings',
     'last',
     'locate',
@@ -124,11 +124,11 @@ __all__ = [
     'map_reduce',
     'mark_ends',
     'minmax',
+    'nth_combination_with_replacement',
     'nth_or_last',
     'nth_permutation',
     'nth_prime',
     'nth_product',
-    'nth_combination_with_replacement',
     'numeric_range',
     'one',
     'only',
@@ -162,8 +162,8 @@ __all__ = [
     'split_when',
     'spy',
     'stagger',
-    'strip',
     'strictly_n',
+    'strip',
     'subfactorial',
     'substrings',
     'substrings_indexes',
@@ -1524,9 +1524,9 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
         >>> from more_itertools import consume
         >>> f = StringIO()
         >>> func = lambda x: print(x, file=f)
-        >>> before = lambda: print(u'HEADER', file=f)
+        >>> before = lambda: print('HEADER', file=f)
         >>> after = f.close
-        >>> it = [u'a', u'b', u'c']
+        >>> it = ['a', 'b', 'c']
         >>> consume(side_effect(func, it, before=before, after=after))
         >>> f.closed
         True
@@ -1569,6 +1569,9 @@ def sliced(seq, n, strict=False):
     For non-sliceable iterables, see :func:`chunked`.
 
     """
+    if n < 0:
+        raise ValueError('n must be at least 0')
+
     iterator = takewhile(len, (seq[i : i + n] for i in count(0, n)))
     if strict:
 
@@ -4052,10 +4055,8 @@ class AbortThread(BaseException):
 class callback_iter:
     """Convert a function that uses callbacks to an iterator.
 
-    .. warning::
-
-       This function is deprecated as of version 11.0.0. It will be removed in a future
-       major release.
+    .. deprecated:: 11.0.0
+       Will be removed in a future major release.
 
     Let *func* be a function that takes a `callback` keyword argument.
     For example:
@@ -5437,7 +5438,7 @@ class serialize:
 
     def __init__(self, iterable):
         self._iterator = iter(iterable)
-        self._lock = allocate_lock()
+        self._lock = Lock()
 
     def __iter__(self):
         return self
@@ -5534,7 +5535,7 @@ class _concurrent_tee:
         else:
             self.iterator = iter(iterable)
             self.link = [None, None]
-            self.lock = allocate_lock()
+            self.lock = Lock()
 
     def __iter__(self):
         return self

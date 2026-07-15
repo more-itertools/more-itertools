@@ -47,8 +47,8 @@ __all__ = [
     'consume',
     'convolve',
     'dotproduct',
-    'first_true',
     'factor',
+    'first_true',
     'flatten',
     'grouper',
     'is_prime',
@@ -60,23 +60,23 @@ __all__ = [
     'ncycles',
     'nth',
     'nth_combination',
-    'padnone',
     'pad_none',
+    'padnone',
     'pairwise',
     'partition',
+    'polynomial_derivative',
     'polynomial_eval',
     'polynomial_from_roots',
-    'polynomial_derivative',
     'powerset',
     'prepend',
     'quantify',
-    'reshape',
-    'random_combination_with_replacement',
     'random_combination',
+    'random_combination_with_replacement',
     'random_derangement',
     'random_permutation',
     'random_product',
     'repeatfunc',
+    'reshape',
     'roundrobin',
     'running_max',
     'running_mean',
@@ -342,10 +342,8 @@ def pairwise(iterable):
     """
     Wrapper for :func:`itertools.pairwise`.
 
-    .. warning::
-
-       This function is deprecated as of version 11.0.0. It will be removed in a future
-       major release.
+    .. deprecated:: 11.0.0
+       Will be removed in a future major release.
     """
     return itertools_pairwise(iterable)
 
@@ -1473,14 +1471,18 @@ def running_mean(iterable, *, maxlen=None):
 
 
 def _windowed_running_min(iterator, maxlen):
-    sis = deque()  # Strictly increasing subsequence
+    # Monotonically increasing subsequence of potential minimums,
+    # ordered by arrival time, with the window minimum at s[0]
+    # and the newest value at s[-1].
+    s = deque()
+
     for index, value in enumerate(iterator):
-        if sis and sis[0][0] == index - maxlen:
-            sis.popleft()
-        while sis and not sis[-1][1] < value:  # Remove non-increasing values
-            sis.pop()
-        sis.append((index, value))  # Most recent value at position -1
-        yield sis[0][1]  # Window minimum at position 0
+        if s and s[0][0] == index - maxlen:
+            s.popleft()
+        while s and value < s[-1][1]:
+            s.pop()
+        s.append((index, value))
+        yield s[0][1]
 
 
 def running_min(iterable, *, maxlen=None):
@@ -1514,14 +1516,18 @@ def running_min(iterable, *, maxlen=None):
 
 
 def _windowed_running_max(iterator, maxlen):
-    sds = deque()  # Strictly decreasing subsequence
+    # Monotonically decreasing subsequence of potential maximums,
+    # ordered by arrival time, with the window maximum at s[0]
+    # and the newest value at s[-1].
+    s = deque()
+
     for index, value in enumerate(iterator):
-        if sds and sds[0][0] == index - maxlen:
-            sds.popleft()
-        while sds and not sds[-1][1] > value:  # Remove non-decreasing values
-            sds.pop()
-        sds.append((index, value))  # Most recent value at position -1
-        yield sds[0][1]  # Window maximum at position 0
+        if s and s[0][0] == index - maxlen:
+            s.popleft()
+        while s and value > s[-1][1]:
+            s.pop()
+        s.append((index, value))
+        yield s[0][1]
 
 
 def running_max(iterable, *, maxlen=None):
