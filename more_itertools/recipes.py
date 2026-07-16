@@ -883,10 +883,10 @@ def iter_index(iterable, value, start=0, stop=None):
     []
     >>> list(iter_index([[0, 1], [2, 3], [0, 1], [2, 3]], [0, 1]))
     [0, 2]
-    
+
     For ``range`` objects (and other objects whose ``index`` method's behavior doesn't
     match that of ``list``), wrap *iterable* with ``iter``:
-    
+
     >>> list(iter_index(iter(range(5)), 2))
     [2]
 
