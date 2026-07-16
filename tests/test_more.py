@@ -2911,12 +2911,32 @@ class NumericRangeTests(TestCase):
                 mi.numeric_range(*expected_args), mi.numeric_range(*args)[sl]
             )
 
+    def test_eq_single_element_ignores_step(self):
+        # Mirrors range(): a range holding one value is equal to any other
+        # range holding that value, whatever the step. The empty case is
+        # already special-cased above.
+        self.assertEqual(range(2, 3, 1), range(2, 3, 5))
+        self.assertEqual(
+            mi.numeric_range(2, 3, 1), mi.numeric_range(2, 3, 5)
+        )
+        self.assertEqual(
+            hash(mi.numeric_range(2, 3, 1)), hash(mi.numeric_range(2, 3, 5))
+        )
+        self.assertEqual(
+            mi.numeric_range(
+                Fraction(1, 2), Fraction(3, 4), Fraction(1, 3)
+            ),
+            mi.numeric_range(
+                Fraction(1, 2), Fraction(3, 4), Fraction(5, 1)
+            ),
+        )
     def test_hash(self):
         for args, expected in [
             ((1.0, 6.0, 1.5), hash((1.0, 5.5, 1.5))),
             ((1.0, 7.0, 1.5), hash((1.0, 5.5, 1.5))),
             ((1.0, 7.5, 1.5), hash((1.0, 7.0, 1.5))),
-            ((1.0, 1.5, 1.5), hash((1.0, 1.0, 1.5))),
+            # A one-value range hashes without its step, matching __eq__
+            ((1.0, 1.5, 1.5), hash((1.0, 1.0, None))),
             ((1.5, 1.0, 1.5), hash(range(0, 0))),
             ((1.5, 1.5, 1.5), hash(range(0, 0))),
             (

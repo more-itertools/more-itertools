@@ -2343,6 +2343,9 @@ class numeric_range(Sequence):
             empty_other = not bool(other)
             if empty_self or empty_other:
                 return empty_self and empty_other  # True if both empty
+            elif len(self) == 1 or len(other) == 1:
+                # Step doesn't shape a one-value range, so range() ignores it
+                return self._start == other._start and len(self) == len(other)
             else:
                 return (
                     self._start == other._start
@@ -2369,10 +2372,13 @@ class numeric_range(Sequence):
             )
 
     def __hash__(self):
-        if self:
-            return hash((self._start, self._get_by_index(-1), self._step))
-        else:
+        if not self:
             return self._EMPTY_HASH
+        elif len(self) == 1:
+            # __eq__ ignores step here, so it must not reach the hash either
+            return hash((self._start, self._start, None))
+        else:
+            return hash((self._start, self._get_by_index(-1), self._step))
 
     def __iter__(self):
         values = (self._start + (n * self._step) for n in count())
