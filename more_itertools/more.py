@@ -2339,8 +2339,8 @@ class numeric_range(Sequence):
 
     def __eq__(self, other):
         if isinstance(other, numeric_range):
-            empty_self = not bool(self)
-            empty_other = not bool(other)
+            empty_self = not self
+            empty_other = not other
             if empty_self or empty_other:
                 return empty_self and empty_other  # True if both empty
             else:
