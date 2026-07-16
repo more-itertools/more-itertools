@@ -1056,22 +1056,33 @@ class IterIndexTests(TestCase):
                     self.assertEqual(actual, expected)
 
     def test_range(self):
-        # range has an index() method that accepts only the value (no
-        # start/stop), so it must not be routed through the sequence fast
-        # path. Results should match the equivalent general iterable.
+        # range.index() takes only the value, so range cannot drive the
+        # sequence fast path. Results must match the equivalent tuple.
         cases = [
-            (range(10), 5, {}, [5]),
-            (range(0, 20, 2), 4, {}, [2]),
-            (range(10), 3, dict(start=1, stop=8), [3]),
-            (range(10), 100, {}, []),
-            (range(10), 5, dict(start=-6), [5]),
-            (range(20), 5, dict(stop=-2), [5]),
+            (range(10), 5, {}),
+            (range(0, 20, 2), 4, {}),
+            (range(10, 0, -1), 7, {}),
+            (range(10), 3, dict(start=1, stop=8)),
+            (range(10), 3, dict(start=4)),
+            (range(10), 3, dict(stop=3)),
+            (range(10), 100, {}),
+            (range(10), 5, dict(start=-6)),
+            (range(20), 5, dict(stop=-2)),
+            (range(10), 5.0, {}),
+            (range(10), True, {}),
+            (range(0), 0, {}),
         ]
-        for iterable, value, kwargs, expected in cases:
+        for iterable, value, kwargs in cases:
             with self.subTest(iterable=iterable, value=value, kwargs=kwargs):
+                expected = list(mi.iter_index(tuple(iterable), value, **kwargs))
                 self.assertEqual(
                     list(mi.iter_index(iterable, value, **kwargs)), expected
                 )
+
+    def test_range_does_not_scan(self):
+        # A range locates a value arithmetically and never repeats one, so a
+        # huge range must not be walked element by element.
+        self.assertEqual(list(mi.iter_index(range(10**9), 999_999_999)), [999999999])
 
 
 class SieveTests(TestCase):
