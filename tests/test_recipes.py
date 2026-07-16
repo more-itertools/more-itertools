@@ -1055,6 +1055,24 @@ class IterIndexTests(TestCase):
                     )
                     self.assertEqual(actual, expected)
 
+    def test_range(self):
+        # range has an index() method that accepts only the value (no
+        # start/stop), so it must not be routed through the sequence fast
+        # path. Results should match the equivalent general iterable.
+        cases = [
+            (range(10), 5, {}, [5]),
+            (range(0, 20, 2), 4, {}, [2]),
+            (range(10), 3, dict(start=1, stop=8), [3]),
+            (range(10), 100, {}, []),
+            (range(10), 5, dict(start=-6), [5]),
+            (range(20), 5, dict(stop=-2), [5]),
+        ]
+        for iterable, value, kwargs, expected in cases:
+            with self.subTest(iterable=iterable, value=value, kwargs=kwargs):
+                self.assertEqual(
+                    list(mi.iter_index(iterable, value, **kwargs)), expected
+                )
+
 
 class SieveTests(TestCase):
     def test_basic(self):

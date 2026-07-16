@@ -10,6 +10,7 @@ Unreleased
 
 * Changes to existing functions:
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
+    * :func:`iter_index` no longer raises ``TypeError`` on :class:`range` inputs (thanks to chuenchen309)
 
 11.1.0
 ------
