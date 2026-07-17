@@ -2338,19 +2338,29 @@ class numeric_range(Sequence):
         return False
 
     def __eq__(self, other):
-        if isinstance(other, numeric_range):
-            empty_self = not bool(self)
-            empty_other = not bool(other)
-            if empty_self or empty_other:
-                return empty_self and empty_other  # True if both empty
-            else:
-                return (
-                    self._start == other._start
-                    and self._step == other._step
-                    and self._get_by_index(-1) == other._get_by_index(-1)
-                )
-        else:
+        # numeric_range object equality is intended to mirror the built-in range
+        # object's equality.
+        # https://github.com/python/cpython/blob/f5c4880151b609e0a0a0b05c292d36b18038c061/Objects/rangeobject.c#L499
+        if not isinstance(other, numeric_range):
             return False
+
+        if self is other:
+            return True
+
+        len_self = len(self)
+        if len_self != len(other):
+            return False
+
+        if not len_self:
+            return True
+
+        if self._start != other._start:
+            return False
+
+        if len_self == 1:
+            return True
+
+        return self._step == other._step
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -2369,10 +2379,15 @@ class numeric_range(Sequence):
             )
 
     def __hash__(self):
-        if self:
-            return hash((self._start, self._get_by_index(-1), self._step))
-        else:
-            return self._EMPTY_HASH
+        # numeric_range hashing is intended to mirror the built-in range object's
+        # hashing.
+        # https://github.com/python/cpython/blob/f5c4880151b609e0a0a0b05c292d36b18038c061/Objects/rangeobject.c#L570
+        len_self = len(self)
+        if not len_self:
+            return hash((len_self, None, None))
+        if len_self == 1:
+            return hash((len_self, self._start, None))
+        return hash((len_self, self._start, self._step))
 
     def __iter__(self):
         values = (self._start + (n * self._step) for n in count())
