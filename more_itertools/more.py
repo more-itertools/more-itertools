@@ -2343,6 +2343,10 @@ class numeric_range(Sequence):
             empty_other = not bool(other)
             if empty_self or empty_other:
                 return empty_self and empty_other  # True if both empty
+            elif len(self) == 1 and len(other) == 1:
+                return (
+                    self._start == other._start
+                )
             else:
                 return (
                     self._start == other._start
