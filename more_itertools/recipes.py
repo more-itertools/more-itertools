@@ -889,21 +889,11 @@ def iter_index(iterable, value, start=0, stop=None):
     associated with particular values.
 
     """
-    if isinstance(iterable, range):
-        # range.index() takes only the value -- no start/stop -- so it cannot
-        # drive the fast path below. It does locate the value arithmetically,
-        # and a range never repeats one, so at most one index can match and
-        # finding it needs no scan.
-        try:
-            i = iterable.index(value)
-        except ValueError:
-            return
-        lo, hi, _ = slice(start, stop).indices(len(iterable))
-        if lo <= i < hi:
-            yield i
-        return
-
     seq_index = getattr(iterable, 'index', None)
+    if isinstance(iterable, range):
+        # The fast path resumes past each hit with index(value, i, stop), but
+        # range.index() takes only the value and reports just the first match.
+        seq_index = None
     if seq_index is None and (start < 0 or (stop is not None and stop < 0)):
         # islice() rejects negative indices, but the fast path (below) accepts
         # them with the usual from-the-end semantics. Materialize so that both

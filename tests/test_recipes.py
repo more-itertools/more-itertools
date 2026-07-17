@@ -1058,6 +1058,12 @@ class IterIndexTests(TestCase):
     def test_range(self):
         # range.index() takes only the value, so range cannot drive the
         # sequence fast path. Results must match the equivalent tuple.
+        class MultiMatch:
+            # Equality is defined by the value, not by the container, so a
+            # single value may match many elements of a range.
+            def __eq__(self, other):
+                return not other % 2
+
         cases = [
             (range(10), 5, {}),
             (range(0, 20, 2), 4, {}),
@@ -1071,18 +1077,33 @@ class IterIndexTests(TestCase):
             (range(10), 5.0, {}),
             (range(10), True, {}),
             (range(0), 0, {}),
+            (range(10), MultiMatch(), {}),
+            (range(10), MultiMatch(), dict(start=3, stop=8)),
+            (range(10), MultiMatch(), dict(start=-6)),
+            (range(0, 20, 2), MultiMatch(), {}),
         ]
         for iterable, value, kwargs in cases:
             with self.subTest(iterable=iterable, value=value, kwargs=kwargs):
-                expected = list(mi.iter_index(tuple(iterable), value, **kwargs))
+                expected = list(
+                    mi.iter_index(tuple(iterable), value, **kwargs)
+                )
                 self.assertEqual(
                     list(mi.iter_index(iterable, value, **kwargs)), expected
                 )
 
-    def test_range_does_not_scan(self):
-        # A range locates a value arithmetically and never repeats one, so a
-        # huge range must not be walked element by element.
-        self.assertEqual(list(mi.iter_index(range(10**9), 999_999_999)), [999999999])
+    def test_range_value_matching_multiple_elements(self):
+        # range.index() reports only the first match and takes no start, so
+        # it cannot be resumed past a hit the way list.index(value, i, stop)
+        # is in the fast path. A range's elements are distinct under int
+        # equality, but that does not bound how many of them compare equal
+        # to an arbitrary *value*.
+        class Even:
+            def __eq__(self, other):
+                return not other % 2
+
+        self.assertEqual(
+            list(mi.iter_index(range(10), Even())), [0, 2, 4, 6, 8]
+        )
 
 
 class SieveTests(TestCase):
