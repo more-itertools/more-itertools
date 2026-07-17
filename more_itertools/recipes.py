@@ -868,7 +868,6 @@ def iter_index(iterable, value, start=0, stop=None):
     """Yield the index of each place in *iterable* that *value* occurs,
     beginning with index *start* and ending before index *stop*.
 
-
     >>> list(iter_index('AABCADEAF', 'A'))
     [0, 1, 4, 7]
     >>> list(iter_index('AABCADEAF', 'A', 1))  # start index is inclusive
@@ -876,7 +875,7 @@ def iter_index(iterable, value, start=0, stop=None):
     >>> list(iter_index('AABCADEAF', 'A', 1, 7))  # stop index is not inclusive
     [1, 4]
 
-    The behavior for non-scalar *values* matches the built-in Python types.
+    The behavior for non-scalar *value* arguments matches the built-in Python types.
 
     >>> list(iter_index('ABCDABCD', 'AB'))
     [0, 4]
@@ -884,6 +883,12 @@ def iter_index(iterable, value, start=0, stop=None):
     []
     >>> list(iter_index([[0, 1], [2, 3], [0, 1], [2, 3]], [0, 1]))
     [0, 2]
+
+    For ``range`` objects (and other objects whose ``index`` method's behavior doesn't
+    match that of ``list``), wrap *iterable* with ``iter``:
+
+    >>> list(iter_index(iter(range(5)), 2))
+    [2]
 
     See :func:`locate` for a more general means of finding the indexes
     associated with particular values.
