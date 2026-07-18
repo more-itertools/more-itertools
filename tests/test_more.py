@@ -4525,6 +4525,13 @@ class SampleTests(TestCase):
         with self.assertRaises(ValueError):
             mi.sample(data, 6, strict=True)
 
+    def test_weighted_empty_weights_returns_empty(self):
+        """Empty weights yield an empty reservoir; return [] not IndexError."""
+        self.assertEqual(mi.sample([1, 2, 3], k=2, weights=[]), [])
+        self.assertEqual(mi.sample([], k=2, weights=[]), [])
+        with self.assertRaises(ValueError):
+            mi.sample([1, 2, 3], k=2, weights=[], strict=True)
+
     def test_counts(self):
         # Test with counts
         seed(0)

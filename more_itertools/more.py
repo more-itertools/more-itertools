@@ -3851,6 +3851,9 @@ def _sample_weighted(iterator, k, weights, strict):
     reservoir = take(k, zip(weight_keys, iterator))
     if strict and len(reservoir) < k:
         raise ValueError('Sample larger than population')
+    if not reservoir:
+        # No elements (empty weights or empty iterable); match unweighted.
+        return []
 
     heapify(reservoir)
 
