@@ -3843,8 +3843,14 @@ def _sample_weighted(iterator, k, weights, strict):
     # Implementation of "A-ExpJ" from the 2006 paper by Efraimidis et al. :
     # "Weighted random sampling with a reservoir".
 
-    # Log-transform for numerical stability for weights that are small/large
-    weight_keys = (log(random()) / weight for weight in weights)
+    # Log-transform for numerical stability for weights that are small/large.
+    # Non-positive weights are invalid for A-ExpJ (division by weight).
+    def weight_key(weight):
+        if weight <= 0:
+            raise ValueError('weights must be positive')
+        return log(random()) / weight
+
+    weight_keys = (weight_key(weight) for weight in weights)
 
     # Fill up the reservoir (collection of samples) with the first `k`
     # weight-keys and elements, then heapify the list.
@@ -3860,6 +3866,8 @@ def _sample_weighted(iterator, k, weights, strict):
     weights_to_skip = log(random()) / smallest_weight_key
 
     for weight, element in zip(weights, iterator):
+        if weight <= 0:
+            raise ValueError('weights must be positive')
         if weight >= weights_to_skip:
             # The notation here is consistent with the paper, but we store
             # the weight-keys in log-space for better numerical stability.

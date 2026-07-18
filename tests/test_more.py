@@ -4525,6 +4525,15 @@ class SampleTests(TestCase):
         with self.assertRaises(ValueError):
             mi.sample(data, 6, strict=True)
 
+    def test_weighted_nonpositive_raises(self):
+        """Zero or negative weights are invalid for A-ExpJ."""
+        with self.assertRaises(ValueError):
+            mi.sample([1, 2, 3], k=2, weights=[0, 1, 1])
+        with self.assertRaises(ValueError):
+            mi.sample([1, 2, 3], k=2, weights=[1, -1, 1])
+        with self.assertRaises(ValueError):
+            mi.sample([1, 2, 3], k=2, weights=[0, 0, 0])
+
     def test_counts(self):
         # Test with counts
         seed(0)
