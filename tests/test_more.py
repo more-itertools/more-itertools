@@ -70,6 +70,15 @@ class ChunkedTests(TestCase):
             list(mi.chunked('ABCDE', None)), [['A', 'B', 'C', 'D', 'E']]
         )
 
+    def test_negative(self):
+        """Test that a negative ``n`` raises a clear ``ValueError``, matching
+        the behavior of :func:`sliced`."""
+        self.assertRaisesRegex(
+            ValueError,
+            "n must be at least 0",
+            lambda: list(mi.chunked('ABCDE', -1)),
+        )
+
     def test_strict_false(self):
         """Test when ``n`` does not divide evenly into the length of the
         iterable and strict is false.
