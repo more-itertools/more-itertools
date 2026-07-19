@@ -4224,6 +4224,79 @@ def all_unique(iterable, key=None):
     return True
 
 
+class fenwick:
+    '''tricks to bear in mind:
+    remove last 1 bit: ``i&i-1``.  iterations until is 0: ``i.bit_count()``
+    add last 1 bit: ``(i-1|i)+1``. iterations until is next power of 2: ``(i-1).bit_length()-(i-1).bit_count()``
+    '''
+
+    def __init__(f, l, raw=False):
+        if type(l) == int:
+            f.tree = [i + 1 & ~i for i in range(l)]
+        else:
+            f.tree = l
+            if not raw:
+                for i in range(len(l)):
+                    j = i | i + 1
+                    if j < len(l):
+                        f.tree[j] += f.tree[i]
+
+    def flatten(f):
+        flat = f.tree[:]
+        for i in range(len(f) - 1, -1, -1):
+            j = i | i + 1
+            if j < len(f):
+                flat[j] -= flat[i]
+        return flat
+
+    __repr__ = lambda f: str(f.flatten())
+
+    def sum(f, i=None):  # upper-exclusive
+        if i == None:
+            i = len(f)
+        out = 0
+        j = i
+        for _ in range(i.bit_count()):
+            out += f.tree[j - 1]
+            j &= j - 1
+        return out
+
+    __len__ = lambda f: len(f.tree)
+
+    def __getitem__(f, i):
+        out = f.tree[i]
+        j = i
+        while j != i & i + 1:
+            out -= f.tree[j - 1]
+            j &= j - 1
+        return out
+
+    def __setitem__(f, i, p):
+        p -= f[i]
+        n = len(f)
+        while i < n:
+            f.tree[i] += p
+            i |= i + 1
+
+    def index(f, val):
+        '''returns the index of val within the list of partial sums; ie. if f is a
+        list of weights, val=randrange(f.sum()) lets you select from them uniformly.
+        bisecting using the sum operator would be ``O(log(n)**2)`` time;
+        by mutating the sum inline we can do it in ``O(log(n))``!
+        chooses furthest-right element if 0s cause indices to tie in partial sum.
+        '''
+        i = 0
+        if len(f) == 1:
+            return int(val >= f[0])
+        j = 1 << (len(f) - 1).bit_length() - 1
+        while j:
+            if i | j <= len(f) and val >= (t := f.tree[(i | j) - 1]):
+                val -= t
+                i |= j
+            j >>= 1
+        return i
+
+
 def nth_product(index, *iterables, repeat=1):
     """Equivalent to ``list(product(*iterables, repeat=repeat))[index]``.
 
@@ -4287,39 +4360,39 @@ def nth_permutation(iterable, r, index):
     if n == 0:
         return ()
 
-    split = [index]
-    for depth in range(1, l := r.bit_length() + 1):
-        prev, split = split, [0] * ((r - 1 >> l + ~depth) + 1)
-        for i, s in enumerate(prev):
-            d, split[2 * i] = divmod(
-                s, perm(n - r + (2 * i + 1 << l + ~depth), 1 << l + ~depth)
-            )
-            if d:
-                split[2 * i + 1] = d
+    l = r.bit_length()
 
-    if n < 10**5:  # determined experimentally
+    def rec(index, a, n):
+        if index.bit_length() < 128:
+            index = (index, 0)
+            return [
+                (index := divmod(index[0], u))[1]
+                for u in range(a + 1, a + n + 1)
+            ]
+        h = n + 1 >> 1
+        x = a + h
+        k = max(
+            1, min(n - 1, h - int(h**2 / (2 * x * log(x))))
+        )  # from using Stirling's approximation & Newton-iterating about midpoint
+        quo, rem = divmod(index, perm(a + k, k))
+        return rec(rem, a, k) + rec(quo, a + k, n - k)
+
+    split = rec(index, n - r, r)
+
+    if n < 1 << 16:  # determined experimentally
         return tuple(map(pool.pop, split[::-1]))
     else:
-        tree = [i + 1 & ~i for i in range(n)]
-        for i in range(r - 1, -1, -1):
-            t = 0
-            u = 1 << (n - 1).bit_length() - 1
-            while u:
-                if t | u <= n and split[i] >= (c := tree[(t | u) - 1]):
-                    split[i] -= c
-                    t |= u
-                u >>= 1
-            out = tree[t]
-            u = t
-            while u != t & t + 1:
-                out -= tree[u - 1]
-                u &= u - 1
-            u = t
-            while u < n:
-                tree[u] -= out
-                u |= u + 1
-            split[i] = t
-        return tuple(map(pool.__getitem__, split[::-1]))
+        binsize = min(l, 10)
+        pools = [list(b) for b in batched(pool, 1 << binsize)]
+        tree = fenwick(
+            [(i + 1 & ~i) << binsize for i in range((n - 1 >> binsize) + 1)],
+            raw=True,
+        )
+        for i in range(r):
+            poolind = tree.index(split[~i])
+            split[~i] = pools[poolind].pop(split[~i] - tree.sum(poolind))
+            tree[poolind] -= 1
+        return tuple(split[::-1])
 
 
 def nth_combination_with_replacement(iterable, r, index):
