@@ -1,9 +1,8 @@
-__lazy_modules__ = frozenset({'queue'})
+__lazy_modules__ = frozenset({'queue', 'threading'})
 
 import math
 import types
 
-from _thread import allocate_lock
 from collections import Counter, defaultdict, deque
 from collections.abc import Sequence
 from contextlib import suppress
@@ -42,6 +41,7 @@ from operator import (
 )
 from sys import maxsize
 from time import monotonic
+from threading import Lock
 
 from .recipes import (
     _marker,
@@ -72,6 +72,7 @@ __all__ = [
     'chunked',
     'chunked_even',
     'circular_shifts',
+    'classify_unique',
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
@@ -91,7 +92,6 @@ __all__ = [
     'doublestarmap',
     'duplicates_everseen',
     'duplicates_justseen',
-    'classify_unique',
     'exactly_n',
     'extract',
     'filter_except',
@@ -100,8 +100,8 @@ __all__ = [
     'gray_product',
     'groupby_transform',
     'ichunked',
-    'iequals',
     'idft',
+    'iequals',
     'ilen',
     'interleave',
     'interleave_evenly',
@@ -110,8 +110,8 @@ __all__ = [
     'intersperse',
     'is_sorted',
     'islice_extended',
-    'iterate',
     'iter_suppress',
+    'iterate',
     'join_mappings',
     'last',
     'locate',
@@ -123,11 +123,11 @@ __all__ = [
     'map_reduce',
     'mark_ends',
     'minmax',
+    'nth_combination_with_replacement',
     'nth_or_last',
     'nth_permutation',
     'nth_prime',
     'nth_product',
-    'nth_combination_with_replacement',
     'numeric_range',
     'one',
     'only',
@@ -161,8 +161,8 @@ __all__ = [
     'split_when',
     'spy',
     'stagger',
-    'strip',
     'strictly_n',
+    'strip',
     'subfactorial',
     'substrings',
     'substrings_indexes',
@@ -1489,9 +1489,9 @@ def side_effect(func, iterable, chunk_size=None, before=None, after=None):
         >>> from more_itertools import consume
         >>> f = StringIO()
         >>> func = lambda x: print(x, file=f)
-        >>> before = lambda: print(u'HEADER', file=f)
+        >>> before = lambda: print('HEADER', file=f)
         >>> after = f.close
-        >>> it = [u'a', u'b', u'c']
+        >>> it = ['a', 'b', 'c']
         >>> consume(side_effect(func, it, before=before, after=after))
         >>> f.closed
         True
@@ -1534,6 +1534,9 @@ def sliced(seq, n, strict=False):
     For non-sliceable iterables, see :func:`chunked`.
 
     """
+    if n < 0:
+        raise ValueError('n must be at least 0')
+
     iterator = takewhile(len, (seq[i : i + n] for i in count(0, n)))
     if strict:
 
@@ -2335,19 +2338,29 @@ class numeric_range(Sequence):
         return False
 
     def __eq__(self, other):
-        if isinstance(other, numeric_range):
-            empty_self = not bool(self)
-            empty_other = not bool(other)
-            if empty_self or empty_other:
-                return empty_self and empty_other  # True if both empty
-            else:
-                return (
-                    self._start == other._start
-                    and self._step == other._step
-                    and self._get_by_index(-1) == other._get_by_index(-1)
-                )
-        else:
+        # numeric_range object equality is intended to mirror the built-in range
+        # object's equality.
+        # https://github.com/python/cpython/blob/f5c4880151b609e0a0a0b05c292d36b18038c061/Objects/rangeobject.c#L499
+        if not isinstance(other, numeric_range):
             return False
+
+        if self is other:
+            return True
+
+        len_self = len(self)
+        if len_self != len(other):
+            return False
+
+        if not len_self:
+            return True
+
+        if self._start != other._start:
+            return False
+
+        if len_self == 1:
+            return True
+
+        return self._step == other._step
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -2366,10 +2379,15 @@ class numeric_range(Sequence):
             )
 
     def __hash__(self):
-        if self:
-            return hash((self._start, self._get_by_index(-1), self._step))
-        else:
-            return self._EMPTY_HASH
+        # numeric_range hashing is intended to mirror the built-in range object's
+        # hashing.
+        # https://github.com/python/cpython/blob/f5c4880151b609e0a0a0b05c292d36b18038c061/Objects/rangeobject.c#L570
+        len_self = len(self)
+        if not len_self:
+            return hash((len_self, None, None))
+        if len_self == 1:
+            return hash((len_self, self._start, None))
+        return hash((len_self, self._start, self._step))
 
     def __iter__(self):
         values = (self._start + (n * self._step) for n in count())
@@ -4017,10 +4035,8 @@ class AbortThread(BaseException):
 class callback_iter:
     """Convert a function that uses callbacks to an iterator.
 
-    .. warning::
-
-       This function is deprecated as of version 11.0.0. It will be removed in a future
-       major release.
+    .. deprecated:: 11.0.0
+       Will be removed in a future major release.
 
     Let *func* be a function that takes a `callback` keyword argument.
     For example:
@@ -5500,7 +5516,7 @@ class serialize:
 
     def __init__(self, iterable):
         self._iterator = iter(iterable)
-        self._lock = allocate_lock()
+        self._lock = Lock()
 
     def __iter__(self):
         return self
@@ -5597,7 +5613,7 @@ class _concurrent_tee:
         else:
             self.iterator = iter(iterable)
             self.link = [None, None]
-            self.lock = allocate_lock()
+            self.lock = Lock()
 
     def __iter__(self):
         return self

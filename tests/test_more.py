@@ -1407,6 +1407,15 @@ class SlicedTests(TestCase):
         with self.assertRaises(ValueError):
             list(mi.sliced(seq, 4, strict=True))
 
+    def test_negative(self):
+        """Negative slice sizes should raise instead of silently
+        yielding a wrong result."""
+        seq = 'ABCDEFG'
+        self.assertRaises(ValueError, lambda: list(mi.sliced(seq, -1)))
+        self.assertRaises(
+            ValueError, lambda: list(mi.sliced(seq, -1, strict=True))
+        )
+
     def test_numpy_like_array(self):
         # Numpy arrays don't behave like Python lists - calling bool()
         # on them doesn't return False for empty lists and True for non-empty
@@ -2740,6 +2749,14 @@ class NumericRangeTests(TestCase):
                 self.assertTrue(v not in r)
 
     def test_eq(self):
+        # numeric_range objects are equal to themselves
+        range_1 = mi.numeric_range(2, 4, 1)
+        self.assertTrue(range_1, range_1)
+
+        # numeric_range objects are not equal other types of objects
+        self.assertNotEqual(mi.numeric_range(7.0), 1)
+        self.assertNotEqual(mi.numeric_range(7.0), "abc")
+
         for args1, args2 in [
             ((0, 5, 2), (0, 6, 2)),
             ((1.0, 9.9, 1.5), (1.0, 8.6, 1.5)),
@@ -2765,10 +2782,12 @@ class NumericRangeTests(TestCase):
                     timedelta(hours=10),
                 ),
             ),
+            ((2, 3, 1), (2, 3, 5)),
         ]:
-            self.assertEqual(
-                mi.numeric_range(*args1), mi.numeric_range(*args2)
-            )
+            range1 = mi.numeric_range(*args1)
+            range2 = mi.numeric_range(*args2)
+            self.assertEqual(range1, range2)
+            self.assertEqual(hash(range1), hash(range2))
 
         for args1, args2 in [
             ((0, 5, 2), (0, 7, 2)),
@@ -2800,12 +2819,10 @@ class NumericRangeTests(TestCase):
                 ),
             ),
         ]:
-            self.assertNotEqual(
-                mi.numeric_range(*args1), mi.numeric_range(*args2)
-            )
-
-        self.assertNotEqual(mi.numeric_range(7.0), 1)
-        self.assertNotEqual(mi.numeric_range(7.0), "abc")
+            range1 = mi.numeric_range(*args1)
+            range2 = mi.numeric_range(*args2)
+            self.assertNotEqual(range1, range2)
+            self.assertNotEqual(hash(range1), hash(range2))
 
     def test_get_item_by_index(self):
         for args, index, expected in [
@@ -2901,39 +2918,6 @@ class NumericRangeTests(TestCase):
             self.assertEqual(
                 mi.numeric_range(*expected_args), mi.numeric_range(*args)[sl]
             )
-
-    def test_hash(self):
-        for args, expected in [
-            ((1.0, 6.0, 1.5), hash((1.0, 5.5, 1.5))),
-            ((1.0, 7.0, 1.5), hash((1.0, 5.5, 1.5))),
-            ((1.0, 7.5, 1.5), hash((1.0, 7.0, 1.5))),
-            ((1.0, 1.5, 1.5), hash((1.0, 1.0, 1.5))),
-            ((1.5, 1.0, 1.5), hash(range(0, 0))),
-            ((1.5, 1.5, 1.5), hash(range(0, 0))),
-            (
-                (Decimal("1.0"), Decimal("9.0"), Decimal("1.5")),
-                hash((Decimal("1.0"), Decimal("8.5"), Decimal("1.5"))),
-            ),
-            (
-                (Fraction(1, 1), Fraction(5, 1), Fraction(3, 2)),
-                hash((Fraction(1, 1), Fraction(4, 1), Fraction(3, 2))),
-            ),
-            (
-                (
-                    datetime(2019, 3, 29),
-                    datetime(2019, 3, 30),
-                    timedelta(hours=10),
-                ),
-                hash(
-                    (
-                        datetime(2019, 3, 29),
-                        datetime(2019, 3, 29, 20),
-                        timedelta(hours=10),
-                    )
-                ),
-            ),
-        ]:
-            self.assertEqual(expected, hash(mi.numeric_range(*args)))
 
     def test_iter_twice(self):
         r1 = mi.numeric_range(1.0, 9.9, 1.5)
@@ -6814,6 +6798,14 @@ class TestRunningMin(TestCase):
             list(mi.running_min(iter(data))),
         )
 
+    def test_stability(self):
+        # min(x, y) returns x when x == y
+        data = [0, 0.0, Fraction(0)]
+        self.assertEqual(
+            list(map(type, mi.running_min(data, maxlen=2))),
+            [type(min(data[0:1])), type(min(data[0:2])), type(min(data[1:3]))],
+        )
+
 
 class TestRunningMax(TestCase):
     def test_basic(self):
@@ -6858,6 +6850,14 @@ class TestRunningMax(TestCase):
         self.assertEqual(
             list(mi.running_max(iter(data), maxlen=len(data) * 2)),
             list(mi.running_max(iter(data))),
+        )
+
+    def test_stability(self):
+        # max(x, y) returns x when x == y
+        data = [0, 0.0, Fraction(0)]
+        self.assertEqual(
+            list(map(type, mi.running_max(data, maxlen=2))),
+            [type(max(data[0:1])), type(max(data[0:2])), type(max(data[1:3]))],
         )
 
 

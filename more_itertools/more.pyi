@@ -45,6 +45,7 @@ __all__ = [
     'chunked',
     'chunked_even',
     'circular_shifts',
+    'classify_unique',
     'collapse',
     'combination_index',
     'combination_with_replacement_index',
@@ -64,7 +65,6 @@ __all__ = [
     'doublestarmap',
     'duplicates_everseen',
     'duplicates_justseen',
-    'classify_unique',
     'exactly_n',
     'extract',
     'filter_except',
@@ -73,8 +73,8 @@ __all__ = [
     'gray_product',
     'groupby_transform',
     'ichunked',
-    'iequals',
     'idft',
+    'iequals',
     'ilen',
     'interleave',
     'interleave_evenly',
@@ -83,8 +83,8 @@ __all__ = [
     'intersperse',
     'is_sorted',
     'islice_extended',
-    'iterate',
     'iter_suppress',
+    'iterate',
     'join_mappings',
     'last',
     'locate',
@@ -96,11 +96,11 @@ __all__ = [
     'map_reduce',
     'mark_ends',
     'minmax',
+    'nth_combination_with_replacement',
     'nth_or_last',
     'nth_permutation',
     'nth_prime',
     'nth_product',
-    'nth_combination_with_replacement',
     'numeric_range',
     'one',
     'only',
@@ -134,8 +134,8 @@ __all__ = [
     'split_when',
     'spy',
     'stagger',
-    'strip',
     'strictly_n',
+    'strip',
     'subfactorial',
     'substrings',
     'substrings_indexes',
@@ -598,14 +598,29 @@ def consecutive_groups(
 @overload
 def difference(
     iterable: Iterable[_T],
-    func: Callable[[_T, _T], _U] = ...,
+    func: Callable[[_T, _T], _U],
     *,
     initial: None = ...,
 ) -> Iterator[_T | _U]: ...
 @overload
 def difference(
-    iterable: Iterable[_T], func: Callable[[_T, _T], _U] = ..., *, initial: _U
+    iterable: Iterable[_T],
+    *,
+    initial: None = ...,
+) -> Iterator[Any]: ...
+@overload
+def difference(
+    iterable: Iterable[_T],
+    func: Callable[[_T, _T], _U],
+    *,
+    initial: Any,
 ) -> Iterator[_U]: ...
+@overload
+def difference(
+    iterable: Iterable[_T],
+    *,
+    initial: Any,
+) -> Iterator[Any]: ...
 
 class SequenceView(Generic[_T_co], Sequence[_T_co]):
     def __init__(self, target: Sequence[_T_co]) -> None: ...
