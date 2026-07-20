@@ -6345,6 +6345,166 @@ class JoinMappingTests(TestCase):
         self.assertEqual(dict(mi.join_mappings()), {})
 
 
+class MapValuesTests(TestCase):
+    def test_basic(self):
+        self.assertEqual(
+            mi.map_values(str.upper, {'a': 'one', 'b': 'two'}),
+            {'a': 'ONE', 'b': 'TWO'},
+        )
+
+    def test_changes_type(self):
+        self.assertEqual(
+            mi.map_values(len, {'a': [1, 2], 'b': [3, 4, 5]}),
+            {'a': 2, 'b': 3},
+        )
+
+    def test_empty(self):
+        self.assertEqual(mi.map_values(str.upper, {}), {})
+
+    def test_single(self):
+        self.assertEqual(mi.map_values(lambda v: v + 1, {'a': 1}), {'a': 2})
+
+    def test_returns_new_dict(self):
+        original = {'a': 1, 'b': 2}
+        result = mi.map_values(lambda v: v, original)
+        self.assertIsNot(result, original)
+        self.assertEqual(result, original)
+
+    def test_accepts_any_mapping(self):
+        from collections import OrderedDict
+
+        result = mi.map_values(lambda v: v * 2, OrderedDict(a=1, b=2))
+        self.assertEqual(result, {'a': 2, 'b': 4})
+
+    def test_preserves_order(self):
+        result = mi.map_values(lambda v: v, {'c': 1, 'a': 2, 'b': 3})
+        self.assertEqual(list(result), ['c', 'a', 'b'])
+
+    def test_does_not_mutate_input(self):
+        original = {'a': 1}
+        mi.map_values(lambda v: v + 1, original)
+        self.assertEqual(original, {'a': 1})
+
+
+class MapKeysTests(TestCase):
+    def test_basic(self):
+        self.assertEqual(
+            mi.map_keys(str.upper, {'a': 1, 'b': 2}),
+            {'A': 1, 'B': 2},
+        )
+
+    def test_changes_type(self):
+        self.assertEqual(
+            mi.map_keys(lambda k: k * 2, {1: 'a', 2: 'b'}),
+            {2: 'a', 4: 'b'},
+        )
+
+    def test_empty(self):
+        self.assertEqual(mi.map_keys(str.upper, {}), {})
+
+    def test_single(self):
+        self.assertEqual(mi.map_keys(str.upper, {'a': 1}), {'A': 1})
+
+    def test_duplicate_key_raises(self):
+        with self.assertRaises(ValueError):
+            mi.map_keys(abs, {-1: 'a', 1: 'b'})
+
+    def test_returns_new_dict(self):
+        original = {'a': 1, 'b': 2}
+        result = mi.map_keys(lambda k: k, original)
+        self.assertIsNot(result, original)
+        self.assertEqual(result, original)
+
+    def test_duplicate_key_message(self):
+        with self.assertRaises(ValueError) as ctx:
+            mi.map_keys(lambda k: 'x', {'a': 1, 'b': 2})
+        self.assertIn('duplicate key', str(ctx.exception))
+
+    def test_preserves_order(self):
+        result = mi.map_keys(str.upper, {'c': 1, 'a': 2, 'b': 3})
+        self.assertEqual(list(result), ['C', 'A', 'B'])
+
+
+class FilterValuesTests(TestCase):
+    def test_basic(self):
+        self.assertEqual(
+            mi.filter_values(lambda v: v > 1, {'a': 1, 'b': 2, 'c': 3}),
+            {'b': 2, 'c': 3},
+        )
+
+    def test_default_pred(self):
+        self.assertEqual(
+            mi.filter_values(None, {'a': 0, 'b': 1, 'c': '', 'd': 'x'}),
+            {'b': 1, 'd': 'x'},
+        )
+
+    def test_empty(self):
+        self.assertEqual(mi.filter_values(bool, {}), {})
+
+    def test_all_removed(self):
+        self.assertEqual(
+            mi.filter_values(lambda v: v > 10, {'a': 1, 'b': 2}), {}
+        )
+
+    def test_returns_new_dict(self):
+        original = {'a': 1, 'b': 2}
+        result = mi.filter_values(lambda v: True, original)
+        self.assertIsNot(result, original)
+        self.assertEqual(result, original)
+
+    def test_keep_all(self):
+        self.assertEqual(
+            mi.filter_values(lambda v: True, {'a': 1, 'b': 2}),
+            {'a': 1, 'b': 2},
+        )
+
+    def test_preserves_order(self):
+        result = mi.filter_values(lambda v: True, {'c': 1, 'a': 2})
+        self.assertEqual(list(result), ['c', 'a'])
+
+
+class FilterKeysTests(TestCase):
+    def test_basic(self):
+        self.assertEqual(
+            mi.filter_keys(
+                lambda k: k.startswith('a'),
+                {'a1': 1, 'b': 2, 'a2': 3},
+            ),
+            {'a1': 1, 'a2': 3},
+        )
+
+    def test_default_pred(self):
+        self.assertEqual(
+            mi.filter_keys(None, {0: 'a', 1: 'b', '': 'c', 'x': 'd'}),
+            {1: 'b', 'x': 'd'},
+        )
+
+    def test_empty(self):
+        self.assertEqual(mi.filter_keys(bool, {}), {})
+
+    def test_all_removed(self):
+        self.assertEqual(
+            mi.filter_keys(lambda k: k > 10, {1: 'a', 2: 'b'}), {}
+        )
+
+    def test_returns_new_dict(self):
+        original = {'a': 1, 'b': 2}
+        result = mi.filter_keys(lambda k: True, original)
+        self.assertIsNot(result, original)
+        self.assertEqual(result, original)
+
+    def test_set_membership_pred(self):
+        record = {'id': 7, 'name': 'Bob', 'password': 'secret'}
+        self.assertEqual(
+            mi.filter_keys({'id', 'name'}.__contains__, record),
+            {'id': 7, 'name': 'Bob'},
+        )
+
+    def test_preserves_order(self):
+        result = mi.filter_keys(lambda k: True, {'c': 1, 'a': 2})
+        self.assertEqual(list(result), ['c', 'a'])
+
+
 class DiscreteFourierTransformTests(TestCase):
     def test_basic(self):
         # Example calculation from:

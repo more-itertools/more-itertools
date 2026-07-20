@@ -68,7 +68,9 @@ __all__ = [
     'exactly_n',
     'extract',
     'filter_except',
+    'filter_keys',
     'filter_map',
+    'filter_values',
     'first',
     'gray_product',
     'groupby_transform',
@@ -93,7 +95,9 @@ __all__ = [
     'make_decorator',
     'map_except',
     'map_if',
+    'map_keys',
     'map_reduce',
+    'map_values',
     'mark_ends',
     'minmax',
     'nth_combination_with_replacement',
@@ -980,6 +984,18 @@ def powerset_of_sets(
 def join_mappings(
     **field_to_map: Mapping[_T, _V],
 ) -> dict[_T, dict[str, _V]]: ...
+def map_values(
+    func: Callable[[_V], _W], mapping: Mapping[_T, _V]
+) -> dict[_T, _W]: ...
+def map_keys(
+    func: Callable[[_T], _U], mapping: Mapping[_T, _V]
+) -> dict[_U, _V]: ...
+def filter_values(
+    pred: Callable[[_V], object] | None, mapping: Mapping[_T, _V]
+) -> dict[_T, _V]: ...
+def filter_keys(
+    pred: Callable[[_T], object] | None, mapping: Mapping[_T, _V]
+) -> dict[_T, _V]: ...
 def doublestarmap(
     func: Callable[..., _T],
     iterable: Iterable[Mapping[str, Any]],
