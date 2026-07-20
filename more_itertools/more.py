@@ -25,7 +25,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import comb, e, exp, floor, fsum, log, log1p, perm, tau
 from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
@@ -4277,7 +4277,7 @@ def nth_product(index, *iterables, repeat=1):
 
 
 def nth_permutation(iterable, r, index):
-    """Equivalent to ``list(permutations(iterable, r))[index]```
+    """Equivalent to ``list(permutations(iterable, r))[index]``
 
     The subsequences of *iterable* that are of length *r* where order is
     important can be ordered lexicographically. :func:`nth_permutation`
@@ -4300,17 +4300,25 @@ def nth_permutation(iterable, r, index):
         index += c
     if not 0 <= index < c:
         raise IndexError
+    if n == 0:
+        return ()
 
-    result = [0] * r
-    q = index * factorial(n) // c if r < n else index
-    for d in range(1, n + 1):
-        q, i = divmod(q, d)
-        if 0 <= n - d < r:
-            result[n - d] = i
-        if q == 0:
-            break
+    def rec(index, a, n):
+        if index.bit_length() < 128:
+            index = (index, 0)
+            return [
+                (index := divmod(index[0], u))[1]
+                for u in range(a + 1, a + n + 1)
+            ]
+        h = n + 1 >> 1
+        x = a + h
+        k = max(
+            1, min(n - 1, h - int(h**2 / (2 * x * log(x))))
+        )  # from using Stirling's approximation & Newton-iterating about midpoint
+        quo, rem = divmod(index, perm(a + k, k))
+        return rec(rem, a, k) + rec(quo, a + k, n - k)
 
-    return tuple(map(pool.pop, result))
+    return tuple(map(pool.pop, rec(index, n - r, r)[::-1]))
 
 
 def nth_combination_with_replacement(iterable, r, index):
