@@ -230,6 +230,9 @@ def chunked(iterable, n, strict=False):
     list is yielded.
 
     """
+    if n is not None and n < 0:
+        raise ValueError('n must be at least 0')
+
     iterator = iter(partial(take, n, iter(iterable)), [])
     if strict:
         if n is None:
