@@ -91,6 +91,7 @@ __all__ = [
     'divide',
     'doublestarmap',
     'duplicates_everseen',
+    'duplicates',
     'duplicates_justseen',
     'exactly_n',
     'extract',
@@ -4760,6 +4761,17 @@ def duplicates_everseen(iterable, key=None):
             else:
                 yield element
 
+
+
+def duplicates(iterable, key=None):
+    """Yield elements that appear more than once in *iterable*.
+
+    Alias for :func:`duplicates_everseen` (issue #1204).
+
+    >>> list(duplicates('ABBCcAD'))
+    ['B', 'C', 'A']
+    """
+    yield from duplicates_everseen(iterable, key=key)
 
 def duplicates_justseen(iterable, key=None):
     """Yields serially-duplicate elements after their first appearance.
