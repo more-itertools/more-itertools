@@ -744,9 +744,18 @@ def convolve(signal, kernel):
     # this one was kept because the inlined window logic is faster
     # and it avoids an unnecessary deque-to-tuple conversion.
     kernel = tuple(kernel)[::-1]
+    if not kernel:
+        return
+
+    signal = iter(signal)
+    try:
+        first = next(signal)
+    except StopIteration:
+        return
+
     n = len(kernel)
     window = deque([0], maxlen=n) * n
-    for x in chain(signal, repeat(0, n - 1)):
+    for x in chain((first,), signal, repeat(0, n - 1)):
         window.append(x)
         yield _sumprod(kernel, window)
 

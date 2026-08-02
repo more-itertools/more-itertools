@@ -837,6 +837,14 @@ class Convolvetests(TestCase):
         expected = [0, 1, 1, 1, 1]
         self.assertEqual(actual, expected)
 
+    def test_empty_signal(self):
+        actual = list(mi.convolve([], [1, -1, 2]))
+        self.assertEqual(actual, [])
+
+    def test_empty_kernel(self):
+        actual = list(mi.convolve([1, 2, 3], []))
+        self.assertEqual(actual, [])
+
 
 class BeforeAndAfterTests(TestCase):
     def test_empty(self):
