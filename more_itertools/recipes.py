@@ -718,7 +718,7 @@ def convolve(signal, kernel):
         >>> list(convolve([1, -1, -20], [1, -3]))
         [1, -4, -17, 60]
 
-    Examples of popular kinds of kernels:
+    Examples of useful kernels:
 
     * The kernel ``[0.25, 0.25, 0.25, 0.25]`` computes a moving average.
       For image data, this blurs the image and reduces noise.
@@ -727,11 +727,12 @@ def convolve(signal, kernel):
     * The kernel ``[1, -2, 1]`` estimates the second derivative of a
       function evaluated at evenly spaced inputs.
 
-    Convolutions are mathematically commutative; however, the inputs are
-    evaluated differently.  The signal is consumed lazily and can be
+    Convolutions are mathematically commutative. However, the input iterables are
+    evaluated differently by this function. The signal is consumed lazily and can be
     infinite. The kernel is fully consumed before the calculations begin.
-
-    Supports all numeric types: int, float, complex, Decimal, Fraction.
+    
+    Supports input iterables with all numeric types: int, float, complex, Decimal, 
+    Fraction. Note that empty input iterables will produce meaningless output.
 
     References:
 
