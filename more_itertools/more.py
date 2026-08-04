@@ -4742,6 +4742,11 @@ def duplicates_everseen(iterable, key=None):
     This function is analogous to :func:`unique_everseen` and is subject to
     the same performance considerations.
 
+    If you would like each duplicate to only appear once, much like ``uniq -d``
+    in the Unix shell or ``Itertools::duplicates`` from the Rust ``itertools``
+    crate, pass the return value of this function into :func:`unique_everseen`
+    with the same ``key``.
+
     """
     seen_set = set()
     seen_list = []
