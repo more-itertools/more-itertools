@@ -1,4 +1,4 @@
-flit
+flit==3.12.0
 setuptools
 twine
 wheel
