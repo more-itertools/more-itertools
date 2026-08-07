@@ -20,7 +20,7 @@ format:
 coverage:
 	python -m pip install --upgrade -r requirements/testing.txt
 	coverage run --include="more_itertools/*.py" -m unittest
-	coverage report --show-missing --fail-under=99
+	coverage report --show-missing --fail-under=100
 
 .PHONY: test
 test:

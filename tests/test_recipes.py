@@ -1468,6 +1468,31 @@ class PrimeFunctionTests(TestCase):
         with self.assertRaises(ValueError):
             mi.nth_prime(-1)
 
+    def test_nth_prime_tightened_bound(self):
+        # nth_prime() counts from 0 and asks for bounds on n + 1, so 688_382
+        # is the first argument that gets the tightened upper bound and
+        # 688_381 is the last that doesn't. The exact path sieves up to that
+        # bound, so tightening it too far would leave the sieve short and
+        # nth() would return None. At the threshold the bound clears the
+        # prime it has to reach by 3.
+        self.assertEqual(mi.nth_prime(688_381), 10_384_259)
+        self.assertEqual(mi.nth_prime(688_382), 10_384_261)
+
+    def test_nth_prime_approximate(self):
+        # approximate=True is ignored at or below 1,000,000
+        self.assertEqual(
+            mi.nth_prime(1_000_000, approximate=True),
+            mi.nth_prime(1_000_000),
+        )
+
+        # Above it, the result is some nearby prime rather than the exact one
+        for n in (1_000_001, 2_000_000):
+            with self.subTest(n=n):
+                approximate = mi.nth_prime(n, approximate=True)
+                exact = mi.nth_prime(n)
+                self.assertTrue(mi.is_prime(approximate))
+                self.assertLess(abs(approximate - exact) / exact, 0.01)
+
     def test_special_primes(self):
         for n in (
             # Mersenee primes:

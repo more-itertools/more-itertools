@@ -32,7 +32,7 @@ from pickle import loads, dumps
 from random import Random, choices, random, randrange, seed
 from statistics import mean, median
 from string import ascii_letters
-from threading import Thread, Lock
+from threading import Event, Thread, Lock
 from time import sleep
 from typing import NamedTuple
 from unittest import TestCase, mock
@@ -704,6 +704,20 @@ class MinMaxTests(TestCase):
         self.assertTupleEqual(
             mi.minmax((x for x in [10, 3, 25]), key=str), (10, 3)
         )
+
+    def test_key_matches_builtins(self):
+        # The keyed code path compares items pairwise, so a single example
+        # only reaches some of its branches. Exhausting the short orderings
+        # covers each one. `x % 7` keeps every key distinct, so there are no
+        # ties and `min`/`max` pick the same items `minmax` does.
+        key = lambda x: x % 7
+        for n in range(1, 5):
+            for values in permutations(range(1, 8), n):
+                with self.subTest(values=values):
+                    self.assertTupleEqual(
+                        mi.minmax(values, key=key),
+                        (min(values, key=key), max(values, key=key)),
+                    )
 
     def test_default(self):
         with self.assertRaises(ValueError):
@@ -2760,7 +2774,10 @@ class NumericRangeTests(TestCase):
     def test_eq(self):
         # numeric_range objects are equal to themselves
         range_1 = mi.numeric_range(2, 4, 1)
-        self.assertTrue(range_1, range_1)
+        self.assertEqual(range_1, range_1)
+
+        # ...and to distinct objects covering the same values
+        self.assertEqual(range_1, mi.numeric_range(2, 4, 1))
 
         # numeric_range objects are not equal other types of objects
         self.assertNotEqual(mi.numeric_range(7.0), 1)
@@ -4779,6 +4796,24 @@ class CallbackIterTests(TestCase):
         with mi.callback_iter(func) as it:
             with self.assertRaises(RuntimeError):
                 it.result
+
+    def test_no_result_while_running(self):
+        # Unlike test_no_result, here the function has started but hasn't
+        # returned, so there is a pending future to interrogate.
+        gate = Event()
+
+        def func(callback=None):
+            callback(1, 'a', intermediate_total=1)
+            gate.wait()
+            return 6
+
+        with mi.callback_iter(func, wait_seconds=0.01) as it:
+            self.assertEqual(next(it), ((1, 'a'), {'intermediate_total': 1}))
+            self.assertFalse(it.done)
+            with self.assertRaises(RuntimeError):
+                it.result
+
+            gate.set()
 
     def test_exception(self):
         func = lambda callback=None: self._target(cb=callback, exc=ValueError)
