@@ -4557,6 +4557,19 @@ def combination_with_replacement_index(element, iterable):
 
 
 def permutation_index(element, iterable):
+    """Equivalent to ``list(permutations(iterable, r)).index(element)```
+
+    The subsequences of *iterable* that are of length *r* where order is
+    important can be ordered lexicographically. :func:`permutation_index`
+    computes the index of the first *element* directly, without computing
+    the previous permutations.
+
+        >>> permutation_index([1, 3, 2], range(5))
+        19
+
+    ``ValueError`` will be raised if the given *element* isn't one of the
+    permutations of *iterable*.
+    """
     r = len(element)
     n = len(iterable)
     if n < 64:
