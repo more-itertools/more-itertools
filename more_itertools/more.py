@@ -25,7 +25,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import comb, e, exp, floor, fsum, log, log1p, perm, tau
 from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
@@ -4305,11 +4305,10 @@ def nth_permutation(iterable, r, index):
         raise IndexError
 
     result = [0] * r
-    q = index * factorial(n) // c if r < n else index
-    for d in range(1, n + 1):
+    q = index
+    for d in range(n - r + 1, n + 1):
         q, i = divmod(q, d)
-        if 0 <= n - d < r:
-            result[n - d] = i
+        result[n - d] = i
         if q == 0:
             break
 
