@@ -25,7 +25,7 @@ from itertools import (
     zip_longest,
     product,
 )
-from math import comb, e, exp, factorial, floor, fsum, log, log1p, perm, tau
+from math import comb, e, exp, floor, fsum, log, log1p, perm, tau
 from math import ceil, prod
 from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
@@ -4279,8 +4279,47 @@ def nth_product(index, *iterables, repeat=1):
     return tuple(reversed(result))
 
 
+def _perm_rec(inp, a, n, hi=None, root=False):
+    """
+    presence of hi (bisecting into list) indicates whether it's used for nth_permutation (absent) or permutation_index (present).
+    in nth_permutation: a+1 is starting index, a+n is ending index
+    in permutation_index: lo and hi are indexes in list, a is offset for multipliers
+    """
+    if rank := hi is not None:
+        n = hi - (lo := n)
+
+    if rank:
+        if n < 64 or (n + a) * log(n + a) - n * log(n) - a < 192:
+            # 89 ≈ 128*log(2)
+            index = 0
+            for i in range(-hi, -lo):
+                index *= a - i
+                index += inp[i]
+            return index if root else (index, perm(a + hi, n))
+    elif inp.bit_length() < 512:
+        inp = (inp, 0)
+        return [(inp := divmod(inp[0], u))[1] for u in range(a + 1, a + n + 1)]
+
+    h = n + 1 >> 1
+    x = a + h
+    k = max(1, min(n - 1, h - int(h**2 / (2 * x * log(x)))))
+    # from using Stirling's approximation & Newton-iterating about midpoint
+    if rank:
+        small, sfac = _perm_rec(inp, a, lo, lo + k)
+        large = _perm_rec(inp, a, lo + k, hi, root)
+        if root:
+            out = small + sfac * large
+            return out
+        large, lfac = large
+        out = small + sfac * large
+        return out, sfac * lfac
+    else:
+        quo, rem = divmod(inp, perm(a + k, k))
+        return _perm_rec(rem, a, k) + _perm_rec(quo, a + k, n - k)
+
+
 def nth_permutation(iterable, r, index):
-    """Equivalent to ``list(permutations(iterable, r))[index]```
+    """Equivalent to ``list(permutations(iterable, r))[index]``
 
     The subsequences of *iterable* that are of length *r* where order is
     important can be ordered lexicographically. :func:`nth_permutation`
@@ -4303,17 +4342,14 @@ def nth_permutation(iterable, r, index):
         index += c
     if not 0 <= index < c:
         raise IndexError
-
-    result = [0] * r
-    q = index * factorial(n) // c if r < n else index
-    for d in range(1, n + 1):
-        q, i = divmod(q, d)
-        if 0 <= n - d < r:
-            result[n - d] = i
-        if q == 0:
-            break
-
-    return tuple(map(pool.pop, result))
+    if n == 0:
+        return ()
+    return tuple(
+        map(
+            pool.pop,
+            reversed(_perm_rec(index, n - r, r, root=True))
+        )
+    )
 
 
 def nth_combination_with_replacement(iterable, r, index):
@@ -4537,14 +4573,25 @@ def permutation_index(element, iterable):
     ``ValueError`` will be raised if the given *element* isn't one of the
     permutations of *iterable*.
     """
-    index = 0
-    pool = list(iterable)
-    for i, x in zip(range(len(pool), -1, -1), element):
-        r = pool.index(x)
-        index = index * i + r
-        del pool[r]
+    r = len(element)
+    n = len(iterable)
+    if n < 64:
+        indexes = []
+        pool = list(iterable)
+        for x in element:
+            i = pool.index(x)
+            indexes.append(i)
+            del pool[i]
+    else:
+        positions = {x: i for i, x in enumerate(iterable)}
+        alive = ~(~0 << n)
+        indexes = []
+        for x in element:
+            p = positions[x]
+            indexes.append((alive & ~(~0 << p)).bit_count())
+            alive ^= 1 << p
 
-    return index
+    return _perm_rec(indexes, n - r, 0, r, True)
 
 
 class countable:
