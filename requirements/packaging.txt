@@ -1,5 +1,5 @@
-flit<4.0.0
-flit_core<4.0.0
+flit>=4.0.2,<5
+flit_core>=4.0.2,<5
 setuptools
 twine
 wheel
