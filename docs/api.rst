@@ -224,6 +224,7 @@ These tools yield certain items from an iterable.
 .. autofunction:: tail
 .. autofunction:: unique_everseen
 .. autofunction:: unique_justseen
+.. autofunction:: limit_runs
 .. autofunction:: unique
 
 

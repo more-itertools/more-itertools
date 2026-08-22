@@ -114,6 +114,7 @@ __all__ = [
     'iterate',
     'join_mappings',
     'last',
+    'limit_runs',
     'locate',
     'longest_common_prefix',
     'lstrip',
@@ -5562,3 +5563,43 @@ def subfactorial(n):
         sf = sf * i + adj
         adj = -adj
     return sf
+
+
+def limit_runs(iterable, max_run, key=None):
+    """Yield items from *iterable*, capping each maximal run of
+    adjacent-equal items at *max_run* elements and dropping the rest.
+
+    >>> list(limit_runs('AAAABBBCCDAABBB', 2))
+    ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'A', 'A', 'B', 'B']
+
+    Runs no longer than *max_run* pass through unchanged; note how the
+    second run of ``'A'`` above starts fresh after the ``'D'``.
+
+    Adjacency is measured the same way as :func:`unique_justseen`: only
+    neighbouring elements are compared, using ``key(item)`` when *key* is
+    given and the item itself otherwise.
+
+    >>> list(limit_runs('AAAaaaBBB', 2, str.lower))
+    ['A', 'A', 'B', 'B']
+
+    Capping each run at one element is equivalent to
+    :func:`unique_justseen`:
+
+    >>> from more_itertools import unique_justseen
+    >>> list(limit_runs('AAAABBBCCDAABBB', 1))
+    ['A', 'B', 'C', 'D', 'A', 'B']
+    >>> list(limit_runs('AAAABBBCCDAABBB', 1)) == list(
+    ...     unique_justseen('AAAABBBCCDAABBB')
+    ... )
+    True
+
+    """
+    if (
+        not isinstance(max_run, int)
+        or isinstance(max_run, bool)
+        or max_run < 1
+    ):
+        raise ValueError('max_run must be a positive integer')
+
+    for _, group in groupby(iterable, key):
+        yield from islice(group, max_run)
