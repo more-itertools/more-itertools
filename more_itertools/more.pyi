@@ -87,6 +87,7 @@ __all__ = [
     'iterate',
     'join_mappings',
     'last',
+    'limit_runs',
     'locate',
     'longest_common_prefix',
     'lstrip',
@@ -1018,3 +1019,6 @@ def concurrent_tee(
 def synchronized(
     func: Callable[..., Iterator[_T]],
 ) -> Callable[..., Iterator[_T]]: ...
+def limit_runs(
+    iterable: Iterable[_T], max_run: int, key: Callable[[_T], _U] | None = ...
+) -> Iterator[_T]: ...

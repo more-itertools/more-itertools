@@ -7076,3 +7076,80 @@ class TestSubfactorial(TestCase):
             mi.subfactorial('5')  # string input
         with self.assertRaises(ValueError):
             mi.subfactorial(-1)  # negative input
+
+
+class LimitRunsTests(TestCase):
+    def test_run_capping(self):
+        self.assertEqual(
+            list(mi.limit_runs('AAAABBBCCDAABBB', 2)),
+            list('AABBCCDAABB'),
+        )
+
+    def test_short_runs_pass_through(self):
+        # Runs of length <= max_run are unchanged.
+        self.assertEqual(
+            list(mi.limit_runs('ABBCCC', 3)),
+            list('ABBCCC'),
+        )
+
+    def test_empty_iterable(self):
+        self.assertEqual(list(mi.limit_runs('', 2)), [])
+        self.assertEqual(list(mi.limit_runs([], 5)), [])
+
+    def test_adjacency_without_key(self):
+        # A value recurring after a different item starts a fresh run.
+        self.assertEqual(
+            list(mi.limit_runs('AAABAAAA', 2)),
+            list('AABAA'),
+        )
+
+    def test_adjacency_with_key(self):
+        self.assertEqual(
+            list(mi.limit_runs('AAAaaaBBB', 2, str.lower)),
+            list('AABB'),
+        )
+
+    def test_adjacency_with_key_recurring_value(self):
+        # 'A' recurs after 'b' (case-insensitively different), so it
+        # starts a fresh run rather than joining the earlier one.
+        self.assertEqual(
+            list(mi.limit_runs('AaAbBaA', 1, str.lower)),
+            list('Aba'),
+        )
+
+    def test_vs_unique_justseen(self):
+        input = 'AAAABBBCCDAABBB'
+        self.assertEqual(
+            list(mi.limit_runs(input, 1)),
+            list(mi.unique_justseen(input)),
+        )
+
+    def test_vs_unique_justseen_key(self):
+        input = 'AaAABbBCCcDdAaBB'
+        self.assertEqual(
+            list(mi.limit_runs(input, 1, str.lower)),
+            list(mi.unique_justseen(input, str.lower)),
+        )
+
+    def test_laziness(self):
+        # Works against an infinite iterator without consuming it fully.
+        it = mi.limit_runs(count(), 3)
+        self.assertEqual(list(islice(it, 5)), [0, 1, 2, 3, 4])
+
+    def test_laziness_within_run(self):
+        # A single (infinite) run is capped, and items can be drawn
+        # lazily up to the cap without exhausting the source.
+        it = mi.limit_runs(repeat(1), 4)
+        self.assertEqual(list(islice(it, 4)), [1, 1, 1, 1])
+
+    def test_max_run_validation(self):
+        for bad in (0, -1, -5):
+            with self.subTest(max_run=bad):
+                with self.assertRaises(ValueError):
+                    list(mi.limit_runs('AAA', bad))
+
+    def test_max_run_non_integer(self):
+        for bad in (1.0, '1', 2.5, True, False):
+            with self.subTest(max_run=bad):
+                with self.assertRaises(ValueError):
+                    list(mi.limit_runs('AAA', bad))
