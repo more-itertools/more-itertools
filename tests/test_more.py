@@ -779,6 +779,30 @@ class OneTests(TestCase):
             lambda: mi.one(it),
         )
 
+    def test_too_long_bad_raisable_repr(self):
+        class BadRepr:
+            def __repr__(self):
+                raise NotImplementedError("__repr__ is not supported")
+
+        it = (BadRepr() for _ in count())
+        self.assertRaises(OverflowError, lambda: mi.one(it, too_long=OverflowError))
+
+    def test_too_long_opinionated_raisable_bool(self):
+        class FalseError(Exception):
+            def __bool__(self):
+                return False
+
+        it = count()
+        self.assertRaises(FalseError, lambda: mi.one(it, too_long=FalseError()))
+
+    def test_too_short_opinionated_raisable_bool(self):
+        class FalseError(Exception):
+            def __bool__(self):
+                return False
+
+        it = []
+        self.assertRaises(FalseError, lambda: mi.one(it, too_short=FalseError()))
+
 
 class IntersperseTest(TestCase):
     """Tests for intersperse()"""
