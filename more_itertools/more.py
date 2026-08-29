@@ -663,7 +663,7 @@ def one(iterable, too_short=None, too_long=None):
                 f'Expected exactly one item in iterable, but got {first!r}, '
                 f'{second!r}, and perhaps more.'
             )
-            raise too_long or ValueError(msg)
+            raise ValueError(msg)
         return first
     if too_short is not None:
         raise too_short
