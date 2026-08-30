@@ -755,6 +755,9 @@ def distinct_permutations(iterable, r=None):
     duplicates are not generated and thrown away. For larger input sequences
     this is much more efficient.
 
+    If the elements of the input iterable are sortable, the output tuples are
+    produced in sorted order.
+
     Duplicate permutations arise when there are duplicated elements in the
     input iterable. The number of items returned is
     `n! / (x_1! * x_2! * ... * x_n!)`, where `n` is the total number of
