@@ -791,6 +791,33 @@ class OneTests(TestCase):
             lambda: mi.one(it),
         )
 
+    def test_falsy_custom_exception(self):
+        # An exception whose instances are falsy must still be raised, rather
+        # than being treated as "no custom exception given".
+        class FalsyError(Exception):
+            def __bool__(self):
+                return False
+
+        too_long = FalsyError('too many')
+        self.assertRaises(
+            FalsyError, lambda: mi.one(count(), too_long=too_long)
+        )
+
+        too_short = FalsyError('too few')
+        self.assertRaises(FalsyError, lambda: mi.one([], too_short=too_short))
+
+    def test_too_long_does_not_evaluate_repr(self):
+        # When too_long is given, the default message (which reprs the first two
+        # items) should never be built.
+        class NoRepr:
+            def __repr__(self):
+                raise RuntimeError('repr should not be called')
+
+        it = (NoRepr() for _ in count())
+        self.assertRaises(
+            OverflowError, lambda: mi.one(it, too_long=OverflowError)
+        )
+
 
 class IntersperseTest(TestCase):
     """Tests for intersperse()"""
@@ -4383,6 +4410,28 @@ class OnlyTests(TestCase):
             "Expected exactly one item in iterable, "
             "but got 'foo', 'bar', and perhaps more",
             lambda: mi.only(['foo', 'bar', 'baz']),
+        )
+
+    def test_falsy_custom_exception(self):
+        class FalsyError(Exception):
+            def __bool__(self):
+                return False
+
+        too_long = FalsyError('too many')
+        self.assertRaises(
+            FalsyError, lambda: mi.only([1, 2], too_long=too_long)
+        )
+
+    def test_too_long_does_not_evaluate_repr(self):
+        class NoRepr:
+            def __repr__(self):
+                raise RuntimeError('repr should not be called')
+
+        self.assertRaises(
+            OverflowError,
+            lambda: mi.only(
+                [NoRepr(), NoRepr(), NoRepr()], too_long=OverflowError
+            ),
         )
 
 
