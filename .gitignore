@@ -45,3 +45,5 @@ venv/
 
 # Ruff
 .ruff_cache/
+.cie/
+.forge/
