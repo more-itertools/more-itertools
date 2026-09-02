@@ -561,6 +561,17 @@ class DistinctPermutationsTests(TestCase):
         expected = list(mi.unique_everseen(permutations(iterable), key=str))
         self.assertCountEqual(actual, expected)
 
+    def test_sortable_input_produces_sorted_output(self):
+        for iterable in [
+            [4, 3, 2, 1],
+            [2, 2, 3, 1],
+        ]:
+            for r in range(len(iterable) + 1):
+                with self.subTest(iterable=iterable, r=r):
+                    actual = list(mi.distinct_permutations(iterable, r=r))
+                    expected = sorted(set(permutations(iterable, r=r)))
+                    self.assertEqual(actual, expected)
+
 
 class DerangementsTests(TestCase):
     def test_unique_values(self):
