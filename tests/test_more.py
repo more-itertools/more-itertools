@@ -5253,6 +5253,18 @@ class CountableTests(TestCase):
 class ChunkedEvenTests(TestCase):
     """Tests for ``chunked_even()``"""
 
+    def test_n_less_than_one(self):
+        self.assertRaisesRegex(
+            ValueError,
+            'n must be at least 1',
+            lambda: list(mi.chunked_even('ABC', 0)),
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            'n must be at least 1',
+            lambda: list(mi.chunked_even('ABC', -1)),
+        )
+
     def test_0(self):
         self._test_finite('', 3, [])
 

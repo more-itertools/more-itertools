@@ -10,6 +10,7 @@ Unreleased
 
 * Changes to existing functions:
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
+    * :func:`chunked_even` now raises ``ValueError`` when *n* is less than 1
 
 11.1.0
 ------
