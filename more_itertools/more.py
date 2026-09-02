@@ -2331,14 +2331,11 @@ class numeric_range(Sequence):
             return self._start > self._stop
 
     def __contains__(self, elem):
-        if self._growing:
-            if self._start <= elem < self._stop:
-                return (elem - self._start) % self._step == self._zero
-        else:
-            if self._start >= elem > self._stop:
-                return (self._start - elem) % (-self._step) == self._zero
-
-        return False
+        try:
+            self.index(elem)
+        except ValueError:
+            return False
+        return True
 
     def __eq__(self, other):
         # numeric_range object equality is intended to mirror the built-in range
@@ -2417,7 +2414,20 @@ class numeric_range(Sequence):
             return 0
         else:  # distance > 0 and step > 0: regular euclidean division
             q, r = divmod(distance, step)
-            return int(q) + int(r != self._zero)
+            n = int(q) + int(r != self._zero)
+            # The division above measures the distance to cover, but the items
+            # are produced by repeated multiplication (see `__iter__`). With
+            # inexact arithmetic the two disagree at the boundary, so settle
+            # the count against the items themselves.
+            while n and not self._before_stop(n - 1):
+                n -= 1
+            while self._before_stop(n):
+                n += 1
+            return n
+
+    def _before_stop(self, i):
+        value = self._start + i * self._step
+        return value < self._stop if self._growing else value > self._stop
 
     def __reduce__(self):
         return numeric_range, (self._start, self._stop, self._step)
@@ -2446,14 +2456,27 @@ class numeric_range(Sequence):
     def index(self, value):
         if self._growing:
             if self._start <= value < self._stop:
-                q, r = divmod(value - self._start, self._step)
-                if r == self._zero:
-                    return int(q)
+                q, _ = divmod(value - self._start, self._step)
+                return self._index_near(int(q), value)
         else:
             if self._start >= value > self._stop:
-                q, r = divmod(self._start - value, -self._step)
-                if r == self._zero:
-                    return int(q)
+                q, _ = divmod(self._start - value, -self._step)
+                return self._index_near(int(q), value)
+
+        raise ValueError(f"{value} is not in numeric range")
+
+    def _index_near(self, i, value):
+        # `i` is the quotient of the division of `value` by the step, which
+        # locates the value on the grid of items this range produces. For
+        # exact types that quotient is the index. For inexact ones (floats)
+        # it can land one short, and the remainder of the division is not a
+        # reliable membership test either: `numeric_range(0.0, 1.0, 0.1)`
+        # yields 0.30000000000000004, which leaves a non-zero remainder.
+        # So compare against the item the range actually produces there.
+        for candidate in (i, i + 1):
+            if 0 <= candidate < self._len:
+                if self._start + candidate * self._step == value:
+                    return candidate
 
         raise ValueError(f"{value} is not in numeric range")
 
