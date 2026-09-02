@@ -2782,6 +2782,35 @@ class NumericRangeTests(TestCase):
                 self.assertFalse(v in r)
                 self.assertTrue(v not in r)
 
+    def test_contains_items_with_inexact_step(self):
+        # The items are produced by repeated multiplication, so with a step
+        # that has no exact float representation they do not land on an exact
+        # multiple of it. Every item must still be a member, and index() must
+        # locate it where __getitem__ puts it.
+        for args in [
+            (0.0, 1.0, 0.1),
+            (0.0, 3.0, 0.7),
+            (1.0, 0.0, -0.1),
+            (2.1, 5.1, 0.5),
+            (-1.0, 1.0, 0.25),
+        ]:
+            r = mi.numeric_range(*args)
+            for i, v in enumerate(r):
+                self.assertIn(v, r)
+                self.assertEqual(i, r.index(v))
+                self.assertEqual(v, r[i])
+                self.assertEqual(1, r.count(v))
+
+    def test_contains_non_items_with_inexact_step(self):
+        # Values the range does not produce stay out of it.
+        r = mi.numeric_range(0.0, 1.0, 0.1)
+        items = set(r)
+        for i in range(1000):
+            v = i / 1000
+            if v not in items:
+                self.assertNotIn(v, r)
+                self.assertRaises(ValueError, r.index, v)
+
     def test_eq(self):
         # numeric_range objects are equal to themselves
         range_1 = mi.numeric_range(2, 4, 1)
@@ -2991,6 +3020,28 @@ class NumericRangeTests(TestCase):
             ),
         ]:
             self.assertEqual(expected, len(mi.numeric_range(*args)))
+
+    def test_len_matches_iteration(self):
+        # len() is derived by division while the items come from repeated
+        # multiplication; the two must not disagree, or the last index reports
+        # an item the range never yields.
+        for args in [
+            # the division overshoots: len() counted an item past the stop
+            (-8.732, -13.532, -2.4),
+            (4.51, 10.375, 0.255),
+            # the division falls short: len() missed an item the range yields
+            (-69.37276490678778, -29.8339073344664, 4.942357196540172),
+            (32.50227965239458, 9.003418351482358, -1.9582384417426848),
+            (0.0, 1.0, 0.1),
+            (0.0, 3.0, 0.7),
+            (10.0, -10.0, -0.7),
+            (2.1, 5.1, 0.5),
+        ]:
+            r = mi.numeric_range(*args)
+            items = list(r)
+            self.assertEqual(len(items), len(r))
+            if items:
+                self.assertEqual(items[-1], r[len(r) - 1])
 
     def test_repr(self):
         for args, *expected in [
