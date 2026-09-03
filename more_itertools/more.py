@@ -1618,7 +1618,9 @@ def split_before(iterable, pred, maxsplit=-1):
         [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9]]
     """
     if maxsplit == 0:
-        yield list(iterable)
+        buf = list(iterable)
+        if buf:
+            yield buf
         return
 
     buf = []
@@ -1654,7 +1656,9 @@ def split_after(iterable, pred, maxsplit=-1):
 
     """
     if maxsplit == 0:
-        yield list(iterable)
+        buf = list(iterable)
+        if buf:
+            yield buf
         return
 
     buf = []
@@ -1694,7 +1698,9 @@ def split_when(iterable, pred, maxsplit=-1):
 
     """
     if maxsplit == 0:
-        yield list(iterable)
+        buf = list(iterable)
+        if buf:
+            yield buf
         return
 
     it = iter(iterable)
