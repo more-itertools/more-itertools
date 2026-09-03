@@ -5074,6 +5074,28 @@ class ValueChainTests(TestCase):
         expected = [1, (2, (3,)), 'foo', ['bar', ['baz']], 'tic', 'key', obj]
         self.assertEqual(actual, expected)
 
+    def test_type_error_while_iterating(self):
+        # A TypeError raised while consuming an argument means the argument
+        # is broken, not that it is a scalar - it should propagate.
+        def gen():
+            yield 1
+            yield 2
+            raise TypeError('failure inside the iterable')
+
+        it = mi.value_chain(gen(), 3)
+        self.assertEqual([next(it), next(it)], [1, 2])
+        with self.assertRaises(TypeError):
+            next(it)
+
+    def test_type_error_from_iter(self):
+        # An object that cannot be iterated at all is still emitted as-is.
+        class NotIterable:
+            def __iter__(self):
+                raise TypeError('not iterable')
+
+        obj = NotIterable()
+        self.assertEqual(list(mi.value_chain(1, obj, [2, 3])), [1, obj, 2, 3])
+
 
 class ProductIndexTests(TestCase):
     def test_basic(self):
