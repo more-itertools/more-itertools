@@ -1490,17 +1490,17 @@ class SplitAtTests(TestCase):
                 self.assertEqual(actual, expected)
 
     def test_maxsplit(self):
-        iterable = 'a,bb,ccc,dddd'
         separator = ','
         pred = lambda x: x == separator
 
-        for maxsplit in range(-1, 4):
-            with self.subTest(maxsplit=maxsplit):
-                it = iter(iterable)
-                result = mi.split_at(it, pred, maxsplit=maxsplit)
-                actual = [''.join(x) for x in result]
-                expected = iterable.split(separator, maxsplit)
-                self.assertEqual(actual, expected)
+        for iterable in ['a,bb,ccc,dddd', '']:
+            for maxsplit in range(-1, 4):
+                with self.subTest(iterable=iterable, maxsplit=maxsplit):
+                    it = iter(iterable)
+                    result = mi.split_at(it, pred, maxsplit=maxsplit)
+                    actual = [''.join(x) for x in result]
+                    expected = iterable.split(separator, maxsplit)
+                    self.assertEqual(actual, expected)
 
     def test_keep_separator(self):
         separator = ','
@@ -1546,9 +1546,13 @@ class SplitBeforeTest(TestCase):
         self.assertEqual(actual, expected)
 
     def test_empty_collection(self):
-        actual = list(mi.split_before([], lambda c: bool(c)))
-        expected = []
-        self.assertEqual(actual, expected)
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                actual = list(
+                    mi.split_before([], lambda c: bool(c), maxsplit=maxsplit)
+                )
+                expected = []
+                self.assertEqual(actual, expected)
 
     def test_max_split(self):
         for args, expected in [
@@ -1602,6 +1606,15 @@ class SplitAfterTest(TestCase):
         actual = list(mi.split_after('ooo', lambda c: c == 'x'))
         expected = [['o', 'o', 'o']]
         self.assertEqual(actual, expected)
+
+    def test_empty_collection(self):
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                actual = list(
+                    mi.split_after([], lambda c: bool(c), maxsplit=maxsplit)
+                )
+                expected = []
+                self.assertEqual(actual, expected)
 
     def test_max_split(self):
         for args, expected in [
@@ -1687,9 +1700,13 @@ class SplitWhenTests(TestCase):
 
     # edge cases
     def test_empty_iterable(self):
-        actual = list(mi.split_when('', lambda a, b: a != b))
-        expected = []
-        self.assertEqual(actual, expected)
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                actual = list(
+                    mi.split_when('', lambda a, b: a != b, maxsplit=maxsplit)
+                )
+                expected = []
+                self.assertEqual(actual, expected)
 
     def test_one_element(self):
         actual = list(mi.split_when('o', lambda a, b: a == b))
