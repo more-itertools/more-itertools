@@ -1550,6 +1550,13 @@ class SplitBeforeTest(TestCase):
         expected = []
         self.assertEqual(actual, expected)
 
+    def test_empty_collection_max_split_zero(self):
+        # maxsplit=0 took a fast path that yielded [[]] while every other
+        # maxsplit yielded [] for an empty iterable (issue #1252)
+        for maxsplit in (-1, 0, 1, 2):
+            actual = list(mi.split_before([], lambda c: bool(c), maxsplit=maxsplit))
+            self.assertEqual(actual, [])
+
     def test_max_split(self):
         for args, expected in [
             (
@@ -1587,6 +1594,13 @@ class SplitBeforeTest(TestCase):
 
 class SplitAfterTest(TestCase):
     """Tests for ``split_after()``"""
+
+    def test_empty_collection_max_split_zero(self):
+        # maxsplit=0 took a fast path that yielded [[]] while every other
+        # maxsplit yielded [] for an empty iterable (issue #1252)
+        for maxsplit in (-1, 0, 1, 2):
+            actual = list(mi.split_after([], lambda c: bool(c), maxsplit=maxsplit))
+            self.assertEqual(actual, [])
 
     def test_starts_with_sep(self):
         actual = list(mi.split_after('xooxoo', lambda c: c == 'x'))
@@ -1652,6 +1666,13 @@ class SplitWhenTests(TestCase):
     @staticmethod
     def _split_when_after(iterable, pred):
         return mi.split_when(iterable, lambda c, _: pred(c))
+
+    def test_empty_collection_max_split_zero(self):
+        # maxsplit=0 took a fast path that yielded [[]] while every other
+        # maxsplit yielded [] for an empty iterable (issue #1252)
+        for maxsplit in (-1, 0, 1, 2):
+            actual = list(mi.split_when([], lambda a, b: False, maxsplit=maxsplit))
+            self.assertEqual(actual, [])
 
     # split_before emulation
     def test_before_emulation_starts_with_sep(self):
