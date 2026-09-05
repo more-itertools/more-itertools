@@ -333,6 +333,7 @@ The tools focus on math with integers.
 .. autofunction:: is_prime
 .. autofunction:: multinomial
 .. autofunction:: sieve
+.. autofunction:: primes
 .. autofunction:: totient
 
 
