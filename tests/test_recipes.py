@@ -731,6 +731,26 @@ class NthCombinationTests(TestCase):
         expected = (2, 12, 35, 126)
         self.assertEqual(actual, expected)
 
+    def test_singleton_positions_and_iterable(self):
+        iterable = (value for value in 'abc')
+        self.assertEqual(mi.nth_combination(iterable, 1, 0), ('a',))
+        self.assertEqual(tuple(iterable), ())
+        self.assertEqual(mi.nth_combination('abc', 1, 2), ('c',))
+        self.assertEqual(mi.nth_combination('abc', 1, -1), ('c',))
+
+    def test_singleton_invalid_index(self):
+        with self.assertRaises(IndexError):
+            mi.nth_combination('abc', 1, 3)
+        with self.assertRaises(IndexError):
+            mi.nth_combination('abc', 1, -4)
+
+    def test_singleton_int_subclass_fallback(self):
+        class IntSubclass(int):
+            pass
+
+        self.assertEqual(mi.nth_combination('abc', IntSubclass(1), 1), ('b',))
+        self.assertEqual(mi.nth_combination('abc', 1, IntSubclass(-1)), ('c',))
+
     def test_invalid_r(self):
         with self.assertRaises(ValueError):
             mi.nth_combination([], -1, 0)
