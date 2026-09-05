@@ -11,6 +11,7 @@ Unreleased
 * Changes to existing functions:
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
     * :func:`chunked_even` now raises ``ValueError`` when *n* is less than 1
+    * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0``
 
 11.1.0
 ------

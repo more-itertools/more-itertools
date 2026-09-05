@@ -561,6 +561,17 @@ class DistinctPermutationsTests(TestCase):
         expected = list(mi.unique_everseen(permutations(iterable), key=str))
         self.assertCountEqual(actual, expected)
 
+    def test_sortable_input_produces_sorted_output(self):
+        for iterable in [
+            [4, 3, 2, 1],
+            [2, 2, 3, 1],
+        ]:
+            for r in range(len(iterable) + 1):
+                with self.subTest(iterable=iterable, r=r):
+                    actual = list(mi.distinct_permutations(iterable, r=r))
+                    expected = sorted(set(permutations(iterable, r=r)))
+                    self.assertEqual(actual, expected)
+
 
 class DerangementsTests(TestCase):
     def test_unique_values(self):
@@ -1479,17 +1490,17 @@ class SplitAtTests(TestCase):
                 self.assertEqual(actual, expected)
 
     def test_maxsplit(self):
-        iterable = 'a,bb,ccc,dddd'
         separator = ','
         pred = lambda x: x == separator
 
-        for maxsplit in range(-1, 4):
-            with self.subTest(maxsplit=maxsplit):
-                it = iter(iterable)
-                result = mi.split_at(it, pred, maxsplit=maxsplit)
-                actual = [''.join(x) for x in result]
-                expected = iterable.split(separator, maxsplit)
-                self.assertEqual(actual, expected)
+        for iterable in ['a,bb,ccc,dddd', '']:
+            for maxsplit in range(-1, 4):
+                with self.subTest(iterable=iterable, maxsplit=maxsplit):
+                    it = iter(iterable)
+                    result = mi.split_at(it, pred, maxsplit=maxsplit)
+                    actual = [''.join(x) for x in result]
+                    expected = iterable.split(separator, maxsplit)
+                    self.assertEqual(actual, expected)
 
     def test_keep_separator(self):
         separator = ','
@@ -1535,9 +1546,13 @@ class SplitBeforeTest(TestCase):
         self.assertEqual(actual, expected)
 
     def test_empty_collection(self):
-        actual = list(mi.split_before([], lambda c: bool(c)))
-        expected = []
-        self.assertEqual(actual, expected)
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                actual = list(
+                    mi.split_before([], lambda c: bool(c), maxsplit=maxsplit)
+                )
+                expected = []
+                self.assertEqual(actual, expected)
 
     def test_max_split(self):
         for args, expected in [
@@ -1591,6 +1606,15 @@ class SplitAfterTest(TestCase):
         actual = list(mi.split_after('ooo', lambda c: c == 'x'))
         expected = [['o', 'o', 'o']]
         self.assertEqual(actual, expected)
+
+    def test_empty_collection(self):
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                actual = list(
+                    mi.split_after([], lambda c: bool(c), maxsplit=maxsplit)
+                )
+                expected = []
+                self.assertEqual(actual, expected)
 
     def test_max_split(self):
         for args, expected in [
@@ -1676,9 +1700,13 @@ class SplitWhenTests(TestCase):
 
     # edge cases
     def test_empty_iterable(self):
-        actual = list(mi.split_when('', lambda a, b: a != b))
-        expected = []
-        self.assertEqual(actual, expected)
+        for maxsplit in range(-1, 4):
+            with self.subTest(maxsplit=maxsplit):
+                actual = list(
+                    mi.split_when('', lambda a, b: a != b, maxsplit=maxsplit)
+                )
+                expected = []
+                self.assertEqual(actual, expected)
 
     def test_one_element(self):
         actual = list(mi.split_when('o', lambda a, b: a == b))
@@ -2633,7 +2661,7 @@ class NumericRangeTests(TestCase):
             ((0.0,), []),
             ((1, 0), []),
             ((1.0, 0.0), []),
-            ((0.1, 0.30000000000000001, 0.2), [0.1]),  # IEE 754 !
+            ((0.1, 0.30000000000000001, 0.2), [0.1]),  # IEEE 754 !
             (
                 (
                     Decimal("0.1"),
@@ -2770,6 +2798,35 @@ class NumericRangeTests(TestCase):
             for v in expected_not_in:
                 self.assertFalse(v in r)
                 self.assertTrue(v not in r)
+
+    def test_contains_items_with_inexact_step(self):
+        # The items are produced by repeated multiplication, so with a step
+        # that has no exact float representation they do not land on an exact
+        # multiple of it. Every item must still be a member, and index() must
+        # locate it where __getitem__ puts it.
+        for args in [
+            (0.0, 1.0, 0.1),
+            (0.0, 3.0, 0.7),
+            (1.0, 0.0, -0.1),
+            (2.1, 5.1, 0.5),
+            (-1.0, 1.0, 0.25),
+        ]:
+            r = mi.numeric_range(*args)
+            for i, v in enumerate(r):
+                self.assertIn(v, r)
+                self.assertEqual(i, r.index(v))
+                self.assertEqual(v, r[i])
+                self.assertEqual(1, r.count(v))
+
+    def test_contains_non_items_with_inexact_step(self):
+        # Values the range does not produce stay out of it.
+        r = mi.numeric_range(0.0, 1.0, 0.1)
+        items = set(r)
+        for i in range(1000):
+            v = i / 1000
+            if v not in items:
+                self.assertNotIn(v, r)
+                self.assertRaises(ValueError, r.index, v)
 
     def test_eq(self):
         # numeric_range objects are equal to themselves
@@ -2959,7 +3016,7 @@ class NumericRangeTests(TestCase):
             ((1.0, 7.01, 1.5), 5),
             ((7.0, 1.0, -1.5), 4),
             ((7.01, 1.0, -1.5), 5),
-            ((0.1, 0.30000000000000001, 0.2), 1),  # IEE 754 !
+            ((0.1, 0.30000000000000001, 0.2), 1),  # IEEE 754 !
             (
                 (
                     Decimal("0.1"),
@@ -2980,6 +3037,28 @@ class NumericRangeTests(TestCase):
             ),
         ]:
             self.assertEqual(expected, len(mi.numeric_range(*args)))
+
+    def test_len_matches_iteration(self):
+        # len() is derived by division while the items come from repeated
+        # multiplication; the two must not disagree, or the last index reports
+        # an item the range never yields.
+        for args in [
+            # the division overshoots: len() counted an item past the stop
+            (-8.732, -13.532, -2.4),
+            (4.51, 10.375, 0.255),
+            # the division falls short: len() missed an item the range yields
+            (-69.37276490678778, -29.8339073344664, 4.942357196540172),
+            (32.50227965239458, 9.003418351482358, -1.9582384417426848),
+            (0.0, 1.0, 0.1),
+            (0.0, 3.0, 0.7),
+            (10.0, -10.0, -0.7),
+            (2.1, 5.1, 0.5),
+        ]:
+            r = mi.numeric_range(*args)
+            items = list(r)
+            self.assertEqual(len(items), len(r))
+            if items:
+                self.assertEqual(items[-1], r[len(r) - 1])
 
     def test_repr(self):
         for args, *expected in [
@@ -5011,6 +5090,28 @@ class ValueChainTests(TestCase):
         )
         expected = [1, (2, (3,)), 'foo', ['bar', ['baz']], 'tic', 'key', obj]
         self.assertEqual(actual, expected)
+
+    def test_type_error_while_iterating(self):
+        # A TypeError raised while consuming an argument means the argument
+        # is broken, not that it is a scalar - it should propagate.
+        def gen():
+            yield 1
+            yield 2
+            raise TypeError('failure inside the iterable')
+
+        it = mi.value_chain(gen(), 3)
+        self.assertEqual([next(it), next(it)], [1, 2])
+        with self.assertRaises(TypeError):
+            next(it)
+
+    def test_type_error_from_iter(self):
+        # An object that cannot be iterated at all is still emitted as-is.
+        class NotIterable:
+            def __iter__(self):
+                raise TypeError('not iterable')
+
+        obj = NotIterable()
+        self.assertEqual(list(mi.value_chain(1, obj, [2, 3])), [1, obj, 2, 3])
 
 
 class ProductIndexTests(TestCase):
