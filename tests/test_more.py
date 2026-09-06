@@ -7181,7 +7181,6 @@ class TestSubfactorial(TestCase):
 
 
 class TestRandomOrderedRange(TestCase):
-
     test_inputs = [
         (-1,),
         (0,),
