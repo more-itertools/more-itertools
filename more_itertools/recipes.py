@@ -681,6 +681,8 @@ def nth_combination(iterable, r, index):
         index += c
     if not 0 <= index < c:
         raise IndexError
+    if type(r) is int and type(index) is int and r == 1:
+        return (pool[index],)
 
     result = []
     while r:
