@@ -264,6 +264,7 @@ These tools yield combinatorial arrangements of items from iterables.
 .. autofunction:: nth_product
 .. autofunction:: nth_permutation
 .. autofunction:: nth_combination
+.. autofunction:: random_ordered_range
 
 
 Wrapping

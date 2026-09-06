@@ -27,6 +27,7 @@ from itertools import (
     product,
     repeat,
 )
+from math import factorial
 from operator import add, mul, itemgetter, not_
 from pickle import loads, dumps
 from random import Random, choices, random, randrange, seed
@@ -7177,3 +7178,33 @@ class TestSubfactorial(TestCase):
             mi.subfactorial('5')  # string input
         with self.assertRaises(ValueError):
             mi.subfactorial(-1)  # negative input
+
+
+class TestRandomOrderedRange(TestCase):
+    test_inputs = [
+        (-1,),
+        (0,),
+        (1,),
+        (2,),
+        (3,),
+        (4,),
+        (10,),
+        (50,),
+        (10_000,),
+        (100, 200),
+        (1000, 2000, 10),
+        (2000, 1000, -10),
+    ]
+
+    def test_vs_ordered_baseline(self):
+        # Verify that the randomized values match the ordered values.
+        for args in self.test_inputs:
+            with self.subTest(args=args):
+                randomized = sorted(mi.random_ordered_range(*args))
+                ordered = sorted(range(*args))
+                self.assertEqual(randomized, ordered)
+
+    def test_lcg_mitigation(self):
+        # Without mitigation the LCG doesn't produce many distinct permutations
+        perms = set(tuple(mi.random_ordered_range(6)) for _ in range(10**5))
+        self.assertEqual(len(perms), factorial(6))

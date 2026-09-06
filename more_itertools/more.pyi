@@ -113,6 +113,7 @@ __all__ = [
     'powerset_of_sets',
     'product_index',
     'raise_',
+    'random_ordered_range',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -1018,3 +1019,6 @@ def concurrent_tee(
 def synchronized(
     func: Callable[..., Iterator[_T]],
 ) -> Callable[..., Iterator[_T]]: ...
+def random_ordered_range(
+    *args: int,
+) -> Iterator[int]: ...

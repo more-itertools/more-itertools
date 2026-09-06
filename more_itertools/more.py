@@ -140,6 +140,7 @@ __all__ = [
     'powerset_of_sets',
     'product_index',
     'raise_',
+    'random_ordered_range',
     'repeat_each',
     'repeat_last',
     'replace',
@@ -5596,3 +5597,46 @@ def subfactorial(n):
         sf = sf * i + adj
         adj = -adj
     return sf
+
+
+def _full_period_lcg(n):
+    "Returns values from range(n) in randomly shuffled order."
+
+    # The algorithm is a fluxed, full period linear congruential generator.
+    # Size *m* is a power of two.  The *mask* speeds-up modulo calculations.
+    # The multiplier *a* and addend *c* are Hull-Dobell constants.  See:
+    # https://jackgiffin.com/main/pdfs/Random-Number-Generators-T-E-Hull-and-A-R-Dobell.pdf
+    # The value *x* is a random starting point.
+    # The *flux* bitfield breaks-up patterns in the LCG.
+
+    m = 1 << n.bit_length()
+    mask = m - 1
+    a = randrange(5, m, 4) if m > 4 else 1
+    c = randrange(1, m, 2) if m > 1 else 1
+    x = randrange(m)
+    flux = randrange(m)
+
+    for _ in repeat(None, m):
+        index = x ^ flux
+        if index < n:
+            yield index
+        x = (a * x + c) & mask
+
+
+def _random_ordered_indices(n):
+    "Shuffle batches to mitigate the small state space of the LCG."
+
+    # Batched variation of Knuth's Algorithm M in §3.2.2 of TAOCP.
+    batch_size = 1024
+    iterable = range(n) if n <= batch_size else _full_period_lcg(n)
+    for batch in map(list, batched(iterable, batch_size)):
+        shuffle(batch)
+        yield from batch
+
+
+def random_ordered_range(*args):
+    "Return :func:`range` values in randomly shuffled order."
+    range_object = range(*args)
+    n = len(range_object)
+    for index in _random_ordered_indices(n):
+        yield range_object[index]

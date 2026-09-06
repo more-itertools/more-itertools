@@ -172,6 +172,8 @@ Python iterables.
 |                        | `random_derangement <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_derangement>`_,                                                         |
 |                        | `random_permutation <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_permutation>`_,                                                         |
 |                        | `random_product <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.random_product>`_                                                                  |
+|                        +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                        | `random_ordered_range <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools. random_ordered_range>`_                                                     |
 +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Wrapping               | `always_iterable <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.always_iterable>`_,                                                               |
 |                        | `always_reversible <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.always_reversible>`_,                                                           |
