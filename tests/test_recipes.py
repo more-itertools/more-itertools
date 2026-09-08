@@ -1709,3 +1709,50 @@ class RunningMedianTests(TestCase):
             list(
                 running_median(['abc', 'def', 'ghi'])
             )  # Input type that doesn't support division
+
+
+class RunningWindowSizeTests(TestCase):
+    functions = (
+        mi.running_min,
+        mi.running_max,
+        mi.running_mean,
+        mi.running_statistics,
+    )
+
+    def test_noninteger_window(self):
+        for function in self.functions:
+            for maxlen in (2.5, 2.0, float('nan'), float('inf')):
+                with self.subTest(function=function, maxlen=maxlen):
+                    with self.assertRaises(TypeError):
+                        list(function([1, 2, 3, 4], maxlen=maxlen))
+
+    def test_index_protocol(self):
+        class WindowSize:
+            def __index__(self):
+                return 2
+
+        for function in self.functions:
+            with self.subTest(function=function):
+                expected = list(function([1, 2, 3, 4], maxlen=2))
+                actual = list(function([1, 2, 3, 4], maxlen=WindowSize()))
+                self.assertEqual(actual, expected)
+        self.assertTrue(
+            all(
+                isinstance(stats.size, int)
+                for stats in mi.running_statistics(
+                    [1, 2, 3], maxlen=WindowSize()
+                )
+            )
+        )
+
+    def test_nonpositive_index(self):
+        class WindowSize:
+            def __index__(self):
+                return -1
+
+        for function in self.functions:
+            with (
+                self.subTest(function=function),
+                self.assertRaises(ValueError),
+            ):
+                list(function([1, 2, 3], maxlen=WindowSize()))
