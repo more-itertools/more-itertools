@@ -795,13 +795,19 @@ def _sliding_window_islice(iterable, n):
     return zip(*iterators)
 
 
-def _sliding_window_deque(iterable, n):
+def _sliding_window_list(iterable, n):
     # Normal path for other values of n.
+    #
+    # A list is used rather than a deque with maxlen: the deque updates in
+    # O(1) but has no fast path for conversion to a tuple, and that conversion
+    # happens once per window. Building each tuple from a list is enough
+    # faster to more than pay for the O(n) delete of the leading item.
     iterator = iter(iterable)
-    window = deque(islice(iterator, n - 1), maxlen=n)
+    window = list(islice(iterator, n - 1))
     for x in iterator:
         window.append(x)
         yield tuple(window)
+        del window[0]
 
 
 def sliding_window(iterable, n):
@@ -818,7 +824,7 @@ def sliding_window(iterable, n):
     For a variant with more features, see :func:`windowed`.
     """
     if n > 20:
-        return _sliding_window_deque(iterable, n)
+        return _sliding_window_list(iterable, n)
     elif n > 2:
         return _sliding_window_islice(iterable, n)
     elif n == 2:

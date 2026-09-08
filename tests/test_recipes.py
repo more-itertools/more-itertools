@@ -923,7 +923,7 @@ class SlidingWindowTests(TestCase):
                 actual = list(mi.sliding_window(iterable, n))
                 self.assertEqual(actual, expected)
 
-    def test_deque_version(self):
+    def test_long_window_version(self):
         iterable = map(str, range(100))
         all_windows = list(mi.sliding_window(iterable, 95))
         self.assertEqual(all_windows[0], tuple(map(str, range(95))))
