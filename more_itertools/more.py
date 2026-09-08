@@ -3888,6 +3888,9 @@ def _sample_weighted(iterator, k, weights, strict):
     if strict and len(reservoir) < k:
         raise ValueError('Sample larger than population')
 
+    if not reservoir:
+        return []
+
     heapify(reservoir)
 
     # The number of jumps before changing the reservoir is a random variable

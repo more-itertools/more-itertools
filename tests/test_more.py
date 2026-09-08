@@ -4572,6 +4572,24 @@ class MapIfTests(TestCase):
 
 
 class SampleTests(TestCase):
+    def test_empty(self):
+        for factory in (list, iter):
+            for kwargs in ({}, {'weights': []}, {'counts': []}):
+                with self.subTest(factory=factory, kwargs=kwargs):
+                    self.assertEqual(mi.sample(factory([]), 1, **kwargs), [])
+
+    def test_empty_strict(self):
+        for factory in (list, iter):
+            for kwargs in ({}, {'weights': []}, {'counts': []}):
+                with self.subTest(factory=factory, kwargs=kwargs):
+                    self.assertEqual(
+                        mi.sample(factory([]), 0, strict=True, **kwargs), []
+                    )
+                    with self.assertRaisesRegex(
+                        ValueError, 'Sample larger than population'
+                    ):
+                        mi.sample(factory([]), 1, strict=True, **kwargs)
+
     def test_specific_sample(self):
         """Verify reproducibility."""
 
