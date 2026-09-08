@@ -31,6 +31,7 @@ from queue import Empty, Queue
 from random import random, randrange, shuffle, uniform
 from operator import (
     attrgetter,
+    index as _index,
     getitem,
     is_not,
     itemgetter,
@@ -4294,6 +4295,11 @@ def nth_product(index, *iterables, repeat=1):
 
     ``IndexError`` will be raised if the given *index* is invalid.
     """
+    repeat = _index(repeat)
+    if repeat < 0:
+        raise ValueError('repeat argument cannot be negative')
+    if not repeat:
+        iterables = ()
     pools = tuple(map(tuple, reversed(iterables))) * repeat
     ns = tuple(map(len, pools))
 
@@ -4448,6 +4454,11 @@ def product_index(element, *iterables, repeat=1):
     of *args*.
     """
     elements = tuple(element)
+    repeat = _index(repeat)
+    if repeat < 0:
+        raise ValueError('repeat argument cannot be negative')
+    if not repeat:
+        iterables = ()
     pools = tuple(map(tuple, iterables)) * repeat
     if len(elements) != len(pools):
         raise ValueError('element is not a product of args')
@@ -5011,6 +5022,11 @@ def gray_product(*iterables, repeat=1):
     `this section <https://www-cs-faculty.stanford.edu/~knuth/fasc2a.ps.gz>`__
     of Donald Knuth's *The Art of Computer Programming*.
     """
+    repeat = _index(repeat)
+    if repeat < 0:
+        raise ValueError('repeat argument cannot be negative')
+    if not repeat:
+        iterables = ()
     all_iterables = tuple(map(tuple, iterables)) * repeat
     iterable_count = len(all_iterables)
     for iterable in all_iterables:
@@ -5053,6 +5069,11 @@ def partial_product(*iterables, repeat=1):
     equivalent to ``partial_product('AB', 'AB', 'AB')``.
     """
 
+    repeat = _index(repeat)
+    if repeat < 0:
+        raise ValueError('repeat argument cannot be negative')
+    if not repeat:
+        iterables = ()
     all_iterables = tuple(map(tuple, iterables)) * repeat
     iterators = tuple(map(iter, all_iterables))
 
