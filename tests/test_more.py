@@ -7238,3 +7238,42 @@ class TestRandomOrderedRange(TestCase):
         # Without mitigation the LCG doesn't produce many distinct permutations
         perms = set(tuple(mi.random_ordered_range(6)) for _ in range(10**5))
         self.assertEqual(len(perms), factorial(6))
+
+
+class ProductRepeatTests(TestCase):
+    @staticmethod
+    def results(iterable, repeat):
+        return (
+            lambda: mi.nth_product(0, iterable, repeat=repeat),
+            lambda: mi.product_index((), iterable, repeat=repeat),
+            lambda: list(mi.gray_product(iterable, repeat=repeat)),
+            lambda: list(mi.partial_product(iterable, repeat=repeat)),
+        )
+
+    def test_negative_repeat(self):
+        for call in self.results('AB', -1):
+            with self.subTest(call=call), self.assertRaises(ValueError):
+                call()
+
+    def test_zero_repeat_does_not_consume_inputs(self):
+        for position, expected in enumerate(((), 0, [()], [()])):
+            source = iter('AB')
+            with self.subTest(position=position):
+                self.assertEqual(self.results(source, 0)[position](), expected)
+                self.assertEqual(list(source), ['A', 'B'])
+
+    def test_repeat_supports_index_protocol(self):
+        class Zero:
+            def __index__(self):
+                return 0
+
+        for call, expected in zip(
+            self.results('AB', Zero()), ((), 0, [()], [()])
+        ):
+            with self.subTest(call=call):
+                self.assertEqual(call(), expected)
+
+    def test_noninteger_repeat(self):
+        for call in self.results('AB', 1.5):
+            with self.subTest(call=call), self.assertRaises(TypeError):
+                call()
