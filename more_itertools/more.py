@@ -1748,7 +1748,7 @@ def split_into(iterable, sizes):
 
     When a ``None`` object is encountered in *sizes*, the returned list will
     contain items up to the end of *iterable* the same way that
-    :func:`itertools.slice` does:
+    :func:`itertools.islice` does:
 
         >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
         [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
@@ -1758,6 +1758,15 @@ def split_into(iterable, sizes):
     from a table, multiple columns represent elements of the same feature
     (e.g. a point represented by x,y,z) but, the format is not the same for
     all columns.
+
+    Each size must be ``None`` or a non-negative integer. A negative integer
+    raises ``ValueError``; any other invalid type is rejected by the
+    underlying iteration and also raises ``ValueError``:
+
+        >>> list(split_into([1, 2, 3], [-1, 2]))
+        Traceback (most recent call last):
+            ...
+        ValueError: each size must be non-negative or None
     """
     # convert the iterable argument into an iterator so its contents can
     # be consumed by islice in case it is a generator
@@ -1767,6 +1776,8 @@ def split_into(iterable, sizes):
         if size is None:
             yield list(it)
             return
+        elif isinstance(size, int) and size < 0:
+            raise ValueError('each size must be non-negative or None')
         else:
             yield list(islice(it, size))
 

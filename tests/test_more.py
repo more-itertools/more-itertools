@@ -1884,6 +1884,16 @@ class SplitIntoTests(TestCase):
         with self.assertRaises(ValueError):
             list(mi.split_into(iterable, sizes))
 
+    def test_negative_in_sizes(self):
+        """A ValueError with a clear message is raised for a negative size,
+        rather than leaking islice()'s internal error text."""
+        iterable = [1, 2, 3, 4, 5]
+        sizes = [-1, 2]
+        with self.assertRaisesRegex(
+            ValueError, 'each size must be non-negative or None'
+        ):
+            list(mi.split_into(iterable, sizes))
+
     def test_invalid_in_sizes_after_none(self):
         """A item in ``sizes`` that is invalid will not raise a TypeError if it
         comes after a ``None`` item."""
