@@ -5371,13 +5371,15 @@ def _extract_monotonic(iterator, indices):
     for index in indices:
         advance = index - num_read
         try:
-            value = next(islice(iterator, advance, None))
+            remainder = islice(iterator, advance, None)
         except ValueError:
             if advance != -1 or index < 0:
                 raise ValueError(f'Invalid index: {index}') from None
-        except StopIteration:
-            raise IndexError(index) from None
         else:
+            try:
+                value = next(remainder)
+            except StopIteration:
+                raise IndexError(index) from None
             num_read += advance + 1
         yield value
 

@@ -9,6 +9,7 @@ Unreleased
 ----------
 
 * Changes to existing functions:
+    * :func:`extract` no longer replaces ``ValueError`` exceptions raised by the input iterator when *monotonic* is true.
     * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count*.
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
     * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0``

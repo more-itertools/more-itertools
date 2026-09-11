@@ -6732,6 +6732,38 @@ class ExtractTests(TestCase):
                 mi.extract('abcdefg', [-1, 0, 1], monotonic=True)
             )  # negative index
 
+    def test_source_value_errors_are_preserved(self):
+        class RecordError(ValueError):
+            pass
+
+        cases = [
+            ((), [0]),
+            (('first',), [1]),
+            (('first',), [0, 1]),
+            (('first',), [0, 0, 1]),
+        ]
+        for monotonic in (False, True):
+            for error_type in (ValueError, RecordError):
+                for prefix, indices in cases:
+                    with self.subTest(
+                        monotonic=monotonic,
+                        error_type=error_type,
+                        indices=indices,
+                    ):
+                        error = error_type('record decoding failed')
+
+                        def source():
+                            yield from prefix
+                            raise error
+
+                        with self.assertRaises(ValueError) as raised:
+                            list(
+                                mi.extract(
+                                    source(), indices, monotonic=monotonic
+                                )
+                            )
+                        self.assertIs(raised.exception, error)
+
     def test_lazy_consumption(self):
         extract = mi.extract
 
