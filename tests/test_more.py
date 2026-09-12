@@ -5441,6 +5441,27 @@ class ChunkedEvenTests(TestCase):
 
 
 class ZipBroadcastTests(TestCase):
+    def test_single_use_iterable(self):
+        class SingleUseIterable:
+            def __init__(self, values):
+                self.values = values
+                self.opened = False
+
+            def __iter__(self):
+                if self.opened:
+                    raise RuntimeError('input already opened')
+                self.opened = True
+                return iter(self.values)
+
+        for values in ([], [1, 2]):
+            for strict in (False, True):
+                with self.subTest(values=values, strict=strict):
+                    source = SingleUseIterable(values)
+                    self.assertEqual(
+                        list(mi.zip_broadcast('label', source, strict=strict)),
+                        [('label', value) for value in values],
+                    )
+
     def test_zip(self):
         for objects, zipped, strict_ok in [
             # Empty
