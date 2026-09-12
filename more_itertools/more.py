@@ -2450,7 +2450,10 @@ class numeric_range(Sequence):
         )
 
     def __reversed__(self):
-        return map(self._get_by_index, reversed(range(self._len)))
+        start = self._start
+        step = self._step
+        for i in reversed(range(self._len)):
+            yield start + i * step
 
     def count(self, value):
         return int(value in self)
