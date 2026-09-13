@@ -2195,6 +2195,29 @@ class UnzipTests(TestCase):
 class SortTogetherTest(TestCase):
     """Tests for sort_together()"""
 
+    def test_empty_columns(self):
+        for column_count in (0, 1, 2, 3):
+            for strict in (False, True):
+                with self.subTest(column_count=column_count, strict=strict):
+                    self.assertEqual(
+                        mi.sort_together(
+                            (iter(()) for _ in range(column_count)),
+                            strict=strict,
+                        ),
+                        [()] * column_count,
+                    )
+
+    def test_empty_shortest_column(self):
+        for columns in ([[], [1]], [[1], []]):
+            with self.subTest(columns=columns):
+                self.assertEqual(mi.sort_together(columns), [(), ()])
+                with self.assertRaises(ValueError):
+                    mi.sort_together(columns, strict=True)
+
+    def test_outer_iterator(self):
+        columns = (iter(column) for column in ([2, 1], ['b', 'a']))
+        self.assertEqual(mi.sort_together(columns), [(1, 2), ('a', 'b')])
+
     def test_key_list(self):
         """tests `key_list` including default, iterables include duplicates"""
         iterables = [

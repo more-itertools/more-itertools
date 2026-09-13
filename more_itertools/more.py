@@ -1989,6 +1989,11 @@ def sort_together(
         >>> sort_together([(1, 2, 3), ('c', 'b', 'a')], reverse=True)
         [(3, 2, 1), ('a', 'b', 'c')]
 
+    Empty columns are preserved in the output:
+
+        >>> sort_together([[], []])
+        [(), ()]
+
     If the *strict* keyword argument is ``True``, then
     ``ValueError`` will be raised if any of the iterables have
     different lengths.
@@ -2015,8 +2020,11 @@ def sort_together(
                 *get_key_items(zipped_items)
             )
 
+    iterables = tuple(iterables)
     transposed = zip(*iterables, strict=strict)
     reordered = sorted(transposed, key=key_argument, reverse=reverse)
+    if not reordered:
+        return [()] * len(iterables)
     untransposed = zip(*reordered, strict=strict)
     return list(untransposed)
 
