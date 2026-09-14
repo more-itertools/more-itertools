@@ -658,13 +658,16 @@ def one(iterable, too_short=None, too_long=None):
     iterator = iter(iterable)
     for first in iterator:
         for second in iterator:
-            msg = (
+            if too_long is not None:
+                raise too_long
+            raise ValueError(
                 f'Expected exactly one item in iterable, but got {first!r}, '
                 f'{second!r}, and perhaps more.'
             )
-            raise too_long or ValueError(msg)
         return first
-    raise too_short or ValueError('too few items in iterable (expected 1)')
+    if too_short is not None:
+        raise too_short
+    raise ValueError('too few items in iterable (expected 1)')
 
 
 def raise_(exception, *args):
@@ -3681,11 +3684,12 @@ def only(iterable, default=None, too_long=None):
     iterator = iter(iterable)
     for first in iterator:
         for second in iterator:
-            msg = (
+            if too_long is not None:
+                raise too_long
+            raise ValueError(
                 f'Expected exactly one item in iterable, but got {first!r}, '
                 f'{second!r}, and perhaps more.'
             )
-            raise too_long or ValueError(msg)
         return first
     return default
 
