@@ -6120,6 +6120,23 @@ class IequalsTests(TestCase):
         # See https://github.com/more-itertools/more-itertools/issues/900
         self.assertFalse(mi.iequals([], [mock.ANY]))
 
+    def test_value_error_not_masked(self):
+        class BadComparer:
+            def __eq__(self, other):
+                raise ValueError('comparison failed')
+
+        # A ValueError raised while comparing elements must propagate
+        with self.assertRaises(ValueError):
+            mi.iequals(iter([BadComparer()]), iter([BadComparer()]))
+
+        # A ValueError raised while iterating must propagate
+        def second_item_raises():
+            yield 1
+            raise ValueError('iteration failed')
+
+        with self.assertRaises(ValueError):
+            mi.iequals(second_item_raises(), [1])
+
 
 class ConstrainedBatchesTests(TestCase):
     def test_basic(self):
