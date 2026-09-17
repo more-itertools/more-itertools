@@ -1109,6 +1109,38 @@ class BucketTests(TestCase):
         self.assertEqual(list(D[20]), [])
         self.assertEqual(list(D[30]), [30, 31, 33])
 
+    def test_in_does_not_add_key(self):
+        # A failed membership test must not invent a key (see #1284)
+        iterable = [10, 20, 11, 21]
+        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        self.assertFalse(30 in D)
+        self.assertEqual(set(D), {10, 20})
+        self.assertEqual(list(D[30]), [])
+
+    def test_getitem_miss_does_not_add_key(self):
+        # Selecting an absent bucket must not invent a key either
+        iterable = [10, 20, 11, 21]
+        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        self.assertEqual(list(D[30]), [])
+        self.assertEqual(set(D), {10, 20})
+
+    def test_in_does_not_add_key_with_validator(self):
+        # A key the validator accepts but the iterable never produces
+        iterable = [10, 20, 11, 21]
+        key = lambda x: 10 * (x // 10)
+        validator = lambda x: x in {10, 20, 30}
+        D = mi.bucket(iterable, key, validator=validator)
+        self.assertFalse(30 in D)
+        self.assertEqual(set(D), {10, 20})
+
+    def test_keys_are_only_those_seen(self):
+        # Every reported key must have had at least one matching item
+        iterable = [10, 20, 11]
+        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        for missing in (30, 40, 50):
+            self.assertFalse(missing in D)
+        self.assertEqual(set(D), {10, 20})
+
 
 class SpyTests(TestCase):
     """Tests for ``spy()``"""
