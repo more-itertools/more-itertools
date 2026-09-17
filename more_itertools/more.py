@@ -2002,6 +2002,10 @@ def sort_together(
     different lengths.
 
     """
+    # Keep the outer iterable around so we can tell how many columns there
+    # were, even if every row ends up empty after sorting.
+    iterables = tuple(iterables)
+
     if key is None:
         # if there is no key function, the key argument to sorted is an
         # itemgetter
@@ -2025,6 +2029,10 @@ def sort_together(
 
     transposed = zip(*iterables, strict=strict)
     reordered = sorted(transposed, key=key_argument, reverse=reverse)
+    if not reordered:
+        # zip(*reordered) can't recover the column count when there are no
+        # rows to transpose, so return one empty tuple per input column.
+        return [()] * len(iterables)
     untransposed = zip(*reordered, strict=strict)
     return list(untransposed)
 

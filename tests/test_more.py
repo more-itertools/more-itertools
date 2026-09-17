@@ -2405,6 +2405,19 @@ class SortTogetherTest(TestCase):
             ),
         )
 
+    def test_empty_shortest_column(self):
+        # A shortest column of length 0 leaves no rows to transpose back,
+        # but the number of output columns should still match the input.
+        self.assertEqual(mi.sort_together([[], []]), [(), ()])
+        self.assertEqual(mi.sort_together([[], []], strict=True), [(), ()])
+        self.assertEqual(mi.sort_together([[], [1]]), [(), ()])
+        self.assertEqual(mi.sort_together([]), [])
+
+        self.assertRaises(
+            ValueError,
+            lambda: mi.sort_together([[], [1]], strict=True),
+        )
+
 
 class DivideTest(TestCase):
     """Tests for divide()"""
