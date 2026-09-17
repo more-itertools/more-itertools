@@ -3185,6 +3185,25 @@ class NumericRangeTests(TestCase):
         ]:
             self.assertEqual(expected, list(reversed(mi.numeric_range(*args))))
 
+    def test_reversed_preserves_float_values(self):
+        for args in [
+            (0.0, 1.0, 0.1),
+            (1.0, 0.0, -0.1),
+            (0.1, 0.5, 0.1),
+        ]:
+            with self.subTest(args=args):
+                values = mi.numeric_range(*args)
+                self.assertEqual(list(values)[::-1], list(reversed(values)))
+
+    def test_reversed_datetime_limits(self):
+        for start, step in [
+            (datetime.min, timedelta(days=1)),
+            (datetime.max, -timedelta(days=1)),
+        ]:
+            with self.subTest(start=start, step=step):
+                values = mi.numeric_range(start, start + 2 * step, step)
+                self.assertEqual(list(values)[::-1], list(reversed(values)))
+
     def test_count(self):
         for args, v, c in [
             ((7.0,), 0.0, 1),
