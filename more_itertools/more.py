@@ -1225,7 +1225,8 @@ class bucket:
                         yield item
                         break
                     elif self._validator(item_value):
-                        self._cache.setdefault(item_value, deque()).append(item)
+                        items = self._cache.setdefault(item_value, deque())
+                        items.append(item)
 
     def __iter__(self):
         for item in self._it:
