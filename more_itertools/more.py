@@ -1181,7 +1181,7 @@ class bucket:
     def __init__(self, iterable, key, validator=None):
         self._it = iter(iterable)
         self._key = key
-        self._cache = defaultdict(deque)
+        self._cache = {}
         self._validator = validator or (lambda x: True)
 
     def __contains__(self, value):
@@ -1206,7 +1206,7 @@ class bucket:
         while True:
             # If we've cached some items that match the target value, emit
             # the first one and evict it from the cache.
-            if self._cache[value]:
+            if self._cache.get(value):
                 yield self._cache[value].popleft()
             # Otherwise we need to advance the parent iterator to search for
             # a matching item, caching the rest.
@@ -1218,16 +1218,21 @@ class bucket:
                         return
                     item_value = self._key(item)
                     if item_value == value:
+                        # This item goes straight to the caller rather than
+                        # through the cache, but the key is a real one and
+                        # __iter__ must still report it.
+                        self._cache.setdefault(value, deque())
                         yield item
                         break
                     elif self._validator(item_value):
-                        self._cache[item_value].append(item)
+                        items = self._cache.setdefault(item_value, deque())
+                        items.append(item)
 
     def __iter__(self):
         for item in self._it:
             item_value = self._key(item)
             if self._validator(item_value):
-                self._cache[item_value].append(item)
+                self._cache.setdefault(item_value, deque()).append(item)
 
         return iter(self._cache)
 
