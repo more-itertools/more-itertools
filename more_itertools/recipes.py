@@ -1470,6 +1470,7 @@ def running_mean(iterable, *, maxlen=None):
     if maxlen is None:
         return map(truediv, accumulate(iterator), count(1))
 
+    maxlen = _index(maxlen)
     if maxlen <= 0:
         raise ValueError('Window size should be positive')
 
@@ -1515,6 +1516,7 @@ def running_min(iterable, *, maxlen=None):
     if maxlen is None:
         return accumulate(iterator, func=min)
 
+    maxlen = _index(maxlen)
     if maxlen <= 0:
         raise ValueError('Window size should be positive')
 
@@ -1560,6 +1562,7 @@ def running_max(iterable, *, maxlen=None):
     if maxlen is None:
         return accumulate(iterator, func=max)
 
+    maxlen = _index(maxlen)
     if maxlen <= 0:
         raise ValueError('Window size should be positive')
 
@@ -1588,6 +1591,9 @@ def running_statistics(iterable, *, maxlen=None):
     Supports numeric types such as int, float, Decimal, and Fraction,
     but not complex numbers which are unorderable.
     """
+
+    if maxlen is not None:
+        maxlen = _index(maxlen)
 
     # fmt: off
     t0, t1, t2, t3 = tee(iterable, 4)

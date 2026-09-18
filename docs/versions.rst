@@ -9,6 +9,7 @@ Unreleased
 ----------
 
 * Changes to existing functions:
+    * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
     * :func:`numeric_range` now preserves its original values and length when reversed, including floating-point ranges and ranges near datetime limits.
     * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count*.
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
