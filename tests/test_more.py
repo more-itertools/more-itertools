@@ -4505,6 +4505,10 @@ class IchunkedTests(TestCase):
         expected = []
         self.assertEqual(actual, expected)
 
+    def test_zero_nonempty_raises(self):
+        with self.assertRaises(ValueError):
+            [list(c) for c in mi.ichunked([1, 2, 3], 0)]
+
     def test_negative(self):
         iterable = count()
         with self.assertRaises(ValueError):

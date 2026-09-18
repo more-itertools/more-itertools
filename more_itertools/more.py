@@ -3714,6 +3714,11 @@ def ichunked(iterable, n):
     """
     iterator = iter(iterable)
     for first in iterator:
+        # Validate once we know a chunk will be produced. Empty iterables still
+        # yield nothing for n < 1 (historical behavior); non-empty used to raise
+        # a cryptic ``islice`` error for n < 1.
+        if n < 1:
+            raise ValueError('n must be at least one')
         rest = islice(iterator, n - 1)
         cache, cacher = tee(rest)
         yield chain([first], rest, cache)
