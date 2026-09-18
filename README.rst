@@ -262,11 +262,11 @@ and `@bbayles <https://github.com/bbayles>`_, with help from `many others <https
 
 Some notes on contributing:
 
-* If you're fixing a documentation typo, you don't need to make an issue before opening a pull request.
-* If you're fixing a bug, please make an issue first
-* If you'd like to propose a new feature, please make an issue first.
-* Not all proposals for new functionality will be accepted, so please save yourself some work by checking first with an issue.
-* Automatically generated pull requests that don't follow these instructions will be closed summarily.
+* In general, please make an issue before opening a pull request. Not all will be accepted, so please save yourself the trouble of creating a PR.
+* Exception: if you're fixing a documentation typo, you can skip making an issue.
+* If you've spotted a bug yourself, please make an issue with a description of the problem it causes in your own words.
+* If you're using a coding assistant or other automated tool to identify bugs, issues you create need to show examples of production code is affected by the problem. Sanitized code is OK; contrived examples aren't.
+* Issues and pull requests from coding assistants or other automated tools that don't follow these instructions will be closed summarily.
 
 Version History
 ===============
