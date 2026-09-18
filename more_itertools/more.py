@@ -658,13 +658,16 @@ def one(iterable, too_short=None, too_long=None):
     iterator = iter(iterable)
     for first in iterator:
         for second in iterator:
-            msg = (
+            if too_long is not None:
+                raise too_long
+            raise ValueError(
                 f'Expected exactly one item in iterable, but got {first!r}, '
                 f'{second!r}, and perhaps more.'
             )
-            raise too_long or ValueError(msg)
         return first
-    raise too_short or ValueError('too few items in iterable (expected 1)')
+    if too_short is not None:
+        raise too_short
+    raise ValueError('too few items in iterable (expected 1)')
 
 
 def raise_(exception, *args):
@@ -1203,7 +1206,7 @@ class bucket:
         while True:
             # If we've cached some items that match the target value, emit
             # the first one and evict it from the cache.
-            if self._cache[value]:
+            if self._cache.get(value):
                 yield self._cache[value].popleft()
             # Otherwise we need to advance the parent iterator to search for
             # a matching item, caching the rest.
@@ -1215,6 +1218,8 @@ class bucket:
                         return
                     item_value = self._key(item)
                     if item_value == value:
+                        if value not in self._cache:
+                            self._cache[value] = deque()
                         yield item
                         break
                     elif self._validator(item_value):
@@ -2450,15 +2455,10 @@ class numeric_range(Sequence):
         )
 
     def __reversed__(self):
-        # Empty iterator
-        try:
-            start = self._get_by_index(-1)
-        except IndexError:
-            return iter([])
-
-        return iter(
-            numeric_range(start, self._start - self._step, -self._step)
-        )
+        start = self._start
+        step = self._step
+        for i in reversed(range(self._len)):
+            yield start + i * step
 
     def count(self, value):
         return int(value in self)
@@ -3681,11 +3681,12 @@ def only(iterable, default=None, too_long=None):
     iterator = iter(iterable)
     for first in iterator:
         for second in iterator:
-            msg = (
+            if too_long is not None:
+                raise too_long
+            raise ValueError(
                 f'Expected exactly one item in iterable, but got {first!r}, '
                 f'{second!r}, and perhaps more.'
             )
-            raise too_long or ValueError(msg)
         return first
     return default
 
@@ -4516,40 +4517,26 @@ def combination_with_replacement_index(element, iterable):
     combinations with replacement of *iterable*.
     """
     element = tuple(element)
-    l = len(element)
-    element = enumerate(element)
-
-    k, y = next(element, (None, None))
-    if k is None:
-        return 0
-
-    indexes = []
+    r = len(element)
     pool = tuple(iterable)
-    for n, x in enumerate(pool):
-        while x == y:
-            indexes.append(n)
-            tmp, y = next(element, (None, None))
-            if tmp is None:
-                break
-            else:
-                k = tmp
-        if y is None:
-            break
-    else:
+    n = len(pool)
+
+    occupations = [0] * n
+    try:
+        i = 0
+        for e in element:
+            i = pool.index(e, i)
+            occupations[i] += 1
+    except ValueError:
         raise ValueError(
             'element is not a combination with replacement of iterable'
         )
-
-    n = len(pool)
-    occupations = [0] * n
-    for p in indexes:
-        occupations[p] += 1
 
     index = 0
     cumulative_sum = 0
     for k in range(1, n):
         cumulative_sum += occupations[k - 1]
-        j = l + n - 1 - k - cumulative_sum
+        j = (r - cumulative_sum) + (n - k) - 1
         i = n - k
         if i <= j:
             index += comb(j, i)
@@ -4685,15 +4672,13 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     different lengths.
     """
 
-    def is_scalar(obj):
+    def get_iterator(obj):
         if scalar_types and isinstance(obj, scalar_types):
-            return True
+            return None
         try:
-            iter(obj)
+            return iter(obj)
         except TypeError:
-            return True
-        else:
-            return False
+            return None
 
     size = len(objects)
     if not size:
@@ -4702,10 +4687,11 @@ def zip_broadcast(*objects, scalar_types=(str, bytes), strict=False):
     new_item = [None] * size
     iterables, iterable_positions = [], []
     for i, obj in enumerate(objects):
-        if is_scalar(obj):
+        iterator = get_iterator(obj)
+        if iterator is None:
             new_item[i] = obj
         else:
-            iterables.append(iter(obj))
+            iterables.append(iterator)
             iterable_positions.append(i)
 
     if not iterables:
@@ -4952,7 +4938,7 @@ def constrained_batches(
     [(b'12345', b'123'), (b'12345678', b'1', b'1'), (b'12', b'1')]
 
     If a *max_count* is supplied, the number of items per batch is also
-    limited:
+    limited. It must be greater than zero:
 
     >>> iterable = [b'12345', b'123', b'12345678', b'1', b'1', b'12', b'1']
     >>> list(constrained_batches(iterable, 10, max_count = 2))
@@ -4966,6 +4952,8 @@ def constrained_batches(
     """
     if max_size <= 0:
         raise ValueError('maximum size must be greater than zero')
+    if max_count is not None and max_count <= 0:
+        raise ValueError('maximum count must be greater than zero')
 
     batch = []
     batch_size = 0

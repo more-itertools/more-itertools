@@ -18,6 +18,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: Run tests
+      env:
+        COVERAGE_CORE: "sysmon"
       run: make coverage
     - name: Static checks
       if: "matrix.python-version == '3.10'"

@@ -791,6 +791,33 @@ class OneTests(TestCase):
             lambda: mi.one(it),
         )
 
+    def test_falsy_custom_exception(self):
+        # An exception whose instances are falsy must still be raised, rather
+        # than being treated as "no custom exception given".
+        class FalsyError(Exception):
+            def __bool__(self):
+                return False
+
+        too_long = FalsyError('too many')
+        self.assertRaises(
+            FalsyError, lambda: mi.one(count(), too_long=too_long)
+        )
+
+        too_short = FalsyError('too few')
+        self.assertRaises(FalsyError, lambda: mi.one([], too_short=too_short))
+
+    def test_too_long_does_not_evaluate_repr(self):
+        # When too_long is given, the default message (which reprs the first two
+        # items) should never be built.
+        class NoRepr:
+            def __repr__(self):
+                raise RuntimeError('repr should not be called')
+
+        it = (NoRepr() for _ in count())
+        self.assertRaises(
+            OverflowError, lambda: mi.one(it, too_long=OverflowError)
+        )
+
 
 class IntersperseTest(TestCase):
     """Tests for intersperse()"""
@@ -1081,6 +1108,38 @@ class BucketTests(TestCase):
         self.assertEqual(list(D[10]), [10, 11, 12])
         self.assertEqual(list(D[20]), [])
         self.assertEqual(list(D[30]), [30, 31, 33])
+
+    def test_in_does_not_add_key(self):
+        # A failed membership test must not invent a key (see #1284)
+        iterable = [10, 20, 11, 21]
+        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        self.assertFalse(30 in D)
+        self.assertEqual(set(D), {10, 20})
+        self.assertEqual(list(D[30]), [])
+
+    def test_getitem_miss_does_not_add_key(self):
+        # Selecting an absent bucket must not invent a key either
+        iterable = [10, 20, 11, 21]
+        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        self.assertEqual(list(D[30]), [])
+        self.assertEqual(set(D), {10, 20})
+
+    def test_in_does_not_add_key_with_validator(self):
+        # A key the validator accepts but the iterable never produces
+        iterable = [10, 20, 11, 21]
+        key = lambda x: 10 * (x // 10)
+        validator = lambda x: x in {10, 20, 30}
+        D = mi.bucket(iterable, key, validator=validator)
+        self.assertFalse(30 in D)
+        self.assertEqual(set(D), {10, 20})
+
+    def test_keys_are_only_those_seen(self):
+        # Every reported key must have had at least one matching item
+        iterable = [10, 20, 11]
+        D = mi.bucket(iterable, key=lambda x: 10 * (x // 10))
+        for missing in (30, 40, 50):
+            self.assertFalse(missing in D)
+        self.assertEqual(set(D), {10, 20})
 
 
 class SpyTests(TestCase):
@@ -3126,6 +3185,25 @@ class NumericRangeTests(TestCase):
         ]:
             self.assertEqual(expected, list(reversed(mi.numeric_range(*args))))
 
+    def test_reversed_preserves_float_values(self):
+        for args in [
+            (0.0, 1.0, 0.1),
+            (1.0, 0.0, -0.1),
+            (0.1, 0.5, 0.1),
+        ]:
+            with self.subTest(args=args):
+                values = mi.numeric_range(*args)
+                self.assertEqual(list(values)[::-1], list(reversed(values)))
+
+    def test_reversed_datetime_limits(self):
+        for start, step in [
+            (datetime.min, timedelta(days=1)),
+            (datetime.max, -timedelta(days=1)),
+        ]:
+            with self.subTest(start=start, step=step):
+                values = mi.numeric_range(start, start + 2 * step, step)
+                self.assertEqual(list(values)[::-1], list(reversed(values)))
+
     def test_count(self):
         for args, v, c in [
             ((7.0,), 0.0, 1),
@@ -4385,6 +4463,28 @@ class OnlyTests(TestCase):
             lambda: mi.only(['foo', 'bar', 'baz']),
         )
 
+    def test_falsy_custom_exception(self):
+        class FalsyError(Exception):
+            def __bool__(self):
+                return False
+
+        too_long = FalsyError('too many')
+        self.assertRaises(
+            FalsyError, lambda: mi.only([1, 2], too_long=too_long)
+        )
+
+    def test_too_long_does_not_evaluate_repr(self):
+        class NoRepr:
+            def __repr__(self):
+                raise RuntimeError('repr should not be called')
+
+        self.assertRaises(
+            OverflowError,
+            lambda: mi.only(
+                [NoRepr(), NoRepr(), NoRepr()], too_long=OverflowError
+            ),
+        )
+
 
 class IchunkedTests(TestCase):
     def test_even(self):
@@ -5231,6 +5331,36 @@ class CombinationIndexTests(TestCase):
 
 
 class CombinationWithReplacementIndexTests(TestCase):
+    def test_none_values(self):
+        for iterable in (
+            [None, 1, 2],
+            [1, None, 2],
+            [1, 2, None],
+            [None, 1, None],
+        ):
+            for r in range(4):
+                first_index = {}
+                for index, element in enumerate(
+                    combinations_with_replacement(iterable, r)
+                ):
+                    with self.subTest(iterable=iterable, element=element):
+                        actual = mi.combination_with_replacement_index(
+                            iter(element), iter(iterable)
+                        )
+                        expected = first_index.setdefault(element, index)
+                        self.assertEqual(actual, expected)
+
+    def test_invalid_none_values(self):
+        for element, iterable in (
+            ((None,), [1, 2]),
+            ((1, None), [1, 2]),
+            ((1, None), [None, 1]),
+            ((None, 2), [1, None]),
+        ):
+            with self.subTest(element=element, iterable=iterable):
+                with self.assertRaises(ValueError):
+                    mi.combination_with_replacement_index(element, iterable)
+
     def test_r_less_than_n(self):
         iterable = 'abcdefg'
         r = 4
@@ -5411,6 +5541,27 @@ class ChunkedEvenTests(TestCase):
 
 
 class ZipBroadcastTests(TestCase):
+    def test_single_use_iterable(self):
+        class SingleUseIterable:
+            def __init__(self, values):
+                self.values = values
+                self.opened = False
+
+            def __iter__(self):
+                if self.opened:
+                    raise RuntimeError('input already opened')
+                self.opened = True
+                return iter(self.values)
+
+        for values in ([], [1, 2]):
+            for strict in (False, True):
+                with self.subTest(values=values, strict=strict):
+                    source = SingleUseIterable(values)
+                    self.assertEqual(
+                        list(mi.zip_broadcast('label', source, strict=strict)),
+                        [('label', value) for value in values],
+                    )
+
     def test_zip(self):
         for objects, zipped, strict_ok in [
             # Empty
@@ -6086,6 +6237,23 @@ class ConstrainedBatchesTests(TestCase):
         actual = list(mi.constrained_batches(iterable, max_size, max_count))
         expected = [('1', '1'), ('12345678',), ('12345', '12345')]
         self.assertEqual(actual, expected)
+
+    def test_max_count_one(self):
+        self.assertEqual(
+            list(mi.constrained_batches(['', 'a', ''], 10, max_count=1)),
+            [('',), ('a',), ('',)],
+        )
+
+    def test_nonpositive_max_count(self):
+        for max_count in (0, -1):
+            for items in ([], ['a', 'b']):
+                with self.subTest(max_count=max_count, items=items):
+                    source = iter(items)
+                    with self.assertRaisesRegex(
+                        ValueError, 'maximum count must be greater than zero'
+                    ):
+                        list(mi.constrained_batches(source, 10, max_count))
+                    self.assertEqual(list(source), items)
 
     def test_strict(self):
         iterable = ['1', '123456789', '1']
