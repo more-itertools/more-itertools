@@ -86,17 +86,17 @@ Unreleased
     * :func:`extract` now accepts a `monotonic` argument for improved performance (thanks to rhettinger)
     * A bug in :func:`numeric_range`'s handling of negative steps was fixed (thanks to bysiber)
     * :func:`grouper` implementation was updated to match the ``itertools`` docs (thanks to rhettinger)
-    * :func:`nth_product`, :func:`product_index`, :func:`gray_product`,
-      :func:`partial_product`, :func:`nth_product`, :func:`product_index`, and
-      :func:`random_product` now accept a ``repeat`` keyword argument (thanks to rhettinger)
+    * :func:`gray_product`, :func:`nth_product`, :func:`partial_product`,
+      :func:`product_index`, and :func:`random_product` now accept a ``repeat``
+      keyword argument (thanks to rhettinger)
     * :func:`powerset_of_sets` can now construct ``frozenset`` instances (thanks to rhettinger)
     * The type hints for :func:`stagger` were improved (thanks to nathanjmcdougall)
-    * Memory efficiency was improved for :func:`partition` was improved (thanks to rhettinger and yueyinqiu)
-    * Performance for the functions :func:`count_cycle`, :func:`difference`,
-      :func:`random_product`,  was improved :func:`nth_combination`, :func:`nth_combination_with_replacement`,
-      :func:`nth_permuwas improvedtation`, :func:`nth_product`, :func:`product_index`,
-      :func:`random_permutation`, :func:`substrings`, and :func:`value_chain` was
-      improved (thanks to rhettinger)
+    * Memory efficiency was improved for :func:`partition` (thanks to rhettinger and yueyinqiu)
+    * Performance was improved for :func:`count_cycle`, :func:`difference`,
+      :func:`nth_combination`, :func:`nth_combination_with_replacement`,
+      :func:`nth_permutation`, :func:`nth_product`, :func:`product_index`,
+      :func:`random_permutation`, :func:`random_product`, :func:`substrings`,
+      and :func:`value_chain` (thanks to rhettinger)
     * Performance for :func:`ichunked` was improved (thanks to pochmann3 and rhettinger)
 
 * Other changes
