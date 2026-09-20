@@ -32,6 +32,7 @@ from random import random, randrange, shuffle, uniform
 from operator import (
     attrgetter,
     getitem,
+    index as _index,
     is_not,
     itemgetter,
     lt,
@@ -2378,20 +2379,21 @@ class numeric_range(Sequence):
         return self._step == other._step
 
     def __getitem__(self, key):
-        if isinstance(key, int):
-            return self._get_by_index(key)
-        elif isinstance(key, slice):
+        if isinstance(key, slice):
             start_idx, stop_idx, step_idx = key.indices(self._len)
             return numeric_range(
                 self._start + start_idx * self._step,
                 self._start + stop_idx * self._step,
                 self._step * step_idx,
             )
-        else:
+        try:
+            index = _index(key)
+        except TypeError:
             raise TypeError(
                 'numeric range indices must be '
                 f'integers or slices, not {type(key).__name__}'
-            )
+            ) from None
+        return self._get_by_index(index)
 
     def __hash__(self):
         # numeric_range hashing is intended to mirror the built-in range object's

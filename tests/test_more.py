@@ -3017,6 +3017,25 @@ class NumericRangeTests(TestCase):
             with self.assertRaises(IndexError):
                 mi.numeric_range(*args)[index]
 
+    def test_get_item_by_index_protocol(self):
+        class Index:
+            def __init__(self, value):
+                self.value = value
+
+            def __index__(self):
+                return self.value
+
+        values = mi.numeric_range(1.0, 6.0, 1.5)
+        for index in (0, 1, -1, -4):
+            with self.subTest(index=index):
+                self.assertEqual(values[Index(index)], values[index])
+        for index in (4, -5):
+            with self.subTest(index=index), self.assertRaises(IndexError):
+                values[Index(index)]
+        for index in (1.0, '1', Index(1.0)):
+            with self.subTest(index=index), self.assertRaises(TypeError):
+                values[index]
+
     def test_get_item_by_slice(self):
         for args, sl, expected_args in [
             ((1.0, 9.0, 1.5), slice(None, None, None), (1.0, 9.0, 1.5)),
