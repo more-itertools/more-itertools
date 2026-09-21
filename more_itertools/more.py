@@ -3132,7 +3132,7 @@ class seekable:
                 raise
             return default
         # maxlen=0 cannot store the item we just consumed, so put it back.
-        if isinstance(self._cache, deque) and self._cache.maxlen == 0:
+        if getattr(self._cache, 'maxlen', None) == 0:
             self._source = chain((peeked,), self._source)
             self._index = None
             return peeked
