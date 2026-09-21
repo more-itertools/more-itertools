@@ -3781,6 +3781,20 @@ class SeekableTest(PeekableMixinTests, TestCase):
         self.assertEqual(list(s), iterable)
         self.assertEqual(list(s.elements()), [])
 
+    def test_maxlen_zero_peek_does_not_drop_items(self):
+        s = mi.seekable([10, 20, 30], maxlen=0)
+        self.assertEqual(s.peek(), 10)
+        self.assertEqual(s.peek(), 10)
+        self.assertEqual(list(s), [10, 20, 30])
+
+    def test_maxlen_zero_bool_does_not_drop_items(self):
+        s = mi.seekable([10, 20, 30], maxlen=0)
+        self.assertTrue(s)
+        self.assertEqual(list(s), [10, 20, 30])
+
+        s = mi.seekable([], maxlen=0)
+        self.assertFalse(s)
+
     def test_relative_seek(self):
         iterable = [str(x) for x in range(5)]
         s = mi.seekable(iterable)

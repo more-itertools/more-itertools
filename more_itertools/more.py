@@ -3131,6 +3131,11 @@ class seekable:
             if default is _marker:
                 raise
             return default
+        # maxlen=0 cannot store the item we just consumed, so put it back.
+        if getattr(self._cache, 'maxlen', None) == 0:
+            self._source = chain((peeked,), self._source)
+            self._index = None
+            return peeked
         if self._index is None:
             self._index = len(self._cache)
         self._index -= 1
