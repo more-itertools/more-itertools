@@ -3716,7 +3716,14 @@ def ichunked(iterable, n):
     >>> list(c_3)
     [8, 9, 10, 11]
 
+    *n* must be at least 0. When *n* is 0, nothing is yielded.
+
     """
+    if n < 0:
+        raise ValueError('n must be at least 0')
+    if n == 0:
+        return
+
     iterator = iter(iterable)
     for first in iterator:
         rest = islice(iterator, n - 1)
@@ -4617,7 +4624,12 @@ def chunked_even(iterable, n):
     >>> list(chunked(iterable, n))  # List lengths: 3, 3, 1
     [[1, 2, 3], [4, 5, 6], [7]]
 
+    *n* must be at least 1.
+
     """
+    if n < 1:
+        raise ValueError('n must be at least 1')
+
     iterator = iter(iterable)
 
     # Initialize a buffer to process the chunks while keeping

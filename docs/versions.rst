@@ -15,6 +15,8 @@ Unreleased
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
     * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0``
     * :func:`one` and :func:`only` were fixed to raise a user-supplied *too_short*/*too_long* exception even when the exception object is falsy, and to no longer build the default error message (which reprs iterable items) when a custom exception is given (thanks to itzzdev09)
+    * :func:`chunked_even` now raises ``ValueError`` when *n* is less than 1, instead of an ``islice`` error (thanks to gyanu2507)
+    * :func:`ichunked` now raises ``ValueError`` for a negative *n*, and yields nothing when *n* is 0, including for a non-empty iterable (thanks to gyanu2507)
 
 11.1.0
 ------
