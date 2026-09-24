@@ -15,14 +15,13 @@ class SeekableMemoryTests(unittest.TestCase):
         if tracemalloc.is_tracing():
             self.skipTest('do not disturb an existing allocation trace')
         iterator = seekable(range(3), maxlen=0)
+        iterator.peek()
         tracemalloc.start()
         try:
-            iterator.peek()
-            baseline = tracemalloc.get_traced_memory()[0]
             for _ in range(10000):
                 iterator.peek()
                 bool(iterator)
-            retained = tracemalloc.get_traced_memory()[0] - baseline
+            retained = tracemalloc.get_traced_memory()[0]
         finally:
             tracemalloc.stop()
         # A lookahead needs one item, not one iterator per peek/truth test.
