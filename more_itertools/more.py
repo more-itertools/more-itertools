@@ -3093,7 +3093,10 @@ class seekable:
     """
 
     def __init__(self, iterable, maxlen=None):
-        self._source = peekable(iterable) if maxlen == 0 else iter(iterable)
+        self._maxlen_zero = maxlen == 0
+        self._source = (
+            peekable(iterable) if self._maxlen_zero else iter(iterable)
+        )
         if maxlen is None:
             self._cache = []
         else:
@@ -3125,6 +3128,8 @@ class seekable:
         return True
 
     def peek(self, default=_marker):
+        if self._maxlen_zero:
+            return self._source.peek(default)
         if getattr(self._cache, 'maxlen', None) == 0:
             return self._source.peek(default)
         try:
