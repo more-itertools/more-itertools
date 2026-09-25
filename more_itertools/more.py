@@ -3093,7 +3093,10 @@ class seekable:
     """
 
     def __init__(self, iterable, maxlen=None):
-        self._source = iter(iterable)
+        self._maxlen_zero = maxlen == 0
+        self._source = (
+            peekable(iterable) if self._maxlen_zero else iter(iterable)
+        )
         if maxlen is None:
             self._cache = []
         else:
@@ -3125,17 +3128,16 @@ class seekable:
         return True
 
     def peek(self, default=_marker):
+        if self._maxlen_zero:
+            return self._source.peek(default)
+        if getattr(self._cache, 'maxlen', None) == 0:
+            return self._source.peek(default)
         try:
             peeked = next(self)
         except StopIteration:
             if default is _marker:
                 raise
             return default
-        # maxlen=0 cannot store the item we just consumed, so put it back.
-        if getattr(self._cache, 'maxlen', None) == 0:
-            self._source = chain((peeked,), self._source)
-            self._index = None
-            return peeked
         if self._index is None:
             self._index = len(self._cache)
         self._index -= 1
