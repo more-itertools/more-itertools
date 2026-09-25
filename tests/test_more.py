@@ -36,7 +36,7 @@ from string import ascii_letters
 from threading import Event, Thread, Lock
 from time import sleep
 from typing import NamedTuple
-from unittest import TestCase, mock
+from unittest import TestCase, mock, skipUnless
 
 import more_itertools as mi
 
@@ -3780,6 +3780,44 @@ class SeekableTest(PeekableMixinTests, TestCase):
         s = mi.seekable(iterable, maxlen=0)
         self.assertEqual(list(s), iterable)
         self.assertEqual(list(s.elements()), [])
+
+    def test_maxlen_zero_peek_does_not_drop_items(self):
+        s = mi.seekable([10, 20, 30], maxlen=0)
+        self.assertEqual(s.peek(), 10)
+        self.assertEqual(s.peek(), 10)
+        self.assertEqual(list(s), [10, 20, 30])
+
+    def test_maxlen_zero_bool_does_not_drop_items(self):
+        s = mi.seekable([10, 20, 30], maxlen=0)
+        self.assertTrue(s)
+        self.assertEqual(list(s), [10, 20, 30])
+
+        s = mi.seekable([], maxlen=0)
+        self.assertFalse(s)
+
+    @skipUnless(
+        platform.python_implementation() == 'CPython',
+        'retained allocation check uses CPython tracemalloc',
+    )
+    def test_repeated_zero_cache_peek_has_bounded_memory(self):
+        import tracemalloc
+
+        if tracemalloc.is_tracing():
+            self.skipTest('do not disturb an existing allocation trace')
+        iterator = mi.seekable(range(3), maxlen=0)
+        iterator.peek()
+        tracemalloc.start()
+        try:
+            for _ in range(10000):
+                iterator.peek()
+                bool(iterator)
+            retained = tracemalloc.get_traced_memory()[0]
+        finally:
+            tracemalloc.stop()
+        # A lookahead needs one item, not one iterator per peek/truth test.
+        self.assertLess(retained, 256 * 1024)
+        self.assertEqual(list(iterator.elements()), [])
+        self.assertEqual(list(iterator), [0, 1, 2])
 
     def test_relative_seek(self):
         iterable = [str(x) for x in range(5)]
