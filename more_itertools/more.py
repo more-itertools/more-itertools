@@ -3130,8 +3130,6 @@ class seekable:
     def peek(self, default=_marker):
         if self._maxlen_zero:
             return self._source.peek(default)
-        if getattr(self._cache, 'maxlen', None) == 0:
-            return self._source.peek(default)
         try:
             peeked = next(self)
         except StopIteration:
