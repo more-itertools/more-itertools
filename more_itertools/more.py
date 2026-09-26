@@ -2260,6 +2260,45 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
     return ret
 
 
+class _numeric_range_indices(Sequence):
+    """Slice of a :class:`numeric_range` taken by parent index.
+
+    Used when an exclusive stop for the slice is not representable (datetime
+    limits) or would not reproduce the parent values (inexact float steps).
+    """
+
+    def __init__(self, start, step, indices):
+        self._start = start
+        self._step = step
+        self._indices = indices
+
+    def __len__(self):
+        return len(self._indices)
+
+    def __iter__(self):
+        start = self._start
+        step = self._step
+        for i in self._indices:
+            yield start + i * step
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return _numeric_range_indices(
+                self._start, self._step, self._indices[key]
+            )
+        return self._start + self._indices[key] * self._step
+
+    def __eq__(self, other):
+        if isinstance(other, (_numeric_range_indices, numeric_range)):
+            return len(self) == len(other) and all(
+                a == b for a, b in zip(self, other)
+            )
+        return NotImplemented
+
+    def __repr__(self):
+        return f"numeric_range([{', '.join(map(repr, self))}])"
+
+
 class numeric_range(Sequence):
     """An extension of the built-in ``range()`` function whose arguments can
     be any orderable numeric type.
@@ -2382,11 +2421,30 @@ class numeric_range(Sequence):
             return self._get_by_index(key)
         elif isinstance(key, slice):
             start_idx, stop_idx, step_idx = key.indices(self._len)
-            return numeric_range(
-                self._start + start_idx * self._step,
-                self._start + stop_idx * self._step,
-                self._step * step_idx,
-            )
+            indices = range(start_idx, stop_idx, step_idx)
+            count = len(indices)
+            if count == 0:
+                return numeric_range(self._start, self._start, self._step)
+
+            # Prefer a real numeric_range when an exclusive stop is representable
+            # and reproduces the same values as indexing into this range.
+            # For inexact steps, `start + stop_idx * step` with stop_idx == -1
+            # invents a bound that can add an extra float or overflow datetime.
+            new_start = self._start + start_idx * self._step
+            new_step = self._step * step_idx
+            try:
+                new_stop = new_start + count * new_step
+                result = numeric_range(new_start, new_stop, new_step)
+            except OverflowError:
+                return _numeric_range_indices(self._start, self._step, indices)
+
+            if len(result) == count and all(
+                result._start + i * result._step
+                == self._start + indices[i] * self._step
+                for i in range(count)
+            ):
+                return result
+            return _numeric_range_indices(self._start, self._step, indices)
         else:
             raise TypeError(
                 'numeric range indices must be '

@@ -3194,6 +3194,7 @@ class NumericRangeTests(TestCase):
             with self.subTest(args=args):
                 values = mi.numeric_range(*args)
                 self.assertEqual(list(values)[::-1], list(reversed(values)))
+                self.assertEqual(list(values[::-1]), list(reversed(values)))
 
     def test_reversed_datetime_limits(self):
         for start, step in [
@@ -3203,6 +3204,7 @@ class NumericRangeTests(TestCase):
             with self.subTest(start=start, step=step):
                 values = mi.numeric_range(start, start + 2 * step, step)
                 self.assertEqual(list(values)[::-1], list(reversed(values)))
+                self.assertEqual(list(values[::-1]), list(reversed(values)))
 
     def test_count(self):
         for args, v, c in [
