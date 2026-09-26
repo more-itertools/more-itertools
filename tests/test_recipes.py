@@ -9,6 +9,7 @@ from itertools import (
     groupby,
     permutations,
     islice,
+    takewhile,
 )
 from operator import mul, eq
 from math import comb, prod, factorial
@@ -1101,6 +1102,64 @@ class SieveTests(TestCase):
         for n in (0, 1, 2):
             with self.subTest(n=n):
                 self.assertEqual(list(mi.sieve(n)), [])
+
+
+class PrimesTests(TestCase):
+    def test_basic(self):
+        self.assertEqual(
+            mi.take(18, mi.primes()),
+            [
+                2,
+                3,
+                5,
+                7,
+                11,
+                13,
+                17,
+                19,
+                23,
+                29,
+                31,
+                37,
+                41,
+                43,
+                47,
+                53,
+                59,
+                61,
+            ],
+        )
+
+    def test_matches_sieve(self):
+        # primes() and sieve() must agree across many internal blocks.
+        for n in (1, 2, 3, 4, 100, 1_000, 100_000, 500_000):
+            with self.subTest(n=n):
+                expected = list(mi.sieve(n))
+                actual = list(takewhile(lambda p: p < n, mi.primes()))
+                self.assertEqual(actual, expected)
+
+    def test_prime_counts(self):
+        for n, expected in (
+            (100, 25),
+            (1_000, 168),
+            (10_000, 1229),
+            (100_000, 9592),
+        ):
+            with self.subTest(n=n):
+                count = mi.ilen(takewhile(lambda p: p < n, mi.primes()))
+                self.assertEqual(count, expected)
+
+    def test_all_prime(self):
+        for p in mi.take(2000, mi.primes()):
+            with self.subTest(p=p):
+                self.assertTrue(mi.is_prime(p))
+
+    def test_lazy_and_infinite(self):
+        # An infinite generator: islice should return without exhausting it.
+        it = mi.primes()
+        self.assertEqual(mi.take(3, it), [2, 3, 5])
+        # The same iterator continues from where it left off.
+        self.assertEqual(mi.take(3, it), [7, 11, 13])
 
 
 class BatchedTests(TestCase):
