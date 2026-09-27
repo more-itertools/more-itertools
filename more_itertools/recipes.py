@@ -123,6 +123,8 @@ def take(n, iterable):
         [0, 1, 2]
 
     """
+    if n is not None and n < 0:
+        raise ValueError('n must be non-negative')
     return list(islice(iterable, n))
 
 
@@ -199,6 +201,8 @@ def consume(iterator, n=None):
         # feed the entire iterator into a zero-length deque
         deque(iterator, maxlen=0)
     else:
+        if n < 0:
+            raise ValueError('n must be non-negative')
         # advance to the empty slice starting at position n
         next(islice(iterator, n, n), None)
 
@@ -213,6 +217,8 @@ def nth(iterable, n, default=None):
     'zebra'
 
     """
+    if n is not None and n < 0:
+        raise ValueError('n must be non-negative')
     return next(islice(iterable, n, None), default)
 
 

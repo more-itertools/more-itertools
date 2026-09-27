@@ -42,7 +42,9 @@ class TakeTests(TestCase):
 
     def test_negative_take(self):
         """Make sure taking negative items results in a ValueError"""
-        self.assertRaises(ValueError, lambda: mi.take(-3, range(10)))
+        self.assertRaisesRegex(
+            ValueError, 'n must be non-negative', mi.take, -3, range(10)
+        )
 
     def test_take_too_much(self):
         """Taking more than an iterator has remaining should return what the
@@ -125,7 +127,9 @@ class ConsumeTests(TestCase):
     def test_negative_consume(self):
         """Check that negative consumption throws an error"""
         r = (x for x in range(10))
-        self.assertRaises(ValueError, lambda: mi.consume(r, -1))
+        self.assertRaisesRegex(
+            ValueError, 'n must be non-negative', mi.consume, r, -1
+        )
 
     def test_total_consume(self):
         """Check that iterator is totally consumed by default"""
@@ -150,7 +154,9 @@ class NthTests(TestCase):
 
     def test_negative_item_raises(self):
         """Ensure asking for a negative item raises an exception"""
-        self.assertRaises(ValueError, lambda: mi.nth(range(10), -3))
+        self.assertRaisesRegex(
+            ValueError, 'n must be non-negative', mi.nth, range(10), -3
+        )
 
 
 class AllEqualTests(TestCase):

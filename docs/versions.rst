@@ -9,6 +9,13 @@ Unreleased
 ----------
 
 * Changes to existing functions:
+    * :func:`take`, :func:`nth`, :func:`consume`, and :func:`spy` now raise a
+      ``ValueError`` that names *n* when the count is negative, instead of surfacing
+      the message from :func:`itertools.islice`.
+    * Corrected the :func:`numeric_range` docstring: with *start* and *stop* given, the
+      item type follows *start* + *step*, where *step* is typed to match *stop* -
+      *start*. The previous wording said the items match the type of *start*, which
+      does not hold when the two arguments have different types.
     * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
     * :func:`numeric_range` now preserves its original values and length when reversed, including floating-point ranges and ranges near datetime limits.
     * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count*.

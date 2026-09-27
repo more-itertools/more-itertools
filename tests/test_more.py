@@ -1175,6 +1175,11 @@ class SpyTests(TestCase):
         self.assertEqual(head, [])
         self.assertEqual(list(new_iterable), ['a', 'b', 'c'])
 
+    def test_negative(self):
+        original_iterable = iter('abc')
+        with self.assertRaisesRegex(ValueError, 'n must be non-negative'):
+            mi.spy(original_iterable, -1)
+
     def test_immutable(self):
         original_iterable = iter('abcdefg')
         head, new_iterable = mi.spy(original_iterable, 3)
