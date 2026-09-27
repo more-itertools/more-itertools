@@ -2270,8 +2270,9 @@ class numeric_range(Sequence):
         >>> list(numeric_range(3.5))
         [0.0, 1.0, 2.0, 3.0]
 
-    With only *start* and *stop* specified, *step* defaults to ``1``. The
-    output items will match the type of *start*:
+    With only *start* and *stop* specified, *step* defaults to ``1``, typed
+    to match *stop* - *start*. The output items will match the type of
+    ``start + step``:
 
         >>> from decimal import Decimal
         >>> start = Decimal('2.1')
