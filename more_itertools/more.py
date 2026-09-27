@@ -2272,7 +2272,7 @@ class numeric_range(Sequence):
 
     With only *start* and *stop* specified, *step* defaults to ``1``, typed
     to match *stop* - *start*. The output items will match the type of
-    *start* + *step*:
+    ``start + step``:
 
         >>> from decimal import Decimal
         >>> start = Decimal('2.1')
