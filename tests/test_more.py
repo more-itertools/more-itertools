@@ -4543,10 +4543,22 @@ class IchunkedTests(TestCase):
         expected = []
         self.assertEqual(actual, expected)
 
+    def test_zero_nonempty(self):
+        # chunked(..., 0) yields nothing; ichunked should match, including
+        # when the source still has items (the empty-iterable case hid this).
+        iterable = [1, 2, 3]
+        actual = [list(c) for c in mi.ichunked(iterable, 0)]
+        self.assertEqual(actual, [])
+
+        source = iter([1, 2, 3])
+        self.assertEqual([list(c) for c in mi.ichunked(source, 0)], [])
+        self.assertEqual(list(source), [1, 2, 3])
+
     def test_negative(self):
         iterable = count()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as cm:
             [list(c) for c in mi.ichunked(iterable, -1)]
+        self.assertIn('n must be at least 0', str(cm.exception))
 
     def test_out_of_order(self):
         iterable = map(str, count())
