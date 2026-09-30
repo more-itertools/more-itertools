@@ -550,19 +550,15 @@ def iter_except(function, exception, first=None):
     Like ``iter(function, sentinel)``, but uses an exception instead of a sentinel
     to end the loop.
 
-        >>> l = [0, 1, 2]
-        >>> list(iter_except(l.pop, IndexError))
-        [2, 1, 0]
+    Examples:
+        iter_except(functools.partial(heappop, h), IndexError)   # priority queue iterator
+        iter_except(d.popitem, KeyError)                         # non-blocking dict iterator
+        iter_except(d.popleft, IndexError)                       # non-blocking deque iterator
+        iter_except(q.get_nowait, Queue.Empty)                   # loop over a producer Queue
+        iter_except(s.pop, KeyError)                             # non-blocking set iterator
 
-    Multiple exceptions can be specified as a stopping condition:
-
-        >>> l = [1, 2, 3, '...', 4, 5, 6]
-        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
-        [7, 6, 5]
-        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
-        [4, 3, 2]
-        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
-        []
+    Multiple exceptions can be specified as a stopping condition, for example
+    ``(IndexError, TypeError)``.
 
     """
     with suppress(exception):
