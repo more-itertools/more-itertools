@@ -247,6 +247,8 @@ def quantify(iterable, pred=bool):
 
     >>> quantify([True, False, True])
     2
+    >>> quantify(range(100, 200), pred=lambda x: x<120)
+    20
 
     """
     return sum(map(pred, iterable))
