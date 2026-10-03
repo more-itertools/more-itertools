@@ -5537,10 +5537,10 @@ class ChunkedEvenTests(TestCase):
 
     def test_invalid_n(self):
         for n in (0, -1):
+            source = iter(range(10))
             with self.assertRaisesRegex(ValueError, r'^n must be at least 1$'):
-                list(mi.chunked_even([], n))
-            with self.assertRaisesRegex(ValueError, r'^n must be at least 1$'):
-                list(mi.chunked_even([1, 2, 3], n))
+                list(mi.chunked_even(source, n))
+            self.assertEqual(next(source), 0)
 
     def test_0(self):
         self._test_finite('', 3, [])
