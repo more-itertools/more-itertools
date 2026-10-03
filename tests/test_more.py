@@ -5535,6 +5535,13 @@ class CountableTests(TestCase):
 class ChunkedEvenTests(TestCase):
     """Tests for ``chunked_even()``"""
 
+    def test_invalid_n(self):
+        for n in (0, -1):
+            with self.assertRaisesRegex(ValueError, r'^n must be at least 1$'):
+                list(mi.chunked_even([], n))
+            with self.assertRaisesRegex(ValueError, r'^n must be at least 1$'):
+                list(mi.chunked_even([1, 2, 3], n))
+
     def test_0(self):
         self._test_finite('', 3, [])
 
