@@ -1109,6 +1109,22 @@ class BucketTests(TestCase):
         self.assertEqual(list(D[20]), [])
         self.assertEqual(list(D[30]), [30, 31, 33])
 
+    def test_falsey_validator_is_honoured(self):
+        # A falsey callable is still a valid validator and must not be
+        # replaced by the default (see #1308).
+        class AllowedKeys(set):
+            def __call__(self, key):
+                return key in self
+
+        allowed = AllowedKeys()
+        self.assertFalse(allowed)  # Sanity: the validator itself is falsey
+        D = mi.bucket(
+            iter([10, 20, 11, 21]), key=lambda x: x, validator=allowed
+        )
+        self.assertEqual(list(D[10]), [])
+        self.assertNotIn(10, D)
+        self.assertEqual(set(D), set())
+
     def test_in_does_not_add_key(self):
         # A failed membership test must not invent a key (see #1284)
         iterable = [10, 20, 11, 21]

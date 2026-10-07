@@ -1182,7 +1182,10 @@ class bucket:
         self._it = iter(iterable)
         self._key = key
         self._cache = defaultdict(deque)
-        self._validator = validator or (lambda x: True)
+        # Use ``is None`` rather than truthiness: a valid validator may be a
+        # callable object that is falsey (e.g. an empty ``set`` subclass with
+        # ``__call__``), and ``validator or ...`` would silently replace it.
+        self._validator = (lambda x: True) if validator is None else validator
 
     def __contains__(self, value):
         if not self._validator(value):
