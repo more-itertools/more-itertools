@@ -5153,6 +5153,19 @@ class AllUniqueTests(TestCase):
         self.assertEqual(mi.all_unique(iterable, lambda x: x), True)
         self.assertEqual(mi.all_unique(iterable, str.lower), False)
 
+    def test_falsey_key_is_honoured(self):
+        # A falsey callable is still a valid key and must not be ignored
+        class CaseFold:
+            def __bool__(self):
+                return False
+
+            def __call__(self, x):
+                return x.lower()
+
+        key = CaseFold()
+        self.assertFalse(key)  # Sanity: the key itself is falsey
+        self.assertEqual(mi.all_unique(['A', 'B', 'C', 'b'], key), False)
+
     def test_infinite(self):
         self.assertEqual(mi.all_unique(mi.prepend(3, count())), False)
 

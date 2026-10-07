@@ -4279,7 +4279,7 @@ def all_unique(iterable, key=None):
     seenset_add = seenset.add
     seenlist = []
     seenlist_add = seenlist.append
-    for element in map(key, iterable) if key else iterable:
+    for element in map(key, iterable) if key is not None else iterable:
         try:
             if element in seenset:
                 return False
