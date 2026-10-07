@@ -1118,7 +1118,9 @@ class BucketTests(TestCase):
 
         allowed = AllowedKeys()
         self.assertFalse(allowed)  # Sanity: the validator itself is falsey
-        D = mi.bucket(iter([10, 20, 11, 21]), key=lambda x: x, validator=allowed)
+        D = mi.bucket(
+            iter([10, 20, 11, 21]), key=lambda x: x, validator=allowed
+        )
         self.assertEqual(list(D[10]), [])
         self.assertNotIn(10, D)
         self.assertEqual(set(D), set())
