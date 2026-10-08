@@ -2255,9 +2255,9 @@ def groupby_transform(iterable, keyfunc=None, valuefunc=None, reducefunc=None):
 
     """
     ret = groupby(iterable, keyfunc)
-    if valuefunc:
+    if valuefunc is not None:
         ret = ((k, map(valuefunc, g)) for k, g in ret)
-    if reducefunc:
+    if reducefunc is not None:
         ret = ((k, reducefunc(g)) for k, g in ret)
 
     return ret

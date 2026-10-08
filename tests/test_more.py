@@ -2645,6 +2645,34 @@ class AdjacentTests(TestCase):
 
 
 class GroupByTransformTests(TestCase):
+    def test_falsey_funcs(self):
+        class FalseyCallable:
+            def __init__(self, function):
+                self.function = function
+
+            def __bool__(self):
+                return False
+
+            def __call__(self, value):
+                return self.function(value)
+
+        for valuefunc in (None, FalseyCallable(str.upper)):
+            for reducefunc in (None, FalseyCallable(''.join)):
+                with self.subTest(valuefunc=valuefunc, reducefunc=reducefunc):
+                    grouper = mi.groupby_transform(
+                        'aAbB', str.lower, valuefunc, reducefunc
+                    )
+                    actual = [
+                        (key, ''.join(group) if reducefunc is None else group)
+                        for key, group in grouper
+                    ]
+                    expected = (
+                        [('a', 'aA'), ('b', 'bB')]
+                        if valuefunc is None
+                        else [('a', 'AA'), ('b', 'BB')]
+                    )
+                    self.assertEqual(actual, expected)
+
     def assertAllGroupsEqual(self, groupby1, groupby2):
         for a, b in zip(groupby1, groupby2):
             key1, group1 = a
