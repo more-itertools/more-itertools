@@ -5160,7 +5160,7 @@ class AllUniqueTests(TestCase):
                 return False
 
             def __call__(self, x):
-                return x.lower()
+                return x.casefold()
 
         key = CaseFold()
         self.assertFalse(key)  # Sanity: the key itself is falsey
