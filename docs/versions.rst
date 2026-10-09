@@ -9,15 +9,21 @@ Unreleased
 ----------
 
 * New functions:
+    * :func:`random_ordered_range` returns values from range(n) in randomly shuffled order (thanks to rhettinger)
     * :func:`subfactorial` computes the number of permutations of *n* elements with no fixed points (thanks to rhettinger)
 
 * Updated functions:
-    * :func:`interleave_evenly` returns immediately for empty input (thanks to nyxst4ck)
+    * :func:`bucket` no longer adds keys when looking them up (thanks to onk3sh and rhettinger)
     * :func:`chunked` now raises ``ValueError`` for negative chunk sizes (thanks to uttam12331)
-    * :func:`numeric_range` now more closely mirrors the behavior of the built-in ``range`` (thanks to onk3sh, chuenchen309, and JamesParrott)
+    * :func:`combination_with_replacement_index` now handles inputs with ``None`` (thanks to pochmann and JamesParrott)
+    * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count* (thanks to gheshm-jpg).
+    * :func:`interleave_evenly` returns immediately for empty input (thanks to nyxst4ck)
+    * :func:`numeric_range` now more closely mirrors the behavior of the built-in ``range`` (thanks to emme1t, onk3sh, chuenchen309, and JamesParrott)
+    * :func:`one` and :func:`only` now accept user-supplied exceptions that evaluate to ``False`` (thanks to andjf, itzzdev09, rhettinger)
     * :func:`running_min` and :func:`running_max` are now more numerically stable (thanks to rhettinger)
     * :func:`sliced` now raises ``ValueError`` for negative slice sizes (thanks to Sanjays2402)
     * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0`` (thanks to dylanpulver)
+    * :func:`zip_broadcast` no longer opens input iterables twice (thanks to dylanpulver)
 
 * Functions with performance improvements
     * :func:`count_cycle` (thanks to jonathandung)
@@ -36,6 +42,10 @@ Unreleased
     * :func:`duplicates_everseen` (thanks to jonathandung, JamesParrot, and rhettinger)
     * :func:`iter_index` (thanks to chuenchen309, JamesParrott, pochmann, rhettinger)
     * :func:`numeric_range` (thanks to jonathandung, JamesParrot, areiche2, and rhettinger)
+    * :func:`random_combination` (thanks to areiche2)
+    * :func:`random_combination_with_replacement` (thanks to areiche2)
+    * :func:`random_permutation` (thanks to areiche2)
+    * :func:`random_product` (thanks to areiche2)
     * :func:`time_limited` (thanks to jonathandung, JamesParrot, and rhettinger)
     * :func:`lstrip` (thanks to Labib-Bin-Salam)
 
@@ -45,19 +55,9 @@ Unreleased
     * :func:`powerset_of_sets` tests fixed an incorrect assumption (thanks to rhettinger and pochmann)
     * Remove redundant u-prefix strings were removed from the docstring for :func:`side_effect` (thanks to jonathandung)
     * Test coverage was improved (thanks to darrenhuai)
+    * Coverage testing is now much faster in GitHub Actions (thanks to JamesParrott and pochmann)
     * The build process was updated to support recent versions of ``flit`` (thanks to jonathandung)
 
-* Issue 1113: Add random ordered combinatoric functions by rhettinger in https://github.com/more-itertools/more-itertools/pull/1116
-* Add missing word "is" in docstrings by areiche2 in https://github.com/more-itertools/more-itertools/pull/1256
-* Fix/simplify `combination_with_replacement_index` by pochmann in https://github.com/more-itertools/more-itertools/pull/1261
-* Clarify `combination_with_replacement_index` a bit by pochmann in https://github.com/more-itertools/more-itertools/pull/1266
-* fix nonpositive item limits in constrained_batches by gheshm-jpg in https://github.com/more-itertools/more-itertools/pull/1270
-* Set COVERAGE_CORE="sysmon" by JamesParrott in https://github.com/more-itertools/more-itertools/pull/1272
-* Reuse input iterators in zip_broadcast by vitalivo in https://github.com/more-itertools/more-itertools/pull/1278
-* Fix one() and only() dropping a falsy user-supplied exception by itzzdev09 in https://github.com/more-itertools/more-itertools/pull/1279
-* Issue 1284: don't let a bucket lookup invent a key by onk3sh in https://github.com/more-itertools/more-itertools/pull/1285
-* Preserve numeric_range values during reverse iteration by emme1t in https://github.com/more-itertools/more-itertools/pull/1276
-* Issue #1287: Less aggressive fix for issue #1284 by rhettinger in https://github.com/more-itertools/more-itertools/pull/1288
 * Validate running window sizes through the index protocol by jackwalkerlabs in https://github.com/more-itertools/more-itertools/pull/1260
 * Issue 1268: seekable.peek/bool no longer drop items when maxlen is 0 by otiscuilei in https://github.com/more-itertools/more-itertools/pull/1269
 * Bound lookahead storage for zero-cache seekable iterators by rupayon123 in https://github.com/more-itertools/more-itertools/pull/1294
