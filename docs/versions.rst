@@ -13,17 +13,29 @@ Unreleased
 
 * Updated functions:
     * :func:`interleave_evenly` returns immediately for empty input (thanks to nyxst4ck)
+    * :func:`chunked` now raises ``ValueError`` for negative chunk sizes (thanks to uttam12331)
+    * :func:`numeric_range` now more closely mirrors the behavior of the built-in ``range`` (thanks to onk3sh, chuenchen309, and JamesParrott)
+    * :func:`running_min` and :func:`running_max` are now more numerically stable (thanks to rhettinger)
+    * :func:`sliced` now raises ``ValueError`` for negative slice sizes (thanks to Sanjays2402)
+    * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0`` (thanks to dylanpulver)
 
 * Functions with performance improvements
     * :func:`count_cycle` (thanks to jonathandung)
     * :func:`last` (thanks to rhettinger)
     * :func:`minmax` (thanks to rhettinger)
+    * :func:`nth_permutation` (thanks to pochmann)
+    * :func:`serialize` (thanks to JamesParrott, rhettinger, and jonathandung)
+    * :func:`value_chain` no longer swallows ``TypeError`` exceptions (thanks to onk3sh)
 
 * Functions with documentation improvements:
     * :func:`bucket` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`convolve` (thanks to deepakganesh78, pochmann, and jonathandung)
     * :func:`consecutive_groups` (thanks to Labib-Bin-Salam)
     * :func:`countable` (thanks to jonathandung, JamesParrot, and rhettinger)
-    * :func:`numeric_range` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`distinct_permutations` (thanks to areiche2)
+    * :func:`duplicates_everseen` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`iter_index` (thanks to chuenchen309, JamesParrott, pochmann, rhettinger)
+    * :func:`numeric_range` (thanks to jonathandung, JamesParrot, areiche2, and rhettinger)
     * :func:`time_limited` (thanks to jonathandung, JamesParrot, and rhettinger)
     * :func:`lstrip` (thanks to Labib-Bin-Salam)
 
@@ -31,48 +43,29 @@ Unreleased
     * Python 3.15 is officially supported. Python 3.10 is no longer officially supported
     * Several functions now have more accurate type annotations (thanks to jonathandung, jorenham, rhettinger and pochmann)
     * :func:`powerset_of_sets` tests fixed an incorrect assumption (thanks to rhettinger and pochmann)
+    * Remove redundant u-prefix strings were removed from the docstring for :func:`side_effect` (thanks to jonathandung)
+    * Test coverage was improved (thanks to darrenhuai)
+    * The build process was updated to support recent versions of ``flit`` (thanks to jonathandung)
 
-* Handle empty interleave_evenly input by @nyxst4ck in https://github.com/more-itertools/more-itertools/pull/1193
-* Improve types for difference by @bbayles in https://github.com/more-itertools/more-itertools/pull/1195
-* Raise for negative tail sizes on sized iterables by @CodingFeng101 in https://github.com/more-itertools/more-itertools/pull/1194
-* Remove redundant u-prefix strings by @jonathandung in https://github.com/more-itertools/more-itertools/pull/1203
-* Use `.. deprecated::` directive for `callback_iter` and `pairwise` by @jonathandung in https://github.com/more-itertools/more-itertools/pull/1199
-* Raise for negative slice sizes in sliced() by @Sanjays2402 in https://github.com/more-itertools/more-itertools/pull/1200
-* Sort `__all__` by @jonathandung in https://github.com/more-itertools/more-itertools/pull/1207
-* Add threading to __lazy_modules__ and restore the import of it, reverting c6b640 by @JamesParrott in https://github.com/more-itertools/more-itertools/pull/1210
-* Fix stability in running_min and running_max by @rhettinger in https://github.com/more-itertools/more-itertools/pull/1211
-* Issue 1214: Update __eq__ and __hash__ for numeric_range by @bbayles in https://github.com/more-itertools/more-itertools/pull/1216
-* Issue 1215: Add docstring note for iter_index on using range objects by @bbayles in https://github.com/more-itertools/more-itertools/pull/1217
-* Raise a clear ValueError for negative n in chunked() by @uttam12331 in https://github.com/more-itertools/more-itertools/pull/1223
-* Update the convolve docstring  by @bbayles in https://github.com/more-itertools/more-itertools/pull/1231
-* Document suggested method to unique-ify `duplicates_everseen` output by @jonathandung in https://github.com/more-itertools/more-itertools/pull/1229
-* Simplify and speed up nth_permutation by @pochmann in https://github.com/more-itertools/more-itertools/pull/1236
-* Close the last coverage gaps, fix a no-op equality assertion by @darrenhuai in https://github.com/more-itertools/more-itertools/pull/1235
-* Upgrade to flit 4.0.2+ by @bbayles in https://github.com/more-itertools/more-itertools/pull/1238
-* docs: Clarify output order for sortable input elements by @areiche2 in https://github.com/more-itertools/more-itertools/pull/1242
-* Issue 1247: Keep numeric_range consistent with the items it produces by @onk3sh in https://github.com/more-itertools/more-itertools/pull/1248
-* docs: Correct IEEE 754 comment spelling by @areiche2 in https://github.com/more-itertools/more-itertools/pull/1249
-* Issue 1250: don't mask TypeError raised while iterating in value_chain by @onk3sh in https://github.com/more-itertools/more-itertools/pull/1251
-* Do not yield an empty list for an empty iterable when maxsplit is 0 by @dylanpulver in https://github.com/more-itertools/more-itertools/pull/1253
-* Issue 1113: Add random ordered combinatoric functions by @rhettinger in https://github.com/more-itertools/more-itertools/pull/1116
-* Add missing word "is" in docstrings by @areiche2 in https://github.com/more-itertools/more-itertools/pull/1256
-* Fix/simplify `combination_with_replacement_index` by @pochmann in https://github.com/more-itertools/more-itertools/pull/1261
-* Clarify `combination_with_replacement_index` a bit by @pochmann in https://github.com/more-itertools/more-itertools/pull/1266
-* fix nonpositive item limits in constrained_batches by @gheshm-jpg in https://github.com/more-itertools/more-itertools/pull/1270
-* Set COVERAGE_CORE="sysmon" by @JamesParrott in https://github.com/more-itertools/more-itertools/pull/1272
-* Reuse input iterators in zip_broadcast by @vitalivo in https://github.com/more-itertools/more-itertools/pull/1278
-* Fix one() and only() dropping a falsy user-supplied exception by @itzzdev09 in https://github.com/more-itertools/more-itertools/pull/1279
-* Issue 1284: don't let a bucket lookup invent a key by @onk3sh in https://github.com/more-itertools/more-itertools/pull/1285
-* Preserve numeric_range values during reverse iteration by @emme1t in https://github.com/more-itertools/more-itertools/pull/1276
-* Issue #1287: Less aggressive fix for issue #1284 by @rhettinger in https://github.com/more-itertools/more-itertools/pull/1288
-* Validate running window sizes through the index protocol by @jackwalkerlabs in https://github.com/more-itertools/more-itertools/pull/1260
-* Issue 1268: seekable.peek/bool no longer drop items when maxlen is 0 by @otiscuilei in https://github.com/more-itertools/more-itertools/pull/1269
-* Bound lookahead storage for zero-cache seekable iterators by @rupayon123 in https://github.com/more-itertools/more-itertools/pull/1294
-* Remove redundant seekable peek cache check by @rupayon123 in https://github.com/more-itertools/more-itertools/pull/1298
-* Document that numeric_range's default step is typed from stop - start by @feiiiiii5 in https://github.com/more-itertools/more-itertools/pull/1303
-* Issue 1304: ichunked matches chunked for n=0 and negative n by @00200200 in https://github.com/more-itertools/more-itertools/pull/1305
-* fix: honour a falsey validator in bucket (#1308) by @DawnofGenX in https://github.com/more-itertools/more-itertools/pull/1309
-* Minor tweak to recipes by @rhettinger in https://github.com/more-itertools/more-itertools/pull/1313
+* Issue 1113: Add random ordered combinatoric functions by rhettinger in https://github.com/more-itertools/more-itertools/pull/1116
+* Add missing word "is" in docstrings by areiche2 in https://github.com/more-itertools/more-itertools/pull/1256
+* Fix/simplify `combination_with_replacement_index` by pochmann in https://github.com/more-itertools/more-itertools/pull/1261
+* Clarify `combination_with_replacement_index` a bit by pochmann in https://github.com/more-itertools/more-itertools/pull/1266
+* fix nonpositive item limits in constrained_batches by gheshm-jpg in https://github.com/more-itertools/more-itertools/pull/1270
+* Set COVERAGE_CORE="sysmon" by JamesParrott in https://github.com/more-itertools/more-itertools/pull/1272
+* Reuse input iterators in zip_broadcast by vitalivo in https://github.com/more-itertools/more-itertools/pull/1278
+* Fix one() and only() dropping a falsy user-supplied exception by itzzdev09 in https://github.com/more-itertools/more-itertools/pull/1279
+* Issue 1284: don't let a bucket lookup invent a key by onk3sh in https://github.com/more-itertools/more-itertools/pull/1285
+* Preserve numeric_range values during reverse iteration by emme1t in https://github.com/more-itertools/more-itertools/pull/1276
+* Issue #1287: Less aggressive fix for issue #1284 by rhettinger in https://github.com/more-itertools/more-itertools/pull/1288
+* Validate running window sizes through the index protocol by jackwalkerlabs in https://github.com/more-itertools/more-itertools/pull/1260
+* Issue 1268: seekable.peek/bool no longer drop items when maxlen is 0 by otiscuilei in https://github.com/more-itertools/more-itertools/pull/1269
+* Bound lookahead storage for zero-cache seekable iterators by rupayon123 in https://github.com/more-itertools/more-itertools/pull/1294
+* Remove redundant seekable peek cache check by rupayon123 in https://github.com/more-itertools/more-itertools/pull/1298
+* Document that numeric_range's default step is typed from stop - start by feiiiiii5 in https://github.com/more-itertools/more-itertools/pull/1303
+* Issue 1304: ichunked matches chunked for n=0 and negative n by 00200200 in https://github.com/more-itertools/more-itertools/pull/1305
+* fix: honour a falsey validator in bucket (#1308) by DawnofGenX in https://github.com/more-itertools/more-itertools/pull/1309
+* Minor tweak to recipes by rhettinger in https://github.com/more-itertools/more-itertools/pull/1313
 
 
 
