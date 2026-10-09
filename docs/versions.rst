@@ -5,7 +5,7 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
-Unreleased
+11.2.0
 ----------
 
 * New functions:
@@ -13,7 +13,7 @@ Unreleased
     * :func:`subfactorial` computes the number of permutations of *n* elements with no fixed points (thanks to rhettinger)
 
 * Updated functions:
-    * :func:`bucket` no longer adds keys when looking them up and allows ``validators`` that evaluate to ``False`` (thanks to onk3sh, DawnofGenX and rhettinger)
+    * :func:`bucket` no longer adds keys when looking them up and allows ``validators`` that evaluate to ``False`` (thanks to onk3sh, DawnofGenX, and rhettinger)
     * :func:`chunked` and :func:`ichunked` now raises ``ValueError`` for negative chunk sizes (thanks to uttam12331 and 00200200)
     * :func:`combination_with_replacement_index` now handles inputs with ``None`` (thanks to pochmann and JamesParrott)
     * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count* (thanks to gheshm-jpg).
@@ -55,7 +55,7 @@ Unreleased
     * :func:`lstrip` (thanks to Labib-Bin-Salam)
 
 * Other changes:
-    * Python 3.15 is officially supported. Python 3.10 is no longer officially supported
+    * Python 3.15 is officially supported. Python 3.10 is no longer officially supported.
     * Several functions now have more accurate type annotations (thanks to jonathandung, jorenham, rhettinger and pochmann)
     * :func:`powerset_of_sets` tests fixed an incorrect assumption (thanks to rhettinger and pochmann)
     * Remove redundant u-prefix strings were removed from the docstring for :func:`side_effect` (thanks to jonathandung)
