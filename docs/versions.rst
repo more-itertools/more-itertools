@@ -11,6 +11,9 @@ Unreleased
 * New functions:
     * :func:`subfactorial` computes the number of permutations of *n* elements with no fixed points (thanks to rhettinger)
 
+* Updated functions:
+    * :func:`interleave_evenly` returns immediately for empty input (thanks to nyxst4ck)
+
 * Functions with performance improvements
     * :func:`count_cycle` (thanks to jonathandung)
     * :func:`last` (thanks to rhettinger)
@@ -25,19 +28,10 @@ Unreleased
     * :func:`lstrip` (thanks to Labib-Bin-Salam)
 
 * Other changes:
-    * Several functions now have more accurate type annotations (thanks to jorenham, rhettinger and pochmann)
+    * Python 3.15 is officially supported. Python 3.10 is no longer officially supported
+    * Several functions now have more accurate type annotations (thanks to jonathandung, jorenham, rhettinger and pochmann)
     * :func:`powerset_of_sets` tests fixed an incorrect assumption (thanks to rhettinger and pochmann)
 
-* Use (co)variant type params in the stubs where appropriate by @jorenham in https://github.com/more-itertools/more-itertools/pull/1173
-* Remove unused `TypeVar`s in the stubs by @jorenham in https://github.com/more-itertools/more-itertools/pull/1175
-* Remove outdated `if sys.version_info` guard in the stubs by @jorenham in https://github.com/more-itertools/more-itertools/pull/1176
-* Remove needless `__future__.annotations` imports in the stubs by @jorenham in https://github.com/more-itertools/more-itertools/pull/1177
-* Remove `threading` import and make `queue` import lazy by @jonathandung in https://github.com/more-itertools/more-itertools/pull/1178
-* Support negative start/stop in iter_index for general iterables by @binggao1230 in https://github.com/more-itertools/more-itertools/pull/1182
-* Completely type `groupby_transform` by @jonathandung in https://github.com/more-itertools/more-itertools/pull/1181
-* Use `_typeshed` protocols in the stubs by @jorenham in https://github.com/more-itertools/more-itertools/pull/1174
-* Move `Protocol[_T]` to the end of the superclasses of `_SizedReversible[_T]` by @jonathandung in https://github.com/more-itertools/more-itertools/pull/1184
-* Upgrade GitHub actions, test Python 3.14 release by @bbayles in https://github.com/more-itertools/more-itertools/pull/1188
 * Handle empty interleave_evenly input by @nyxst4ck in https://github.com/more-itertools/more-itertools/pull/1193
 * Improve types for difference by @bbayles in https://github.com/more-itertools/more-itertools/pull/1195
 * Raise for negative tail sizes on sized iterables by @CodingFeng101 in https://github.com/more-itertools/more-itertools/pull/1194
