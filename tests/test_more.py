@@ -232,8 +232,10 @@ class PeekableMixinTests:
 
     def test_peek_default(self):
         """Make sure passing a default into ``peek()`` works."""
-        p = self.cls([])
-        self.assertEqual(p.peek(7), 7)
+        for default in (None, False, 0, '', 7, object()):
+            with self.subTest(default=default):
+                p = self.cls([])
+                self.assertIs(p.peek(default), default)
 
     def test_truthiness(self):
         """Make sure a ``peekable`` tests true iff there are items remaining in
@@ -3867,6 +3869,10 @@ class SeekableTest(PeekableMixinTests, TestCase):
         mi.take(5, s)
         self.assertEqual(s[-1], '4')
         self.assertEqual(s[0], '3')
+
+
+class ZeroCacheSeekableTest(PeekableMixinTests, TestCase):
+    cls = staticmethod(partial(mi.seekable, maxlen=0))
 
 
 class SequenceViewTests(TestCase):
