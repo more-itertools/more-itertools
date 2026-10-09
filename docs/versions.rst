@@ -13,14 +13,16 @@ Unreleased
     * :func:`subfactorial` computes the number of permutations of *n* elements with no fixed points (thanks to rhettinger)
 
 * Updated functions:
-    * :func:`bucket` no longer adds keys when looking them up (thanks to onk3sh and rhettinger)
-    * :func:`chunked` now raises ``ValueError`` for negative chunk sizes (thanks to uttam12331)
+    * :func:`bucket` no longer adds keys when looking them up and allows ``validators`` that evaluate to ``False`` (thanks to onk3sh, DawnofGenX and rhettinger)
+    * :func:`chunked` and :func:`ichunked` now raises ``ValueError`` for negative chunk sizes (thanks to uttam12331 and 00200200)
     * :func:`combination_with_replacement_index` now handles inputs with ``None`` (thanks to pochmann and JamesParrott)
     * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count* (thanks to gheshm-jpg).
     * :func:`interleave_evenly` returns immediately for empty input (thanks to nyxst4ck)
-    * :func:`numeric_range` now more closely mirrors the behavior of the built-in ``range`` (thanks to emme1t, onk3sh, chuenchen309, and JamesParrott)
+    * :func:`numeric_range` now more closely mirrors the behavior of the built-in ``range`` (thanks to emme1t, onk3sh, chuenchen309, feiiiiii5, and JamesParrott)
     * :func:`one` and :func:`only` now accept user-supplied exceptions that evaluate to ``False`` (thanks to andjf, itzzdev09, rhettinger)
     * :func:`running_min` and :func:`running_max` are now more numerically stable (thanks to rhettinger)
+    * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now validate *maxlen* as an integer and support the index protocol (thanks to jackwalkerlabs and rhettinger)
+    * :func:`seekable` now handles ``maxlen=0`` more robustly (thanks to otiscuilei, pochmann , upayon123)
     * :func:`sliced` now raises ``ValueError`` for negative slice sizes (thanks to Sanjays2402)
     * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0`` (thanks to dylanpulver)
     * :func:`zip_broadcast` no longer opens input iterables twice (thanks to dylanpulver)
@@ -30,6 +32,7 @@ Unreleased
     * :func:`last` (thanks to rhettinger)
     * :func:`minmax` (thanks to rhettinger)
     * :func:`nth_permutation` (thanks to pochmann)
+    * :func:`partition` (thanks to rhettinger)
     * :func:`serialize` (thanks to JamesParrott, rhettinger, and jonathandung)
     * :func:`value_chain` no longer swallows ``TypeError`` exceptions (thanks to onk3sh)
 
@@ -40,8 +43,10 @@ Unreleased
     * :func:`countable` (thanks to jonathandung, JamesParrot, and rhettinger)
     * :func:`distinct_permutations` (thanks to areiche2)
     * :func:`duplicates_everseen` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`iter_except` (thanks to rhettinger)
     * :func:`iter_index` (thanks to chuenchen309, JamesParrott, pochmann, rhettinger)
     * :func:`numeric_range` (thanks to jonathandung, JamesParrot, areiche2, and rhettinger)
+    * :func:`quantify` (thanks to rhettinger)
     * :func:`random_combination` (thanks to areiche2)
     * :func:`random_combination_with_replacement` (thanks to areiche2)
     * :func:`random_permutation` (thanks to areiche2)
@@ -57,28 +62,6 @@ Unreleased
     * Test coverage was improved (thanks to darrenhuai)
     * Coverage testing is now much faster in GitHub Actions (thanks to JamesParrott and pochmann)
     * The build process was updated to support recent versions of ``flit`` (thanks to jonathandung)
-
-* Validate running window sizes through the index protocol by jackwalkerlabs in https://github.com/more-itertools/more-itertools/pull/1260
-* Issue 1268: seekable.peek/bool no longer drop items when maxlen is 0 by otiscuilei in https://github.com/more-itertools/more-itertools/pull/1269
-* Bound lookahead storage for zero-cache seekable iterators by rupayon123 in https://github.com/more-itertools/more-itertools/pull/1294
-* Remove redundant seekable peek cache check by rupayon123 in https://github.com/more-itertools/more-itertools/pull/1298
-* Document that numeric_range's default step is typed from stop - start by feiiiiii5 in https://github.com/more-itertools/more-itertools/pull/1303
-* Issue 1304: ichunked matches chunked for n=0 and negative n by 00200200 in https://github.com/more-itertools/more-itertools/pull/1305
-* fix: honour a falsey validator in bucket (#1308) by DawnofGenX in https://github.com/more-itertools/more-itertools/pull/1309
-* Minor tweak to recipes by rhettinger in https://github.com/more-itertools/more-itertools/pull/1313
-
-
-
-* Changes to existing functions:
-    * :func:`bucket` now honours a falsey *validator* callable (such as an empty ``set`` subclass that defines ``__call__``) instead of silently replacing it with the default that accepts every key.
-    * :func:`ichunked` now matches :func:`chunked` for ``n = 0`` and negative *n*: it yields nothing for a zero chunk size (without consuming the source) and raises ``ValueError: n must be at least 0`` instead of leaking :func:`itertools.islice`'s error.
-    * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
-    * :func:`numeric_range` now preserves its original values and length when reversed, including floating-point ranges and ranges near datetime limits.
-    * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count*.
-    * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
-    * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
-    * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0``
-    * :func:`one` and :func:`only` were fixed to raise a user-supplied *too_short*/*too_long* exception even when the exception object is falsy, and to no longer build the default error message (which reprs iterable items) when a custom exception is given (thanks to itzzdev09)
 
 11.1.0
 ------
