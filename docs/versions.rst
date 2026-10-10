@@ -13,9 +13,9 @@ Version History
     * :func:`subfactorial` computes the number of permutations of *n* elements with no fixed points (thanks to rhettinger)
 
 * Updated functions:
-    * :func:`bucket` no longer adds keys when looking them up and allows ``validators`` that evaluate to ``False`` (thanks to onk3sh, DawnofGenX, and rhettinger)
-    * :func:`chunked` and :func:`ichunked` now raises ``ValueError`` for negative chunk sizes (thanks to uttam12331 and 00200200)
-    * :func:`combination_with_replacement_index` now handles inputs with ``None`` (thanks to pochmann and JamesParrott)
+    * :func:`bucket` no longer adds keys when looking them. It now also allows ``validator``s that evaluate to ``False``. (thanks to onk3sh, DawnofGenX, and rhettinger)
+    * :func:`chunked` and :func:`ichunked` now raise ``ValueError`` for negative chunk sizes (thanks to uttam12331 and 00200200)
+    * :func:`combination_with_replacement_index` now handles inputs with ``None`` properly (thanks to pochmann and JamesParrott)
     * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count* (thanks to gheshm-jpg).
     * :func:`interleave_evenly` returns immediately for empty input (thanks to nyxst4ck)
     * :func:`numeric_range` now more closely mirrors the behavior of the built-in ``range`` (thanks to emme1t, onk3sh, chuenchen309, feiiiiii5, and JamesParrott)
@@ -25,6 +25,7 @@ Version History
     * :func:`seekable` now handles ``maxlen=0`` more robustly (thanks to otiscuilei, pochmann , upayon123)
     * :func:`sliced` now raises ``ValueError`` for negative slice sizes (thanks to Sanjays2402)
     * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0`` (thanks to dylanpulver)
+    * :func:`value_chain` no longer swallows ``TypeError`` exceptions (thanks to onk3sh)
     * :func:`zip_broadcast` no longer opens input iterables twice (thanks to dylanpulver)
 
 * Functions with performance improvements
@@ -34,7 +35,6 @@ Version History
     * :func:`nth_permutation` (thanks to pochmann)
     * :func:`partition` (thanks to rhettinger)
     * :func:`serialize` (thanks to JamesParrott, rhettinger, and jonathandung)
-    * :func:`value_chain` no longer swallows ``TypeError`` exceptions (thanks to onk3sh)
 
 * Functions with documentation improvements:
     * :func:`bucket` (thanks to jonathandung, JamesParrot, and rhettinger)
