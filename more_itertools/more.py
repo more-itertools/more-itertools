@@ -3599,13 +3599,18 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
                 for i in range(len(p)):
                     yield p[:i] + [[e] + p[i]] + p[i + 1 :]
 
+    # A partition into k blocks can only satisfy the size limits when
+    # k * min_size <= n <= k * max_size, so skip any k outside that range.
+    k_min = -(-n // max_size) if max_size > 0 else n + 1
+    k_max = min(n // min_size, n) if min_size > 0 else n
+
     if k is None:
-        for k in range(1, n + 1):
+        for k in range(max(k_min, 1), k_max + 1):
             yield from filter(
                 lambda z: all(min_size <= len(bk) <= max_size for bk in z),
                 set_partitions_helper(L, k),
             )
-    else:
+    elif k_min <= k <= k_max:
         yield from filter(
             lambda z: all(min_size <= len(bk) <= max_size for bk in z),
             set_partitions_helper(L, k),

@@ -4457,6 +4457,32 @@ class SetPartitionsTests(TestCase):
             list(mi.set_partitions(it, min_size=4, max_size=3)), []
         )
 
+    def test_size_limits_match_filter(self):
+        # Results with size limits should be the unconstrained results,
+        # filtered, in the same order.
+        sizes = [None, -1, 0, 1, 2, 3, 4, 9]
+        for n in range(9):
+            it = range(n)
+            for k in [None, *range(1, n + 2)]:
+                unconstrained = list(mi.set_partitions(it, k))
+                for min_size, max_size in product(sizes, sizes):
+                    lo = 0 if min_size is None else min_size
+                    hi = n if max_size is None else max_size
+                    expected = [
+                        p
+                        for p in unconstrained
+                        if all(lo <= len(g) <= hi for g in p)
+                    ]
+                    with self.subTest(
+                        n=n, k=k, min_size=min_size, max_size=max_size
+                    ):
+                        actual = list(
+                            mi.set_partitions(
+                                it, k, min_size=min_size, max_size=max_size
+                            )
+                        )
+                        self.assertEqual(actual, expected)
+
 
 class TimeLimitedTests(TestCase):
     def test_basic(self):

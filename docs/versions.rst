@@ -18,6 +18,7 @@ Unreleased
     * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
     * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0``
     * :func:`one` and :func:`only` were fixed to raise a user-supplied *too_short*/*too_long* exception even when the exception object is falsy, and to no longer build the default error message (which reprs iterable items) when a custom exception is given (thanks to itzzdev09)
+    * :func:`set_partitions` no longer generates partitions whose number of blocks can't satisfy *min_size* and *max_size*, which makes size-limited calls much faster (thanks to TheNetherWatcher)
 
 11.1.0
 ------
