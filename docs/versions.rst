@@ -5,19 +5,63 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
-Unreleased
+11.2.0
 ----------
 
-* Changes to existing functions:
-    * :func:`bucket` now honours a falsey *validator* callable (such as an empty ``set`` subclass that defines ``__call__``) instead of silently replacing it with the default that accepts every key.
-    * :func:`ichunked` now matches :func:`chunked` for ``n = 0`` and negative *n*: it yields nothing for a zero chunk size (without consuming the source) and raises ``ValueError: n must be at least 0`` instead of leaking :func:`itertools.islice`'s error.
-    * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
-    * :func:`numeric_range` now preserves its original values and length when reversed, including floating-point ranges and ranges near datetime limits.
-    * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count*.
-    * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
-    * :func:`iter_index` was fixed to accept negative *start* and *stop* with general iterables (thanks to gaoflow)
-    * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0``
-    * :func:`one` and :func:`only` were fixed to raise a user-supplied *too_short*/*too_long* exception even when the exception object is falsy, and to no longer build the default error message (which reprs iterable items) when a custom exception is given (thanks to itzzdev09)
+* New functions:
+    * :func:`random_ordered_range` returns values from range(n) in randomly shuffled order (thanks to rhettinger)
+    * :func:`subfactorial` computes the number of permutations of *n* elements with no fixed points (thanks to rhettinger)
+
+* Updated functions:
+    * :func:`bucket` no longer adds keys when looking them. It now also allows ``validator``s that evaluate to ``False``. (thanks to onk3sh, DawnofGenX, and rhettinger)
+    * :func:`chunked` and :func:`ichunked` now raise ``ValueError`` for negative chunk sizes (thanks to uttam12331 and 00200200)
+    * :func:`combination_with_replacement_index` now handles inputs with ``None`` properly (thanks to pochmann and JamesParrott)
+    * :func:`constrained_batches` now raises ``ValueError`` for a nonpositive *max_count* (thanks to gheshm-jpg).
+    * :func:`interleave_evenly` returns immediately for empty input (thanks to nyxst4ck)
+    * :func:`numeric_range` now more closely mirrors the behavior of the built-in ``range`` (thanks to emme1t, onk3sh, chuenchen309, feiiiiii5, and JamesParrott)
+    * :func:`one` and :func:`only` now accept user-supplied exceptions that evaluate to ``False`` (thanks to andjf, itzzdev09, rhettinger)
+    * :func:`running_min` and :func:`running_max` are now more numerically stable (thanks to rhettinger)
+    * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now validate *maxlen* as an integer and support the index protocol (thanks to jackwalkerlabs and rhettinger)
+    * :func:`seekable` now handles ``maxlen=0`` more robustly (thanks to otiscuilei, pochmann , upayon123)
+    * :func:`sliced` now raises ``ValueError`` for negative slice sizes (thanks to Sanjays2402)
+    * :func:`split_before`, :func:`split_after`, and :func:`split_when` no longer yield an empty list for an empty *iterable* when *maxsplit* is ``0`` (thanks to dylanpulver)
+    * :func:`value_chain` no longer swallows ``TypeError`` exceptions (thanks to onk3sh)
+    * :func:`zip_broadcast` no longer opens input iterables twice (thanks to dylanpulver)
+
+* Functions with performance improvements
+    * :func:`count_cycle` (thanks to jonathandung)
+    * :func:`last` (thanks to rhettinger)
+    * :func:`minmax` (thanks to rhettinger)
+    * :func:`nth_permutation` (thanks to pochmann)
+    * :func:`partition` (thanks to rhettinger)
+    * :func:`serialize` (thanks to JamesParrott, rhettinger, and jonathandung)
+
+* Functions with documentation improvements:
+    * :func:`bucket` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`convolve` (thanks to deepakganesh78, pochmann, and jonathandung)
+    * :func:`consecutive_groups` (thanks to Labib-Bin-Salam)
+    * :func:`countable` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`distinct_permutations` (thanks to areiche2)
+    * :func:`duplicates_everseen` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`iter_except` (thanks to rhettinger)
+    * :func:`iter_index` (thanks to chuenchen309, JamesParrott, pochmann, rhettinger)
+    * :func:`numeric_range` (thanks to jonathandung, JamesParrot, areiche2, and rhettinger)
+    * :func:`quantify` (thanks to rhettinger)
+    * :func:`random_combination` (thanks to areiche2)
+    * :func:`random_combination_with_replacement` (thanks to areiche2)
+    * :func:`random_permutation` (thanks to areiche2)
+    * :func:`random_product` (thanks to areiche2)
+    * :func:`time_limited` (thanks to jonathandung, JamesParrot, and rhettinger)
+    * :func:`lstrip` (thanks to Labib-Bin-Salam)
+
+* Other changes:
+    * Python 3.15 is officially supported. Python 3.10 is no longer officially supported.
+    * Several functions now have more accurate type annotations (thanks to jonathandung, jorenham, rhettinger and pochmann)
+    * :func:`powerset_of_sets` tests fixed an incorrect assumption (thanks to rhettinger and pochmann)
+    * Remove redundant u-prefix strings were removed from the docstring for :func:`side_effect` (thanks to jonathandung)
+    * Test coverage was improved (thanks to darrenhuai)
+    * Coverage testing is now much faster in GitHub Actions (thanks to JamesParrott and pochmann)
+    * The build process was updated to support recent versions of ``flit`` (thanks to jonathandung)
 
 11.1.0
 ------
