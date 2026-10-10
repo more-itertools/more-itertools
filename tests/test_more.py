@@ -731,6 +731,28 @@ class MinMaxTests(TestCase):
                         (min(values, key=key), max(values, key=key)),
                     )
 
+    def test_key_called_once_per_item(self):
+        for values in ([5], [5, 3], [5, 3, 1], [5, 3, 1, 8]):
+            with self.subTest(values=values):
+                calls = []
+
+                def key(value):
+                    calls.append(value)
+                    return value
+
+                self.assertEqual(
+                    mi.minmax(iter(values), key=key),
+                    (min(values), max(values)),
+                )
+                self.assertEqual(calls, values)
+
+    def test_key_consumes_external_values_once(self):
+        keys = {'first': 2, 'second': 1}
+        self.assertEqual(
+            mi.minmax(keys.copy(), key=keys.pop), ('second', 'first')
+        )
+        self.assertEqual(keys, {})
+
     def test_default(self):
         with self.assertRaises(ValueError):
             mi.minmax([])
