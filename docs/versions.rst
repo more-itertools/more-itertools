@@ -9,6 +9,7 @@ Unreleased
 ----------
 
 * Changes to existing functions:
+    * :func:`all_unique` now honours a falsey *key* callable (such as an object whose ``__bool__`` returns ``False``) instead of silently ignoring it.
     * :func:`bucket` now honours a falsey *validator* callable (such as an empty ``set`` subclass that defines ``__call__``) instead of silently replacing it with the default that accepts every key.
     * :func:`ichunked` now matches :func:`chunked` for ``n = 0`` and negative *n*: it yields nothing for a zero chunk size (without consuming the source) and raises ``ValueError: n must be at least 0`` instead of leaking :func:`itertools.islice`'s error.
     * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
