@@ -4923,10 +4923,11 @@ def minmax(iterable_or_value, *others, key=None, default=_marker):
 
     else:
         lo_key = hi_key = key(lo)
+        keyed = ((item, key(item)) for item in it)
 
-        for x, y in zip_longest(it, it, fillvalue=lo):
-            x_key, y_key = key(x), key(y)
-
+        for (x, x_key), (y, y_key) in zip_longest(
+            keyed, keyed, fillvalue=(lo, lo_key)
+        ):
             if y_key < x_key:
                 if y_key < lo_key:
                     lo, lo_key = y, y_key
