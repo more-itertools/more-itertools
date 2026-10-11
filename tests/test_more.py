@@ -340,6 +340,19 @@ class PeekableTests(PeekableMixinTests, TestCase):
         self.assertEqual(old_cache, list(p._cache))
         self.assertEqual(list(p), list(iterable))
 
+    def test_slicing_negative_step_omitted_stop(self):
+        it = iter(range(100))
+        p = mi.peekable(it)
+        self.assertEqual(p[5::-1], [5, 4, 3, 2, 1, 0])
+        self.assertEqual(len(p._cache), 6)
+        self.assertEqual(next(p), 0)
+
+        # Ensure infinite iterables can be sliced backwards without hanging
+        p_inf = mi.peekable(count())
+        self.assertEqual(p_inf[4::-2], [4, 2, 0])
+        self.assertEqual(len(p_inf._cache), 5)
+        self.assertEqual(next(p_inf), 0)
+
     # prepend() behavior tests
 
     def test_prepend(self):
