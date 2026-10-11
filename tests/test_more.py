@@ -5961,6 +5961,26 @@ class DuplicatesJustSeenTests(TestCase):
 
 
 class ClassifyUniqueTests(TestCase):
+    def test_adjacent_identical_nan(self):
+        nan = float('nan')
+        result = list(mi.classify_unique([nan, nan]))
+        self.assertEqual(
+            [flags[1:] for flags in result], [(True, True), (False, False)]
+        )
+        self.assertEqual(list(mi.unique_justseen([nan, nan])), [nan])
+
+    def test_adjacent_distinct_nans(self):
+        values = [float('nan'), float('nan')]
+        result = list(mi.classify_unique(values))
+        self.assertEqual(
+            [flags[1:] for flags in result], [(True, True), (True, True)]
+        )
+
+    def test_adjacent_identical_key(self):
+        nan = float('nan')
+        result = list(mi.classify_unique('ab', key=lambda _: nan))
+        self.assertEqual(result, [('a', True, True), ('b', False, False)])
+
     def test_basic(self):
         self.assertEqual(
             list(mi.classify_unique('mississippi')),

@@ -4842,7 +4842,7 @@ def classify_unique(iterable, key=None):
 
     for i, element in enumerate(iterable):
         k = key(element) if use_key else element
-        is_unique_justseen = not i or previous != k
+        is_unique_justseen = not i or not (previous is k or previous == k)
         previous = k
         is_unique_everseen = False
         try:
