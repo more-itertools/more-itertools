@@ -4738,6 +4738,13 @@ class MapIfTests(TestCase):
 
 
 class SampleTests(TestCase):
+    def test_empty_weighted_population(self):
+        for k in (1, 3):
+            with self.subTest(k=k):
+                self.assertEqual(mi.sample(iter(()), k, weights=iter(())), [])
+                with self.assertRaises(ValueError):
+                    mi.sample(iter(()), k, weights=iter(()), strict=True)
+
     def test_specific_sample(self):
         """Verify reproducibility."""
 
