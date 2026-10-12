@@ -9,6 +9,7 @@ Unreleased
 ----------
 
 * Changes to existing functions:
+    * Python 3.10 support was dropped, since it went EOL on 2026-10-01
     * :func:`bucket` now honours a falsey *validator* callable (such as an empty ``set`` subclass that defines ``__call__``) instead of silently replacing it with the default that accepts every key.
     * :func:`ichunked` now matches :func:`chunked` for ``n = 0`` and negative *n*: it yields nothing for a zero chunk size (without consuming the source) and raises ``ValueError: n must be at least 0`` instead of leaking :func:`itertools.islice`'s error.
     * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
@@ -120,8 +121,8 @@ Unreleased
 * Changes to existing functions:
     * The type hints and docstring for :func:`batched` were improved (thanks to qobilidop and inventshah)
     * The memory usage of :func:`islice_extended` was reduced (thanks to ben42code)
-    * The performance of :func:`sample` and :func:`consecutive_groups`, :func:`dft`, :func:`idft`, :func:`map_if`, :func:`count_cycle`, and :func:`tail` were improved (thanks to rhettinger) 
-    * The performance of :func:`before_and_after`, :func:`mark_ends`, and :func:`interleave_longest` were improved (thanks to pochmann3) 
+    * The performance of :func:`sample` and :func:`consecutive_groups`, :func:`dft`, :func:`idft`, :func:`map_if`, :func:`count_cycle`, and :func:`tail` were improved (thanks to rhettinger)
+    * The performance of :func:`before_and_after`, :func:`mark_ends`, and :func:`interleave_longest` were improved (thanks to pochmann3)
     * :func:`nth_prime` now accepts an ``approximate`` keyword. When set to ``True``, a faster but less accurate method is used to return a result. (thanks to rhettinger)
     * :func:`last` now works when its input has ``__reversed__`` set to ``None`` (thanks to inventshah)
     * The :func:`unzip` function was simplified (thanks to pochmann3)
