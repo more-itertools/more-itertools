@@ -3605,16 +3605,16 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     k_max = min(n // min_size, n) if min_size > 0 else n
 
     if k is None:
-        for k in range(max(k_min, 1), k_max + 1):
-            yield from filter(
-                lambda z: all(min_size <= len(bk) <= max_size for bk in z),
-                set_partitions_helper(L, k),
-            )
+        ks = range(max(k_min, 1), k_max + 1)
     elif k_min <= k <= k_max:
-        yield from filter(
-            lambda z: all(min_size <= len(bk) <= max_size for bk in z),
-            set_partitions_helper(L, k),
-        )
+        ks = (k,)
+    else:
+        return
+
+    for k in ks:
+        for p in set_partitions_helper(L, k):
+            if all(min_size <= len(bk) <= max_size for bk in p):
+                yield p
 
 
 class time_limited:
