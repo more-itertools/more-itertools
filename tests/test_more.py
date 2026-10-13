@@ -5156,6 +5156,41 @@ class AllUniqueTests(TestCase):
     def test_infinite(self):
         self.assertEqual(mi.all_unique(mi.prepend(3, count())), False)
 
+    def test_equal_hashable_and_unhashable(self):
+        a = {1}
+        b = frozenset({1})
+        self.assertTrue(a == b)
+        self.assertFalse(mi.all_unique([a, b]))
+        self.assertFalse(mi.all_unique([b, a]))
+        self.assertTrue(mi.all_unique([a, {2}]))
+        self.assertTrue(mi.all_unique([b, frozenset({2})]))
+
+        class UnhashableInt(int):
+            __hash__ = None
+
+        self.assertFalse(mi.all_unique([1, UnhashableInt(1)]))
+        self.assertFalse(mi.all_unique([UnhashableInt(1), 1]))
+        self.assertTrue(mi.all_unique([1, UnhashableInt(2)]))
+
+    def test_mixed_key_hashability(self):
+        def to_setish(value):
+            return {value} if value % 2 else frozenset({value})
+
+        self.assertFalse(mi.all_unique([1, 1], key=to_setish))
+        self.assertTrue(mi.all_unique([1, 2], key=to_setish))
+
+    def test_early_return(self):
+        calls = []
+
+        def gen():
+            yield {1}
+            yield frozenset({1})
+            calls.append('continued')
+            yield {2}
+
+        self.assertFalse(mi.all_unique(gen()))
+        self.assertEqual(calls, [])
+
 
 class NthProductTests(TestCase):
     def test_basic(self):

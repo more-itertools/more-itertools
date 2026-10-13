@@ -4274,6 +4274,9 @@ def all_unique(iterable, key=None):
     The function returns as soon as the first non-unique element is
     encountered. Iterables with a mix of hashable and unhashable items can
     be used, but the function will be slower for unhashable items.
+
+        >>> all_unique([{1}, frozenset({1})])
+        False
     """
     seenset = set()
     seenset_add = seenset.add
@@ -4283,9 +4286,17 @@ def all_unique(iterable, key=None):
         try:
             if element in seenset:
                 return False
+            # A later hashable value may equal an earlier unhashable one
+            # (e.g. frozenset({1}) == {1}). List membership uses equality.
+            if seenlist and element in seenlist:
+                return False
             seenset_add(element)
         except TypeError:
             if element in seenlist:
+                return False
+            # ``element in seenset`` raises TypeError for unhashable
+            # values, so compare by equality instead.
+            if any(element == seen for seen in seenset):
                 return False
             seenlist_add(element)
     return True

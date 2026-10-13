@@ -5,6 +5,12 @@ Version History
 .. automodule:: more_itertools
    :noindex:
 
+11.3.0
+----------
+
+* Updated functions:
+    * :func:`all_unique` now detects equal hashable and unhashable values regardless of order (thanks to theman6660)
+
 11.2.0
 ----------
 
