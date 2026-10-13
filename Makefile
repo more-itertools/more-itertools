@@ -35,4 +35,5 @@ docs:
 package:
 	python -m pip install --upgrade -r requirements/packaging.txt
 	flit build
+	python tests/check_sdist.py
 	twine check dist/*
