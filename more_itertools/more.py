@@ -3580,8 +3580,10 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
         elif k > n:
             return
 
-    min_size = min_size if min_size is not None else 0
-    max_size = max_size if max_size is not None else n
+    if min_size is None or min_size < 1:
+        min_size = 1
+    if max_size is None or max_size > n:
+        max_size = n
     if min_size > max_size:
         return
 
@@ -3601,11 +3603,11 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
 
     # A partition into k blocks can only satisfy the size limits when
     # k * min_size <= n <= k * max_size, so skip any k outside that range.
-    k_min = -(-n // max_size) if max_size > 0 else n + 1
-    k_max = min(n // min_size, n) if min_size > 0 else n
+    k_min = -(-n // max_size)
+    k_max = n // min_size
 
     if k is None:
-        ks = range(max(k_min, 1), k_max + 1)
+        ks = range(k_min, k_max + 1)
     elif k_min <= k <= k_max:
         ks = (k,)
     else:
