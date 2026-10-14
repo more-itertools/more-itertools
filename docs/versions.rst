@@ -4,6 +4,12 @@ Version History
 
 .. automodule:: more_itertools
    :noindex:
+   
+11.2.1
+----------
+
+* Updates
+    * This release fixes an issue with the source distribution. No module code changed.
 
 11.2.0
 ----------
