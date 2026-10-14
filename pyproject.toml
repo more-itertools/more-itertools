@@ -43,6 +43,24 @@ Documentation = "https://more-itertools.readthedocs.io/en/stable/"
 [tool.flit.module]
 name = "more_itertools"
 
+[tool.flit.sdist]
+include = [
+    ".gitattributes",
+    ".github/",
+    ".gitignore",
+    ".readthedocs.yaml",
+    "docs/",
+    "Makefile",
+    "MANIFEST.in",
+    "requirements/",
+    "setup.cfg",
+    "tests/",
+    "tox.ini",
+]
+exclude = [
+    "docs/_build/",
+]
+
 [tool.ruff]
 indent-width = 4
 line-length = 79
