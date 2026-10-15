@@ -4433,6 +4433,22 @@ class SetPartitionsTests(TestCase):
     def test_to_many_groups(self):
         self.assertEqual([], list(mi.set_partitions(range(4), 5)))
 
+    def test_empty(self):
+        # The empty iterable has exactly one partition: the empty
+        # partition. Its counts by number of items are the Bell
+        # numbers, which start 1, 1, 2, 5, 15, 52 for n = 0..5.
+        self.assertEqual([[]], list(mi.set_partitions([])))
+        self.assertEqual(
+            [1, 1, 2, 5, 15, 52],
+            [len(list(mi.set_partitions(range(n)))) for n in range(6)],
+        )
+        # The empty partition has no blocks, so it satisfies any
+        # size limits.
+        self.assertEqual([[]], list(mi.set_partitions([], min_size=2)))
+        self.assertEqual([[]], list(mi.set_partitions([], max_size=2)))
+        # An explicit k still requires at least one block.
+        self.assertEqual([], list(mi.set_partitions([], 1)))
+
     def test_min_size(self):
         it = 'abc'
         actual = mi.set_partitions(it, min_size=2)
