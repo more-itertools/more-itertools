@@ -3580,6 +3580,14 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
         elif k > n:
             return
 
+    if n == 0:
+        # The empty iterable has exactly one partition: the empty
+        # partition, which has no blocks and so satisfies any size
+        # limits. An explicit *k* cannot reach this point, since *k*
+        # must be at least 1 and would exceed ``n`` above.
+        yield []
+        return
+
     min_size = min_size if min_size is not None else 0
     max_size = max_size if max_size is not None else n
     if min_size > max_size:
