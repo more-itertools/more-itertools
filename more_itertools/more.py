@@ -461,12 +461,24 @@ class peekable:
 
         # If either the start or stop index is negative, we'll need to cache
         # the rest of the iterable in order to slice from the right side.
-        if (start < 0) or (stop < 0):
+        # When step < 0 and stop is None, the slice stops at index 0 rather than
+        # indexing from the right, so only items up to start must be cached.
+        has_negative_index = (
+            (index.start is not None and index.start < 0)
+            or (index.stop is not None and index.stop < 0)
+            or (step < 0 and index.start is None)
+        )
+        if has_negative_index:
             self._cache.extend(self._it)
         # Otherwise we'll need to find the rightmost index and cache to that
         # point.
         else:
-            n = min(max(start, stop) + 1, maxsize)
+            rightmost = (
+                start
+                if (step < 0 and index.stop is None)
+                else max(start, stop)
+            )
+            n = min(rightmost + 1, maxsize)
             cache_len = len(self._cache)
             if n >= cache_len:
                 self._cache.extend(islice(self._it, n - cache_len))
