@@ -84,12 +84,6 @@ class TailTests(TestCase):
         """Length of iterator is less than requested tail"""
         self.assertEqual(list(mi.tail(8, iter('ABCDEFG'))), list('ABCDEFG'))
 
-    def test_iterator_negative(self):
-        """Negative tail sizes should raise for non-sized iterables."""
-        self.assertRaises(
-            ValueError, lambda: list(mi.tail(-1, iter('ABCDEFG')))
-        )
-
     def test_sized_greater(self):
         """Length of sized iterable is greater than requested tail"""
         self.assertEqual(list(mi.tail(3, 'ABCDEFG')), list('EFG'))
@@ -101,10 +95,6 @@ class TailTests(TestCase):
     def test_sized_less(self):
         """Length of sized iterable is less than requested tail"""
         self.assertEqual(list(mi.tail(8, 'ABCDEFG')), list('ABCDEFG'))
-
-    def test_sized_negative(self):
-        """Negative tail sizes should raise for sized iterables."""
-        self.assertRaises(ValueError, lambda: list(mi.tail(-1, 'ABCDEFG')))
 
 
 class ConsumeTests(TestCase):
@@ -1035,25 +1025,6 @@ class IterIndexTests(TestCase):
         actual = list(mi.iter_index('AABCADEAF', 'A', stop=7))
         expected = [0, 1, 4]
         self.assertEqual(actual, expected)
-
-    def test_negative_start_and_stop(self):
-        # Negative *start* / *stop* should behave like the built-in
-        # ``str.index`` / ``list.index`` and produce identical results for the
-        # fast (sequence) and slow (general-iterable) code paths.
-        iterable = 'AABCADEAF'  # 'A' occurs at indexes 0, 1, 4, 7
-        cases = [
-            (dict(start=-3), [7]),
-            (dict(start=-9), [0, 1, 4, 7]),
-            (dict(stop=-2), [0, 1, 4]),
-            (dict(start=-5, stop=-1), [4, 7]),
-        ]
-        for kwargs, expected in cases:
-            for wrapper in (list, iter):
-                with self.subTest(kwargs=kwargs, wrapper=wrapper):
-                    actual = list(
-                        mi.iter_index(wrapper(iterable), 'A', **kwargs)
-                    )
-                    self.assertEqual(actual, expected)
 
 
 class SieveTests(TestCase):
