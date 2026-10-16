@@ -19,12 +19,13 @@ from typing import (
     Callable,
     Generic,
     Literal,
+    Protocol,
+    Self,
     TypeAlias,
     TypeVar,
     overload,
     type_check_only,
 )
-from typing_extensions import Protocol, Self
 from _typeshed import (
     SupportsDunderLT,
     SupportsGetItem,
