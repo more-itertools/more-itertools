@@ -5,6 +5,12 @@ Version History
 .. automodule:: more_itertools
    :noindex:
    
+Unreleased
+----------
+
+* Changes to existing functions:
+    * :func:`set_partitions` no longer generates partitions whose number of blocks can't satisfy *min_size* and *max_size*, which makes size-limited calls much faster (thanks to TheNetherWatcher)
+
 11.2.1
 ----------
 
