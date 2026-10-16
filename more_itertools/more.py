@@ -1310,10 +1310,8 @@ def interleave_longest(*iterables):
     is large).
 
     """
-    for xs in zip_longest(*iterables, fillvalue=_marker):
-        for x in xs:
-            if x is not _marker:
-                yield x
+    i = flatten(zip_longest(*iterables, fillvalue=_marker))
+    return filter(partial(is_not, _marker), i)
 
 
 def interleave_evenly(iterables, lengths=None):
