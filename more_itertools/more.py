@@ -3750,6 +3750,13 @@ def iequals(*iterables):
     Not to be confused with :func:`all_equal`, which checks whether all
     elements of iterable are equal to each other.
 
+    .. note::
+        This function catches :exc:`ValueError`. That includes the
+        length-mismatch error from ``zip(..., strict=True)``, and also any
+        :exc:`ValueError` raised while iterating or comparing elements. In
+        those latter cases the result is ``False`` rather than propagating
+        the exception.
+
     """
     try:
         return all(map(all_equal, zip(*iterables, strict=True)))
