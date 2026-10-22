@@ -4235,6 +4235,24 @@ class ReplaceTests(TestCase):
         expected = [5, 6, 7]
         self.assertEqual(actual, expected)
 
+    def test_window_size_empty(self):
+        # pred must not be called with padding for an empty iterable
+        for window_size in (1, 2, 3):
+            with self.subTest(window_size=window_size):
+                pred = lambda *args: True
+                actual = list(
+                    mi.replace([], pred, [5], window_size=window_size)
+                )
+                self.assertEqual(actual, [])
+
+                calls = []
+                pred = lambda *args: calls.append(args)
+                actual = list(
+                    mi.replace([], pred, [5], window_size=window_size)
+                )
+                self.assertEqual(actual, [])
+                self.assertEqual(calls, [])
+
     def test_window_size_zero(self):
         iterable = range(10)
         pred = lambda *args: True
