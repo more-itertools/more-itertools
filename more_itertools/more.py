@@ -1370,19 +1370,25 @@ def interleave_evenly(iterables, lengths=None):
     errors = [delta_primary // dims] * len(deltas_secondary)
 
     to_yield = sum(lengths)
-    while to_yield:
-        yield next(iter_primary)
-        to_yield -= 1
-        # update errors for each secondary iterable
-        errors = [e - delta for e, delta in zip(errors, deltas_secondary)]
+    try:
+        while to_yield:
+            yield next(iter_primary)
+            to_yield -= 1
+            # update errors for each secondary iterable
+            errors = [e - delta for e, delta in zip(errors, deltas_secondary)]
 
-        # those iterables for which the error is negative are yielded
-        # ("diagonal step" in Bresenham)
-        for i, e_ in enumerate(errors):
-            if e_ < 0:
-                yield next(iters_secondary[i])
-                to_yield -= 1
-                errors[i] += delta_primary
+            # those iterables for which the error is negative are yielded
+            # ("diagonal step" in Bresenham)
+            for i, e_ in enumerate(errors):
+                if e_ < 0:
+                    yield next(iters_secondary[i])
+                    to_yield -= 1
+                    errors[i] += delta_primary
+    except StopIteration:
+        # Inside a generator this would surface as a RuntimeError
+        raise ValueError(
+            'An iterable is shorter than its given length.'
+        ) from None
 
 
 def interleave_randomly(*iterables):

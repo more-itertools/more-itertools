@@ -1262,6 +1262,16 @@ class InterleaveEvenlyTests(TestCase):
         actual_swapped = list(mi.interleave_evenly([b, a]))
         self.assertEqual(actual_swapped, expected)
 
+    def test_lengths_longer_than_iterables(self):
+        # Running out early used to leak StopIteration as a RuntimeError
+        for iterables, lengths in [
+            ([iter([1, 2]), iter('ab')], [5, 2]),
+            ([iter([1, 2, 3]), iter('a')], [3, 4]),
+        ]:
+            with self.subTest(lengths=lengths):
+                with self.assertRaises(ValueError):
+                    list(mi.interleave_evenly(iterables, lengths=lengths))
+
     def test_not_proportional(self):
         a = [1, 2, 3, 4, 5, 6, 7]
         b = [8, 9, 10]
