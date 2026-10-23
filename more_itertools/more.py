@@ -3484,7 +3484,12 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
     # Add padding such that the number of windows matches the length of the
     # iterable
     it = chain(iterable, repeat(_marker, window_size - 1))
-    windows = windowed(it, window_size)
+    # Fill short windows with _marker (not the default None) so that the
+    # marker-stripping below removes all padding. For an empty iterable the
+    # padding is one item shorter than a window, so a default None fill would
+    # survive and leak out as a spurious item (see locate() for the same
+    # pattern).
+    windows = windowed(it, window_size, fillvalue=_marker)
 
     n = 0
     for w in windows:
