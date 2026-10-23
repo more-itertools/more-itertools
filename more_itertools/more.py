@@ -39,6 +39,7 @@ from operator import (
     sub,
     gt,
 )
+from operator import index as _index
 from sys import maxsize
 from time import monotonic
 from threading import Lock
@@ -4307,9 +4308,17 @@ def nth_product(index, *iterables, repeat=1):
         >>> nth_product(8, range(2), repeat=4)
         (1, 0, 0, 0)
 
+    If *repeat* is zero, the only product is the empty tuple and the input
+    iterables are not consumed. A negative *repeat* raises ``ValueError``.
+
     ``IndexError`` will be raised if the given *index* is invalid.
     """
-    pools = tuple(map(tuple, reversed(iterables))) * repeat
+    repeat = _index(repeat)
+    if repeat < 0:
+        raise ValueError('repeat argument cannot be negative')
+    pools = ()
+    if repeat:
+        pools = tuple(map(tuple, reversed(iterables))) * repeat
     ns = tuple(map(len, pools))
 
     c = prod(ns)

@@ -5193,6 +5193,55 @@ class NthProductTests(TestCase):
             mi.nth_product(123, 'AB', 'CD', 'EFG', 'AB', 'CD', 'EFG'),
         )
 
+    def test_zero_repeat_does_not_consume(self):
+        for index in (0, -1):
+            with self.subTest(index=index):
+                iterable = iter('abc')
+                self.assertEqual(mi.nth_product(index, iterable, repeat=0), ())
+                self.assertEqual(list(iterable), list('abc'))
+
+    def test_zero_repeat_ignores_inputs(self):
+        for index in (0, -1):
+            with self.subTest(index=index):
+                expected = list(product(None, repeat=0))[index]
+                self.assertEqual(
+                    mi.nth_product(index, None, repeat=0), expected
+                )
+
+    def test_zero_repeat_invalid_index_does_not_consume(self):
+        for index in (-2, 1):
+            with self.subTest(index=index):
+                iterable = iter('abc')
+                with self.assertRaises(IndexError):
+                    mi.nth_product(index, iterable, repeat=0)
+                self.assertEqual(list(iterable), list('abc'))
+
+    def test_negative_repeat(self):
+        for repeat_count in (-1, -3):
+            with self.subTest(repeat=repeat_count):
+                iterable = iter('abc')
+                with self.assertRaises(ValueError):
+                    mi.nth_product(0, iterable, repeat=repeat_count)
+                self.assertEqual(list(iterable), list('abc'))
+
+    def test_invalid_repeat_does_not_consume(self):
+        for repeat_count in (1.0, '2', None):
+            with self.subTest(repeat=repeat_count):
+                iterable = iter('abc')
+                with self.assertRaises(TypeError):
+                    mi.nth_product(0, iterable, repeat=repeat_count)
+                self.assertEqual(list(iterable), list('abc'))
+
+    def test_repeat_index_protocol(self):
+        class RepeatCount:
+            def __index__(self):
+                return 2
+
+        self.assertEqual(
+            mi.nth_product(2, 'ab', repeat=RepeatCount()),
+            list(product('ab', repeat=RepeatCount()))[2],
+        )
+
 
 class NthCombinationWithReplacementTests(TestCase):
     def test_basic(self):
