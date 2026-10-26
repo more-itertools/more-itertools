@@ -4627,6 +4627,11 @@ def chunked_even(iterable, n):
     [[1, 2, 3], [4, 5, 6], [7]]
 
     """
+    if n < 0:
+        raise ValueError('n must be at least 0')
+    if n == 0:
+        return
+
     iterator = iter(iterable)
 
     # Initialize a buffer to process the chunks while keeping
