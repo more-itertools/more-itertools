@@ -5585,6 +5585,19 @@ class ChunkedEvenTests(TestCase):
     def test_0(self):
         self._test_finite('', 3, [])
 
+    def test_zero_chunk_size(self):
+        self._test_finite('ABC', 0, [])
+
+        source = iter('ABC')
+        self.assertEqual(list(mi.chunked_even(source, 0)), [])
+        self.assertEqual(list(source), list('ABC'))
+
+    def test_negative_chunk_size(self):
+        source = iter('ABC')
+        with self.assertRaisesRegex(ValueError, 'n must be at least 0'):
+            list(mi.chunked_even(source, -1))
+        self.assertEqual(list(source), list('ABC'))
+
     def test_1(self):
         self._test_finite('A', 1, [['A']])
 
