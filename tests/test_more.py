@@ -340,6 +340,37 @@ class PeekableTests(PeekableMixinTests, TestCase):
         self.assertEqual(old_cache, list(p._cache))
         self.assertEqual(list(p), list(iterable))
 
+    def test_slicing_negative_step_omitted_stop(self):
+        it = iter(range(100))
+        p = mi.peekable(it)
+        self.assertEqual(p[5::-1], [5, 4, 3, 2, 1, 0])
+        self.assertEqual(len(p._cache), 6)
+        self.assertEqual(next(p), 0)
+
+    def test_slicing_negative_step_omitted_stop_read_bound(self):
+        seen = []
+
+        def guarded_source():
+            for value in count():
+                if len(seen) == 6:
+                    raise AssertionError(
+                        'source read past reverse-slice boundary'
+                    )
+                seen.append(value)
+                yield value
+
+        p = mi.peekable(guarded_source())
+        self.assertEqual(p[2], 2)
+        self.assertEqual(seen, [0, 1, 2])
+
+        self.assertEqual(p[5::-2], [5, 3, 1])
+        self.assertEqual(seen, list(range(6)))
+        self.assertEqual(p[5::-1], [5, 4, 3, 2, 1, 0])
+        self.assertEqual(seen, list(range(6)))
+
+        self.assertEqual(list(islice(p, 6)), list(range(6)))
+        self.assertEqual(seen, list(range(6)))
+
     # prepend() behavior tests
 
     def test_prepend(self):
