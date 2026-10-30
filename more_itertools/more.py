@@ -3149,6 +3149,10 @@ class seekable:
         return SequenceView(self._cache)
 
     def seek(self, index):
+        # A negative index would read from the end of the cache, then go on
+        # from its start
+        if index < 0:
+            raise ValueError('index must be at least 0')
         self._index = index
         remainder = index - len(self._cache)
         if remainder > 0:

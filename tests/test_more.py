@@ -3765,6 +3765,21 @@ class SeekableTest(PeekableMixinTests, TestCase):
         s.seek(0)  # Back to 0
         self.assertEqual(list(s), iterable)  # No difference in result
 
+    def test_negative_index(self):
+        iterable = [str(n) for n in range(10)]
+
+        s = mi.seekable(iterable)
+        self.assertEqual(list(s), iterable)
+
+        # A negative index is rejected, instead of yielding the last item
+        # followed by the whole cache
+        with self.assertRaises(ValueError):
+            s.seek(-1)
+        self.assertEqual(list(s), [])
+
+        s.seek(0)
+        self.assertEqual(list(s), iterable)
+
     def test_elements(self):
         iterable = map(str, count())
 
