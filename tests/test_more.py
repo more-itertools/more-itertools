@@ -4281,6 +4281,30 @@ class ReplaceTests(TestCase):
         expected = ['_', '_', 1, '_', '_', 3, '_', '_']
         self.assertEqual(actual, expected)
 
+    def test_empty_iterable_window_size(self):
+        # An empty iterable has no items to yield or replace, regardless of
+        # window size. With window_size > 1 the internal padding used to leak
+        # a spurious None, and pred was called with that None.
+        for window_size in (1, 2, 3):
+            with self.subTest(window_size=window_size):
+                calls = []
+
+                def pred(*args):
+                    calls.append(args)
+                    return False
+
+                actual = list(
+                    mi.replace([], pred, [9], window_size=window_size)
+                )
+                self.assertEqual(actual, [])
+                self.assertEqual(calls, [])
+
+    def test_empty_iterable_window_size_match(self):
+        # A predicate that matches everything must still yield nothing for an
+        # empty iterable (no window ever actually exists).
+        actual = list(mi.replace([], lambda *args: True, [9], window_size=2))
+        self.assertEqual(actual, [])
+
 
 class PartitionsTest(TestCase):
     def test_types(self):
