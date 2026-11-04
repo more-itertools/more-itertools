@@ -2376,8 +2376,8 @@ class numeric_range(Sequence):
         if self is other:
             return True
 
-        len_self = len(self)
-        if len_self != len(other):
+        len_self = self._len
+        if len_self != other._len:
             return False
 
         if not len_self:
@@ -2411,7 +2411,7 @@ class numeric_range(Sequence):
         # numeric_range hashing is intended to mirror the built-in range object's
         # hashing.
         # https://github.com/python/cpython/blob/f5c4880151b609e0a0a0b05c292d36b18038c061/Objects/rangeobject.c#L570
-        len_self = len(self)
+        len_self = self._len
         if not len_self:
             return hash((len_self, None, None))
         if len_self == 1:

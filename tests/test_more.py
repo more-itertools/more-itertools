@@ -3014,6 +3014,34 @@ class NumericRangeTests(TestCase):
             self.assertNotEqual(range1, range2)
             self.assertNotEqual(hash(range1), hash(range2))
 
+    def test_eq_above_maxsize(self):
+        stop = 10**30
+        cases = [
+            ((0, stop, 1), (0, stop, 1), True),
+            ((0, stop, 2), (0, stop - 1, 2), True),
+            ((stop, 0, -2), (stop, 1, -2), True),
+            ((0, stop, 1), (0, stop + 1, 1), False),
+            ((0, stop, 1), (1, stop + 1, 1), False),
+            ((0, stop, 1), (0, stop * 2, 2), False),
+        ]
+        for args1, args2, expected in cases:
+            with self.subTest(args1=args1, args2=args2):
+                range1 = mi.numeric_range(*args1)
+                range2 = mi.numeric_range(*args2)
+                self.assertEqual(range(*args1) == range(*args2), expected)
+                self.assertEqual(range1 == range2, expected)
+
+    def test_hash_above_maxsize(self):
+        stop = 10**30
+        for args in [(0, stop, 1), (0, stop, 2), (stop, 0, -2)]:
+            with self.subTest(args=args):
+                r = mi.numeric_range(*args)
+                self.assertEqual(hash(r), hash(range(*args)))
+                self.assertEqual(
+                    {r: 'value'}[mi.numeric_range(*args)], 'value'
+                )
+                self.assertRaises(OverflowError, len, r)
+
     def test_get_item_by_index(self):
         for args, index, expected in [
             ((1, 6), 2, 3),
