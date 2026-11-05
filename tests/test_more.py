@@ -4301,6 +4301,15 @@ class ReplaceTests(TestCase):
         with self.assertRaises(ValueError):
             list(mi.replace(iterable, pred, substitutes, window_size=0))
 
+    def test_empty_iterable_window_size(self):
+        # Empty input must yield nothing even with window_size > 1
+        # (regression: padded window filled with None leaked through).
+        for pred in (lambda *a: False, lambda *a: True):
+            actual = list(mi.replace([], pred, [9], window_size=2))
+            self.assertEqual(actual, [])
+        actual = list(mi.replace([], lambda *a: True, [9], window_size=3))
+        self.assertEqual(actual, [])
+
     def test_iterable_substitutes(self):
         iterable = range(5)
         pred = lambda x: x % 2 == 0
