@@ -461,12 +461,24 @@ class peekable:
 
         # If either the start or stop index is negative, we'll need to cache
         # the rest of the iterable in order to slice from the right side.
-        if (start < 0) or (stop < 0):
+        # When step < 0 and stop is None, the slice stops at index 0 rather than
+        # indexing from the right, so only items up to start must be cached.
+        has_negative_index = (
+            (index.start is not None and index.start < 0)
+            or (index.stop is not None and index.stop < 0)
+            or (step < 0 and index.start is None)
+        )
+        if has_negative_index:
             self._cache.extend(self._it)
         # Otherwise we'll need to find the rightmost index and cache to that
         # point.
         else:
-            n = min(max(start, stop) + 1, maxsize)
+            rightmost = (
+                start
+                if (step < 0 and index.stop is None)
+                else max(start, stop)
+            )
+            n = min(rightmost + 1, maxsize)
             cache_len = len(self._cache)
             if n >= cache_len:
                 self._cache.extend(islice(self._it, n - cache_len))
@@ -1310,10 +1322,8 @@ def interleave_longest(*iterables):
     is large).
 
     """
-    for xs in zip_longest(*iterables, fillvalue=_marker):
-        for x in xs:
-            if x is not _marker:
-                yield x
+    i = flatten(zip_longest(*iterables, fillvalue=_marker))
+    return filter(partial(is_not, _marker), i)
 
 
 def interleave_evenly(iterables, lengths=None):
@@ -2366,8 +2376,8 @@ class numeric_range(Sequence):
         if self is other:
             return True
 
-        len_self = len(self)
-        if len_self != len(other):
+        len_self = self._len
+        if len_self != other._len:
             return False
 
         if not len_self:
@@ -2401,7 +2411,7 @@ class numeric_range(Sequence):
         # numeric_range hashing is intended to mirror the built-in range object's
         # hashing.
         # https://github.com/python/cpython/blob/f5c4880151b609e0a0a0b05c292d36b18038c061/Objects/rangeobject.c#L570
-        len_self = len(self)
+        len_self = self._len
         if not len_self:
             return hash((len_self, None, None))
         if len_self == 1:
@@ -3484,7 +3494,7 @@ def replace(iterable, pred, substitutes, count=None, window_size=1):
     # Add padding such that the number of windows matches the length of the
     # iterable
     it = chain(iterable, repeat(_marker, window_size - 1))
-    windows = windowed(it, window_size)
+    windows = windowed(it, window_size, fillvalue=_marker)
 
     n = 0
     for w in windows:
@@ -4627,6 +4637,11 @@ def chunked_even(iterable, n):
     [[1, 2, 3], [4, 5, 6], [7]]
 
     """
+    if n < 0:
+        raise ValueError('n must be at least 0')
+    if n == 0:
+        return
+
     iterator = iter(iterable)
 
     # Initialize a buffer to process the chunks while keeping
