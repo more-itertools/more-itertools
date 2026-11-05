@@ -3585,6 +3585,17 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     if min_size > max_size:
         return
 
+    if n == 0:
+        # The empty set has exactly one partition: the empty one (Bell(0) = 1),
+        # matching partitions(), derangements(), distinct_permutations().
+        # Empty partitions have no blocks, so any min_size > 0 / max_size < 0
+        # filter applies vacuously, but respect k: only unfiltered (k is None)
+        # or k == 0 (rejected above) make sense; k >= 1 was already excluded
+        # only if the caller passed k explicitly and n == 0 → k > n → return.
+        # So reaching here with n == 0 means k is None.
+        yield []
+        return
+
     def set_partitions_helper(L, k):
         n = len(L)
         if k == 1:
