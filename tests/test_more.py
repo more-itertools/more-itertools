@@ -340,6 +340,37 @@ class PeekableTests(PeekableMixinTests, TestCase):
         self.assertEqual(old_cache, list(p._cache))
         self.assertEqual(list(p), list(iterable))
 
+    def test_slicing_negative_step_omitted_stop(self):
+        it = iter(range(100))
+        p = mi.peekable(it)
+        self.assertEqual(p[5::-1], [5, 4, 3, 2, 1, 0])
+        self.assertEqual(len(p._cache), 6)
+        self.assertEqual(next(p), 0)
+
+    def test_slicing_negative_step_omitted_stop_read_bound(self):
+        seen = []
+
+        def guarded_source():
+            for value in count():
+                if len(seen) == 6:
+                    raise AssertionError(
+                        'source read past reverse-slice boundary'
+                    )
+                seen.append(value)
+                yield value
+
+        p = mi.peekable(guarded_source())
+        self.assertEqual(p[2], 2)
+        self.assertEqual(seen, [0, 1, 2])
+
+        self.assertEqual(p[5::-2], [5, 3, 1])
+        self.assertEqual(seen, list(range(6)))
+        self.assertEqual(p[5::-1], [5, 4, 3, 2, 1, 0])
+        self.assertEqual(seen, list(range(6)))
+
+        self.assertEqual(list(islice(p, 6)), list(range(6)))
+        self.assertEqual(seen, list(range(6)))
+
     # prepend() behavior tests
 
     def test_prepend(self):
@@ -2983,6 +3014,34 @@ class NumericRangeTests(TestCase):
             self.assertNotEqual(range1, range2)
             self.assertNotEqual(hash(range1), hash(range2))
 
+    def test_eq_above_maxsize(self):
+        stop = 10**30
+        cases = [
+            ((0, stop, 1), (0, stop, 1), True),
+            ((0, stop, 2), (0, stop - 1, 2), True),
+            ((stop, 0, -2), (stop, 1, -2), True),
+            ((0, stop, 1), (0, stop + 1, 1), False),
+            ((0, stop, 1), (1, stop + 1, 1), False),
+            ((0, stop, 1), (0, stop * 2, 2), False),
+        ]
+        for args1, args2, expected in cases:
+            with self.subTest(args1=args1, args2=args2):
+                range1 = mi.numeric_range(*args1)
+                range2 = mi.numeric_range(*args2)
+                self.assertEqual(range(*args1) == range(*args2), expected)
+                self.assertEqual(range1 == range2, expected)
+
+    def test_hash_above_maxsize(self):
+        stop = 10**30
+        for args in [(0, stop, 1), (0, stop, 2), (stop, 0, -2)]:
+            with self.subTest(args=args):
+                r = mi.numeric_range(*args)
+                self.assertEqual(hash(r), hash(range(*args)))
+                self.assertEqual(
+                    {r: 'value'}[mi.numeric_range(*args)], 'value'
+                )
+                self.assertRaises(OverflowError, len, r)
+
     def test_get_item_by_index(self):
         for args, index, expected in [
             ((1, 6), 2, 3),
@@ -5579,6 +5638,19 @@ class ChunkedEvenTests(TestCase):
 
     def test_0(self):
         self._test_finite('', 3, [])
+
+    def test_zero_chunk_size(self):
+        self._test_finite('ABC', 0, [])
+
+        source = iter('ABC')
+        self.assertEqual(list(mi.chunked_even(source, 0)), [])
+        self.assertEqual(list(source), list('ABC'))
+
+    def test_negative_chunk_size(self):
+        source = iter('ABC')
+        with self.assertRaisesRegex(ValueError, 'n must be at least 0'):
+            list(mi.chunked_even(source, -1))
+        self.assertEqual(list(source), list('ABC'))
 
     def test_1(self):
         self._test_finite('A', 1, [['A']])
