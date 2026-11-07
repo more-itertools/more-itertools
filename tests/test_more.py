@@ -1542,6 +1542,12 @@ class SlicedTests(TestCase):
         with self.assertRaises(TypeError):
             list(mi.sliced(seq, 3))
 
+    def test_even_and_strict(self):
+        # A sequence that divides evenly is yielded in full under strict
+        seq = 'ABCDEF'
+        self.assertEqual(list(mi.sliced(seq, 3, strict=True)), ['ABC', 'DEF'])
+        self.assertEqual(list(mi.sliced(seq, 1, strict=True)), list(seq))
+
     def test_odd_and_strict(self):
         seq = [x for x in 'ABCDEFGHI']
 
@@ -6311,6 +6317,9 @@ class IequalsTests(TestCase):
 
 
 class ConstrainedBatchesTests(TestCase):
+    def test_empty(self):
+        self.assertEqual(list(mi.constrained_batches([], 10)), [])
+
     def test_basic(self):
         zen = [
             'Beautiful is better than ugly',
@@ -6990,6 +6999,31 @@ class ExtractTests(TestCase):
             list(
                 mi.extract('abcdefg', [-1, 0, 1], monotonic=True)
             )  # negative index
+
+    def test_monotonic_repeated_indices(self):
+        # Non-decreasing indices may repeat, which re-yields the same
+        # value without advancing the underlying iterator.
+        extract = mi.extract
+        data = 'abcdefgh'
+
+        self.assertEqual(
+            list(extract(data, [0, 2, 2, 4], monotonic=True)),
+            ['a', 'c', 'c', 'e'],
+        )
+        self.assertEqual(
+            list(extract(data, [1, 1, 1], monotonic=True)), ['b', 'b', 'b']
+        )
+        self.assertEqual(
+            list(extract(data, [0, 0], monotonic=True)), ['a', 'a']
+        )
+
+        # Repeats agree with the default, buffered path
+        for indices in combinations_with_replacement(range(len(data)), 3):
+            with self.subTest(indices=indices):
+                self.assertEqual(
+                    list(extract(data, indices, monotonic=True)),
+                    list(extract(data, indices)),
+                )
 
     def test_lazy_consumption(self):
         extract = mi.extract
