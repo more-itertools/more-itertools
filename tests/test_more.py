@@ -216,6 +216,21 @@ class NthOrLastTests(TestCase):
     def test_empty_iterable_no_default(self):
         self.assertRaises(ValueError, lambda: mi.nth_or_last(range(0), 0))
 
+    def test_negative_index(self):
+        self.assertEqual(mi.nth_or_last(range(4), -1), 3)
+        self.assertEqual(mi.nth_or_last(range(4), -2), 2)
+        self.assertEqual(mi.nth_or_last(range(4), -4), 0)
+        self.assertEqual(mi.nth_or_last("abcd", -1), "d")
+        self.assertEqual(mi.nth_or_last((x for x in [5, 6, 7]), -1), 7)
+
+    def test_negative_index_out_of_range(self):
+        self.assertEqual(mi.nth_or_last(range(3), -100, default=9), 9)
+        self.assertRaises(IndexError, lambda: mi.nth_or_last(range(3), -100))
+
+    def test_negative_index_empty(self):
+        self.assertEqual(mi.nth_or_last(range(0), -1, default=5), 5)
+        self.assertRaises(ValueError, lambda: mi.nth_or_last(range(0), -1))
+
 
 class PeekableMixinTests:
     """Common tests for ``peekable()`` and ``seekable()`` behavior"""

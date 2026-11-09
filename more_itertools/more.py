@@ -316,6 +316,24 @@ def nth_or_last(iterable, n, default=_marker):
     If *default* is not provided and there are no items in the iterable,
     raise ``ValueError``.
     """
+    if n < 0:
+        # Indexing from the end requires materializing the iterable so we can
+        # resolve negative positions, mirroring ``peekable``'s negative-index
+        # support.
+        items = list(iterable)
+        if not items:
+            if default is _marker:
+                raise ValueError(
+                    'nth_or_last() was called on an empty iterable, '
+                    'and no default value was provided.'
+                )
+            return default
+        try:
+            return items[n]
+        except IndexError:
+            if default is _marker:
+                raise
+            return default
     return last(islice(iterable, n + 1), default=default)
 
 
