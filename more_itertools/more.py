@@ -3789,6 +3789,8 @@ def distinct_combinations(iterable, r):
         yield ()
         return
     pool = tuple(iterable)
+    if r > len(pool):
+        return
     generators = [unique_everseen(enumerate(pool), key=itemgetter(1))]
     current_combo = [None] * r
     level = 0
