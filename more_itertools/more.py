@@ -3569,6 +3569,11 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     ['b', 'ac']
     ['a', 'b', 'c']
 
+    An empty *iterable* yields no partitions.
+
+    >>> list(set_partitions([]))
+    []
+
     """
     L = list(iterable)
     n = len(L)
