@@ -10,6 +10,7 @@ Unreleased
 
 * Updated functions:
     * :func:`peekable` was updated to avoid caching the entire iterable when sliced with a negative step and omitted *stop*.
+    * :func:`set_partitions` no longer generates partitions whose number of blocks can't satisfy *min_size* and *max_size*, which makes size-limited calls much faster (thanks to TheNetherWatcher)
 
 11.2.1
 ----------
