@@ -554,6 +554,35 @@ class RandomProductTests(TestCase):
     create predictable outcomes across platforms.
     """
 
+    def test_zero_repeat_preserves_input(self):
+        source = iter([1, 2, 3])
+        self.assertEqual(mi.random_product(source, repeat=0), ())
+        self.assertEqual(list(source), [1, 2, 3])
+
+    def test_zero_repeat_does_not_open_input(self):
+        class Unused:
+            def __iter__(self):
+                raise AssertionError('input must not be opened')
+
+        self.assertEqual(mi.random_product(Unused(), repeat=0), ())
+
+    def test_invalid_repeat_preserves_input(self):
+        for value, error in ((-1, ValueError), (1.5, TypeError)):
+            with self.subTest(repeat=value):
+                source = iter([1, 2, 3])
+                with self.assertRaises(error):
+                    mi.random_product(source, repeat=value)
+                self.assertEqual(list(source), [1, 2, 3])
+
+    def test_repeat_index_protocol(self):
+        class Repeat:
+            def __index__(self):
+                return 2
+
+        self.assertEqual(
+            mi.random_product([1], [2], repeat=Repeat()), (1, 2, 1, 2)
+        )
+
     def test_simple_lists(self):
         """Ensure that one item is chosen from each list in each pair.
         Also ensure that each item from each list eventually appears in

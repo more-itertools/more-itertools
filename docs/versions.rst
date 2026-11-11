@@ -9,6 +9,7 @@ Unreleased
 ----------
 
 * Updated functions:
+    * :func:`random_product` now rejects negative *repeat* values and leaves input iterables untouched when *repeat* is zero.
     * :func:`peekable` was updated to avoid caching the entire iterable when sliced with a negative step and omitted *stop*.
 
 11.2.1
