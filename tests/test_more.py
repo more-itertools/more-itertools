@@ -4466,6 +4466,12 @@ class SetPartitionsTests(TestCase):
             self._normalize_partitions(actual),
         )
 
+    def test_empty_iterable(self):
+        # Bell(0) == 1: the empty set has exactly one (empty) partition.
+        self.assertEqual(list(mi.set_partitions([])), [[]])
+        bell = [len(list(mi.set_partitions(range(n)))) for n in range(6)]
+        self.assertEqual(bell, [1, 1, 2, 5, 15, 52])
+
     def test_stirling_numbers(self):
         """Check against https://en.wikipedia.org/wiki/
         Stirling_numbers_of_the_second_kind#Table_of_values"""
