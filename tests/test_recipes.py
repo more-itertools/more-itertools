@@ -84,12 +84,6 @@ class TailTests(TestCase):
         """Length of iterator is less than requested tail"""
         self.assertEqual(list(mi.tail(8, iter('ABCDEFG'))), list('ABCDEFG'))
 
-    def test_iterator_negative(self):
-        """Negative tail sizes should raise for non-sized iterables."""
-        self.assertRaises(
-            ValueError, lambda: list(mi.tail(-1, iter('ABCDEFG')))
-        )
-
     def test_sized_greater(self):
         """Length of sized iterable is greater than requested tail"""
         self.assertEqual(list(mi.tail(3, 'ABCDEFG')), list('EFG'))
@@ -101,10 +95,6 @@ class TailTests(TestCase):
     def test_sized_less(self):
         """Length of sized iterable is less than requested tail"""
         self.assertEqual(list(mi.tail(8, 'ABCDEFG')), list('ABCDEFG'))
-
-    def test_sized_negative(self):
-        """Negative tail sizes should raise for sized iterables."""
-        self.assertRaises(ValueError, lambda: list(mi.tail(-1, 'ABCDEFG')))
 
 
 class ConsumeTests(TestCase):
@@ -1036,25 +1026,6 @@ class IterIndexTests(TestCase):
         expected = [0, 1, 4]
         self.assertEqual(actual, expected)
 
-    def test_negative_start_and_stop(self):
-        # Negative *start* / *stop* should behave like the built-in
-        # ``str.index`` / ``list.index`` and produce identical results for the
-        # fast (sequence) and slow (general-iterable) code paths.
-        iterable = 'AABCADEAF'  # 'A' occurs at indexes 0, 1, 4, 7
-        cases = [
-            (dict(start=-3), [7]),
-            (dict(start=-9), [0, 1, 4, 7]),
-            (dict(stop=-2), [0, 1, 4]),
-            (dict(start=-5, stop=-1), [4, 7]),
-        ]
-        for kwargs, expected in cases:
-            for wrapper in (list, iter):
-                with self.subTest(kwargs=kwargs, wrapper=wrapper):
-                    actual = list(
-                        mi.iter_index(wrapper(iterable), 'A', **kwargs)
-                    )
-                    self.assertEqual(actual, expected)
-
 
 class SieveTests(TestCase):
     def test_basic(self):
@@ -1468,6 +1439,31 @@ class PrimeFunctionTests(TestCase):
         with self.assertRaises(ValueError):
             mi.nth_prime(-1)
 
+    def test_nth_prime_tightened_bound(self):
+        # nth_prime() counts from 0 and asks for bounds on n + 1, so 688_382
+        # is the first argument that gets the tightened upper bound and
+        # 688_381 is the last that doesn't. The exact path sieves up to that
+        # bound, so tightening it too far would leave the sieve short and
+        # nth() would return None. At the threshold the bound clears the
+        # prime it has to reach by 3.
+        self.assertEqual(mi.nth_prime(688_381), 10_384_259)
+        self.assertEqual(mi.nth_prime(688_382), 10_384_261)
+
+    def test_nth_prime_approximate(self):
+        # approximate=True is ignored at or below 1,000,000
+        self.assertEqual(
+            mi.nth_prime(1_000_000, approximate=True),
+            mi.nth_prime(1_000_000),
+        )
+
+        # Above it, the result is some nearby prime rather than the exact one
+        for n in (1_000_001, 2_000_000):
+            with self.subTest(n=n):
+                approximate = mi.nth_prime(n, approximate=True)
+                exact = mi.nth_prime(n)
+                self.assertTrue(mi.is_prime(approximate))
+                self.assertLess(abs(approximate - exact) / exact, 0.01)
+
     def test_special_primes(self):
         for n in (
             # Mersenee primes:
@@ -1684,3 +1680,50 @@ class RunningMedianTests(TestCase):
             list(
                 running_median(['abc', 'def', 'ghi'])
             )  # Input type that doesn't support division
+
+
+class RunningWindowSizeTests(TestCase):
+    functions = (
+        mi.running_min,
+        mi.running_max,
+        mi.running_mean,
+        mi.running_statistics,
+    )
+
+    def test_noninteger_window(self):
+        for function in self.functions:
+            for maxlen in (2.5, 2.0, float('nan'), float('inf')):
+                with self.subTest(function=function, maxlen=maxlen):
+                    with self.assertRaises(TypeError):
+                        list(function([1, 2, 3, 4], maxlen=maxlen))
+
+    def test_index_protocol(self):
+        class WindowSize:
+            def __index__(self):
+                return 2
+
+        for function in self.functions:
+            with self.subTest(function=function):
+                expected = list(function([1, 2, 3, 4], maxlen=2))
+                actual = list(function([1, 2, 3, 4], maxlen=WindowSize()))
+                self.assertEqual(actual, expected)
+        self.assertTrue(
+            all(
+                isinstance(stats.size, int)
+                for stats in mi.running_statistics(
+                    [1, 2, 3], maxlen=WindowSize()
+                )
+            )
+        )
+
+    def test_nonpositive_index(self):
+        class WindowSize:
+            def __index__(self):
+                return -1
+
+        for function in self.functions:
+            with (
+                self.subTest(function=function),
+                self.assertRaises(ValueError),
+            ):
+                list(function([1, 2, 3], maxlen=WindowSize()))

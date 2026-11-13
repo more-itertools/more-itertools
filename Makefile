@@ -34,5 +34,5 @@ docs:
 .PHONY: package
 package:
 	python -m pip install --upgrade -r requirements/packaging.txt
-	flit build --setup-py
+	flit build
 	twine check dist/*

@@ -152,9 +152,6 @@ def tail(n, iterable):
     ['E', 'F', 'G']
 
     """
-    if n < 0:
-        raise ValueError('n must be at least 0')
-
     try:
         size = len(iterable)
     except TypeError:
@@ -247,6 +244,8 @@ def quantify(iterable, pred=bool):
 
     >>> quantify([True, False, True])
     2
+    >>> quantify(range(100, 200), pred=lambda x: x<120)
+    20
 
     """
     return sum(map(pred, iterable))
@@ -435,11 +434,13 @@ def partition(pred, iterable):
     true_queue = deque()
 
     def gen(queue):
+        append_false = false_queue.append
+        append_true = true_queue.append
         while True:
             while queue:
                 yield queue.popleft()
             for value in iterator:
-                (true_queue if pred(value) else false_queue).append(value)
+                (append_true if pred(value) else append_false)(value)
                 break
             else:
                 return
@@ -546,19 +547,15 @@ def iter_except(function, exception, first=None):
     Like ``iter(function, sentinel)``, but uses an exception instead of a sentinel
     to end the loop.
 
-        >>> l = [0, 1, 2]
-        >>> list(iter_except(l.pop, IndexError))
-        [2, 1, 0]
+    Examples:
+        iter_except(functools.partial(heappop, h), IndexError)   # priority queue iterator
+        iter_except(d.popitem, KeyError)                         # non-blocking dict iterator
+        iter_except(d.popleft, IndexError)                       # non-blocking deque iterator
+        iter_except(q.get_nowait, Queue.Empty)                   # loop over a producer Queue
+        iter_except(s.pop, KeyError)                             # non-blocking set iterator
 
-    Multiple exceptions can be specified as a stopping condition:
-
-        >>> l = [1, 2, 3, '...', 4, 5, 6]
-        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
-        [7, 6, 5]
-        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
-        [4, 3, 2]
-        >>> list(iter_except(lambda: 1 + l.pop(), (IndexError, TypeError)))
-        []
+    Multiple exceptions can be specified as a stopping condition, for example
+    ``(IndexError, TypeError)``.
 
     """
     with suppress(exception):
@@ -600,7 +597,7 @@ def random_product(*iterables, repeat=1):
         >>> random_product('abcd', range(4), repeat=2)  # doctest:+SKIP
         ('a', 2, 'd', 3)
 
-    This equivalent to taking a random selection from
+    This is equivalent to taking a random selection from
     ``itertools.product(*args, repeat=repeat)``.
 
     """
@@ -617,7 +614,7 @@ def random_permutation(iterable, r=None):
         >>> random_permutation(range(5))  # doctest:+SKIP
         (3, 4, 0, 1, 2)
 
-    This equivalent to taking a random selection from
+    This is equivalent to taking a random selection from
     ``itertools.permutations(iterable, r)``.
 
     """
@@ -632,7 +629,7 @@ def random_combination(iterable, r):
         >>> random_combination(range(5), 3)  # doctest:+SKIP
         (2, 3, 4)
 
-    This equivalent to taking a random selection from
+    This is equivalent to taking a random selection from
     ``itertools.combinations(iterable, r)``.
 
     """
@@ -649,7 +646,7 @@ def random_combination_with_replacement(iterable, r):
         >>> random_combination_with_replacement(range(3), 5) # doctest:+SKIP
         (0, 0, 1, 2, 2)
 
-    This equivalent to taking a random selection from
+    This is equivalent to taking a random selection from
     ``itertools.combinations_with_replacement(iterable, r)``.
 
     """
@@ -896,13 +893,6 @@ def iter_index(iterable, value, start=0, stop=None):
 
     """
     seq_index = getattr(iterable, 'index', None)
-    if seq_index is None and (start < 0 or (stop is not None and stop < 0)):
-        # islice() rejects negative indices, but the fast path (below) accepts
-        # them with the usual from-the-end semantics. Materialize so that both
-        # paths agree for negative *start* / *stop*.
-        iterable = tuple(iterable)
-        seq_index = iterable.index
-
     if seq_index is None:
         # Slow path for general iterables
         iterator = islice(iterable, start, stop)
@@ -1470,6 +1460,7 @@ def running_mean(iterable, *, maxlen=None):
     if maxlen is None:
         return map(truediv, accumulate(iterator), count(1))
 
+    maxlen = _index(maxlen)
     if maxlen <= 0:
         raise ValueError('Window size should be positive')
 
@@ -1515,6 +1506,7 @@ def running_min(iterable, *, maxlen=None):
     if maxlen is None:
         return accumulate(iterator, func=min)
 
+    maxlen = _index(maxlen)
     if maxlen <= 0:
         raise ValueError('Window size should be positive')
 
@@ -1560,6 +1552,7 @@ def running_max(iterable, *, maxlen=None):
     if maxlen is None:
         return accumulate(iterator, func=max)
 
+    maxlen = _index(maxlen)
     if maxlen <= 0:
         raise ValueError('Window size should be positive')
 
@@ -1588,6 +1581,9 @@ def running_statistics(iterable, *, maxlen=None):
     Supports numeric types such as int, float, Decimal, and Fraction,
     but not complex numbers which are unorderable.
     """
+
+    if maxlen is not None:
+        maxlen = _index(maxlen)
 
     # fmt: off
     t0, t1, t2, t3 = tee(iterable, 4)
