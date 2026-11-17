@@ -600,7 +600,15 @@ def random_product(*iterables, repeat=1):
     This is equivalent to taking a random selection from
     ``itertools.product(*args, repeat=repeat)``.
 
+    A zero *repeat* returns an empty tuple without consuming the inputs.
+    A negative *repeat* raises ``ValueError``.
+
     """
+    repeat = _index(repeat)
+    if repeat < 0:
+        raise ValueError('repeat argument cannot be negative')
+    if repeat == 0:
+        return ()
     pools = tuple(map(tuple, iterables)) * repeat
     return tuple(map(choice, pools))
 
