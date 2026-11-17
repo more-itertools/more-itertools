@@ -4353,7 +4353,7 @@ def nth_permutation(iterable, r, index):
         >>> nth_permutation('ghijk', 2, 5)
         ('h', 'i')
 
-    ``ValueError`` will be raised If *r* is negative.
+    ``ValueError`` will be raised if *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = list(iterable)
@@ -4391,7 +4391,7 @@ def nth_combination_with_replacement(iterable, r, index):
         >>> nth_combination_with_replacement(range(5), 3, 5)
         (0, 1, 1)
 
-    ``ValueError`` will be raised If *r* is negative.
+    ``ValueError`` will be raised if *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = tuple(iterable)
