@@ -5109,6 +5109,8 @@ def outer_product(func, xs, ys, *args, **kwargs):
     columns.
     Also accepts ``*args`` and ``**kwargs`` that are passed to ``func``.
 
+    *ys* must not be empty; if it is, ``ValueError`` is raised.
+
     Multiplication table:
 
     >>> from operator import mul
