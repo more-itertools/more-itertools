@@ -8,8 +8,7 @@ Version History
 Unreleased
 ----------
 
-* Updated functions:
-    * :func:`peekable` was updated to avoid caching the entire iterable when sliced with a negative step and omitted *stop*.
+* The maintainer will add release notes; there's no need for PR authors to do it.
 
 11.2.1
 ----------
