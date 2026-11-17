@@ -667,7 +667,7 @@ def nth_combination(iterable, r, index):
         >>> nth_combination(range(5), 3, 5)
         (0, 3, 4)
 
-    ``ValueError`` will be raised If *r* is negative.
+    ``ValueError`` will be raised if *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = tuple(iterable)
