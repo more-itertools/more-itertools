@@ -649,7 +649,14 @@ def random_combination_with_replacement(iterable, r):
     This is equivalent to taking a random selection from
     ``itertools.combinations_with_replacement(iterable, r)``.
 
+    *r* must be a non-negative integer. Invalid values are rejected before
+    consuming *iterable*.
+
     """
+    r = _index(r)
+    if r < 0:
+        raise ValueError('r must be non-negative')
+
     pool = tuple(iterable)
     n = len(pool)
     indices = sorted(randrange(n) for i in range(r))
