@@ -663,6 +663,42 @@ class RandomCombinationTests(TestCase):
 class RandomCombinationWithReplacementTests(TestCase):
     """Tests for ``random_combination_with_replacement()``"""
 
+    def test_negative_length(self):
+        for items in ([], [1, 2]):
+            for r in (-1, -10):
+                with self.subTest(items=items, r=r):
+                    with self.assertRaises(ValueError):
+                        mi.random_combination_with_replacement(items, r)
+
+    def test_invalid_length_preserves_input(self):
+        for r, error in ((-1, ValueError), (1.5, TypeError), ('2', TypeError)):
+            with self.subTest(r=r):
+                source = iter([1, 2])
+                with self.assertRaises(error):
+                    mi.random_combination_with_replacement(source, r)
+                self.assertEqual(list(source), [1, 2])
+
+    def test_index_protocol(self):
+        class Index:
+            def __init__(self, value):
+                self.value = value
+
+            def __index__(self):
+                return self.value
+
+        self.assertEqual(
+            mi.random_combination_with_replacement([1], Index(2)), (1, 1)
+        )
+        with self.assertRaises(ValueError):
+            mi.random_combination_with_replacement([1], Index(-1))
+
+    def test_zero_length(self):
+        for items in ([], [1, 2]):
+            with self.subTest(items=items):
+                self.assertEqual(
+                    mi.random_combination_with_replacement(items, 0), ()
+                )
+
     def test_replacement(self):
         """ensure that elements are sampled with replacement"""
         items = range(5)
