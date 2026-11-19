@@ -157,7 +157,7 @@ These tools return summarized or aggregated data from an iterable.
 
 .. autofunction:: ilen
 .. autofunction:: unique_to_each
-.. autofunction:: sample(iterable, k=1, weights=None)
+.. autofunction:: sample
 .. autofunction:: consecutive_groups(iterable, ordering=lambda x: x)
 .. autoclass:: run_length
 .. autofunction:: map_reduce

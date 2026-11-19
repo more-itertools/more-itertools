@@ -4003,8 +4003,9 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
 
     >>> iterable = range(100)
     >>> weights = (i * i + 1 for i in range(100))
-    >>> sampled = sample(iterable, 5, weights=weights)  # doctest: +SKIP
-    [79, 67, 74, 66, 78]
+    >>> sampled = sample(iterable, 5, weights=weights)
+    >>> len(sampled), len(set(sampled))
+    (5, 5)
 
     Weighted selections are made without replacement.
     After an element is selected, it is removed from the pool and the
