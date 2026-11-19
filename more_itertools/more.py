@@ -4673,10 +4673,10 @@ def chunked_even(iterable, n):
     num_full = length - partial_size * num_lists
 
     # Yield chunks of full size
+    # The buffer is non-empty here, so full_size is always at least 1
     partial_start_idx = num_full * full_size
-    if full_size > 0:
-        for i in range(0, partial_start_idx, full_size):
-            yield buffer[i : i + full_size]
+    for i in range(0, partial_start_idx, full_size):
+        yield buffer[i : i + full_size]
 
     # Yield chunks of partial size
     if partial_size > 0:
