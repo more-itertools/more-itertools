@@ -388,6 +388,20 @@ class PartitionTests(TestCase):
         self.assertEqual(list(falses), [0])
         self.assertEqual(list(trues), [1, 2])
 
+    def test_reentrant_pred_preserves_order(self):
+        # pred() consuming the sibling iterable while a value is being
+        # classified must not let later values overtake it (issue #1315).
+        falses, trues = None, None
+
+        def pred(value):
+            if value == 1:
+                next(falses, None)
+            return True
+
+        falses, trues = mi.partition(pred, [1, 2])
+        self.assertEqual(list(trues), [1, 2])
+        self.assertEqual(list(falses), [])
+
 
 class PowersetTests(TestCase):
     """Tests for ``powerset()``"""
