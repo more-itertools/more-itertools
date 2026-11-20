@@ -3481,6 +3481,13 @@ class LocateTests(TestCase):
         expected = [0]
         self.assertEqual(actual, expected)
 
+    def test_window_size_large_args(self):
+        iterable = [1, 2, 3, 4]
+        pred = lambda *args: args == (1, 2, 3, 4)
+        actual = list(mi.locate(iterable, pred, window_size=5))
+        expected = [0]
+        self.assertEqual(actual, expected)
+
     def test_window_size_zero(self):
         iterable = [1, 2, 3, 4]
         pred = lambda: True
