@@ -3579,6 +3579,11 @@ def set_partitions(iterable, k=None, min_size=None, max_size=None):
     ['b', 'ac']
     ['a', 'b', 'c']
 
+    An empty *iterable* yields no partitions.
+
+    >>> list(set_partitions([]))
+    []
+
     """
     L = list(iterable)
     n = len(L)
@@ -4005,8 +4010,9 @@ def sample(iterable, k, weights=None, *, counts=None, strict=False):
 
     >>> iterable = range(100)
     >>> weights = (i * i + 1 for i in range(100))
-    >>> sampled = sample(iterable, 5, weights=weights)  # doctest: +SKIP
-    [79, 67, 74, 66, 78]
+    >>> sampled = sample(iterable, 5, weights=weights)
+    >>> len(sampled), len(set(sampled))
+    (5, 5)
 
     Weighted selections are made without replacement.
     After an element is selected, it is removed from the pool and the
@@ -4296,7 +4302,7 @@ def all_unique(iterable, key=None):
     seenset_add = seenset.add
     seenlist = []
     seenlist_add = seenlist.append
-    for element in map(key, iterable) if key else iterable:
+    for element in iterable if key is None else map(key, iterable):
         try:
             if element in seenset:
                 return False
@@ -4355,7 +4361,7 @@ def nth_permutation(iterable, r, index):
         >>> nth_permutation('ghijk', 2, 5)
         ('h', 'i')
 
-    ``ValueError`` will be raised If *r* is negative.
+    ``ValueError`` will be raised if *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = list(iterable)
@@ -4393,7 +4399,7 @@ def nth_combination_with_replacement(iterable, r, index):
         >>> nth_combination_with_replacement(range(5), 3, 5)
         (0, 1, 1)
 
-    ``ValueError`` will be raised If *r* is negative.
+    ``ValueError`` will be raised if *r* is negative.
     ``IndexError`` will be raised if the given *index* is invalid.
     """
     pool = tuple(iterable)
@@ -5110,6 +5116,8 @@ def outer_product(func, xs, ys, *args, **kwargs):
     pairs of items. Returns a 2D matrix with ``len(xs)`` rows and ``len(ys)``
     columns.
     Also accepts ``*args`` and ``**kwargs`` that are passed to ``func``.
+
+    *ys* must not be empty; if it is, ``ValueError`` is raised.
 
     Multiplication table:
 
