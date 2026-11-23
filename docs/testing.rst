@@ -2,7 +2,7 @@
 Testing
 =======
 
-To run install dependencies and run tests, use this command::
+To run the test suite, use this command::
 
     python -m unittest
 
