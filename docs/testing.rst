@@ -2,15 +2,9 @@
 Testing
 =======
 
-From the repository root, run the test suite with Python's built-in
-``unittest`` runner (no extra dependencies are required)::
+To run the test suite, use this command::
 
     python -m unittest
-
-To run just the tests for a function, pass the dotted path to its test class.
-For example, to test ``chunked``::
-
-    python -m unittest tests.test_more.ChunkedTests
 
 Multiple Python Versions
 ========================
