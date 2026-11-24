@@ -13,6 +13,7 @@ from itertools import (
 from operator import mul, eq
 from math import comb, prod, factorial
 from statistics import mean
+from sys import maxsize
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -553,6 +554,43 @@ class RandomProductTests(TestCase):
     python versions 2.x and 3.x, these tests use highly probably events to
     create predictable outcomes across platforms.
     """
+
+    def test_zero_repeat_preserves_input(self):
+        source = iter([1, 2, 3])
+        self.assertEqual(mi.random_product(source, repeat=0), ())
+        self.assertEqual(list(source), [1, 2, 3])
+
+    def test_zero_repeat_does_not_open_input(self):
+        class Unused:
+            def __iter__(self):
+                raise AssertionError('input must not be opened')
+
+        self.assertEqual(mi.random_product(Unused(), repeat=0), ())
+
+    def test_invalid_repeat_preserves_input(self):
+        for value, error in ((-1, ValueError), (1.5, TypeError)):
+            with self.subTest(repeat=value):
+                source = iter([1, 2, 3])
+                with self.assertRaises(error):
+                    mi.random_product(source, repeat=value)
+                self.assertEqual(list(source), [1, 2, 3])
+
+    def test_repeat_index_protocol(self):
+        class Repeat:
+            def __index__(self):
+                return 2
+
+        self.assertEqual(
+            mi.random_product([1], [2], repeat=Repeat()), (1, 2, 1, 2)
+        )
+
+    def test_out_of_range_repeat_preserves_input(self):
+        for repeat in (maxsize + 1, -maxsize - 2):
+            with self.subTest(repeat=repeat):
+                source = iter([1])
+                with self.assertRaises(OverflowError):
+                    mi.random_product(source, repeat=repeat)
+                self.assertEqual(list(source), [1])
 
     def test_simple_lists(self):
         """Ensure that one item is chosen from each list in each pair.
