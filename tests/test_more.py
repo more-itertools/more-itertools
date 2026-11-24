@@ -3,6 +3,7 @@ from __future__ import annotations
 import cmath
 import gc
 import platform
+import sys
 import types
 import weakref
 
@@ -4693,6 +4694,13 @@ class IchunkedTests(TestCase):
 
 
 class DistinctCombinationsTests(TestCase):
+    def test_size_larger_than_pool(self):
+        for iterable in ([], [1, 2], iter([1, 1, 2])):
+            with self.subTest(iterable=iterable):
+                self.assertEqual(
+                    list(mi.distinct_combinations(iterable, sys.maxsize)), []
+                )
+
     def test_basic(self):
         for iterable in [
             (1, 2, 2, 3, 3, 3),  # In order
