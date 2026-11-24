@@ -2605,10 +2605,16 @@ def locate(iterable, pred=bool, window_size=None):
     if window_size < 1:
         raise ValueError('window size must be at least 1')
 
+    # Only a window shorter than window_size ends with _marker padding.
     it = windowed(iterable, window_size, fillvalue=_marker)
     return compress(
         count(),
-        (pred(*(x for x in w if x is not _marker)) for w in it),
+        (
+            pred(*w)
+            if w[-1] is not _marker
+            else pred(*[x for x in w if x is not _marker])
+            for w in it
+        ),
     )
 
 
