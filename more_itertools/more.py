@@ -1909,9 +1909,10 @@ def stagger(iterable, offsets=(-1, 0, 1), longest=False, fillvalue=None):
         >>> list(stagger(range(8), offsets=(0, 2, 4)))
         [(0, 2, 4), (1, 3, 5), (2, 4, 6), (3, 5, 7)]
 
-    By default, the sequence will end when the final element of a tuple is the
-    last item in the iterable. To continue until the first element of a tuple
-    is the last item in the iterable, set *longest* to ``True``::
+    By default, the sequence will end when the element with the largest offset
+    is the last item in the iterable. To continue until the element with the
+    smallest offset is the last item in the iterable, set *longest* to
+    ``True``::
 
         >>> list(stagger([0, 1, 2, 3], longest=True))
         [(None, 0, 1), (0, 1, 2), (1, 2, 3), (2, 3, None), (3, None, None)]
