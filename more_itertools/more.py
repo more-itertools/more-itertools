@@ -831,10 +831,13 @@ def distinct_permutations(iterable, r=None):
             # sequence from A[i + 1] to form the new permutation
             A[i], A[j] = A[j], A[i]
             left, right = i + 1, size - 1
-            while left < right:
-                A[left], A[right] = A[right], A[left]
-                left += 1
-                right -= 1
+            if right - left < 8:
+                while left < right:
+                    A[left], A[right] = A[right], A[left]
+                    left += 1
+                    right -= 1
+            else:
+                A[left:] = A[: i - size : -1]  # A[i + 1:][::-1]
 
     # Algorithm: modified from the above
     def _partial(A, r):
