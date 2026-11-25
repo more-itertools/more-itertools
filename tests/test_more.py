@@ -8,6 +8,7 @@ import weakref
 
 from collections import Counter, deque
 from collections.abc import Set, Sequence, Iterable, Iterator, Hashable
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from decimal import Decimal
 from doctest import DocTestSuite
@@ -7165,6 +7166,66 @@ class TestSynchronized(TestCase):
 
 
 class TestConcurrentTee(TestCase):
+    def test_consumers_contend_for_uncached_item(self):
+        contended = Event()
+
+        class ObservedLock:
+            def __init__(self):
+                self.lock = Lock()
+
+            def __enter__(self):
+                if not self.lock.acquire(blocking=False):
+                    contended.set()
+                    self.lock.acquire()
+
+            def __exit__(self, *exc_info):
+                self.lock.release()
+
+        item = object()
+        produced = []
+
+        def producer():
+            # Hold the first consumer inside next() until the second consumer
+            # has observed the empty cache and attempted to acquire the lock.
+            if not contended.wait(timeout=5):
+                raise AssertionError('The second consumer did not contend')
+            produced.append(item)
+            yield item
+            produced.append(None)
+            yield None
+
+        first, second = mi.concurrent_tee(producer())
+        first.lock = second.lock = ObservedLock()
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [executor.submit(next, it) for it in (first, second)]
+            for future in futures:
+                self.assertIs(future.result(timeout=10), item)
+
+        self.assertEqual(produced, [item])
+        self.assertEqual(list(first), [None])
+        self.assertEqual(list(second), [None])
+        self.assertEqual(produced, [item, None])
+
+    def test_clone_partially_consumed_iterator(self):
+        produced = []
+
+        def producer():
+            for value in range(5):
+                produced.append(value)
+                yield value
+
+        ahead, behind = mi.concurrent_tee(producer())
+        self.assertEqual(list(islice(ahead, 3)), [0, 1, 2])
+        self.assertEqual(next(behind), 0)
+        left, right = mi.concurrent_tee(behind)
+
+        # Cloning preserves the current position without pulling the source.
+        self.assertEqual(produced, [0, 1, 2])
+        self.assertEqual(list(ahead), [3, 4])
+        for iterator in (left, right, behind):
+            self.assertEqual(list(iterator), [1, 2, 3, 4])
+        self.assertEqual(produced, list(range(5)))
+
     def test_concurrent_consumers(self):
         result = 0
         result_lock = Lock()
