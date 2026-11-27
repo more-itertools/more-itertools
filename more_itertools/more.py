@@ -4510,7 +4510,7 @@ def combination_index(element, iterable):
     indexes = []
     pool = enumerate(iterable)
     for n, x in pool:
-        if x == y:
+        if x is y or x == y:
             indexes.append(n)
             tmp, y = next(element, (None, None))
             if tmp is None:

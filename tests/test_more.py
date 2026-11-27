@@ -5418,6 +5418,15 @@ class ProductIndexTests(TestCase):
 
 
 class CombinationIndexTests(TestCase):
+    def test_nonreflexive_element(self):
+        missing = float('nan')
+        data = [0, missing, 2, missing]
+        target = (missing, missing)
+        expected = list(combinations(data, 2)).index(target)
+        self.assertEqual(mi.combination_index(target, iter(data)), expected)
+        with self.assertRaises(ValueError):
+            mi.combination_index((float('nan'),), data)
+
     def test_r_less_than_n(self):
         iterable = 'abcdefg'
         r = 4
